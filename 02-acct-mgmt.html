@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<!--[if IE]><meta http-equiv="X-UA-Compatible" content="IE=edge"><![endif]-->
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="generator" content="Asciidoctor 1.5.3">
+<title>Account Management</title>
+<link rel="stylesheet" href="./srp-doc.css">
+<link rel="stylesheet" href="./coderay-asciidoctor.css">
+</head>
+<body class="article toc2 toc-left">
+<div id="header">
+<div id="toc" class="toc2">
+<div id="toctitle">Table of Contents</div>
+<ul class="sectlevel1">
+<li><a href="#_account_management">1. Account Management</a>
+<ul class="sectlevel2">
+<li><a href="#_roles">1.1. Roles</a></li>
+<li><a href="#_register_user">1.2. Register User</a></li>
+<li><a href="#_register_new_organisation">1.3. Register new organisation</a></li>
+<li><a href="#_reset_own_password">1.4. Reset Own Password</a></li>
+<li><a href="#_raise_support_ticket">1.5. Raise Support Ticket</a></li>
+<li><a href="#_process_support_tickets">1.6. Process Support Tickets</a></li>
+<li><a href="#_reset_other_s_password">1.7. Reset Other&#8217;s Password</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div id="content">
+<div class="sect1">
+<h2 id="_account_management">1. Account Management</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_roles">1.1. Roles</h3>
+<div class="paragraph">
+<p>Roles are what grant users permission to access the system and add, change or
+delete data. A summary of the roles that exist and the permissions they confer
+is shown below:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>User</code> - The initial state of a user after <a href="register-user.adoc">registration</a>.
+No specific capabilities beyond viewing own profile page.</p>
+</li>
+<li>
+<p><code>Contributor</code> - Able to view, edit and export data of the single organisation (s)he belongs to ;</p>
+</li>
+<li>
+<p><code>Approver</code> - All functionality of the Contributor role and additionally the ability to submit and restate annual data ;</p>
+</li>
+<li>
+<p><code>Analyst</code> - Ability to:</p>
+<div class="ulist">
+<ul>
+<li>
+<p>View and export but not edit data from all organisations. This is expected to be reserved to members of the SDU though there may be need for others to have it too ;</p>
+</li>
+<li>
+<p>View and edit reference data such as Carbon factors.</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p><code>Administrator</code> - Initially at least one user within the SDU and one from ourselves. Users with this role will be able to:</p>
+<div class="ulist">
+<ul>
+<li>
+<p>View, edit and export all data for all organisations ;</p>
+</li>
+<li>
+<p>Assign and revoke roles of other users ;</p>
+</li>
+<li>
+<p>View and process Support Tickets.</p>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_register_user">1.2. Register User</h3>
+<div class="sect3">
+<h4 id="_actor">1.2.1. Actor</h4>
+<div class="paragraph">
+<p>Prospective user him or herself</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_user_story">1.2.2. User story</h4>
+<div class="paragraph">
+<p>The user comes to the site and is presented with the login dialogue. Not yet
+having an account the user may click a link to register a new account. In this
+form the user provides an email address, organisation name, agrees terms amnd
+conditions and submits the form.</p>
+</div>
+<div class="paragraph">
+<p>The system shows a confirmation message and re-presents the login dialogue.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_user_outcome">1.2.3. User outcome</h4>
+<div class="paragraph">
+<p>The user receives an email with an initial password included and may login with
+it. Once logged in the user may <a href="reset-own-password.adoc">change the password</a>
+if desired.</p>
+</div>
+<div class="paragraph">
+<p>If the user is the first from a given organisation (s)he will automatically
+become the <a href="roles.adoc"><code>approver</code> role</a>. In this case the users profile page
+and application home page will contain links to
+<a href="register-organisation.adoc">register an organisation</a>.</p>
+</div>
+<div class="paragraph">
+<p>Otherwise a request will be sent to
+the current Approver to grant (or deny) the necessary roles. In the latter case
+the user will not be able to access anything beyond his or her own profile page
+until approved.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_status">1.2.4. Status</h4>
+<div class="paragraph">
+<p>In progress</p>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_register_new_organisation">1.3. Register new organisation</h3>
+<div class="sect3">
+<h4 id="_actor_2">1.3.1. Actor</h4>
+<div class="paragraph">
+<p>Staff of healthcare organisation (e.g. Trust, Care home etc.)</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_user_story_2">1.3.2. User story</h4>
+<div class="paragraph">
+<p>The user needs to deliver the reporting requirements of his or her organisation
+and has become aware of these tools from the SDU newsletter, a colleague etc. but
+no one in the organisation has yet created an account as far as can be
+ascertained.</p>
+</div>
+<div class="paragraph">
+<p>The user comes to the site and registers an account using
+<a href="register-user.adoc">Register user</a>. Next (s)he can supply some basic organisational
+details. The system will then check the supplied details are unique and if so
+assign the user the ownership of that organisation <a href="roles:adoc"><code>approver</code> role</a>.
+Alternately if the organisation is already registered both the user and the
+existing <code>approver</code> will be notified in order that the approver can join the
+user to the organisation.</p>
+</div>
+<div class="paragraph">
+<p>Should this process fail for any reason such as the original approver has left
+the organisation without passing on ownership the user may raise a support
+ticket on the site, which will be handled manually.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_user_outcome_2">1.3.3. User outcome</h4>
+<div class="paragraph">
+<p>The user should be able to access the system on behalf of his or her
+organisation.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_pre_requisites">1.3.4. Pre-requisites</h4>
+<div class="paragraph">
+<p><a href="register-user.adoc">Register user</a></p>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_reset_own_password">1.4. Reset Own Password</h3>
+<div class="sect3">
+<h4 id="_actor_3">1.4.1. Actor</h4>
+<div class="paragraph">
+<p>Any user</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_user_story_3">1.4.2. User story</h4>
+<div class="paragraph">
+<p>From time to time a user may forget his or her password. To allow this to be
+reset the user must be able to supply the registered email address. The system
+will then send an email with a new password.</p>
+</div>
+<div class="paragraph">
+<p>Once back in to the system the user may change the password again if desired
+but minimum length and complexity rules apply.</p>
+</div>
+<div class="paragraph">
+<p>If for any reason the user is not able to recall or access the correct email
+address then at this stage the only solution is to
+<a href="register-user.adoc">register a new account</a>. If, worse still, the lost
+account belongs to the Approver then the user must raise a support ticket and
+we would probably require additional, offline, verification of their identity.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_user_outcome_3">1.4.3. User outcome</h4>
+<div class="paragraph">
+<p>A new password is issued and access to the system is restored.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_status_2">1.4.4. Status</h4>
+<div class="paragraph">
+<p>Available</p>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_raise_support_ticket">1.5. Raise Support Ticket</h3>
+<div class="sect3">
+<h4 id="_actor_4">1.5.1. Actor</h4>
+<div class="paragraph">
+<p>End user of the system, typically an employee of a reporting organisation</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_user_story_4">1.5.2. User story</h4>
+<div class="paragraph">
+<p>Two main reasons could lead the user to need to raise a support ticket:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>The system is behaving in an unexpected way, possibly as a result of a bug or
+simply because the user does not understand it in some way. Termed 'Application'
+problem.</p>
+</li>
+<li>
+<p>The user has a question regarding the requested data or wishes to have it
+presented out in a different way. These are Data problems.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>It is possible to record support tickets directly within the system including:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>A short description of the problem</p>
+</li>
+<li>
+<p>A screenshot of the application&#8217;s current state</p>
+</li>
+<li>
+<p>Category of problem as above: Application, Data, Other</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_user_outcome_4">1.5.3. User outcome</h4>
+<div class="paragraph">
+<p>The user receives an email confirming the ticket&#8217;s submission and the ticket
+is placed into the task queue of one or more groups of users, based on the
+category of the problem.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_status_3">1.5.4. Status</h4>
+<div class="paragraph">
+<p>In progress</p>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_process_support_tickets">1.6. Process Support Tickets</h3>
+<div class="sect3">
+<h4 id="_actors">1.6.1. Actors</h4>
+<div class="ulist">
+<ul>
+<li>
+<p>Primary: System administrator or SDU analyst</p>
+</li>
+<li>
+<p>Secondary: End user of the system</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Requires <a href="roles.adoc"><code>admin</code> role</a>.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_user_story_5">1.6.2. User story</h4>
+<div class="paragraph">
+<p>When new support tickets are raised they are placed in a queue that records
+when they are opened, closed and any activities in between if it proves
+impossible to resolve straight away.</p>
+</div>
+<div class="paragraph">
+<p>The user can see this list in a summary 'inbox' and choose which one (s)he
+wishes to open. From there the following actions exist:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Defer the ticket for a specific period of time</p>
+</li>
+<li>
+<p>Request further information of the end user</p>
+</li>
+<li>
+<p>Add notes</p>
+</li>
+<li>
+<p>Close the ticket</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>In all cases the system will send a notification to the end user if public
+information has been provided. It is only possible to close the ticket with a
+public comment to explain to the end user.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_user_outcome_5">1.6.3. User outcome</h4>
+<div class="paragraph">
+<p>The ticket will typically disappear from the inbox, either because further
+information has been requested or because it has been deferred. However it is
+also possible to open and view a ticket and take no action, in which case it
+stays in the list.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_status_4">1.6.4. Status</h4>
+<div class="paragraph">
+<p>In progress</p>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_reset_other_s_password">1.7. Reset Other&#8217;s Password</h3>
+<div class="sect3">
+<h4 id="_actor_5">1.7.1. Actor</h4>
+<div class="ulist">
+<ul>
+<li>
+<p>Primary: System administrator or SDU analyst</p>
+</li>
+<li>
+<p>Secondary: End user of the system</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Requires <a href="roles.adoc"><code>admin</code> role</a>.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_user_story_6">1.7.2. User story</h4>
+<div class="paragraph">
+<p>In normal use any user can reset his or her own password using
+<a href="reset-password.adoc">Reset own password</a>. However there may be circumstances
+in which it is simply more convenient for an administrator to reset the password
+on the user&#8217;s behalf.</p>
+</div>
+<div class="paragraph">
+<p>The administrator accesses a full list of all users and from there initiates
+an email to send the user a new password. Note that the administrator cannot
+see the old or the new passwords.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_exclusions">1.7.3. Exclusions</h4>
+<div class="paragraph">
+<p>This story does not cater for the situation that the user
+has lost access to the registered email account as well as the password. That
+would pose a risk of the administrator being tricked into re-assigning an
+account to someone entirely different.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_user_outcome_6">1.7.4. User outcome</h4>
+<div class="paragraph">
+<p>The user is able to login using the new password received in email and
+optionally to <a href="reset-own-password.adoc">reset that password</a>.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_status_5">1.7.5. Status</h4>
+<div class="paragraph">
+<p>Available</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div id="footer">
+<div id="footer-text">
+Version 2.0.0-SNAPSHOT<br>
+Last updated 2017-01-25 18:11:33 GMT
+</div>
+</div>
+</body>
+</html>

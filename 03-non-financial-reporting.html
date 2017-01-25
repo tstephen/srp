@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<!--[if IE]><meta http-equiv="X-UA-Compatible" content="IE=edge"><![endif]-->
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="generator" content="Asciidoctor 1.5.3">
+<title>Non-Financial Reporting</title>
+<link rel="stylesheet" href="./srp-doc.css">
+<link rel="stylesheet" href="./coderay-asciidoctor.css">
+</head>
+<body class="article toc2 toc-left">
+<div id="header">
+<div id="toc" class="toc2">
+<div id="toctitle">Table of Contents</div>
+<ul class="sectlevel1">
+<li><a href="#_non_financial_reporting">1. Non-Financial Reporting</a>
+<ul class="sectlevel2">
+<li><a href="#_enter_report_data">1.1. Enter Report Data</a></li>
+<li><a href="#_submit_report">1.2. Submit Report</a></li>
+<li><a href="#_submit_revised_report">1.3. Submit Revised Report</a></li>
+<li><a href="#_x_y_name">1.4. X.Y Name</a></li>
+<li><a href="#_x_y_name_2">1.5. X.Y Name</a></li>
+<li><a href="#_x_y_name_3">1.6. X.Y Name</a></li>
+<li><a href="#_maintain_reference_data">1.7. Maintain Reference Data</a></li>
+<li><a href="#_x_y_name_4">1.8. X.Y Name</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div id="content">
+<div class="sect1">
+<h2 id="_non_financial_reporting">1. Non-Financial Reporting</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_enter_report_data">1.1. Enter Report Data</h3>
+<div class="sect3">
+<h4 id="_actor">1.1.1. Actor</h4>
+<div class="paragraph">
+<p>End user of the system, typically an employee of a reporting organisation</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_user_story">1.1.2. User story</h4>
+<div class="paragraph">
+<p>The user will be able to enter the same data as currently requested in the
+spreadsheet. Exact nature and structure of this data is described in the
+<a href="A1-data-model.adoc">data model</a>.</p>
+</div>
+<div class="paragraph">
+<p>The user may enter one year’s data in a single page. All entries are
+automatically saved minimising the risk of any being lost. It is possible to
+scroll to previous and subsequent years, providing they exist. Only one year
+into the future will be available.</p>
+</div>
+<div class="paragraph">
+<p>None of this data is shared with the SDU until it is submitted by a suitably
+qualified user within the reporting organisation. <em>Suitably qualified</em> means
+a user with the Approver role.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_user_outcome">1.1.3. User outcome</h4>
+<div class="paragraph">
+<p>The user may login and change any data (s)he wishes until prior to the report
+being submitted. After that it may only be viewed, or copied to created a
+revised submission. See <a href="submit-revised-report.adoc">here</a> for details of
+that.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_status">1.1.4. Status</h4>
+<div class="paragraph">
+<p>Visual design</p>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_submit_report">1.2. Submit Report</h3>
+<div class="sect3">
+<h4 id="_actor_2">1.2.1. Actor</h4>
+<div class="paragraph">
+<p>Reporting organisation user with <a href="roles.adoc"><code>approver</code> role</a>.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_pre_requisites">1.2.2. Pre-requisites</h4>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="register-user.adoc">Register user</a></p>
+</li>
+<li>
+<p><a href="register-organisation.adoc">Register organisation</a></p>
+</li>
+<li>
+<p><a href="enter-report-data.adoc">Enter report data</a></p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_user_story_2">1.2.3. User story</h4>
+<div class="paragraph">
+<p>Once the Approver has satisfied him or herself that the provided data is
+accurate (s)he may submit it to the SDU. This will include a reminder of the
+terms and conditions presented at <a href="register-user.adoc">registration</a>.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_user_outcome_2">1.2.4. User outcome</h4>
+<div class="paragraph">
+<p>Data is submitted to the SDU, and becomes read-only to the reporting
+organisation. Subsequent changes may be made by
+<a href="submit-revised-report.adoc">re-stating the submission</a>.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_status_2">1.2.5. Status</h4>
+<div class="paragraph">
+<p>Visual design</p>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_submit_revised_report">1.3. Submit Revised Report</h3>
+<div class="sect3">
+<h4 id="_actor_3">1.3.1. Actor</h4>
+<div class="paragraph">
+<p>Reporting organisation user with <a href="roles.adoc"><code>approver</code></a> role.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_pre_requisites_2">1.3.2. Pre-requisites</h4>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="submit-report.adoc">Submit Report</a></p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_user_story_3">1.3.3. User story</h4>
+<div class="paragraph">
+<p>If, after submission, revision is necessary it will be possible to create a
+complete copy of a given year’s return and submit that. This submission will
+be clearly labelled as being a restated submission.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_user_outcome_3">1.3.4. User outcome</h4>
+<div class="paragraph">
+<p>All 'live' reports will be replaced without any further user interaction.
+Obviously those created for offline use, for example as PDFs, will need to be
+re-created.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_status_3">1.3.5. Status</h4>
+<div class="paragraph">
+<p>Visual design</p>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_x_y_name">1.4. X.Y Name</h3>
+<div class="sect3">
+<h4 id="_actor_4">1.4.1. Actor:</h4>
+
+</div>
+<div class="sect3">
+<h4 id="_user_story_4">1.4.2. User story</h4>
+
+</div>
+<div class="sect3">
+<h4 id="_user_outcome_4">1.4.3. User outcome</h4>
+
+</div>
+<div class="sect3">
+<h4 id="_implementation_pre_requisites">1.4.4. Implementation pre-requisites</h4>
+
+</div>
+<div class="sect3">
+<h4 id="_implementation">1.4.5. Implementation</h4>
+
+</div>
+<div class="sect3">
+<h4 id="_status_4">1.4.6. Status</h4>
+<div class="paragraph">
+<p>Available</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_order_form">1.4.7. Order Form</h4>
+<div class="paragraph">
+<p><a href="/uploads/94d84d5ffd2d44f5a696fbd3116e3324/ContactMgmtOrderForm.docx">ContactMgmtOrderForm.docx</a></p>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_x_y_name_2">1.5. X.Y Name</h3>
+<div class="sect3">
+<h4 id="_actor_5">1.5.1. Actor:</h4>
+
+</div>
+<div class="sect3">
+<h4 id="_user_story_5">1.5.2. User story</h4>
+
+</div>
+<div class="sect3">
+<h4 id="_user_outcome_5">1.5.3. User outcome</h4>
+
+</div>
+<div class="sect3">
+<h4 id="_implementation_pre_requisites_2">1.5.4. Implementation pre-requisites</h4>
+
+</div>
+<div class="sect3">
+<h4 id="_implementation_2">1.5.5. Implementation</h4>
+
+</div>
+<div class="sect3">
+<h4 id="_status_5">1.5.6. Status</h4>
+<div class="paragraph">
+<p>Available</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_order_form_2">1.5.7. Order Form</h4>
+<div class="paragraph">
+<p><a href="/uploads/94d84d5ffd2d44f5a696fbd3116e3324/ContactMgmtOrderForm.docx">ContactMgmtOrderForm.docx</a></p>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_x_y_name_3">1.6. X.Y Name</h3>
+<div class="sect3">
+<h4 id="_actor_6">1.6.1. Actor:</h4>
+
+</div>
+<div class="sect3">
+<h4 id="_user_story_6">1.6.2. User story</h4>
+
+</div>
+<div class="sect3">
+<h4 id="_user_outcome_6">1.6.3. User outcome</h4>
+
+</div>
+<div class="sect3">
+<h4 id="_implementation_pre_requisites_3">1.6.4. Implementation pre-requisites</h4>
+
+</div>
+<div class="sect3">
+<h4 id="_implementation_3">1.6.5. Implementation</h4>
+
+</div>
+<div class="sect3">
+<h4 id="_status_6">1.6.6. Status</h4>
+<div class="paragraph">
+<p>Available</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_order_form_3">1.6.7. Order Form</h4>
+<div class="paragraph">
+<p><a href="/uploads/94d84d5ffd2d44f5a696fbd3116e3324/ContactMgmtOrderForm.docx">ContactMgmtOrderForm.docx</a></p>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_maintain_reference_data">1.7. Maintain Reference Data</h3>
+<div class="sect3">
+<h4 id="_actor_7">1.7.1. Actor</h4>
+<div class="paragraph">
+<p>SDU analyst or System administrator</p>
+</div>
+<div class="paragraph">
+<p>Requires <a href="roles"><code>admin</code></a> role.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_user_story_7">1.7.2. User story</h4>
+<div class="paragraph">
+<p>Several pieces of data are expected to change over time and will dramatically
+affect the calculations reported. For example the Carbon intensity of certain
+operations will change as the wider economy is gradually de-carbonised.</p>
+</div>
+<div class="paragraph">
+<p>Once logged in the user will the available application pages including any
+maintenance pages. Navigating to the appropriate one, the user will be able to
+enter or update the appropriate values.</p>
+</div>
+<div class="paragraph">
+<p>Most, perhaps all, reference data will have an applicability period so there
+should not be any risk of confusion due to reports changing after being
+submitted so long as reference data is defined ahead of the reporting period.
+Should retrospective changes <em>need</em> to be made appropriate communication to
+users should accompany it.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_exclusions">1.7.3. Exclusions</h4>
+<div class="paragraph">
+<p>Note that all reference data will need to have values provided as part of the
+initial system implementation or the calculations will not work.
+Therefore it is not necessary to add new reference data but only to update the
+existing values.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_user_outcome_7">1.7.4. User outcome</h4>
+<div class="paragraph">
+<p>Reports should reflect the changed reference data on next viewing.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_status_7">1.7.5. Status</h4>
+<div class="paragraph">
+<p>Visual design</p>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_x_y_name_4">1.8. X.Y Name</h3>
+<div class="sect3">
+<h4 id="_actor_8">1.8.1. Actor:</h4>
+
+</div>
+<div class="sect3">
+<h4 id="_user_story_8">1.8.2. User story</h4>
+
+</div>
+<div class="sect3">
+<h4 id="_user_outcome_8">1.8.3. User outcome</h4>
+
+</div>
+<div class="sect3">
+<h4 id="_implementation_pre_requisites_4">1.8.4. Implementation pre-requisites</h4>
+
+</div>
+<div class="sect3">
+<h4 id="_implementation_4">1.8.5. Implementation</h4>
+
+</div>
+<div class="sect3">
+<h4 id="_status_8">1.8.6. Status</h4>
+<div class="paragraph">
+<p>Available</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_order_form_4">1.8.7. Order Form</h4>
+<div class="paragraph">
+<p><a href="/uploads/94d84d5ffd2d44f5a696fbd3116e3324/ContactMgmtOrderForm.docx">ContactMgmtOrderForm.docx</a></p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div id="footer">
+<div id="footer-text">
+Version 2.0.0-SNAPSHOT<br>
+Last updated 2017-01-25 18:11:33 GMT
+</div>
+</div>
+</body>
+</html>

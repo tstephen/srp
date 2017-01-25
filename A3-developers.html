@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<!--[if IE]><meta http-equiv="X-UA-Compatible" content="IE=edge"><![endif]-->
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="generator" content="Asciidoctor 1.5.3">
+<title>For Developers</title>
+<link rel="stylesheet" href="./srp-doc.css">
+<link rel="stylesheet" href="./coderay-asciidoctor.css">
+</head>
+<body class="article toc2 toc-left">
+<div id="header">
+<div id="toc" class="toc2">
+<div id="toctitle">Table of Contents</div>
+<ul class="sectlevel1">
+<li><a href="#_for_developers">1. For Developers</a>
+<ul class="sectlevel2">
+<li><a href="#_pre_requisites">1.1. Pre-requisites</a></li>
+<li><a href="#_source_code">1.2. Source Code</a></li>
+<li><a href="#_building">1.3. Building</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div id="content">
+<div class="sect1">
+<h2 id="_for_developers">1. For Developers</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The architecture of the system is described <a href="A2-architecture.adoc">here</a>.
+This page gives the basic 5 minute guide to get the software installed and
+running on your machine.</p>
+</div>
+<div class="sect2">
+<h3 id="_pre_requisites">1.1. Pre-requisites</h3>
+<div class="paragraph">
+<p>Before starting please ensure you have the following basic tools installed:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Java 8: Get and install the JDK for your operating system from
+<a href="http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html">Oracle site</a>.
+Version 8 is the minimum version required</p>
+</li>
+<li>
+<p><a href="http://maven.apache.org">Maven</a> is used to build the Java source code</p>
+</li>
+<li>
+<p>(optional) MySQL: There is an embedded database used by default but this is
+only suitable for demonstration purposes. Even in development you will probably
+want to switch this for a more robust database. The system is developed using
+MySQL though there should be minimal effort to use others such as PostgreSQL.</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_source_code">1.2. Source Code</h3>
+<div class="paragraph">
+<p>Source code is held and versioned on Github, more information may be found at
+TODO.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_building">1.3. Building</h3>
+<div class="paragraph">
+<p>Once you have Maven installed and the source code checked out it, it is a simple
+matter of running this command to build all the artefacts.</p>
+</div>
+<div class="paragraph">
+<p>You may compile and run the server locally using an embedded database with some
+minimal test data using this command:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code>  mvn clean spring-boot:run</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Having done so open your browser with this address:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code>  http://localhost:8090/</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Spring Boot takes an opinionated view of building applications, in other words
+there are defaults for everything so that it works with minimal code but you
+gradually remove these defaults and replace them with your own if you wish as
+requirements grow and change. There is lots of good documentation and sample
+projects that you can read about <a href="https://projects.spring.io/spring-boot/#">here</a>.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div id="footer">
+<div id="footer-text">
+Version 2.0.0-SNAPSHOT<br>
+Last updated 2017-01-25 18:11:33 GMT
+</div>
+</div>
+</body>
+</html>

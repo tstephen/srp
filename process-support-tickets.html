@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<!--[if IE]><meta http-equiv="X-UA-Compatible" content="IE=edge"><![endif]-->
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="generator" content="Asciidoctor 1.5.3">
+<title>Process Support Tickets</title>
+<link rel="stylesheet" href="./srp-doc.css">
+<link rel="stylesheet" href="./coderay-asciidoctor.css">
+</head>
+<body class="article toc2 toc-left">
+<div id="header">
+<div id="toc" class="toc2">
+<div id="toctitle">Table of Contents</div>
+<ul class="sectlevel2">
+<li><a href="#_process_support_tickets">1. Process Support Tickets</a></li>
+</ul>
+</div>
+</div>
+<div id="content">
+<div class="sect2">
+<h3 id="_process_support_tickets">1. Process Support Tickets</h3>
+<div class="sect3">
+<h4 id="_actors">1.1. Actors</h4>
+<div class="ulist">
+<ul>
+<li>
+<p>Primary: System administrator or SDU analyst</p>
+</li>
+<li>
+<p>Secondary: End user of the system</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Requires <a href="roles.adoc"><code>admin</code> role</a>.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_user_story">1.2. User story</h4>
+<div class="paragraph">
+<p>When new support tickets are raised they are placed in a queue that records
+when they are opened, closed and any activities in between if it proves
+impossible to resolve straight away.</p>
+</div>
+<div class="paragraph">
+<p>The user can see this list in a summary 'inbox' and choose which one (s)he
+wishes to open. From there the following actions exist:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Defer the ticket for a specific period of time</p>
+</li>
+<li>
+<p>Request further information of the end user</p>
+</li>
+<li>
+<p>Add notes</p>
+</li>
+<li>
+<p>Close the ticket</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>In all cases the system will send a notification to the end user if public
+information has been provided. It is only possible to close the ticket with a
+public comment to explain to the end user.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_user_outcome">1.3. User outcome</h4>
+<div class="paragraph">
+<p>The ticket will typically disappear from the inbox, either because further
+information has been requested or because it has been deferred. However it is
+also possible to open and view a ticket and take no action, in which case it
+stays in the list.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_status">1.4. Status</h4>
+<div class="paragraph">
+<p>In progress</p>
+</div>
+</div>
+</div>
+</div>
+<div id="footer">
+<div id="footer-text">
+Version 2.0.0-SNAPSHOT<br>
+Last updated 2017-01-25 18:11:33 GMT
+</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<!--[if IE]><meta http-equiv="X-UA-Compatible" content="IE=edge"><![endif]-->
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="generator" content="Asciidoctor 1.5.3">
+<title>Roles</title>
+<link rel="stylesheet" href="./srp-doc.css">
+<link rel="stylesheet" href="./coderay-asciidoctor.css">
+</head>
+<body class="article toc2 toc-left">
+<div id="header">
+<div id="toc" class="toc2">
+<div id="toctitle">Table of Contents</div>
+<ul class="sectlevel2">
+<li><a href="#_roles">1. Roles</a></li>
+</ul>
+</div>
+</div>
+<div id="content">
+<div class="sect2">
+<h3 id="_roles">1. Roles</h3>
+<div class="paragraph">
+<p>Roles are what grant users permission to access the system and add, change or
+delete data. A summary of the roles that exist and the permissions they confer
+is shown below:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>User</code> - The initial state of a user after <a href="register-user.adoc">registration</a>.
+No specific capabilities beyond viewing own profile page.</p>
+</li>
+<li>
+<p><code>Contributor</code> - Able to view, edit and export data of the single organisation (s)he belongs to ;</p>
+</li>
+<li>
+<p><code>Approver</code> - All functionality of the Contributor role and additionally the ability to submit and restate annual data ;</p>
+</li>
+<li>
+<p><code>Analyst</code> - Ability to:</p>
+<div class="ulist">
+<ul>
+<li>
+<p>View and export but not edit data from all organisations. This is expected to be reserved to members of the SDU though there may be need for others to have it too ;</p>
+</li>
+<li>
+<p>View and edit reference data such as Carbon factors.</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p><code>Administrator</code> - Initially at least one user within the SDU and one from ourselves. Users with this role will be able to:</p>
+<div class="ulist">
+<ul>
+<li>
+<p>View, edit and export all data for all organisations ;</p>
+</li>
+<li>
+<p>Assign and revoke roles of other users ;</p>
+</li>
+<li>
+<p>View and process Support Tickets.</p>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div id="footer">
+<div id="footer-text">
+Version 2.0.0-SNAPSHOT<br>
+Last updated 2017-01-25 18:11:33 GMT
+</div>
+</div>
+</body>
+</html>

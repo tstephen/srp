@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<!--[if IE]><meta http-equiv="X-UA-Compatible" content="IE=edge"><![endif]-->
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="generator" content="Asciidoctor 1.5.3">
+<title>Register new organisation</title>
+<link rel="stylesheet" href="./srp-doc.css">
+<link rel="stylesheet" href="./coderay-asciidoctor.css">
+</head>
+<body class="article toc2 toc-left">
+<div id="header">
+<div id="toc" class="toc2">
+<div id="toctitle">Table of Contents</div>
+<ul class="sectlevel2">
+<li><a href="#_register_new_organisation">1. Register new organisation</a></li>
+</ul>
+</div>
+</div>
+<div id="content">
+<div class="sect2">
+<h3 id="_register_new_organisation">1. Register new organisation</h3>
+<div class="sect3">
+<h4 id="_actor">1.1. Actor</h4>
+<div class="paragraph">
+<p>Staff of healthcare organisation (e.g. Trust, Care home etc.)</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_user_story">1.2. User story</h4>
+<div class="paragraph">
+<p>The user needs to deliver the reporting requirements of his or her organisation
+and has become aware of these tools from the SDU newsletter, a colleague etc. but
+no one in the organisation has yet created an account as far as can be
+ascertained.</p>
+</div>
+<div class="paragraph">
+<p>The user comes to the site and registers an account using
+<a href="register-user.adoc">Register user</a>. Next (s)he can supply some basic organisational
+details. The system will then check the supplied details are unique and if so
+assign the user the ownership of that organisation <a href="roles:adoc"><code>approver</code> role</a>.
+Alternately if the organisation is already registered both the user and the
+existing <code>approver</code> will be notified in order that the approver can join the
+user to the organisation.</p>
+</div>
+<div class="paragraph">
+<p>Should this process fail for any reason such as the original approver has left
+the organisation without passing on ownership the user may raise a support
+ticket on the site, which will be handled manually.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_user_outcome">1.3. User outcome</h4>
+<div class="paragraph">
+<p>The user should be able to access the system on behalf of his or her
+organisation.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_pre_requisites">1.4. Pre-requisites</h4>
+<div class="paragraph">
+<p><a href="register-user.adoc">Register user</a></p>
+</div>
+</div>
+</div>
+</div>
+<div id="footer">
+<div id="footer-text">
+Version 2.0.0-SNAPSHOT<br>
+Last updated 2017-01-25 18:11:33 GMT
+</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,17 @@
+@import "asciidoctor.css";
+@font-face {
+  font-family: 'barmenoregular';
+  src: url('https://api.omny.link/webjars/barmeno/1.0.0/barmeno_regular-webfont.eot');
+  src: url('https://api.omny.link/webjars/barmeno/1.0.0/barmeno_regular-webfont.eot?#iefix') format('embedded-opentype'),
+       url('https://api.omny.link/webjars/barmeno/1.0.0/barmeno_regular-webfont.woff') format('woff'),
+       url('https://api.omny.link/webjars/barmeno/1.0.0/barmeno_regular-webfont.ttf') format('truetype'),
+       url('https://api.omny.link/webjars/barmeno/1.0.0/barmeno_regular-webfont.svg#barmenoregular') format('svg');
+  font-weight: normal;
+  font-style: normal;
+}
+h1,h2,h3,h4,h5,h6,
+#header>h1:first-child,
+#toctitle {
+  color: #FF6C06;
+  font-family:barmenoregular,Lato;
+}

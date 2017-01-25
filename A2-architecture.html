@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<!--[if IE]><meta http-equiv="X-UA-Compatible" content="IE=edge"><![endif]-->
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="generator" content="Asciidoctor 1.5.3">
+<title>Architecture</title>
+<link rel="stylesheet" href="./srp-doc.css">
+<link rel="stylesheet" href="./coderay-asciidoctor.css">
+</head>
+<body class="article toc2 toc-left">
+<div id="header">
+<div id="toc" class="toc2">
+<div id="toctitle">Table of Contents</div>
+<ul class="sectlevel1">
+<li><a href="#_architecture">1. Architecture</a></li>
+</ul>
+</div>
+</div>
+<div id="content">
+<div class="sect1">
+<h2 id="_architecture">1. Architecture</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The system is built 'API-first'. In other words the data is hosted on a cloud
+server and a series of services exposed to permit access to it. These services
+represent the Application Programming Interface (API) and support not only the
+web application at <a href="https://srp.digital" class="bare">https://srp.digital</a> but potentially other applications
+that may be built in the future by the community.</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/component.png" alt="Component model">
+</div>
+</div>
+<div class="paragraph">
+<p>The front-end is built as a 'Progressive Web Application' which means that users
+need only a reasonably recent browser to access the system. The <em>progressive</em>
+part is that certain features, such as offline access, may only be available
+to the most modern browsers but a graceful fallback should exist back to at
+least Internet Explorer 10.</p>
+</div>
+<div class="paragraph">
+<p>On the server side, the application is built on Spring Boot with a MySQL data
+store.</p>
+</div>
+</div>
+</div>
+</div>
+<div id="footer">
+<div id="footer-text">
+Version 2.0.0-SNAPSHOT<br>
+Last updated 2017-01-25 18:11:33 GMT
+</div>
+</div>
+</body>
+</html>

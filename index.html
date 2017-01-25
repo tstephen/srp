@@ -1,0 +1,1110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<!--[if IE]><meta http-equiv="X-UA-Compatible" content="IE=edge"><![endif]-->
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="generator" content="Asciidoctor 1.5.3">
+<title>SRP User Guide</title>
+<link rel="stylesheet" href="./srp-doc.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.4.0/css/font-awesome.min.css">
+<link rel="stylesheet" href="./coderay-asciidoctor.css">
+</head>
+<body class="article toc2 toc-left">
+<div id="header">
+<h1>SRP User Guide</h1>
+<div class="details">
+<span id="revnumber">version 2.0.0-SNAPSHOT,</span>
+<span id="revdate">2017-01-25 18:11</span>
+</div>
+<div id="toc" class="toc2">
+<div id="toctitle">Table of Contents</div>
+<ul class="sectlevel1">
+<li><a href="#_introduction">1. Introduction</a>
+<ul class="sectlevel2">
+<li><a href="#_aims">1.1. Aims</a></li>
+<li><a href="#_licensing">1.2. Licensing</a></li>
+<li><a href="#_supporters">1.3. Supporters</a></li>
+</ul>
+</li>
+<li><a href="#_account_management">2. Account Management</a>
+<ul class="sectlevel2">
+<li><a href="#_roles">2.1. Roles</a></li>
+<li><a href="#_register_user">2.2. Register User</a></li>
+<li><a href="#_register_new_organisation">2.3. Register new organisation</a></li>
+<li><a href="#_reset_own_password">2.4. Reset Own Password</a></li>
+<li><a href="#_raise_support_ticket">2.5. Raise Support Ticket</a></li>
+<li><a href="#_process_support_tickets">2.6. Process Support Tickets</a></li>
+<li><a href="#_reset_other_s_password">2.7. Reset Other&#8217;s Password</a></li>
+</ul>
+</li>
+<li><a href="#_non_financial_reporting">3. Non-Financial Reporting</a>
+<ul class="sectlevel2">
+<li><a href="#_enter_report_data">3.1. Enter Report Data</a></li>
+<li><a href="#_submit_report">3.2. Submit Report</a></li>
+<li><a href="#_submit_revised_report">3.3. Submit Revised Report</a></li>
+<li><a href="#_x_y_name">3.4. X.Y Name</a></li>
+<li><a href="#_x_y_name_2">3.5. X.Y Name</a></li>
+<li><a href="#_x_y_name_3">3.6. X.Y Name</a></li>
+<li><a href="#_maintain_reference_data">3.7. Maintain Reference Data</a></li>
+<li><a href="#_x_y_name_4">3.8. X.Y Name</a></li>
+</ul>
+</li>
+<li><a href="#_abatement_interventions">4. Abatement interventions</a>
+<ul class="sectlevel2">
+<li><a href="#_national_carbon_cost_benefit_curve">4.1. National carbon cost benefit curve</a></li>
+<li><a href="#_national_organisation_type_carbon_and_cost_benefit_curve">4.2. National organisation type carbon and cost benefit curve</a></li>
+<li><a href="#_your_carbon_and_cost_benefit_curve">4.3. Your carbon and cost benefit curve</a></li>
+</ul>
+</li>
+<li><a href="#_data_model">5. Data Model</a></li>
+<li><a href="#_architecture">6. Architecture</a></li>
+<li><a href="#_for_developers">7. For Developers</a>
+<ul class="sectlevel2">
+<li><a href="#_pre_requisites_4">7.1. Pre-requisites</a></li>
+<li><a href="#_source_code">7.2. Source Code</a></li>
+<li><a href="#_building">7.3. Building</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div id="content">
+<div class="sect1">
+<h2 id="_introduction">1. Introduction</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>This project provides data tools to support evidence-based policies to reduce
+social and environmental impacts of the health system. It is a collaboration
+between the Sustainable Development Unit, private industry
+and individuals within the NHS responsible for these policies and their delivery.</p>
+</div>
+<div class="sect2">
+<h3 id="_aims">1.1. Aims</h3>
+<div class="ulist">
+<ul>
+<li>
+<p>To streamline and digitise existing reporting efforts of the SDU.</p>
+</li>
+<li>
+<p>To encourage collaboration on tools and break down silo-ed efforts.</p>
+</li>
+<li>
+<p>To foster a community of the interested and responsible for these issues.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>This documentation serves two different but overlapping audiences:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Analysts and Reporters of data relating to all kinds of non-financial,
+non-clinical impacts of the NHS. This material is structured around a set of
+user stories so you can quickly find the way that the toolkit is able to
+satisfy problems you already recognise.</p>
+</li>
+<li>
+<p>Technologists interested in maintaining, extending or using the data tools.
+For these people we have API documentation and an overview of the software
+architecture.</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_licensing">1.2. Licensing</h3>
+<div class="paragraph">
+<p>The copyright holders license both documentation and software under the
+following licenses unless otherwise notes:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Documents, such as this, are licensed under a
+<a href="http://creativecommons.org/licenses/by/4.0/">Creative Commons Attribution 4.0 International License</a>.
+<span class="image"><img src="https://i.creativecommons.org/l/by/4.0/88x31.png" alt="Creative Commons License"></span></p>
+</li>
+<li>
+<p>Software is licensed under the <a href="https://www.apache.org/licenses/LICENSE-2.0">Apache license v2</a>.</p>
+</li>
+<li>
+<p>Data is the property of the reporting organisation until and unless they
+choose to submit it to the SDU. The SDU will release it publically under the
+<a href="http://reference.data.gov.uk/id/open-government-licence">Open Government Licence</a> in the December following the reporting cycle ending March. <span class="image"><img src="images/ogl-symbol-41px-retina-black.png" alt="Open Government Licence"></span></p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_supporters">1.3. Supporters</h3>
+<div class="sect3">
+<h4 id="_sdu">1.3.1. SDU</h4>
+<div class="paragraph">
+<p>We support the NHS, public health and social care to embed and promote the three
+elements of sustainable development - environmental, social and financial.</p>
+</div>
+<div class="paragraph">
+<p>The Unit is jointly funded by, and accountable to, NHS England and Public Health
+England to ensure that the health and care system fulfils its potential as a
+leading sustainable and low carbon service.</p>
+</div>
+<div class="paragraph">
+<p><a href="http://www.sduhealth.org.uk">sduhealth.org.uk</a></p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/SDU-logo.jpg" alt="SDU">
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_care_without_carbon_cwc">1.3.2. Care Without Carbon (CWC)</h4>
+<div class="paragraph">
+<p>CWC, which has been developed in partnership with Sussex Community NHS
+Foundation Trust, brings a wealth of knowledge and experience in practical
+implementation of sustainability programmes in the NHS, including an in-depth
+understanding of sustainability data management and reporting processes.</p>
+</div>
+<div class="paragraph">
+<p>The team were recognised by PwC as leaders in sustainability reporting in the
+public sector in 2015 and the annual sustainability report it has recently
+created for Sussex Community NHS Foundation Trust has been shortlisted in this
+year’s Building Public Trust Awards (November 2016).</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_eevs">1.3.3. EEVS</h4>
+<div class="paragraph">
+<p>EEVS is the UK’s leading provider of performance assurance, analysis and
+information services in relation to energy efficiency. As well as working with
+clients to develop performance governance and management strategies for larger
+schemes, since 2011 EEVS has evaluated the performance of over 400 individual
+energy and carbon saving investments to the global good practice standard, IPMVP.</p>
+</div>
+<div class="paragraph">
+<p><a href="http://www.eevs.co.uk">eevs.co.uk</a></p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/EEVS-logo.jpg" alt="EEVS logo">
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_puffin_digital">1.3.4. Puffin Digital</h4>
+<div class="paragraph">
+<p>Puffin Digital is a UK based provider of data and digital transformation
+services focused on sustainability within healthcare.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_account_management">2. Account Management</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_roles">2.1. Roles</h3>
+<div class="paragraph">
+<p>Roles are what grant users permission to access the system and add, change or
+delete data. A summary of the roles that exist and the permissions they confer
+is shown below:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>User</code> - The initial state of a user after <a href="register-user.adoc">registration</a>.
+No specific capabilities beyond viewing own profile page.</p>
+</li>
+<li>
+<p><code>Contributor</code> - Able to view, edit and export data of the single organisation (s)he belongs to ;</p>
+</li>
+<li>
+<p><code>Approver</code> - All functionality of the Contributor role and additionally the ability to submit and restate annual data ;</p>
+</li>
+<li>
+<p><code>Analyst</code> - Ability to:</p>
+<div class="ulist">
+<ul>
+<li>
+<p>View and export but not edit data from all organisations. This is expected to be reserved to members of the SDU though there may be need for others to have it too ;</p>
+</li>
+<li>
+<p>View and edit reference data such as Carbon factors.</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p><code>Administrator</code> - Initially at least one user within the SDU and one from ourselves. Users with this role will be able to:</p>
+<div class="ulist">
+<ul>
+<li>
+<p>View, edit and export all data for all organisations ;</p>
+</li>
+<li>
+<p>Assign and revoke roles of other users ;</p>
+</li>
+<li>
+<p>View and process Support Tickets.</p>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_register_user">2.2. Register User</h3>
+<div class="sect3">
+<h4 id="_actor">2.2.1. Actor</h4>
+<div class="paragraph">
+<p>Prospective user him or herself</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_user_story">2.2.2. User story</h4>
+<div class="paragraph">
+<p>The user comes to the site and is presented with the login dialogue. Not yet
+having an account the user may click a link to register a new account. In this
+form the user provides an email address, organisation name, agrees terms amnd
+conditions and submits the form.</p>
+</div>
+<div class="paragraph">
+<p>The system shows a confirmation message and re-presents the login dialogue.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_user_outcome">2.2.3. User outcome</h4>
+<div class="paragraph">
+<p>The user receives an email with an initial password included and may login with
+it. Once logged in the user may <a href="reset-own-password.adoc">change the password</a>
+if desired.</p>
+</div>
+<div class="paragraph">
+<p>If the user is the first from a given organisation (s)he will automatically
+become the <a href="roles.adoc"><code>approver</code> role</a>. In this case the users profile page
+and application home page will contain links to
+<a href="register-organisation.adoc">register an organisation</a>.</p>
+</div>
+<div class="paragraph">
+<p>Otherwise a request will be sent to
+the current Approver to grant (or deny) the necessary roles. In the latter case
+the user will not be able to access anything beyond his or her own profile page
+until approved.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_status">2.2.4. Status</h4>
+<div class="paragraph">
+<p>In progress</p>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_register_new_organisation">2.3. Register new organisation</h3>
+<div class="sect3">
+<h4 id="_actor_2">2.3.1. Actor</h4>
+<div class="paragraph">
+<p>Staff of healthcare organisation (e.g. Trust, Care home etc.)</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_user_story_2">2.3.2. User story</h4>
+<div class="paragraph">
+<p>The user needs to deliver the reporting requirements of his or her organisation
+and has become aware of these tools from the SDU newsletter, a colleague etc. but
+no one in the organisation has yet created an account as far as can be
+ascertained.</p>
+</div>
+<div class="paragraph">
+<p>The user comes to the site and registers an account using
+<a href="register-user.adoc">Register user</a>. Next (s)he can supply some basic organisational
+details. The system will then check the supplied details are unique and if so
+assign the user the ownership of that organisation <a href="roles:adoc"><code>approver</code> role</a>.
+Alternately if the organisation is already registered both the user and the
+existing <code>approver</code> will be notified in order that the approver can join the
+user to the organisation.</p>
+</div>
+<div class="paragraph">
+<p>Should this process fail for any reason such as the original approver has left
+the organisation without passing on ownership the user may raise a support
+ticket on the site, which will be handled manually.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_user_outcome_2">2.3.3. User outcome</h4>
+<div class="paragraph">
+<p>The user should be able to access the system on behalf of his or her
+organisation.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_pre_requisites">2.3.4. Pre-requisites</h4>
+<div class="paragraph">
+<p><a href="register-user.adoc">Register user</a></p>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_reset_own_password">2.4. Reset Own Password</h3>
+<div class="sect3">
+<h4 id="_actor_3">2.4.1. Actor</h4>
+<div class="paragraph">
+<p>Any user</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_user_story_3">2.4.2. User story</h4>
+<div class="paragraph">
+<p>From time to time a user may forget his or her password. To allow this to be
+reset the user must be able to supply the registered email address. The system
+will then send an email with a new password.</p>
+</div>
+<div class="paragraph">
+<p>Once back in to the system the user may change the password again if desired
+but minimum length and complexity rules apply.</p>
+</div>
+<div class="paragraph">
+<p>If for any reason the user is not able to recall or access the correct email
+address then at this stage the only solution is to
+<a href="register-user.adoc">register a new account</a>. If, worse still, the lost
+account belongs to the Approver then the user must raise a support ticket and
+we would probably require additional, offline, verification of their identity.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_user_outcome_3">2.4.3. User outcome</h4>
+<div class="paragraph">
+<p>A new password is issued and access to the system is restored.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_status_2">2.4.4. Status</h4>
+<div class="paragraph">
+<p>Available</p>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_raise_support_ticket">2.5. Raise Support Ticket</h3>
+<div class="sect3">
+<h4 id="_actor_4">2.5.1. Actor</h4>
+<div class="paragraph">
+<p>End user of the system, typically an employee of a reporting organisation</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_user_story_4">2.5.2. User story</h4>
+<div class="paragraph">
+<p>Two main reasons could lead the user to need to raise a support ticket:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>The system is behaving in an unexpected way, possibly as a result of a bug or
+simply because the user does not understand it in some way. Termed 'Application'
+problem.</p>
+</li>
+<li>
+<p>The user has a question regarding the requested data or wishes to have it
+presented out in a different way. These are Data problems.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>It is possible to record support tickets directly within the system including:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>A short description of the problem</p>
+</li>
+<li>
+<p>A screenshot of the application&#8217;s current state</p>
+</li>
+<li>
+<p>Category of problem as above: Application, Data, Other</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_user_outcome_4">2.5.3. User outcome</h4>
+<div class="paragraph">
+<p>The user receives an email confirming the ticket&#8217;s submission and the ticket
+is placed into the task queue of one or more groups of users, based on the
+category of the problem.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_status_3">2.5.4. Status</h4>
+<div class="paragraph">
+<p>In progress</p>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_process_support_tickets">2.6. Process Support Tickets</h3>
+<div class="sect3">
+<h4 id="_actors">2.6.1. Actors</h4>
+<div class="ulist">
+<ul>
+<li>
+<p>Primary: System administrator or SDU analyst</p>
+</li>
+<li>
+<p>Secondary: End user of the system</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Requires <a href="roles.adoc"><code>admin</code> role</a>.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_user_story_5">2.6.2. User story</h4>
+<div class="paragraph">
+<p>When new support tickets are raised they are placed in a queue that records
+when they are opened, closed and any activities in between if it proves
+impossible to resolve straight away.</p>
+</div>
+<div class="paragraph">
+<p>The user can see this list in a summary 'inbox' and choose which one (s)he
+wishes to open. From there the following actions exist:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Defer the ticket for a specific period of time</p>
+</li>
+<li>
+<p>Request further information of the end user</p>
+</li>
+<li>
+<p>Add notes</p>
+</li>
+<li>
+<p>Close the ticket</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>In all cases the system will send a notification to the end user if public
+information has been provided. It is only possible to close the ticket with a
+public comment to explain to the end user.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_user_outcome_5">2.6.3. User outcome</h4>
+<div class="paragraph">
+<p>The ticket will typically disappear from the inbox, either because further
+information has been requested or because it has been deferred. However it is
+also possible to open and view a ticket and take no action, in which case it
+stays in the list.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_status_4">2.6.4. Status</h4>
+<div class="paragraph">
+<p>In progress</p>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_reset_other_s_password">2.7. Reset Other&#8217;s Password</h3>
+<div class="sect3">
+<h4 id="_actor_5">2.7.1. Actor</h4>
+<div class="ulist">
+<ul>
+<li>
+<p>Primary: System administrator or SDU analyst</p>
+</li>
+<li>
+<p>Secondary: End user of the system</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Requires <a href="roles.adoc"><code>admin</code> role</a>.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_user_story_6">2.7.2. User story</h4>
+<div class="paragraph">
+<p>In normal use any user can reset his or her own password using
+<a href="reset-password.adoc">Reset own password</a>. However there may be circumstances
+in which it is simply more convenient for an administrator to reset the password
+on the user&#8217;s behalf.</p>
+</div>
+<div class="paragraph">
+<p>The administrator accesses a full list of all users and from there initiates
+an email to send the user a new password. Note that the administrator cannot
+see the old or the new passwords.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_exclusions">2.7.3. Exclusions</h4>
+<div class="paragraph">
+<p>This story does not cater for the situation that the user
+has lost access to the registered email account as well as the password. That
+would pose a risk of the administrator being tricked into re-assigning an
+account to someone entirely different.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_user_outcome_6">2.7.4. User outcome</h4>
+<div class="paragraph">
+<p>The user is able to login using the new password received in email and
+optionally to <a href="reset-own-password.adoc">reset that password</a>.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_status_5">2.7.5. Status</h4>
+<div class="paragraph">
+<p>Available</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_non_financial_reporting">3. Non-Financial Reporting</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_enter_report_data">3.1. Enter Report Data</h3>
+<div class="sect3">
+<h4 id="_actor_6">3.1.1. Actor</h4>
+<div class="paragraph">
+<p>End user of the system, typically an employee of a reporting organisation</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_user_story_7">3.1.2. User story</h4>
+<div class="paragraph">
+<p>The user will be able to enter the same data as currently requested in the
+spreadsheet. Exact nature and structure of this data is described in the
+<a href="A1-data-model.adoc">data model</a>.</p>
+</div>
+<div class="paragraph">
+<p>The user may enter one year’s data in a single page. All entries are
+automatically saved minimising the risk of any being lost. It is possible to
+scroll to previous and subsequent years, providing they exist. Only one year
+into the future will be available.</p>
+</div>
+<div class="paragraph">
+<p>None of this data is shared with the SDU until it is submitted by a suitably
+qualified user within the reporting organisation. <em>Suitably qualified</em> means
+a user with the Approver role.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_user_outcome_7">3.1.3. User outcome</h4>
+<div class="paragraph">
+<p>The user may login and change any data (s)he wishes until prior to the report
+being submitted. After that it may only be viewed, or copied to created a
+revised submission. See <a href="submit-revised-report.adoc">here</a> for details of
+that.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_status_6">3.1.4. Status</h4>
+<div class="paragraph">
+<p>Visual design</p>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_submit_report">3.2. Submit Report</h3>
+<div class="sect3">
+<h4 id="_actor_7">3.2.1. Actor</h4>
+<div class="paragraph">
+<p>Reporting organisation user with <a href="roles.adoc"><code>approver</code> role</a>.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_pre_requisites_2">3.2.2. Pre-requisites</h4>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="register-user.adoc">Register user</a></p>
+</li>
+<li>
+<p><a href="register-organisation.adoc">Register organisation</a></p>
+</li>
+<li>
+<p><a href="enter-report-data.adoc">Enter report data</a></p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_user_story_8">3.2.3. User story</h4>
+<div class="paragraph">
+<p>Once the Approver has satisfied him or herself that the provided data is
+accurate (s)he may submit it to the SDU. This will include a reminder of the
+terms and conditions presented at <a href="register-user.adoc">registration</a>.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_user_outcome_8">3.2.4. User outcome</h4>
+<div class="paragraph">
+<p>Data is submitted to the SDU, and becomes read-only to the reporting
+organisation. Subsequent changes may be made by
+<a href="submit-revised-report.adoc">re-stating the submission</a>.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_status_7">3.2.5. Status</h4>
+<div class="paragraph">
+<p>Visual design</p>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_submit_revised_report">3.3. Submit Revised Report</h3>
+<div class="sect3">
+<h4 id="_actor_8">3.3.1. Actor</h4>
+<div class="paragraph">
+<p>Reporting organisation user with <a href="roles.adoc"><code>approver</code></a> role.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_pre_requisites_3">3.3.2. Pre-requisites</h4>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="submit-report.adoc">Submit Report</a></p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_user_story_9">3.3.3. User story</h4>
+<div class="paragraph">
+<p>If, after submission, revision is necessary it will be possible to create a
+complete copy of a given year’s return and submit that. This submission will
+be clearly labelled as being a restated submission.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_user_outcome_9">3.3.4. User outcome</h4>
+<div class="paragraph">
+<p>All 'live' reports will be replaced without any further user interaction.
+Obviously those created for offline use, for example as PDFs, will need to be
+re-created.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_status_8">3.3.5. Status</h4>
+<div class="paragraph">
+<p>Visual design</p>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_x_y_name">3.4. X.Y Name</h3>
+<div class="sect3">
+<h4 id="_actor_9">3.4.1. Actor:</h4>
+
+</div>
+<div class="sect3">
+<h4 id="_user_story_10">3.4.2. User story</h4>
+
+</div>
+<div class="sect3">
+<h4 id="_user_outcome_10">3.4.3. User outcome</h4>
+
+</div>
+<div class="sect3">
+<h4 id="_implementation_pre_requisites">3.4.4. Implementation pre-requisites</h4>
+
+</div>
+<div class="sect3">
+<h4 id="_implementation">3.4.5. Implementation</h4>
+
+</div>
+<div class="sect3">
+<h4 id="_status_9">3.4.6. Status</h4>
+<div class="paragraph">
+<p>Available</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_order_form">3.4.7. Order Form</h4>
+<div class="paragraph">
+<p><a href="/uploads/94d84d5ffd2d44f5a696fbd3116e3324/ContactMgmtOrderForm.docx">ContactMgmtOrderForm.docx</a></p>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_x_y_name_2">3.5. X.Y Name</h3>
+<div class="sect3">
+<h4 id="_actor_10">3.5.1. Actor:</h4>
+
+</div>
+<div class="sect3">
+<h4 id="_user_story_11">3.5.2. User story</h4>
+
+</div>
+<div class="sect3">
+<h4 id="_user_outcome_11">3.5.3. User outcome</h4>
+
+</div>
+<div class="sect3">
+<h4 id="_implementation_pre_requisites_2">3.5.4. Implementation pre-requisites</h4>
+
+</div>
+<div class="sect3">
+<h4 id="_implementation_2">3.5.5. Implementation</h4>
+
+</div>
+<div class="sect3">
+<h4 id="_status_10">3.5.6. Status</h4>
+<div class="paragraph">
+<p>Available</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_order_form_2">3.5.7. Order Form</h4>
+<div class="paragraph">
+<p><a href="/uploads/94d84d5ffd2d44f5a696fbd3116e3324/ContactMgmtOrderForm.docx">ContactMgmtOrderForm.docx</a></p>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_x_y_name_3">3.6. X.Y Name</h3>
+<div class="sect3">
+<h4 id="_actor_11">3.6.1. Actor:</h4>
+
+</div>
+<div class="sect3">
+<h4 id="_user_story_12">3.6.2. User story</h4>
+
+</div>
+<div class="sect3">
+<h4 id="_user_outcome_12">3.6.3. User outcome</h4>
+
+</div>
+<div class="sect3">
+<h4 id="_implementation_pre_requisites_3">3.6.4. Implementation pre-requisites</h4>
+
+</div>
+<div class="sect3">
+<h4 id="_implementation_3">3.6.5. Implementation</h4>
+
+</div>
+<div class="sect3">
+<h4 id="_status_11">3.6.6. Status</h4>
+<div class="paragraph">
+<p>Available</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_order_form_3">3.6.7. Order Form</h4>
+<div class="paragraph">
+<p><a href="/uploads/94d84d5ffd2d44f5a696fbd3116e3324/ContactMgmtOrderForm.docx">ContactMgmtOrderForm.docx</a></p>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_maintain_reference_data">3.7. Maintain Reference Data</h3>
+<div class="sect3">
+<h4 id="_actor_12">3.7.1. Actor</h4>
+<div class="paragraph">
+<p>SDU analyst or System administrator</p>
+</div>
+<div class="paragraph">
+<p>Requires <a href="roles"><code>admin</code></a> role.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_user_story_13">3.7.2. User story</h4>
+<div class="paragraph">
+<p>Several pieces of data are expected to change over time and will dramatically
+affect the calculations reported. For example the Carbon intensity of certain
+operations will change as the wider economy is gradually de-carbonised.</p>
+</div>
+<div class="paragraph">
+<p>Once logged in the user will the available application pages including any
+maintenance pages. Navigating to the appropriate one, the user will be able to
+enter or update the appropriate values.</p>
+</div>
+<div class="paragraph">
+<p>Most, perhaps all, reference data will have an applicability period so there
+should not be any risk of confusion due to reports changing after being
+submitted so long as reference data is defined ahead of the reporting period.
+Should retrospective changes <em>need</em> to be made appropriate communication to
+users should accompany it.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_exclusions_2">3.7.3. Exclusions</h4>
+<div class="paragraph">
+<p>Note that all reference data will need to have values provided as part of the
+initial system implementation or the calculations will not work.
+Therefore it is not necessary to add new reference data but only to update the
+existing values.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_user_outcome_13">3.7.4. User outcome</h4>
+<div class="paragraph">
+<p>Reports should reflect the changed reference data on next viewing.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_status_12">3.7.5. Status</h4>
+<div class="paragraph">
+<p>Visual design</p>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_x_y_name_4">3.8. X.Y Name</h3>
+<div class="sect3">
+<h4 id="_actor_13">3.8.1. Actor:</h4>
+
+</div>
+<div class="sect3">
+<h4 id="_user_story_14">3.8.2. User story</h4>
+
+</div>
+<div class="sect3">
+<h4 id="_user_outcome_14">3.8.3. User outcome</h4>
+
+</div>
+<div class="sect3">
+<h4 id="_implementation_pre_requisites_4">3.8.4. Implementation pre-requisites</h4>
+
+</div>
+<div class="sect3">
+<h4 id="_implementation_4">3.8.5. Implementation</h4>
+
+</div>
+<div class="sect3">
+<h4 id="_status_13">3.8.6. Status</h4>
+<div class="paragraph">
+<p>Available</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_order_form_4">3.8.7. Order Form</h4>
+<div class="paragraph">
+<p><a href="/uploads/94d84d5ffd2d44f5a696fbd3116e3324/ContactMgmtOrderForm.docx">ContactMgmtOrderForm.docx</a></p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_abatement_interventions">4. Abatement interventions</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>This module was developed within the Healthy Returns 2020 project. You can see
+the results and access the tool here <a href="http://TODO.com/">Healthy Returns 2020</a>.</p>
+</div>
+<div class="sect2">
+<h3 id="_national_carbon_cost_benefit_curve">4.1. National carbon cost benefit curve</h3>
+<div class="sect3">
+<h4 id="_actor_14">4.1.1. Actor</h4>
+<div class="paragraph">
+<p>Staff of NHS provider organisation</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_user_story_15">4.1.2. User story</h4>
+<div class="paragraph">
+<p>The national carbon and cost benefit curve presents the potential for savings
+in the NHS, public health and social care sector showing a range of
+interventions and investments. Savings are shown for the health and care
+sector in England assuming moderate implementation in five years.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_user_outcome_15">4.1.3. User outcome</h4>
+
+</div>
+<div class="sect3">
+<h4 id="_status_14">4.1.4. Status</h4>
+<div class="paragraph">
+<p>Available</p>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_national_organisation_type_carbon_and_cost_benefit_curve">4.2. National organisation type carbon and cost benefit curve</h3>
+<div class="sect3">
+<h4 id="_actor_15">4.2.1. Actor</h4>
+<div class="paragraph">
+<p>Staff of NHS provider organisation</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_user_story_16">4.2.2. User story</h4>
+<div class="paragraph">
+<p>The national organisation type carbon and cost benefit curve shows the
+interventions for a specific type of organisation. Savings are shown
+assuming a moderate implementation in five years for the organisations of this
+type in England.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_user_outcome_16">4.2.3. User outcome</h4>
+
+</div>
+<div class="sect3">
+<h4 id="_status_15">4.2.4. Status</h4>
+<div class="paragraph">
+<p>Available</p>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_your_carbon_and_cost_benefit_curve">4.3. Your carbon and cost benefit curve</h3>
+<div class="sect3">
+<h4 id="_actor_16">4.3.1. Actor</h4>
+<div class="paragraph">
+<p>Staff of NHS provider organisation</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_user_story_17">4.3.2. User story</h4>
+<div class="paragraph">
+<p>This interactive tool is to support organisation planning for carbon and cost
+savings available. Average organisation size is used by default or you can
+enter your own data for planning. You can also add data for other interventions
+specific to your organisation to see the information alongside existing
+interventions.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_user_outcome_17">4.3.3. User outcome</h4>
+
+</div>
+<div class="sect3">
+<h4 id="_status_16">4.3.4. Status</h4>
+<div class="paragraph">
+<p>Available</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_data_model">5. Data Model</h2>
+<div class="sectionbody">
+
+</div>
+</div>
+<div class="sect1">
+<h2 id="_architecture">6. Architecture</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The system is built 'API-first'. In other words the data is hosted on a cloud
+server and a series of services exposed to permit access to it. These services
+represent the Application Programming Interface (API) and support not only the
+web application at <a href="https://srp.digital" class="bare">https://srp.digital</a> but potentially other applications
+that may be built in the future by the community.</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/component.png" alt="Component model">
+</div>
+</div>
+<div class="paragraph">
+<p>The front-end is built as a 'Progressive Web Application' which means that users
+need only a reasonably recent browser to access the system. The <em>progressive</em>
+part is that certain features, such as offline access, may only be available
+to the most modern browsers but a graceful fallback should exist back to at
+least Internet Explorer 10.</p>
+</div>
+<div class="paragraph">
+<p>On the server side, the application is built on Spring Boot with a MySQL data
+store.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_for_developers">7. For Developers</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The architecture of the system is described <a href="A2-architecture.adoc">here</a>.
+This page gives the basic 5 minute guide to get the software installed and
+running on your machine.</p>
+</div>
+<div class="sect2">
+<h3 id="_pre_requisites_4">7.1. Pre-requisites</h3>
+<div class="paragraph">
+<p>Before starting please ensure you have the following basic tools installed:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Java 8: Get and install the JDK for your operating system from
+<a href="http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html">Oracle site</a>.
+Version 8 is the minimum version required</p>
+</li>
+<li>
+<p><a href="http://maven.apache.org">Maven</a> is used to build the Java source code</p>
+</li>
+<li>
+<p>(optional) MySQL: There is an embedded database used by default but this is
+only suitable for demonstration purposes. Even in development you will probably
+want to switch this for a more robust database. The system is developed using
+MySQL though there should be minimal effort to use others such as PostgreSQL.</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_source_code">7.2. Source Code</h3>
+<div class="paragraph">
+<p>Source code is held and versioned on Github, more information may be found at
+TODO.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_building">7.3. Building</h3>
+<div class="paragraph">
+<p>Once you have Maven installed and the source code checked out it, it is a simple
+matter of running this command to build all the artefacts.</p>
+</div>
+<div class="paragraph">
+<p>You may compile and run the server locally using an embedded database with some
+minimal test data using this command:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code>  mvn clean spring-boot:run</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Having done so open your browser with this address:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code>  http://localhost:8090/</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Spring Boot takes an opinionated view of building applications, in other words
+there are defaults for everything so that it works with minimal code but you
+gradually remove these defaults and replace them with your own if you wish as
+requirements grow and change. There is lots of good documentation and sample
+projects that you can read about <a href="https://projects.spring.io/spring-boot/#">here</a>.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div id="footer">
+<div id="footer-text">
+Version 2.0.0-SNAPSHOT<br>
+Last updated 2017-01-25 18:11:33 GMT
+</div>
+</div>
+</body>
+</html>

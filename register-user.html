@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<!--[if IE]><meta http-equiv="X-UA-Compatible" content="IE=edge"><![endif]-->
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="generator" content="Asciidoctor 1.5.3">
+<title>Register User</title>
+<link rel="stylesheet" href="./srp-doc.css">
+<link rel="stylesheet" href="./coderay-asciidoctor.css">
+</head>
+<body class="article toc2 toc-left">
+<div id="header">
+<div id="toc" class="toc2">
+<div id="toctitle">Table of Contents</div>
+<ul class="sectlevel2">
+<li><a href="#_register_user">1. Register User</a></li>
+</ul>
+</div>
+</div>
+<div id="content">
+<div class="sect2">
+<h3 id="_register_user">1. Register User</h3>
+<div class="sect3">
+<h4 id="_actor">1.1. Actor</h4>
+<div class="paragraph">
+<p>Prospective user him or herself</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_user_story">1.2. User story</h4>
+<div class="paragraph">
+<p>The user comes to the site and is presented with the login dialogue. Not yet
+having an account the user may click a link to register a new account. In this
+form the user provides an email address, organisation name, agrees terms amnd
+conditions and submits the form.</p>
+</div>
+<div class="paragraph">
+<p>The system shows a confirmation message and re-presents the login dialogue.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_user_outcome">1.3. User outcome</h4>
+<div class="paragraph">
+<p>The user receives an email with an initial password included and may login with
+it. Once logged in the user may <a href="reset-own-password.adoc">change the password</a>
+if desired.</p>
+</div>
+<div class="paragraph">
+<p>If the user is the first from a given organisation (s)he will automatically
+become the <a href="roles.adoc"><code>approver</code> role</a>. In this case the users profile page
+and application home page will contain links to
+<a href="register-organisation.adoc">register an organisation</a>.</p>
+</div>
+<div class="paragraph">
+<p>Otherwise a request will be sent to
+the current Approver to grant (or deny) the necessary roles. In the latter case
+the user will not be able to access anything beyond his or her own profile page
+until approved.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_status">1.4. Status</h4>
+<div class="paragraph">
+<p>In progress</p>
+</div>
+</div>
+</div>
+</div>
+<div id="footer">
+<div id="footer-text">
+Version 2.0.0-SNAPSHOT<br>
+Last updated 2017-01-25 18:11:33 GMT
+</div>
+</div>
+</body>
+</html>
