@@ -1,0 +1,25 @@
+{
+  "id":0,
+  "name": "ERIC-201516",
+  "applicablePeriod":"2015-16",
+  "categories":[
+    {
+      "id":0,"name":"Organisation",
+      "questions":[
+        {"id":0,"text":"Name of organisation","required":true,"unit":null},
+        {"id":0,"text":"Organisation code e.g. RAA","required":true,"unit":null},
+        {"id":0,"text":"Organisation type","required":true,"unit":null},
+        {"id":0,"text":"Commissioning region","required":true,"unit":null}
+      ]
+    },{
+      "id":0,
+      "name":"Trust Profile",
+      "questions":[
+        {"id":0,"text":"Number of sites - General acute hospital (No.)","required":true,"unit":null},
+        {"id":0,"text":"Number of sites - Specialist hospital (acute only) (No.)","required":true,"unit":null},
+        {"id":0,"text":"Number of sites - Mixed service hospital (No.)","required":true,"unit":null},
+        {"id":0,"text":"Number of sites - Mental Health (including Specialist services) (No.)","required":true,"unit":null},
+        {"id":0,"text":"Number of sites - Learning Disabilities (No.)","required":true,"unit":null},
+        {"id":0,"text":"Number of sites - Mental Health and Learning Disabilities (No.)","required":true,"unit":null},
+        {"id":0,"text":"Number of sites - Community hospital (with inpatient beds) (No.)","required":true,"unit":null},
+        {"id":0,"text":"Number of sites - Other inpatient (No.)","required":true,"unit":null},{"id":0,"text":"Number of sites - Non inpatient (No.)","required":true,"unit":null},{"id":0,"text":"Number of sites - Support facilities (No.)","required":true,"unit":null},{"id":0,"text":"Number of sites - Unreported sites (No.)","required":true,"unit":null}]},{"id":0,"name":"Strategies and Policies","questions":[{"id":0,"text":"Estates Development Strategy","required":true,"unit":null},{"id":0,"text":"Healthy transport plan","required":true,"unit":null},{"id":0,"text":"Board approved Adaptation Plan","required":true,"unit":null},{"id":0,"text":"Sustainable Development Management Plan/Carbon Reduction Management Plan ","required":true,"unit":null},{"id":0,"text":"Carbon reduction target","required":true,"unit":null},{"id":0,"text":"NHS Premises and Facilities Assurance - Assessment/Approval","required":true,"unit":null},{"id":0,"text":"NHS Premises and Facilities Assurance - action plan","required":true,"unit":null}]},{"id":0,"name":"Contracted Out Services","questions":[{"id":0,"text":"Value of contracted out services","required":true,"unit":null},{"id":0,"text":"Percentage of hard FM (estates) and soft FM (hotel services) contracted out","required":true,"unit":null}]},{"id":0,"name":"Contracted Out Services","questions":[{"id":0,"text":"Capital investment for new build","required":true,"unit":null},{"id":0,"text":"Capital investment for improving existing buildings","required":true,"unit":null},{"id":0,"text":"Capital investment for equipment","required":true,"unit":null},{"id":0,"text":"Private Sector investment","required":true,"unit":null},{"id":0,"text":"Investment to reduce backlog maintenance","required":true,"unit":null},{"id":0,"text":"Cost to meet NHS Premises and Facilities Assurance action plan","required":true,"unit":null},{"id":0,"text":"Non-emergency patient transport","required":true,"unit":null},{"id":0,"text":"Income from services provided to other organisations - catering","required":true,"unit":null},{"id":0,"text":"Income from services provided to other organisations - laundry and linen","required":true,"unit":null},{"id":0,"text":"Income from services provided to other organisations - other","required":true,"unit":null}]},{"id":0,"name":"Safety","questions":[{"id":0,"text":"RIDDOR incidents","required":true,"unit":null},{"id":0,"text":"Estates and facilities related incidents","required":true,"unit":null},{"id":0,"text":"Clinical service incidents caused by estates and infrastructure failure","required":true,"unit":null}]},{"id":0,"name":"Fire Safety","questions":[{"id":0,"text":"Fires recorded","required":true,"unit":null},{"id":0,"text":"False alarms","required":true,"unit":null},{"id":0,"text":"Number of deaths resulting from fire(s)","required":true,"unit":null},{"id":0,"text":"Number of people injured resulting from fire(s)","required":true,"unit":null},{"id":0,"text":"Number of patients sustaining injuries during evacuation","required":true,"unit":null}]}]}

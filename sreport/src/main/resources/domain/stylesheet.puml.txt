@@ -1,0 +1,31 @@
+skinparam componentStyle uml2
+
+skinparam {
+  FontSize 13
+  FontName Ubuntu
+  ArrowFontName Ubuntu
+  ArrowColor #949699
+  ArrowFontColor #949699
+}
+
+skinparam Class {
+  BackgroundColor<<Apache>> #ec9300
+  BorderColor<<Apache>> #FF6655
+  BorderColor #0060ad
+  BackgroundColor #f5c980
+  ArrowColor #949699
+  ArrowFontColor #949699
+}
+
+skinparam component {
+  BackgroundColor #f5c980
+  BorderColor #0060ad
+}
+
+skinparam note {
+  BorderColor #ec9300
+}
+
+skinparam package {
+  BorderColor #0060ad
+}

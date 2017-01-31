@@ -10,16 +10,3 @@
     "tenantId": "barts" 
   }
 }
-
-{ 
-  "firstName": "Wilma",
-  "lastName": "Flintstone",
-  "email": "tim@trakeo.com",
-  "phone1": "07798867607",
-  "stage": "Enquiry",
-  "tenantId": "barts",
-  "account": { 
-    "name": "Bedrock Women's Institute",
-    "tenantId": "barts" 
-  }
-}

@@ -1,0 +1,44 @@
+@startuml
+!include stylesheet.puml.txt
+
+Survey "1" *-- "1..*" SurveyCategory : contains
+SurveyCategory "1" *-- "1..*" SurveyQuestion : contains
+Survey "1" -right- "0..*" SurveyReturn : attracts
+SurveyReturn "*" -right- "1" Organisation : belong to 
+Organisation "1" -right- "1..*" Submitter : may have
+Organisation "1" -- "*" Report 
+SurveyReturn "1" *-- "1..*" SurveyAnswer : consists of 
+SurveyAnswer "*" -- "1" SurveyQuestion : applies to
+Report <|-- OrganisationReport
+Report <|-- CCGReport
+Report <|-- TreasuryReport
+
+class Survey {
+  +applicablePeriod
+}
+
+class SurveyCategory {
+  +name
+}
+
+class SurveyQuestion {
+  +text
+  +required
+  +unit
+}
+
+class SurveyReturn {
+  +applicablePeriod
+  +submittedOn
+  +version
+}
+
+class SurveyAnswer {
+  +response
+}
+
+class CarbonFactor {
+
+}
+
+@enduml
