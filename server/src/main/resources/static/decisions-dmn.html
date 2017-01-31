@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang='en-GB'>
+<head>
+  <meta http-equiv="x-ua-compatible" content="IE=Edge"/> 
+  <!-- as the **very** first line just after head-->  
+  <meta charset='utf-8'>
+  <title>Decisions Repository</title>
+  <link href="/webjars/bootstrap/3.3.5/css/bootstrap.min.css" rel="stylesheet">
+  <link href="/webjars/bootstrap/3.3.5/css/bootstrap-theme.min.css" rel="stylesheet">
+  
+  <link href="2.0.0/css/omny-1.0.0.css" rel="stylesheet">
+  <link href="2.0.0/css/srp.css" rel="stylesheet">
+  <link href="2.0.0/css/icon-font/style.css" rel="stylesheet">
+  <link rel="icon" type="image/png" href="images/icon/srp-icon-32x32.png" />
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.7/styles/default.min.css">
+  
+  <link rel="icon" type="image/png" href="images/icon/srp-icon-16x16.png" />  
+</head>
+<body>
+  <div class="clearfix" id="messages"></div>
+  <div class="container" id="container"></div>
+  <script id='template' type='text/ractive'>
+    {{>profileArea}}
+    {{>titleArea}}
+    {{>dmnListSect}}
+    {{>dmnCurrentSect}}
+    {{>sidebar { active: 'decisions-dmn.html' }}}
+  </script>
+
+  <script src="/webjars/jquery/1.11.1/jquery.min.js"></script>
+  <script src="/webjars/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+  <script src="/webjars/Bootstrap-3-Typeahead/3.1.1/bootstrap3-typeahead.js"></script>
+  <script src="/webjars/ractive/0.7.3/ractive.min.js"></script>
+
+  <script src="js/md5.min.js"></script>
+  <script src="js/one-decision-0.9.0.js"></script>
+  <script src="js/decisions-dmn-0.9.0.js"></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.7/highlight.min.js"></script>
+  <script src="js/base.js"></script>
+  <script src="js/embed.js"></script>
+  <script type="text/javascript">
+    $(document).ready(function() {
+      $auth.getProfile(ractive.get('username'));
+      // are we running in sub-context?
+      if (document.location.href.indexOf('https://trakeo.com/srp')!=-1) {
+        ractive.set('server','https://trakeo.com/srp');
+        ractive.set('context','/srp');
+      }
+    });
+  </script>
+</body>
+</html>

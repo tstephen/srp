@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:tns="http://sourceforge.net/bpmn/definitions/_1446819276528" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:yaoqiang="http://bpmn.sourceforge.net" exporter="Yaoqiang BPMN Editor" exporterVersion="4.0" expressionLanguage="http://www.w3.org/1999/XPath" id="_1446819276528" name="" targetNamespace="http://sourceforge.net/bpmn/definitions/_1446819276528" typeLanguage="http://www.w3.org/2001/XMLSchema" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL http://bpmn.sourceforge.net/schemas/BPMN20.xsd">
+  <message id="srp.sustainabilityDisclosure" name="srp.sustainabilityDisclosure"/>
+  <process id="RecordSustainabilityDisclosure" isClosed="false" isExecutable="true" name="Record a new Supplier Disclosure" processType="None">
+    <extensionElements>
+      <yaoqiang:pageFormat height="841.8897637795276" imageableHeight="831.8897637795276" imageableWidth="588.1102362204724" imageableX="5.0" imageableY="5.0" orientation="0" width="598.1102362204724"/>
+      <yaoqiang:page background="#FFFFFF" horizontalCount="1" verticalCount="1"/>
+    </extensionElements>
+    <startEvent id="_2" isInterrupting="true" name="srp.sustainabilityDisclosure" parallelMultiple="false">
+      <outgoing>_4</outgoing>
+      <messageEventDefinition id="_2_ED_1" messageRef="srp.sustainabilityDisclosure"/>
+    </startEvent>
+    <sequenceFlow id="_8" sourceRef="createWordPressAcct" targetRef="sendDisclosureReceivedMail"/>
+    <endEvent id="_9" name="End Event">
+      <incoming>_10</incoming>
+    </endEvent>
+    <sequenceFlow id="_10" sourceRef="sendDisclosureReceivedMail" targetRef="_9"/>
+    <sequenceFlow id="_6" sourceRef="createSupplier" targetRef="createWordPressAcct"/>
+    <sequenceFlow id="_4" sourceRef="_2" targetRef="createSupplier"/>
+    <callActivity calledElement="CreateContactAndAccount" completionQuantity="1" id="createSupplier" isForCompensation="false" name="Create &#10;supplier &#10;record" startQuantity="1">
+      <extensionElements>
+        <activiti:in source="srp_sustainabilityDisclosure" target="json"/>
+        <activiti:in source="tenantId" target="tenantId"/>
+        <activiti:out source="contactId" target="contactId"/>
+        <activiti:out source="contactEmail" target="contactEmail"/>
+        <activiti:out source="contactPwd" target="contactPwd"/>
+        <activiti:out source="accountId" target="accountId"/>
+      </extensionElements>
+      <incoming>_4</incoming>
+      <outgoing>_6</outgoing>
+    </callActivity>
+    <callActivity calledElement="CreateWordPressAccount" completionQuantity="1" id="createWordPressAcct" isForCompensation="false" name="Create &#10;WordPress &#10;account" startQuantity="1">
+      <extensionElements>
+        <activiti:in sourceExpression="http://srp.digital" target="wordPressSiteUrl"/>
+        <activiti:in source="contactId" target="contactId"/>
+        <activiti:in source="contactEmail" target="contactEmail"/>
+        <activiti:in source="contactPwd" target="contactPwd"/>
+        <activiti:in sourceExpression="contributor" target="contactRole"/>
+        <activiti:out source="textResponse" target="wordPressResponse"/>
+      </extensionElements>
+      <incoming>_6</incoming>
+      <outgoing>_8</outgoing>
+    </callActivity>
+    <callActivity calledElement="SendMemo" completionQuantity="1" id="sendDisclosureReceivedMail" isForCompensation="false" name="Send disclosure received email" startQuantity="1">
+      <extensionElements>
+        <activiti:in sourceExpression="http://srp.digital/products/sustainable-resource-planning/srp/" target="baseUrl"/>
+        <activiti:in source="contactId" target="contactId"/>
+        <activiti:in sourceExpression="3" target="memoId"/>
+        <activiti:in source="tenantId" target="tenantId"/>
+      </extensionElements>
+      <incoming>_8</incoming>
+      <outgoing>_10</outgoing>
+    </callActivity>
+    <textAnnotation id="_11" textFormat="text/plain">
+      <text>Requires 'Contributor' level</text>
+    </textAnnotation>
+    <association associationDirection="None" id="_12" sourceRef="_11" targetRef="createWordPressAcct"/>
+  </process>
+  <bpmndi:BPMNDiagram id="Yaoqiang_Diagram-_1" name="Untitled Diagram" resolution="96.0">
+    <bpmndi:BPMNPlane bpmnElement="RecordSustainabilityDisclosure">
+      <bpmndi:BPMNShape bpmnElement="createSupplier" id="Yaoqiang-createSupplier" isExpanded="false">
+        <dc:Bounds height="76.0" width="110.0" x="187.59090909090912" y="145.04545454545456"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds height="46.955078125" width="50.0" x="217.59090909090912" y="161.56791548295456"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="_2" id="Yaoqiang-_2">
+        <dc:Bounds height="32.0" width="32.0" x="68.0454545454546" y="167.04545454545456"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds height="18.955078125" width="165.0" x="1.5454545454546036" y="207.63529829545456"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="createWordPressAcct" id="Yaoqiang-createWordPressAcct" isExpanded="false">
+        <dc:Bounds height="76.0" width="110.0" x="346.1363636363636" y="145.04545454545456"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds height="46.955078125" width="63.0" x="369.6363636363636" y="161.56791548295456"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="sendDisclosureReceivedMail" id="Yaoqiang-sendDisclosureReceivedMail" isExpanded="false">
+        <dc:Bounds height="76.0" width="110.0" x="504.68181818181813" y="145.04545454545456"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds height="32.955078125" width="91.0" x="514.1818181818181" y="168.56791548295456"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="_9" id="Yaoqiang-_9">
+        <dc:Bounds height="32.0" width="32.0" x="702.2272727272726" y="167.04545454545456"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds height="18.955078125" width="58.0" x="689.2272727272726" y="207.63529829545456"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="_11" id="Yaoqiang-_11">
+        <dc:Bounds height="38.0" width="142.0" x="334.0" y="287.0"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds height="18.955078125" width="153.0" x="334.0" y="298.5224609375"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="_8" id="Yaoqiang-_8">
+        <di:waypoint x="456.0454545454546" y="183.04545454545456"/>
+        <di:waypoint x="505.0454545454546" y="183.04545454545456"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds height="18.955078125" width="6.0" x="477.5454545454546" y="173.56791548295456"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="_10" id="Yaoqiang-_10">
+        <di:waypoint x="615.0454545454546" y="183.04545454545456"/>
+        <di:waypoint x="702.0464876366583" y="183.04545454545456"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds height="18.955078125" width="6.0" x="655.5459710910565" y="173.56791548295456"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="_6" id="Yaoqiang-_6">
+        <di:waypoint x="298.0454545454546" y="183.04545454545456"/>
+        <di:waypoint x="346.0454545454546" y="183.04545454545456"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds height="18.955078125" width="6.0" x="319.0454545454546" y="173.56791548295456"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="_4" id="Yaoqiang-_4">
+        <di:waypoint x="100.04442145425097" y="183.04545454545456"/>
+        <di:waypoint x="188.04545454545462" y="183.04545454545456"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds height="18.955078125" width="6.0" x="141.04493799985278" y="173.56791548295456"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="_12" id="Yaoqiang-_12">
+        <di:waypoint x="404.4249349122033" y="287.22727272727275"/>
+        <di:waypoint x="402.2694456598567" y="221.22727272727275"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds height="18.955078125" width="6.0" x="400.34719028603" y="244.74973366477275"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>

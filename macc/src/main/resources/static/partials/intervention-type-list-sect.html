@@ -1,0 +1,57 @@
+<section class="container navbar-sticky">
+  <h2>
+    {{>navbar}}
+    {{>profileArea}}
+  </h2>
+</section>
+<section id="interventionTypesSect">
+  <h2 class="navbar-top">
+    {{>navbar}}
+  </h2>
+  <table id="interventionTypesTable" class="table table-striped">
+    <thead>
+      <tr>
+        <th></th>
+        <th on-click="sort:name">Name<span class="sortable {{ sorted('name') }} glyphicon "></span></th>
+        <th on-click="sort:status">Status<span class="sortable {{ sorted('status') }} glyphicon "></span></th>
+        <th on-click="sort:classification">Type<span class="sortable {{ sorted('classification') }} glyphicon "></span></th>
+        <th on-click="sort:tonnesCo2eSavedTargetYear">tCO<sub>2</sub>e Saved<span class="sortable {{ sorted('tonnesCo2eSavedTargetYear') }} glyphicon "></span></th>
+        <th on-click="sort:costPerTonneCo2e">MAC <br/>£/tCO<sub>2</sub>e<span class="sortable {{ sorted('costPerTonneCo2e') }} glyphicon "></span></th>
+        <th class="hidden-xs" on-click="sort:confidence">Robustness<span class="sortable {{ sorted('confidence') }} glyphicon "></span></th>
+        <!-- <th on-click="sort:modellingYear">Modelling Year<span class="sortable {{ sorted('modellingYear') }} glyphicon "></span></th> -->
+        <th class="hidden-sm hidden-xs" on-click="sort:lifetime">Lifetime<span class="sortable {{ sorted('lifetime') }} glyphicon "></span></th>
+        <th class="hidden-sm hidden-xs" on-click="sort:leadTime">Lead Time<span class="sortable {{ sorted('leadtime') }} glyphicon "></span></th>
+        <th class="hidden-sm hidden-xs" on-click="sort:uptake">Uptake<span class="sortable {{ sorted('uptake') }} glyphicon "></span></th>
+        <th class="col-actions">Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+    {{#each sort(interventionTypes,sortColumn,sortAsc):i}}
+      {{# matchSearch(this) && matchFilter(this) }}
+          <tr data-href="{{links[rel=='self'].href}}" on-click="edit(this)">
+            <td>{{i+1}}</td>
+            <td>{{name}}</td>
+            <td>{{status}}</td>
+            <td>{{classification}}</td>
+            <td style="text-align:right">{{tonnesCo2eSavedTargetYear.formatDecimal(0, '.', ',')}}</td>
+            <td style="text-align:right">{{costPerTonneCo2e.formatDecimal(0, '.', ',')}}</td>
+            <td class="hidden-xs">{{confidence}}</td>
+            <!-- <td>{{modellingYear}}</td> -->
+            <td class="hidden-sm hidden-xs">{{lifetime}}</td>
+            <td class="hidden-sm hidden-xs">{{leadTime}}</td>
+            <td class="hidden-sm hidden-xs">{{uptake}}</td>
+            <td class="col-actions">
+              <a class="clickable admin glyphicon glyphicon-remove" aria-hidden="true" on-click="delete(this)" title="Delete this record"></a>
+              <a class="clickable glyphicon glyphicon-pencil" aria-hidden="true" on-click="edit(this)" title="View or edit this intervention"></a>
+            </td>
+          </tr>
+      {{/}}
+    {{/each}}
+    </tbody>
+    <tfoot>
+      {{# searchTerm!=undefined }}
+        <tr><th colspan="11">{{searchMatched == 0 ? 'No' : searchMatched}} matching intervention{{searchMatched==1 ? '' : 's'}}</th></tr>
+      {{/}} 
+    </tfoot>
+  </table>
+</section>

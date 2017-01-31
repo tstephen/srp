@@ -1,0 +1,53 @@
+<section id="currentSect" style="display:none">
+  <form class="inline-form form" id="currentForm">
+    <h2 class="form-inline">
+      {{#current._links.self}}
+        <span>Edit </span>
+      {{/}}
+      {{^current._links.self}}
+        <span>Create </span>
+      {{/}}
+      <span>Intervention:</span>
+      <span>{{current.interventionType.name}}</span>
+      <span class="pull-right">
+        <a class="clickable glyphicon glyphicon-remove" aria-hidden="true" on-click="delete(current)" title="Delete this record"></a>
+      </span>
+    </h2>
+    
+    <div class="currentBody col-md-6 col-sm-12 col-xs-12">
+      <ul class="form edit-form">
+        <li>
+          <label class="col-md-4 required" for="curInterventionType">Intervention Type:</label>
+          <input class="form-control" id="curInterventionType" accesskey="i" placeholder="Start typing to filter options" required value="{{current.interventionType.name}}"/>
+          <p class="help-block col-xs-offset-4">.</p>
+        </li>
+      </ul>
+    </div>
+    <div class="currentBody col-md-6 col-sm-12 col-xs-12">
+      <ul class="form edit-form">
+        <li>
+          <label class="col-md-4 required" for="curOrganisationType">Organisation Type:</label>
+          <input class="form-control" id="curOrganisationType" accesskey="o" placeholder="Start typing to filter options" required value="{{current.organisationType.name}}"/>
+          <p class="help-block col-xs-offset-4">.</p>
+        </li>
+      </ul>
+    </div>
+  
+    <h3 class="form-inline" style="clear:both">Additional information</h3>
+
+    <div class="currentBody col-md-6 col-sm-12 col-xs-12">
+      <ul class="form edit-form">
+        <li>
+          <label class="col-md-4 required" for="curShareOfTotal">Share of Total:</label>
+          <div class="input-group">
+            <input class="form-control" id="curShareOfTotal" accesskey="s" max="100" min="0" step="any" type="number" required type="number" value="{{current.shareOfTotal}}">
+            <span class="input-group-addon">%</span>
+          </div>
+          <p class="help-block col-xs-offset-4">The percentage this organisation type represents of the whole nationally.</p>
+        </li>
+      </ul>
+    </div>
+  </form>
+  
+</section>
+    

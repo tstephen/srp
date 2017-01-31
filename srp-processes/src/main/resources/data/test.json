@@ -1,0 +1,10 @@
+[
+  {
+    "addressee.id":"1bf924db-83e6-d7b2-396b-52ebc0663588", "addressee.firstName":"Tim","addressee.email":"tim@trakeo.com",
+    "surveyUrl":"http://trakeo.com/survey3/","assignedTo.firstName":"Tim","assignedTo.email":"tim@trakeo.com","assignedTo.mobile":"07890 123456"
+  },
+  {
+    "addressee.id":"1bf924db-83e6-d7b2-396b-52ebc0663588", "addressee.firstName":"Derek","addressee.email":"derek@trakeo.com",
+    "surveyUrl":"http://trakeo.com/survey3/","assignedTo.firstName":"Derek","assignedTo.email":"derek@trakeo.com","assignedTo.mobile":"07890 123456"
+  }
+]

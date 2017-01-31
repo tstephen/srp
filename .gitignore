@@ -1,0 +1,15 @@
+.classpath
+.project
+.settings/
+.springBeans
+.DS_Store
+*.bak
+*.log
+*.log.*
+*/application.properties
+target/
+
+*.ear
+*.jar
+*.war
+target/

@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="x-ua-compatible" content="IE=Edge"/> 
+  <!-- as the **very** first line just after head-->  
+  <meta charset="UTF-8">
+  <title>SRP</title>
+  <link href="/webjars/bootstrap/3.3.5/css/bootstrap.min.css" rel="stylesheet">
+  <link href="/webjars/bootstrap/3.3.5/css/bootstrap-theme.min.css" rel="stylesheet">
+  
+  <link href="2.0.0/css/omny-1.0.0.css" rel="stylesheet">
+  <link href="2.0.0/css/srp.css" rel="stylesheet">
+  <link href="2.0.0/css/icon-font/style.css" rel="stylesheet">
+  <link rel="icon" type="image/png" href="images/icon/srp-icon-32x32.png"/>
+</head>
+<body>
+
+  <div class="clearfix" id="messages"></div>
+  <div class="container" id="container"></div>
+  <script id='template' type='text/ractive'>
+    {{>profileArea}}
+    {{>titleArea}}
+    
+    {{>interventionTypeListSect}}
+    {{>interventionTypeCurrentSect}}
+    {{>helpModal}}
+
+    {{>sidebar { active: 'intervention-types.html' }}}
+  </script>
+  
+  <script src="/webjars/jquery/1.11.1/jquery.min.js"></script>
+  <script src="/webjars/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+  <script src="/webjars/Bootstrap-3-Typeahead/3.1.1/bootstrap3-typeahead.js"></script>
+  <script src="/webjars/d3js/3.5.5/d3.min.js"></script>
+  
+  <script src="/webjars/ractive/0.7.3/ractive.min.js"></script>
+  <script src="js/autoNumeric.min.js"></script>
+  <script src="js/md5.min.js"></script>
+  <script src="js/string-functions-0.1.0.js"></script>
+  <script src="js/base.js"></script>
+  <script src="js/intervention-type.js"></script>
+  <script src="js/omny-1.0.0.js"></script>
+  <script src="js/embed.js"></script>
+</body>
+</html>

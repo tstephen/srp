@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>SRP</title>
+  <link href="/webjars/bootstrap/3.3.5/css/bootstrap.min.css" rel="stylesheet">
+  <link href="/webjars/bootstrap/3.3.5/css/bootstrap-theme.min.css" rel="stylesheet">
+  
+  <link href="/2.0.0/css/srp.css" rel="stylesheet">
+  <link rel="icon" type="image/png" href="/images/icon/srp-icon-32x32.png"/>
+</head>
+<body>
+
+  <div class="clearfix" id="messages"></div>
+  <div class="container" id="container"></div>
+  
+  <script id='template' type='text/ractive'>
+    {{#partial workings}}
+      <h5>Costs</h5>
+      {{#cashOutflowsUpFront!=0}}<p>£{{cashOutflowsUpFront.sigFigs(3)}} up-front investment in the case study, which represents {{scaling}}% of the national total * {{uptake}}% uptake = £{{(cashOutflowsUpFrontNational).sigFigs(3)}}</p>{{/}}
+      {{#annualCashOutflowsTargetYear!=0}}<p>£{{annualCashOutflowsTargetYear.sigFigs(3)}} p.a. in the case study, which represents {{scaling}}% of the national total * {{uptake}}% uptake = £{{(annualCashOutflowsNationalTargetYear).sigFigs(3)}}</p>{{/}}
+      <h5>Financial savings in target year</h5>
+      {{#annualCashInflowsTargetYear.sigFigs(3)==0}}
+        <p>Due to the nature of the intervention there is no benefit in the target year but significant benefits accrue in subsequent years.</p>
+      {{else}}
+        <p>Savings in the case study once adjusted for projected cost and carbon-intensity<sup>†</sup> are £{{annualCashInflowsTargetYear.sigFigs(3)}}, which represents {{scaling}}% of the national total * {{uptake}}% uptake = £{{(annualCashInflowsNationalTargetYear).sigFigs(3)}}</p>
+      {{/}}
+      <h5>Carbon savings in target year</h5>
+      {{#tonnesCo2eSavedTargetYear.sigFigs(3)==0}}
+        <p>Due to the nature of the intervention there is no benefit in the target year but significant benefits accrue in subsequent years.</p>
+      {{else}}
+        <p>{{annualTonnesCo2eSaved.sigFigs(3)}} tCO<sub>2</sub>e in the case study, which represents {{scaling}}% of the national total * {{uptake}}% uptake = {{(tonnesCo2eSavedTargetYear).sigFigs(3)}} tCO<sub>2</sub>e</p>
+      {{/}}
+      <p><sup>†</sup>Information on the projected cost and carbon-intensity affecting this intervention may be found <a href="http://srp.digital/future-cost-and-carbon-intensity-projections-by-hm-treasury" target="_blank" title="Future cost and carbon-intensity projections by HM Treasury">here</a></p>
+    {{/partial workings}}
+
+    {{>titleArea}}
+    {{>maccIntroSect}}
+    {{>maccDisplaySect}}
+    {{>maccOptionsSect}}
+    {{>macTableDisplaySect  { active: 'maccNational' }}}
+    {{>poweredBy}}
+  </script>
+  
+  <script src="/webjars/jquery/1.11.1/jquery.min.js"></script>
+  <script src="/webjars/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+  <script src="/webjars/Bootstrap-3-Typeahead/3.1.1/bootstrap3-typeahead.js"></script>
+  <script src="/webjars/d3js/3.5.5/d3.min.js"></script>
+  
+  <script src="/webjars/ractive/0.7.3/ractive.min.js"></script>
+  <script src="/js/autoNumeric.js"></script>
+  <script src="/js/string-functions-0.1.0.js"></script>
+  <script src="/js/md5.min.js"></script>
+  <script src="/2.0.0/js/macc.js"></script>
+  <script src="/2.0.0/js/base.js"></script>
+  <script src="/2.0.0/js/macc-national.js"></script>
+  <script src="/js/omny-1.0.0.js"></script>
+  <script src="/2.0.0/js/embed.js"></script>
+  <script>
+    $(document).ready(function() {
+      ractive.fetch(); 
+      if (ractive.fetchCallbacks==undefined) ractive.fetchCallbacks = $.Callbacks();
+      ractive.fetchCallbacks.add(function() {
+        console.warn('page specific ready handler');
+        var tenant = ractive.get('tenant.id');
+        // TODO Variation on ractive.applyBranding() for not logged in...
+        $('link[rel="icon"]').attr('href',$('link[rel="icon"]').attr('href').replace('srp',tenant));
+        $('head').append('<link href="/css/'+tenant+'-1.0.0.css" rel="stylesheet">');
+        $('.navbar-brand').empty().append('<img src="/images/'+tenant+'-logo.png" alt="logo"/>');
+      });
+    });
+  </script>
+
+</body>
+</html>

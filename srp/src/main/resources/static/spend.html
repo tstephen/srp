@@ -1,0 +1,201 @@
+<!doctype html>
+<html lang='en-GB'>
+<head>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta charset='utf-8'>
+  <title>Finance Module</title>
+  <link href="css/bootstrap.min.css" rel="stylesheet">
+  
+  <link href="css/srp.css" rel="stylesheet">
+</head>
+<body class="container" id="container">
+  <script id='template' type='text/ractive'>
+    <h1>
+      <a class="nav navbar-brand" href="http://srp.digital">
+        <img src="/images/icon/srp-icon-256x256.png" alt="logo"/>
+      </a>
+      <span>Finance Module</span>
+    </h1>
+    <div class="clearfix" id="messages">
+       <p class="bg-danger text-danger">Beta! Please ensure you have backups!</p>
+    </div>
+    
+    <form id="transactionSummaryList">
+      <section id="transactionSummariesSect">
+        <h2>
+          <span>Accounts Payable (summarised)</span>
+          <!--
+            <span class="clickable glyphicon glyphicon-plus" aria-hidden="true" onclick="ractive.add()"></span>
+          -->
+          <!--
+          <span class="pull-right">
+            <input type="search" class="form-control search" placeholder="Search" value="{{searchTerm}}">
+            <span class="glyphicon glyphicon-search" aria-hidden="true"></span>
+          </span>
+          -->
+       </h2>
+        <table id="transactionSummariesTable" class="table table-striped">
+          <thead>
+            <tr>
+              <th></th>
+              <th>eClass Code</th>
+              <th>eClass Description</th>
+              <th>Organisation Name</th>
+              <!--<th>Financial Year</th>-->
+              <th>Amount (£)</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- TODO makes unusably slow
+            {{# searchTerm!=undefined && searchTerm!='' && (
+                  this.code.toLowerCase().indexOf(searchTerm.toLowerCase())===0 
+                  || this.description.toLowerCase().indexOf(searchTerm.toLowerCase())===0) }}
+              ...
+            {{/}}-->
+          {{#each transactionSummaries:i}}
+            <tr data-href="{{_links.self.href}}" on-click="edit(this)">
+              <td>{{i+1}}</td>
+              <td>{{eclass.code}}</td>
+              <td>{{eclass.description}}</td>
+              <td>{{organisation == undefined ? 'Summary' : organisation.name}}</td>
+              <!--<td>{{financialYear.name}}</td>-->
+              <td style="text-align:right">{{Math.round(amount).toString().formatNumber(',')}}</td>
+              <td>
+                <span class="clickable glyphicon glyphicon-remove" aria-hidden="true" onclick="ractive.delete('{{_links.self.href}}')"></span>
+                <span class="clickable glyphicon glyphicon-pencil" aria-hidden="true" on-click="select('{{_links.self.href}}')"></span>
+              </td>
+            </tr>
+          {{/each}}
+          </tbody>
+        </table>
+      </section>
+
+      <section id="currentSect" style="display:none">
+        <form id="currentForm">
+          <h2 class="form create-form">New</h2>
+          <h2 class="form edit-form">
+            <span>{{current.eClass}} {{current.organisation.name}}</span>
+          </h2>
+
+          <div id="currentBody" class="col-md-6">
+            <ul class="form edit-form">
+              <li><label>Organisation:</label><input id="curOrgName" required value="{{current.organisation.name}}"></li>
+              <li><label>DUNS:</label><input id="curDuns" value="{{current.organisation.duns}}"/></li>
+            </ul>
+          </div>
+
+          <div class="col-md-6">
+            <ul class="form edit-form">
+              <li><label>eClass:</label><input id="curEClass" value="{{current.eClass}}"></li>
+              <li><label>Financial Year:</label><input class="typeahead" id="curFinancialYear" value="{{current.financialYear}}"></li>
+              <li><label>Amount:</label><input id="curAddress1" value="{{current.amount}}"/></li>
+            </ul>
+          </div>
+
+          {{#if tenant.transactionSummaryFields}}
+          <div class="col-md-12" id="currentExtended">
+            <h2 class="form">
+              <span>More...</span>
+            </h2>
+
+            <div class="col-md-6">
+              <ul class="form edit-form">
+                {{#each tenant.transactionSummaryFields:j}}
+                  <li><label>{{label}}:</label><input id="curUnknown" value="{{current.customFields[key]}}"></li>
+                {{/each}}
+              </ul>
+            </div>
+          </div>
+          {{/if}}
+
+        </form>
+
+        <div>
+          <h2>
+            <span>Notes</span>
+            <span class="clickable glyphicon glyphicon-plus" aria-hidden="true" onclick="ractive.addNote('{{current._links.self.href}}')"></span>
+          </h2>
+          <table id="notesTable" class="table table-striped"><tbody>
+            <tr style="display:none;">
+              <td colspan="3">
+                <textarea id="note" on-blur="saveNote()" placeholder="Type your note here" required style="width:100%;"></textarea>
+                <br/>
+                <a onclick="$('#notesTable tr:nth-child(1)').slideUp();">Cancel</a>
+              </td>
+            </tr>
+            {{#each current.notes:j}}
+              <tr>
+                <td>{{created}}</td>
+                <td>{{author}}</td>
+                <td>{{content}}</td>
+              </tr>
+            {{/each}}
+          </tbody></table>
+        </div>
+      
+        <div>
+          <h2>
+            <span>Documents</span>
+            <span class="clickable glyphicon glyphicon-plus" aria-hidden="true" onclick="ractive.addDoc('{{current._links.self.href}}')"></span>
+          </h2>
+          <table id="docsTable" class="table table-striped"><tbody>
+            <tr style="display:none;">
+              <td colspan="3">
+                <input id="doc" on-blur="saveDoc()" placeholder="Paste document link here" required style="width:100%;"/>
+                <br/>
+                <a onclick="$('#docsTable tr:nth-child(1)').slideUp();">Cancel</a>
+              </td>
+            </tr>
+            {{#each current.documents:k}}
+              <tr>
+                <td>{{created}}</td>
+                <td>{{author}}</td>
+                <td>{{url}}</td>
+              </tr>
+            {{/each}}
+          </tbody></table>
+        </div>
+      </section>
+    </form>
+
+    <form id="transactionSummariesImport">
+      <section id="transactionSummariesImportSect">
+        <h2>
+          <span>Import</span>
+        </h2>
+    
+        <input type="file" name="resourceFile" id="resourceFile" size="45" />
+
+        <button type="button" class="btn btn-default pull-right" aria-label="Left Align" on-click="import('transactionSummariesImport')">
+          Import <span class="clickable glyphicon glyphicon-import" aria-hidden="true"></span>
+        </button>    
+
+      </section>
+    </form>
+
+  </script>
+
+  <script id='template' type='text/ractive'>
+  </script>  
+
+  <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+  <script src="js/jquery-1.11.0.min.js"></script>
+  <!-- Include all compiled plugins (below), or include individual files as needed -->
+  <script src="js/bootstrap.min.js"></script>
+  <script src="js/bootstrap3-typeahead.js"></script>
+  <script src="js/ractive.min.js"></script>
+  
+  <script type="text/javascript" src="http://mbostock.github.com/d3/d3.js?2.1.3"></script>
+  <script src="js/string-functions-0.1.0.js"></script>
+  <script src="js/charts-1.1.0.js"></script>
+  <script src="js/finance-1.1.0.js"></script>
+
+  <script type="text/javascript">
+    $(document).ready(function() {
+      ractive.fetch();
+    });
+  </script>
+  
+</body>
+</html>

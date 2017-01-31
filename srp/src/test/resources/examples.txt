@@ -1,0 +1,5 @@
+curl -v  -H "Content-Type: multipart/form-data" \
+-F reourceFile=@git/srp/src/test/resources/transactionSummaries.json \
+http://localhost:8083/transactionSummaries
+
+

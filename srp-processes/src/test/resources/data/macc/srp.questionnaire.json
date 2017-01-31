@@ -1,0 +1,26 @@
+{
+  "firstName":"tim",
+  "lastName":"stephenson",
+  "email":"tim@trakeo.com",
+  "phone":"07987 654321",
+  "account":{
+    "name":"trakeo",
+    "companySize":"Acute",
+    "noOfEmployees":"under50",
+    "description":"",
+    "tenantId":"sdu",
+    "customFields":{
+      "newModelsOfCareOther":"",
+      "newModelsOfCareSpecifics":"",
+      "procurementOther":"",
+      "procurementSpecifics":"",
+      "travelOther":"",
+      "generalOther":"",
+      "generalSpecifics":"",
+      "buildingsAndEnergyOther":""
+    }
+  },
+  "accountType":"Direct Supplier",
+  "stage":"New Questionnaire",
+  "tenantId":"sdu"
+}

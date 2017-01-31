@@ -1,0 +1,14 @@
+# Create intervention
+curl -X POST -H 'Content-Type:application/json' -v -u tstephen:tstephen -d '{"name":"Turn down 1 degree C","description":""}' http://localhost:8083/interventions
+
+# GET interventions
+curl -X GET -v -u tstephen:tstephen http://localhost:8083/interventions
+
+# GET intervention types by Status 
+curl -X GET -v -u tstephen:tstephen -H 'Accept:application/json' http://localhost:8083/sdu/intervention-types/status/green
+
+# GET interventions by org type 
+curl -X GET -v -u tstephen:tstephen -H 'Accept:application/json' http://localhost:8083/sdu/interventions/status/green/GP%20Surgery
+
+# GET org intervention plan by org type
+curl -X GET -v -u tstephen:tstephen -H 'Accept:application/json' http://localhost:8083/sdu/organisation-interventions/plan/GP%20Surgery

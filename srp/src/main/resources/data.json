@@ -1,0 +1,64 @@
+[
+  { "_class": "digital.srp.finance.model.FinancialYear", "name": "2013-14" },
+  { "_class": "digital.srp.finance.model.FinancialYear", "name": "2014-15" },
+  {
+  "_class": "digital.srp.finance.model.DefraDeccCategory",
+    "code": "AGRICULTURAL_PRODUCTS", "description": "Agricultural Products"
+  },
+  {
+    "_class": "digital.srp.finance.model.DefraDeccCategory",
+    "code": "BUSINESS_SERVICES", "description": "Business Services"
+  },
+  {
+    "_class": "digital.srp.finance.model.DefraDeccCategory",
+    "code": "CONSTRUCTION_AND_CONSTRUCTION_MATERIALS", "description": "Construction and Construction Materials"
+  },
+  {
+    "_class": "digital.srp.finance.model.DefraDeccCategory",
+    "code": "FOOD_AND_CATERING", "description": "Food and Catering"
+  },
+  {
+    "_class": "digital.srp.finance.model.DefraDeccCategory",
+    "code": "HEAT_AND_POWER", "description": "Heating / Hot water and Electricity"
+  },
+  {
+    "_class": "digital.srp.finance.model.DefraDeccCategory",
+    "code": "MANUFACTURED_FUELS_CHEMICALS_GASES", "description": "Manufactured Fuels / Chemicals / Gases"
+  },
+  {
+    "_class": "digital.srp.finance.model.DefraDeccCategory",
+    "code": "MEDICAL_INSTRUMENTS", "description": "Medical Instruments / Equipment"
+  },
+  {
+    "_class": "digital.srp.finance.model.DefraDeccCategory",
+    "code": "METALS_AND_METAL_PRODUCTS", "description": "Metals and metal products"
+  },
+  {
+    "_class": "digital.srp.finance.model.DefraDeccCategory",
+    "code": "NHS_TRAVEL", "description": "NHS Travel"
+  },
+  {
+    "_class": "digital.srp.finance.model.DefraDeccCategory",
+    "code": "OFFICE_AND_OTHER_EQUIPMENT", "description": "Office and Other Equipment"
+  },
+  {
+    "_class": "digital.srp.finance.model.DefraDeccCategory",
+    "code": "OTHER_MANUFACTURED_PROCESSED_PRODUCTS", "description": "Other manufactured and processed products"
+  },
+  {
+    "_class": "digital.srp.finance.model.DefraDeccCategory",
+    "code": "OTHER_PROCUREMENTS", "description": "Other Procurements"
+  },
+  {
+    "_class": "digital.srp.finance.model.DefraDeccCategory",
+    "code": "PHARMACEUTICALS", "description": "Pharmaceuticals"
+  },
+  {
+    "_class": "digital.srp.finance.model.DefraDeccCategory",
+    "code": "UNCLASSIFIED", "description": "Unclassified"
+  },
+  {
+    "_class": "digital.srp.finance.model.DefraDeccCategory",
+    "code": "WOOD_AND_PAPER_PRODUCTS", "description": "Wood and Paper Products"
+  }
+]

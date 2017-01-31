@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:tns="http://sourceforge.net/bpmn/definitions/_1446819276528" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:yaoqiang="http://bpmn.sourceforge.net" exporter="Yaoqiang BPMN Editor" exporterVersion="4.0" expressionLanguage="http://www.w3.org/1999/XPath" id="_1446819276528" name="" targetNamespace="http://sourceforge.net/bpmn/definitions/_1446819276528" typeLanguage="http://www.w3.org/2001/XMLSchema" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL http://bpmn.sourceforge.net/schemas/BPMN20.xsd">
+  <message id="srp.questionnaire" name="srp.questionnaire"/>
+  <process id="RespondToQuestionnaire" isClosed="false" isExecutable="true" name="Record a new questionnaire response" processType="None">
+    <extensionElements>
+      <yaoqiang:pageFormat height="841.8897637795276" imageableHeight="831.8897637795276" imageableWidth="588.1102362204724" imageableX="5.0" imageableY="5.0" orientation="0" width="598.1102362204724"/>
+      <yaoqiang:page background="#FFFFFF" horizontalCount="1" verticalCount="1"/>
+    </extensionElements>
+    <startEvent id="_2" isInterrupting="true" name="srp.questionnaire" parallelMultiple="false">
+      <outgoing>_4</outgoing>
+      <outputSet/>
+      <messageEventDefinition id="_2_ED_1" messageRef="srp.questionnaire"/>
+    </startEvent>
+    <endEvent id="_9" name="End Event">
+      <incoming>_10</incoming>
+      <inputSet/>
+    </endEvent>
+    <sequenceFlow id="_10" sourceRef="sendQuestionnaireReceivedMail" targetRef="_9"/>
+    <sequenceFlow id="_4" sourceRef="_2" targetRef="createSupplier"/>
+    <callActivity calledElement="CreateContactAndAccount" completionQuantity="1" id="createSupplier" isForCompensation="false" name="Create &#10;supplier &#10;record" startQuantity="1">
+      <extensionElements>
+        <activiti:in source="srp_questionnaire" target="json"/>
+        <activiti:in source="tenantId" target="tenantId"/>
+        <activiti:out source="contactId" target="contactId"/>
+        <activiti:out source="contactEmail" target="contactEmail"/>
+        <activiti:out source="contactPwd" target="contactPwd"/>
+        <activiti:out source="accountId" target="accountId"/>
+      </extensionElements>
+      <incoming>_4</incoming>
+      <outgoing>_3</outgoing>
+    </callActivity>
+    <callActivity calledElement="SendMemo" completionQuantity="1" id="sendQuestionnaireReceivedMail" isForCompensation="false" name="Send questionnaire received email" startQuantity="1">
+      <extensionElements>
+        <activiti:in sourceExpression="http://srp.digital.com/products/sustainable-resource-planning/sdu/" target="baseUrl"/>
+        <activiti:in source="contactId" target="contactId"/>
+        <activiti:in sourceExpression="5" target="memoId"/>
+        <activiti:in source="tenantId" target="tenantId"/>
+      </extensionElements>
+      <incoming>_3</incoming>
+      <outgoing>_10</outgoing>
+    </callActivity>
+    <sequenceFlow id="_3" sourceRef="createSupplier" targetRef="sendQuestionnaireReceivedMail"/>
+  </process>
+  <bpmndi:BPMNDiagram id="Yaoqiang_Diagram-_1" name="Untitled Diagram" resolution="96.0">
+    <bpmndi:BPMNPlane bpmnElement="RespondToQuestionnaire">
+      <bpmndi:BPMNShape bpmnElement="createSupplier" id="Yaoqiang-createSupplier" isExpanded="false">
+        <dc:Bounds height="76.0" width="110.0" x="187.59090909090912" y="145.04545454545456"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds height="46.955078125" width="50.0" x="217.59090909090912" y="161.56791548295456"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="_2" id="Yaoqiang-_2">
+        <dc:Bounds height="32.0" width="32.0" x="68.0454545454546" y="167.04545454545456"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds height="18.955078125" width="103.0" x="32.545454545454604" y="207.68022017045456"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="sendQuestionnaireReceivedMail" id="Yaoqiang-sendQuestionnaireReceivedMail" isExpanded="false">
+        <dc:Bounds height="76.0" width="110.0" x="384.68181818181813" y="145.04545454545456"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds height="46.955078125" width="82.0" x="398.68181818181813" y="161.56791548295456"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="_9" id="Yaoqiang-_9">
+        <dc:Bounds height="32.0" width="32.0" x="582.2272727272726" y="167.04545454545456"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds height="18.955078125" width="58.0" x="569.2272727272726" y="207.68022017045456"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="_10" id="Yaoqiang-_10">
+        <di:waypoint x="494.5526315789473" y="183.04545454545456"/>
+        <di:waypoint x="582.5526961451933" y="183.04545454545456"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds height="18.955078125" width="6.0" x="535.5526638620703" y="173.56791548295456"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="_4" id="Yaoqiang-_4">
+        <di:waypoint x="99.5525670127013" y="183.04545454545456"/>
+        <di:waypoint x="187.55263157894728" y="183.04545454545456"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds height="18.955078125" width="6.0" x="140.55259929582428" y="173.56791548295456"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="_3" id="Yaoqiang-_3">
+        <di:waypoint x="297.5526315789473" y="183.04545454545456"/>
+        <di:waypoint x="384.5526315789473" y="183.04545454545456"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds height="18.955078125" width="6.0" x="338.0526315789473" y="173.56791548295456"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>

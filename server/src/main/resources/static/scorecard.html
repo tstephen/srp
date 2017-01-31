@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang='en-GB'>
+<head>
+  <meta http-equiv="x-ua-compatible" content="IE=Edge"/> 
+  <!-- as the **very** first line just after head-->  
+  <meta charset='utf-8'>
+  <title>Scorecard</title>
+  <link href="/webjars/bootstrap/3.3.5/css/bootstrap.min.css" rel="stylesheet">
+  <link href="/webjars/bootstrap/3.3.5/css/bootstrap-theme.min.css" rel="stylesheet">
+  <link href="css/jquery.tagit.css" rel="stylesheet" type="text/css">
+  <link href="css/tagit.ui-zendesk.css" rel="stylesheet" type="text/css">
+  
+  <link href="2.0.0/css/omny-1.0.0.css" rel="stylesheet">
+  <link href="2.0.0/css/srp.css" rel="stylesheet">
+</head>
+<body>
+  <div class="clearfix" id="messages"></div>
+  <div class="container" id="container"></div>
+  <script id='template' type='text/ractive'>
+    {{>profileArea}}
+    {{>titleArea}}
+    
+    <section id="summarySect">
+      <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+        <table class="table table-striped">
+          <tbody>
+            <tr>
+              <th>Company Name</th>
+              <td>Trakeo Limited</td>
+            </tr>
+            <tr>
+              <th>Date Issued</th>
+              <td>13 July 2015</td>
+            </tr>
+            <tr>
+              <th>Reporting Period</th>
+              <td>FY 2014-15</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+        <img src="/images/mock/summary.png" alt="Summary scores for Environment, Social and Governance"/>
+      </div>
+    </section>
+
+    <section id="trendSect">
+      <h2>Performance Change</h2>
+      <img src="/images/mock/trend.png" alt="Performance trend over time"/>
+    </section>
+
+    <section id="carbonSect">
+      <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+        <h2>Carbon Footprint - Corporate</h2>
+        <img src="/images/mock/carbon-footprint-org.png" alt="Organisational Carbon Footprint"/>
+      </div>
+      <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+        <h2>Carbon Footprint - Product Summary</h2>
+        <img src="/images/mock/carbon-footprint-product.png" alt="Aggregated footprint across all products"/>
+      </div>
+    </section>
+
+    <section id="sustainabilitySect">
+      <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+        <h2>Carbon Intensity - Revenue</h2>
+        <img src="/images/mock/carbon-intensity.png" alt="Carbon Intensity compared to sector"/>
+      </div>
+      <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+        <h2>Sustainability</h2>
+        <table class="table">
+          <tbody>
+            <tr>
+              <td>Reporting</td>
+              <td>Localism</td>
+              <td>Governance</td>
+              <td>Social</td>
+            </tr>
+            <tr>
+              <td>
+                <span class="glyphicon scorecardicon icon-stationary"></span>
+              </td>
+              <td>
+                <span class="glyphicon scorecardicon icon-stationary"></span>
+              </td>
+              <td>
+                <span class="glyphicon scorecardicon icon-running"></span>
+              </td>
+              <td>
+                <span class="glyphicon scorecardicon icon-running"></span>
+              </td>
+            </tr>
+            <tr>
+              <td>Water</td>
+              <td>Air Quality</td>
+              <td>Waste</td>
+              <td>Land Use</td>
+            </tr>
+            <tr>
+              <td>
+                <span class="glyphicon scorecardicon icon-walking"></span>
+              </td>
+              <td>
+                <span class="glyphicon scorecardicon icon-running"></span>
+              </td>
+              <td>
+                <span class="glyphicon scorecardicon icon-walking"></span>
+              </td>
+              <td>
+                <span class="glyphicon scorecardicon icon-stationary"></span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+    
+    {{>sidebar { active: 'scorecard.html' }}}
+  </script>
+
+  <script src="/webjars/jquery/1.11.1/jquery.min.js"></script>
+  <script src="/webjars/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+  <script src="/webjars/Bootstrap-3-Typeahead/3.1.1/bootstrap3-typeahead.js"></script>
+  <script src="/webjars/jquery-ui/1.11.4/jquery-ui.min.js" type="text/javascript" charset="utf-8"></script>
+  <script src="js/tag-it.js" type="text/javascript" charset="utf-8"></script>
+  <script src="/webjars/ractive/0.7.3/ractive.min.js"></script>
+
+  <script src="js/autoNumeric.js"></script>
+  <script src="js/md5.min.js"></script>
+  <script src="js/login-1.0.0.js"></script>
+  <script src="js/i18n.js"></script>
+  <script src="js/cust-mgmt-1.0.0.js"></script>
+  <script src="js/omny-1.0.0.js"></script>
+  <script src="js/embed.js"></script>
+  
+  <script type="text/javascript">
+    $(document).ready(function() {
+      ractive.set('title','Carbon and Sustainability Scorecard');
+      // are we running in sub-context?
+      if (document.location.href.indexOf('https://trakeo.com/srp')!=-1) {
+        ractive.set('server','https://trakeo.com/srp');
+        ractive.set('context','/srp');
+      }
+    });
+  </script>
+  <div style="display:none">
+    <span>Icons made by 
+      <a href="http://www.freepik.com" title="Freepik">Freepik</a> from <a href="http://www.flaticon.com" title="Flaticon">www.flaticon.com</a>             is licensed by <a href="http://creativecommons.org/licenses/by/3.0/" title="Creative Commons BY 3.0">CC BY 3.0</a>
+      <a href="http://www.flaticon.com/authors/scott-de-jonge" title="Scott de Jonge">Scott de Jonge</a> from <a href="http://www.flaticon.com" title="Flaticon">www.flaticon.com</a>             is licensed by <a href="http://creativecommons.org/licenses/by/3.0/" title="Creative Commons BY 3.0">CC BY 3.0</a>
+    </span>
+  </div>
+</body>
+</html>

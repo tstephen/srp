@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang='en-GB'>
+<head>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta charset='utf-8'>
+  <title>SRP</title>
+  <link href="css/bootstrap.min.css" rel="stylesheet">
+  <link href="css/srp.css" rel="stylesheet">
+</head>
+
+<body id='container' class="container">
+  <section id="containerSect" class="col-md-12"></section>
+  <script id='template' type='text/ractive'>
+    <h1>Sustainability Disclosure</h1>
+    <p class="bg-danger text-danger">Please ensure you have the authority to complete this disclosure on behalf of your organisation.</p>
+
+    <form id="disclosureForm">
+      <section>
+        <h2>Disclosing Organisation</h2>
+        <div class="form-group">
+          <label for="{{organisation.name}}">Full legal name of your organisation</label>
+          <input class="form-control" id="{{organisation.name}}" placeholder="Please enter the full legal name of your organisation, for example Trakeo Limited" required value="{{organisation.name}}">
+        </div>
+        <div class="form-group">
+          <label for="{{organisation.contact.name}}">Name of representative</label>
+          <input class="form-control" id="{{organisation.contact.name}}" placeholder="Please enter the full name of the official representative able to contract on behalf of your organisation" required value="{{organisation.contact.name}}">
+        </div>
+        <div class="form-group">
+          <label for="{{organisation.contact.email}}">Email of representative</label>
+          <input class="form-control" id="{{organisation.contact.email}}" type="email" placeholder="Email address of organisation's representative" required value="{{organisation.contact.email}}">
+        </div>
+        <div class="form-group">
+          <label for="{{organisation.contact.phone}}">Phone number of representative</label>
+          <input class="form-control" id="{{organisation.contact.phone}}" type="tel" placeholder="Telephone number of organisation's representative" required value="{{organisation.contact.phone}}">
+        </div>
+      </section>
+      <section>
+        <h2>Disclosure</h2>
+        {{#each questionCategories:i}}
+          <h3>{{category.toLeadingCaps()}}</h3>
+          <ol>
+            {{#each questions:j}}
+              <li class="form-group">
+                <label for="{{id}}">{{label}}</label>
+                {{#if type == 'yesno' || type == 'yesnona'}}
+                  <div class="radio">
+                    <label>
+                      <input type="radio" id="{{id}}" on-click="revealDetails(id)" name="{{this.response}}" required value="true">
+                        Yes
+                    </label>
+                  </div>
+                  <div class="radio">
+                    <label>
+                      <input type="radio" id="{{id}}" checked="true" name="{{this.response}}" value="false">
+                        No
+                    </label>
+                  </div>
+                  {{#if type == 'yesnona'}}
+                    <div class="radio">
+                      <label>
+                        <input type="radio" id="{{id}}" name="{{this.response}}" value="na">
+                          Don't know
+                      </label>
+                    </div>
+                  {{/if}}
+                {{/if}}
+                {{#if type != 'yesno' && type != 'yesnona'}}
+                  <input type="{{type}}" class="form-control" id="{{id}}" placeholder="{{placeholder}}" value="{{this.response}}">
+                {{/if}}
+                <input class="form-control hidden" id="{{id}}Details" placeholder="Please specify" value="{{this.responseDetails}}">
+              </li>
+            {{/each}}
+          </ol>
+        {{/each}}
+      </section>
+
+      <!--<section>
+        <h2>Supporting documents</h2>
+      </section>-->
+
+      <div class="form-group">
+        <button class="btn btn-primary" on-click="sendMessage()">Submit</button>
+      </div>
+    </form>
+  </script>
+
+  <!-- jQuery (necessary for Bootstrap's JavaScript plugins) 
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>-->
+  <script src="js/jquery-1.11.0.min.js"></script>
+  <!-- Include all compiled plugins (below), or include individual files as needed -->
+  <script src="js/bootstrap.min.js"></script>
+  <!--
+       3. You can always get the most recent stable version from the URL below.
+       If you want the newest features, use the 'edge' version instead:
+
+           http://cdn.ractivejs.org/edge/ractive.min.js
+
+       If you need IE8 support, change 'ractive' to 'ractive-legacy'.
+  
+  <script src="http://cdn.ractivejs.org/latest/ractive.min.js"></script>
+  -->
+  <script src="js/ractive.min.js"></script>
+  <script src="js/string-functions-0.1.0.js"></script>
+  <script src="js/sr-1.1.0.js"></script>
+</body>
+</html>

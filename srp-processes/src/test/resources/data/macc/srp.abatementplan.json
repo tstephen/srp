@@ -1,0 +1,16 @@
+{
+  "organisationType":"/organisation-types/22",
+  "orgTypeName":"Clinical Commissioning Groups",
+  "existingInterventions":[],
+  "characteristics":[
+    {"unit":"No. of staff","unitCount":5740},
+    {"unit":"Floor area (m2)","unitCount":126001}
+  ],
+  "shortId":123,
+  "firstName":"Tim",
+  "lastName":"Stephenson",
+  "email":"tim@thestephensons.me.uk",
+  "phone1":"+447788967607",
+  "licenseAgreed":true,
+  "tenantId":"sdu"
+}

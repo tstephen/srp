@@ -1,0 +1,92 @@
+<div class="modal fade" id="userInterventionModal" tabindex="-1" role="dialog" aria-labelledby="userInterventionModalLabel">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="userInterventionModalLabel">User Intervention</h4>
+      </div>
+      <div class="modal-body">
+        <div class="alert-info" style="line-height:2.5em;padding:0 10px">To present your own interventions alongside the standard ones please supply the following data.</div>
+        <form id="licenseForm" class="form-horizontal">
+          <ul class="form edit-form">
+            <li style="clear:both">
+              <label class="col-md-3 required" for="curName">Name:</label> 
+              <input class="form-control" id="curName" placeholder="Name" required value="{{currentUserIntervention.name}}">
+              <p class="help-block col-xs-offset-3"></p>
+            </li>
+            <li style="clear:both">
+              <label class="col-md-3" for="curDescription">Description</label>
+              <textarea class="license form-control" id="curDescription" value="{{currentUserIntervention.description}}"></textarea>
+              <p class="help-block col-xs-offset-3"></p>
+            </li>
+            <li style="clear:both">
+              <label class="col-md-3 required" for="curLastName">Lifetime:</label> 
+              <input class="form-control" id="curLifetime" placeholder="No. of years the intervention remains effective" required value="{{currentUserIntervention.lifetime}}">
+              <p class="help-block col-xs-offset-3"></p>
+            </li>
+           <li style="clear:both">
+             <label class="col-md-3 required">Capital costs:</label>
+             <input class="autoNumeric form-control" data-a-sign="£ " data-a-pad="false" data-v-min="-9999999999999" id="curCashOutflowsUpFront" required value="{{currentUserIntervention.cashOutflowsUpFront}}"/>
+             <p class="help-block col-xs-offset-3">Initial up-front costs.</p>
+            </li>
+            <li style="clear:both">
+              <label class="col-md-3 required">Cash outflows in 2020:</label>
+              <div class="input-group">
+                <input class="autoNumeric form-control" data-a-sign="£ " data-a-pad="false" data-v-min="-9999999999999" id="curAnnualCashOutflowsTargetYear" required value="{{currentUserIntervention.annualCashOutflowsTargetYear}}"/>
+                <!-- <span class="clickable input-group-addon" aria-hidden="true" data-toggle="modal" data-target="#timeSeriesModal" on-click="initTimeSeries('annualCashOutflows','ongoingCashOutflows','upFront')">
+                  <span class="glyphicon glyphicon-resize-full"></span>
+                </span> -->
+              </div>
+              <p class="help-block col-xs-offset-3">Ongoing annual cash outflows predicted for 2020.</p>
+            </li>
+            <li style="clear:both">
+              <label class="col-md-3 required">Cash inflows in 2020:</label>
+              <div class="input-group">
+                <input class="autoNumeric form-control" data-a-sign="£ " data-a-pad="false" data-v-min="-9999999999999" id="curAnnualCashInflowsTargetYear" required value="{{currentUserIntervention.annualCashInflowsTargetYear}}"/>
+                <!--<span class="clickable input-group-addon" aria-hidden="true" data-toggle="modal" data-target="#timeSeriesModal" on-click="initTimeSeries('annualCashInflows','average')">
+                  <span class="glyphicon glyphicon-resize-full"></span>
+                </span>-->
+              </div>
+              <p class="help-block col-xs-offset-3">Annual cash inflows predicted for 2020.</p>
+            </li>
+            <!--<li style="clear:both">
+              <label class="col-md-3" for="annualGasSaved">Gas savings in 2020</label>
+              <div class="input-group">
+                <input class="form-control" id="curAnnualGasSaved" type="number" value="{{currentUserIntervention.annualGasSaved}}">
+                <span class="input-group-addon">kWh</span>
+              </div>
+              <p class="help-block col-xs-offset-3">If specified, costs will be take account of future gas price predictions</p>
+            </li>
+            <li style="clear:both">
+              <label class="col-md-3" for="annualElecSaved">Elec. savings in 2020</label>
+              <div class="input-group">
+                <input class="form-control" id="curAnnualElecSaved" type="number" value="{{currentUserIntervention.annualElecSaved}}">
+                <span class="input-group-addon">kWh</span>
+              </div>
+              <p class="help-block col-xs-offset-3">If specified, costs will be take account of future electricity price predictions</p>
+            </li>-->
+            <li style="clear:both">
+              <label class="col-md-3 required">£ / tCO<sub>2</sub>e saved:</label>
+              <input class="autoNumeric form-control" data-a-pad="false" id="curCostPerTonneCo2e" required value="{{currentUserIntervention.costPerTonneCo2e}}"/>
+              <p class="help-block col-xs-offset-3">Annual prediction for CO<sub>2</sub>e being saved in 2020, in tonnes.</p>
+            </li>
+            <li style="clear:both">
+              <label class="col-md-3 required">tCO<sub>2</sub>e saved in 2020:</label>
+              <div class="input-group">
+                <input class="autoNumeric form-control" data-a-pad="false" id="curTonnesCo2eSavedTargetYear" required value="{{currentUserIntervention.tonnesCo2eSavedTargetYear}}"/>
+                <!-- <span class="clickable input-group-addon" aria-hidden="true" data-toggle="modal" data-target="#timeSeriesModal" on-click="initTimeSeries('annualTonnesCo2eSaved','average')">
+                  <span class="glyphicon glyphicon-resize-full"></span>
+                </span> -->
+              </div>
+              <p class="help-block col-xs-offset-3">Annual prediction for CO<sub>2</sub>e being saved in 2020, in tonnes.</p>
+            </li>
+          </ul>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button id="cancelLicenseForm" type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+        <button id="submitLicenseForm" type="button" class="btn btn-primary" onclick="ractive.addUserIntervention()">Add</button>
+      </div>
+    </div>
+  </div>
+</div>

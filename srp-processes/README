@@ -1,0 +1,9 @@
+SRP processes
+================
+
+Business processes to automate some of the SRP work. 
+
+0.1.0 - 28 Jan 14 - revision ?
+------------------------------
+- Mailshot process with txt and html templates deployed at the same time (as 
+resources) and contacts to mail injected in the start message.  
