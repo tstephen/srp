@@ -1,5 +1,6 @@
 package digital.srp.sreport.web;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -11,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.hateoas.Link;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -29,9 +31,12 @@ import com.fasterxml.jackson.annotation.JsonView;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import digital.srp.sreport.model.Survey;
+import digital.srp.sreport.model.SurveyCategory;
+import digital.srp.sreport.model.SurveyQuestion;
 import digital.srp.sreport.model.SurveyReturn;
 import digital.srp.sreport.model.surveys.Eric1516;
 import digital.srp.sreport.model.surveys.Sdu1516;
+import digital.srp.sreport.model.surveys.Sdu1617;
 import digital.srp.sreport.model.views.SurveyReturnViews;
 import digital.srp.sreport.model.views.SurveyViews;
 import digital.srp.sreport.repositories.SurveyRepository;
@@ -60,7 +65,7 @@ public class SurveyController {
     
     @PostConstruct
     protected void init() {
-        String[] expectedSurveys = { Eric1516.ID, Sdu1516.ID };
+        String[] expectedSurveys = { Eric1516.ID, Sdu1516.ID, Sdu1617.ID };
         List<Survey> existingSurveys = list(null, null);
         for (String expected : expectedSurveys) {
             boolean found = false;
@@ -79,10 +84,13 @@ public class SurveyController {
                         expected));
                 switch (expected) {
                 case Eric1516.ID: 
-                    surveyRepo.save(new Eric1516().getSurvey());
+                    createInternal(new Eric1516().getSurvey());
                     break;
                 case Sdu1516.ID: 
-                    surveyRepo.save(new Sdu1516().getSurvey());
+                    createInternal(new Sdu1516().getSurvey());
+                    break;
+                case Sdu1617.ID: 
+                    createInternal(new Sdu1617().getSurvey());
                     break;
                 default: 
                     LOGGER.warn(String.format("Do not know expected survey %1$s", expected));
@@ -129,7 +137,7 @@ public class SurveyController {
         // use logger for force child load
         LOGGER.info(String.format("Found survey with id %1$d named %2$s and with %3$d categories of questions", survey.id(), survey.name(), survey.categories().size()));
 
-        return survey;
+        return addLinks(survey);
     }
 
     /**
@@ -213,7 +221,7 @@ public class SurveyController {
     public @ResponseBody ResponseEntity<?> create(
             @RequestBody Survey survey) {
 
-        surveyRepo.save(survey);
+        createInternal(survey);
 
         UriComponentsBuilder builder = MvcUriComponentsBuilder
                 .fromController(getClass());
@@ -223,6 +231,18 @@ public class SurveyController {
         HttpHeaders headers = new HttpHeaders();
         headers.setLocation(builder.path("/{id}").buildAndExpand(vars).toUri());
         return new ResponseEntity(headers, HttpStatus.CREATED);
+    }
+
+    protected void createInternal(Survey survey) {
+        survey = surveyRepo.save(survey);
+        
+        for (SurveyCategory cat : survey.categories()) {
+            cat.survey(survey);
+            
+            for (SurveyQuestion q : cat.questions()) {
+                q.category(cat);
+            }
+        }
     }
 
     /**
@@ -265,10 +285,10 @@ public class SurveyController {
         surveyRepo.delete(surveyId);
     }
 
-//    private Link linkTo(
-//            @SuppressWarnings("rawtypes") Class<? extends CrudRepository> clazz,
-//            Long id) {
-//        return new Link(clazz.getAnnotation(RepositoryRestResource.class)
-//                .path() + "/" + id);
-//    }
+    private Survey addLinks(Survey survey) {
+        List<Link> links = new ArrayList<Link>();
+        links.add(new Link(getClass().getAnnotation(RequestMapping.class).value()[0] + "/" + survey.id()));
+        
+        return survey.links(links);
+    }
 }

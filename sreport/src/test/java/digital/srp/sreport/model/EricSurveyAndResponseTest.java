@@ -54,7 +54,7 @@ public class EricSurveyAndResponseTest {
                     survey.categories().get(i).name()));
             for (int j = 0; j < survey.categories().get(i).questions().size(); j++) {
                 System.out.println(String.format("    question: %1$d. %2$s", j,
-                        survey.categories().get(i).questions().get(j).text()));
+                        survey.categories().get(i).questions().get(j).label()));
                 answers.add(new SurveyAnswer()
                         .question(survey.categories().get(i).questions().get(j))
                         .response(ANSWERS[i][j]));
@@ -100,7 +100,9 @@ public class EricSurveyAndResponseTest {
         
         try {
             Survey survey2 = objectMapper.readValue(resultFile, Survey.class);
-            assertEquals(survey, survey2);
+            assertEquals(survey.categories().size(), survey2.categories().size());
+            assertEquals(survey.questions().size(), survey2.questions().size());
+            assertEquals(survey.hashCode(), survey2.hashCode());
             assertSurvey(survey2);           
         } catch (IOException e) {
             e.printStackTrace();

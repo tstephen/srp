@@ -19,7 +19,8 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import digital.srp.macc.model.AnnualizedCost;
 import digital.srp.macc.model.Invoice;
@@ -34,7 +35,7 @@ import digital.srp.macc.model.ReportingYear;
  */
 public class ProRataAnnualizer implements Annualizer {
 
-    protected static final Logger LOGGER = Logger
+    protected static final Logger LOGGER = LoggerFactory
             .getLogger(ProRataAnnualizer.class);
 
     // @Override

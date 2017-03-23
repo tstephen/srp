@@ -1,0 +1,25 @@
+# LIST ALL SURVEYS (Basic)
+curl -X GET -v -u tstephen:oUS3wsWErisO -H 'Accept:application/json' http://localhost:8083/surveys/
+# LIST ALL SURVEYS (JWT)
+curl -X GET -H "X-Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ0c3RlcGhlbiIsInNjb3BlcyI6WyJBZG1pbiIsIlN1cGVyIEFkbWluIiwiVXNlciJdLCJpc3MiOiJodHRwOi8va25vd3Byb2Nlc3MuY29tIiwiaWF0IjoxNDg5NDk1MzYyLCJleHAiOjE0ODk0OTYyNjJ9.Pdts5wiRjPg_ri4gLlFzPIGINLgXGhJJ59td2y87KySq-8vsGd0KZs2cQKlCR-TTh6LBC6C7kuEjUbc3K5azBA" \
+  -H 'Accept:application/json' -H "Cache-Control: no-cache" "http://localhost:8083/surveys/"  
+
+# GET A SINGLE SURVEY
+curl -X GET -v -u tstephen:tstephen -H 'Accept:application/json' http://localhost:8083/surveys/5/
+
+# GET _SUMMARY_ returns for a given survey
+curl -X GET -v -u tstephen:tstephen -H 'Accept:application/json' http://localhost:8083/surveys/4/returns
+curl -X GET -H "X-Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ0c3RlcGhlbiIsInNjb3BlcyI6WyJBZG1pbiIsIlN1cGVyIEFkbWluIiwiVXNlciJdLCJpc3MiOiJodHRwOi8va25vd3Byb2Nlc3MuY29tIiwiaWF0IjoxNDg5NDk1MzYyLCJleHAiOjE0ODk0OTYyNjJ9.Pdts5wiRjPg_ri4gLlFzPIGINLgXGhJJ59td2y87KySq-8vsGd0KZs2cQKlCR-TTh6LBC6C7kuEjUbc3K5azBA" \
+  -H 'Accept:application/json' -H "Cache-Control: no-cache" http://localhost:8083/surveys/4/returns
+
+# GET a return (including a blank one if none exists)
+curl -X GET -v -u tstephen:tstephen -H 'Accept:application/json' http://localhost:8083/returns/findBySurveyNameAndOrg/Sdu-201617/R1A
+curl -X GET -v -u tstephen:tstephen -H 'Accept:application/json' http://localhost:8083/returns/findBySurveyNameAndOrg/Eric-201516/RDR
+
+curl -X GET -H "X-Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ0c3RlcGhlbiIsInNjb3BlcyI6WyJBZG1pbiIsIlN1cGVyIEFkbWluIiwiVXNlciJdLCJpc3MiOiJodHRwOi8va25vd3Byb2Nlc3MuY29tIiwiaWF0IjoxNDg5NTAxMTYyLCJleHAiOjE0ODk1MDIwNjJ9.YWr5LjayNUnXG8twvDl098i04Rt1L_JJrG3B1DVJZOWwAKbWKuJtTYSMm5af833qTD9pX9kQL5DjmtlXISFnEQ" \
+  -H 'Accept:application/json' -H "Cache-Control: no-cache" http://localhost:8083/returns/findBySurveyNameAndOrg/Sdu-201516/RDR
+  
+#
+# REPORTS
+#
+

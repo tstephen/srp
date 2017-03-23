@@ -10,9 +10,9 @@ import digital.srp.sreport.model.SurveyQuestion;
  * 
  * @author Tim Stephenson
  */
-public class Sdu1516 implements SduQuestions {
+public class Sdu1617 implements SduQuestions {
     
-    public static final String ID = "Sdu-201516";
+    public static final String ID = "Sdu-201617";
 
     public Survey getSurvey() {
         SurveyCategory catOrg = new SurveyCategory()
@@ -48,7 +48,11 @@ public class Sdu1516 implements SduQuestions {
                         new SurveyQuestion().name(LAST_GCC_DATE).label("When was your last GCC self assessment?").required(true), // TODO surely must be optional
                         new SurveyQuestion().name(LAST_GCC_SCORE).label("What was your score?").required(true), // TODO surely must be optional
                         new SurveyQuestion().name(PROMOTE_SUSTAINABILITY_TO_STAFF).label("Does your organisation promote sustainability to its employees?").required(true).type("yesno"),
-                        new SurveyQuestion().name(ECLASS_USER).label("Do you use eClass for procurement?").required(true).type("yesno")
+                        new SurveyQuestion().name(ECLASS_USER).label("Do you use eClass for procurement?").required(true).type("yesno"),
+                        new SurveyQuestion().name(QUANT_ES_IMPACTS).label("What are the qualitative or quantified social and environmental impacts?").required(true),
+                        new SurveyQuestion().name(QUANT_TRAVEL_IMPACTS).label("Does your organisation quantify the health impacts of travel and transport?").required(true).type("yesno"),
+                        new SurveyQuestion().name(MOD_SLAVERY).label("If your organisation has a Modern Slavery statement, what is it?").required(true).type("yesno"),
+                        new SurveyQuestion().name(SIA).label("Does your business case process include a Sustainability Impact Assessment?").required(true).type("yesno")
                 ));
 
         SurveyCategory catPerf = new SurveyCategory()
@@ -64,7 +68,18 @@ public class Sdu1516 implements SduQuestions {
                         new SurveyQuestion().name(BOARD_LEAD_FOR_SUSTAINABILITY).label("Is there a Board Level lead for Sustainability on your Board?").required(true).type("yesno"),
                         new SurveyQuestion().name(BOARD_SUSTAINABILITY_AS_RISK).label("Does your board consider sustainability issues as part of its risk management process?").required(true).type("yesno"),
                         new SurveyQuestion().name(ADAPTATION_PLAN_INCLUDED).label("Do your board approved plans address the potential need to adapt the delivery of your organisation's activities and organisation's infrastructure as a result of climate change and adverse weather events?").required(true).type("yesno"),
-                        new SurveyQuestion().name(CCGS_SERVED).label("We provide services to the following CCGs").required(true)
+                        new SurveyQuestion().name(CCGS_SERVED).label("We provide services to the following CCGs").required(true),
+                        new SurveyQuestion().name(ENERGY_PERF).label("Please insert a commentary on your performance in the area of energy").required(true),
+                        new SurveyQuestion().name(ENERGY_CONTEXT).label("Please insert a commentary on contextual information e.g. projects, intiatives etc. related to energy use").required(true),
+                        new SurveyQuestion().name(TRAVEL_PERF).label("Please insert a commentary on your performance in the area of travel").required(true),
+                        new SurveyQuestion().name(TRAVEL_CONTEXT).label("Please insert a commentary on contextual information e.g. projects, intiatives etc. related to travel").required(true),
+                        new SurveyQuestion().name(WASTE_PERF).label("Please insert a commentary on your performance in the area of waste").required(true),
+                        new SurveyQuestion().name(WASTE_CONTEXT).label("Please insert a commentary on contextual information e.g. projects, intiatives etc. related to waste").required(true),
+                        new SurveyQuestion().name(WATER_PERF).label("Please insert a commentary on your performance in the area of water").required(true),
+                        new SurveyQuestion().name(WATER_CONTEXT).label("Please insert a commentary on contextual information e.g. projects, intiatives etc. related to water").required(true),
+                        new SurveyQuestion().name(TRAJECTORY_PERF).label("Please insert a commentary on your performance on the trajectory").required(true),
+                        new SurveyQuestion().name(BENCHMARK_PERF).label("Please insert a commentary on your performance in the area of benchmarking").required(true),
+                        new SurveyQuestion().name(ADAPTATION_PERF).label("Please insert a commentary on your performance in the area of adaptation").required(true)
                 ));
         
         SurveyCategory catFinancial = new SurveyCategory()
@@ -98,12 +113,8 @@ public class Sdu1516 implements SduQuestions {
         SurveyCategory catWaste = new SurveyCategory()
                 .name("Waste")
                 .questions(Arrays.asList(
-                        new SurveyQuestion().name(HIGH_TEMP_DISPOSAL_WITH_RECOVERY_WEIGHT).label("High Temperature Disposal Waste with Energy Recovery").required(false).unit("tonnes"),
-                        new SurveyQuestion().name(HIGH_TEMP_DISPOSAL_WEIGHT).label("High Temperature Disposal Waste").required(false).unit("tonnes"),
-                        new SurveyQuestion().name(NON_BURN_WEIGHT).label("Non Burn Treatment Disposal Waste").required(false).unit("tonnes"),
-                        new SurveyQuestion().name(WEEE_WEIGHT).label("Waste Electrical and Electronic Equipment (WEEE)").required(false).unit("tonnes"),
-                        new SurveyQuestion().name(REUSE_WEIGHT).label("Preparing for re-use").required(false).unit("tonnes"),
-                        new SurveyQuestion().name(COMPOSTED_WEIGHT).label("Composted").required(false).unit("tonnes"),
+                        new SurveyQuestion().name(OTHER_RECOVERY_WEIGHT).label("Other Recovery weight").required(false).unit("tonnes"),
+                        new SurveyQuestion().name(INCINERATION_WEIGHT).label("Incineration disposal weight").required(false).unit("tonnes"),
                         new SurveyQuestion().name(LANDFILL_WEIGHT).label("Landfill disposal weight").required(false).unit("tonnes"),
                         new SurveyQuestion().name(RECYCLING_WEIGHT).label("Waste Recycling weight").required(false).unit("tonnes")
                 ));
@@ -132,8 +143,9 @@ public class Sdu1516 implements SduQuestions {
                         new SurveyQuestion().name(PATIENT_MILEAGE).label("Patient Transport Mileage").required(false).unit("miles"),
                         new SurveyQuestion().name(VISITOR_MILEAGE).label("Patient and Visitor Travel").required(false).unit("miles"),
                         new SurveyQuestion().name(TOTAL_EMPLOYEES).label("Total Employees in Organisation").required(false),
-                        new SurveyQuestion().name(STAFF_COMMUTE_MILES).label("Staff commute - Average annual distance travelled by road to work").required(false).unit("miles")
+                        new SurveyQuestion().name(STAFF_COMMUTE_MILES).label("Staff commute - Average annual distance travelled by road to work").required(false).unit("miles"),
                         // NOTE: calculate "Total Employee Commute for Organisation by road") by summing 2 above
+                        new SurveyQuestion().name("healthImpactOfTravel").label("Health impacts of travel and transport associated with provider activities").required(false).unit("QALY")
                 ));
         
         SurveyCategory catGases = new SurveyCategory()
@@ -143,7 +155,8 @@ public class Sdu1516 implements SduQuestions {
                         new SurveyQuestion().name(ISOFLURANE).label("Isoflurane - liquid").required(false).unit("litres"),
                         new SurveyQuestion().name(SEVOFLURANE).label("Sevoflurane - liquid").required(false).unit("litres"),
                         new SurveyQuestion().name(NITROUS_OXIDE).label("Nitrous oxide - gas").required(false).unit("litres"),
-                        new SurveyQuestion().name(PORTABLE_NITROUS_OXIDE_MIX).label("Portable nitrous oxide and oxygen 50/50 split - gas").required(false).unit("litres")
+                        new SurveyQuestion().name(PORTABLE_NITROUS_OXIDE_MIX).label("Portable nitrous oxide and oxygen 50/50 split - gas").required(false).unit("litres"),
+                        new SurveyQuestion().name(PORTABLE_NITROUS_OXIDE_MIX_MATERNITY).label("Maternity Manifold nitrous oxide and oxygen 50/50 split - gas").required(false).unit("litres")
                         // Calculate: "Total: Nitrous oxide with oxygen 50/50 split - gas"
                         // Calculate: Total: Converted to nitrous oxide only - gas
                 ));
@@ -157,6 +170,9 @@ public class Sdu1516 implements SduQuestions {
                         new SurveyQuestion().name(WOOD_CHIPS_OWNED_RENEWABLE_CONSUMPTION).label("Non-fossil fuel Consumed - renewable (wood chips)").required(false).unit("kWh"),
                         new SurveyQuestion().name(WOOD_PELLETS_OWNED_RENEWABLE_CONSUMPTION).label("Non-fossil fuel Consumed - renewable (wood pellets)").required(false).unit("kWh"),
                         new SurveyQuestion().name(ELEC_OWNED_RENEWABLE_CONSUMPTION).label("Electricity Consumed - renewable (Solar Panels)").required(false).unit("kWh"),
+                        new SurveyQuestion().name(LEASED_ASSETS_ENERGY_USE).label("Leased Assets Energy Use(Upstream - Gas, Coal & Electricity)").required(false).unit("tCO2e"),
+                        new SurveyQuestion().name(GREEN_TARIFF_ADDITIONAL_PCT).label("Percentage of green tariff supply proven as additional").required(false).unit("%"),
+                        new SurveyQuestion().name(THIRD_PARTY_ADDITIONAL_PCT).label("Percentage of third party owned supply proven as additional").required(false).unit("%"),
                         new SurveyQuestion().name(LEASED_ASSETS_ENERGY_USE).label("Leased Assets Energy Use(Upstream - Gas, Coal & Electricity)").required(false).unit("tCO2e")
                 ));
         
@@ -179,7 +195,7 @@ public class Sdu1516 implements SduQuestions {
                 ));
         
         Survey survey = new Survey().name(ID).status("Draft")
-                .applicablePeriod("2015-16")
+                .applicablePeriod("2016-17")
                 .categories(Arrays.asList(catOrg, catPolicy, catPerf,
                         catFinancial, catEnergy, catWaste,
                         catWater, catBizTravel, catOtherTravel, catGases,

@@ -15,20 +15,25 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import javax.persistence.Transient;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import javax.xml.bind.annotation.XmlElement;
 
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.hateoas.Link;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonView;
 
-import digital.srp.sreport.model.views.SurveyViews;
+import digital.srp.sreport.model.views.SurveyReturnViews;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 import lombok.experimental.Accessors;
 
 
@@ -39,6 +44,8 @@ import lombok.experimental.Accessors;
  */
 @Accessors(fluent=true)
 @Data
+@ToString(exclude = { "survey" })
+@EqualsAndHashCode(exclude = { "id", "survey", "revision", "created", "createdBy", "lastUpdated", "updatedBy" })
 @NoArgsConstructor
 @Entity
 @Table(name= "SR_RETURN")
@@ -47,12 +54,15 @@ public class SurveyReturn {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @JsonProperty
+    @JsonView(SurveyReturnViews.Summary.class)
+    @Column(name = "id")
     private Long id;
 
     @NotNull
     @Size(max = 50)
     @JsonProperty
-    @JsonView(SurveyViews.Summary.class)
+    @JsonView(SurveyReturnViews.Summary.class)
+    @Column(name = "name")
     private String name;
     
     /**
@@ -62,12 +72,15 @@ public class SurveyReturn {
     @NotNull
     @Size(max = 50)
     @JsonProperty
-    @JsonView(SurveyViews.Summary.class)
+    @JsonView(SurveyReturnViews.Summary.class)
+    @Column(name = "org")
     private String org;
     
     @NotNull
     @Size(max = 50)
     @JsonProperty
+    @JsonView(SurveyReturnViews.Summary.class)
+    @Column(name = "status")
     private String status = StatusType.Draft.name();
     
     /** 
@@ -78,6 +91,8 @@ public class SurveyReturn {
     @NotNull
     @JsonProperty
     @Size(max = 20)
+    @JsonView(SurveyReturnViews.Summary.class)
+    @Column(name = "applicable_period")
     private String applicablePeriod;
     
     /**
@@ -85,19 +100,30 @@ public class SurveyReturn {
      * allows for a re-statement if needed.
      */
     @JsonProperty
+    @JsonView(SurveyReturnViews.Summary.class)
+    @Column(name = "revision")
     private Short revision = 1;
 
     
     @Temporal(TemporalType.TIMESTAMP)
     @JsonProperty
+    @JsonView(SurveyReturnViews.Summary.class)
+    @Column(name = "submitted_date")
     private Date submittedDate;
 
     /** 
      * Username of submitter.
      */
     @JsonProperty
+    @JsonView(SurveyReturnViews.Summary.class)
+    @Column(name = "submitted_by")
     private String submittedBy;
     
+    @Transient
+    @XmlElement(name = "link", namespace = Link.ATOM_NAMESPACE)
+    @JsonProperty("links")
+    @JsonView(SurveyReturnViews.Summary.class)
+    private List<Link> links;
     
     @Column(name = "created", nullable = false, updatable = false)
     @CreatedDate
@@ -120,7 +146,8 @@ public class SurveyReturn {
     private Survey survey;
     
     @JsonProperty
-    @OneToMany(cascade=CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval=true)
+    @JsonView(SurveyReturnViews.Detailed.class)
+    @OneToMany(cascade=CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval=true, mappedBy = "surveyReturn")
     private List<SurveyAnswer> answers;
     
 }

@@ -38,10 +38,10 @@ If not then need to have separation. Conclusions: store ERIC in distinct categor
 4. API / service layer 
 
 Stories
-    - (System) Create initial survey
+    X (System) Create initial survey
         - Needs to be smart: create automatically if not present, but not if unchanged
-    - (Analyst) List all surveys
-    - (Analyst) View single survey (audit? status?)
+    X (Analyst) List all surveys
+    X (Analyst) View single survey (audit? status?)
     - ? (Analyst) Create new survey by modification of previous 
 
     - ??? (Analyst) List organisations (inc. most recent report year?)

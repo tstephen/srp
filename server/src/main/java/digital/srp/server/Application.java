@@ -15,11 +15,6 @@
  *******************************************************************************/
 package digital.srp.server;
 
-import io.onedecision.engine.OneDecisionConfig;
-import link.omny.acctmgmt.AcctMgmtConfig;
-import link.omny.acctmgmt.model.SystemConfig;
-import link.omny.custmgmt.CustMgmtConfig;
-
 import org.apache.catalina.connector.Connector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,20 +25,25 @@ import org.springframework.boot.context.embedded.tomcat.TomcatEmbeddedServletCon
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
+import com.knowprocess.auth.AuthConfig;
 import com.knowprocess.bpm.BpmConfiguration;
-import com.knowprocess.bpm.api.ActivitiApplicationSecurity;
 
-import digital.srp.SrpConfig;
 import digital.srp.macc.MaccConfig;
+import digital.srp.sreport.internal.SReportConfiguration;
+import io.onedecision.engine.OneDecisionConfig;
+import io.onedecision.engine.domain.OneDecisionDomainConfig;
+import link.omny.acctmgmt.AcctMgmtConfig;
+import link.omny.acctmgmt.model.SystemConfig;
+import link.omny.custmgmt.CustMgmtConfig;
 
 @Configuration
-@Import({ OneDecisionConfig.class, AcctMgmtConfig.class,
-        BpmConfiguration.class, CustMgmtConfig.class,
-        MaccConfig.class, SrpConfig.class })
+@Import({ 
+        AuthConfig.class, OneDecisionConfig.class, OneDecisionDomainConfig.class,
+        AcctMgmtConfig.class, BpmConfiguration.class, CustMgmtConfig.class,
+        MaccConfig.class, SReportConfiguration.class/*, SrpConfig.class*/ })
 public class Application extends WebMvcConfigurerAdapter {
 
     protected static final Logger LOGGER = LoggerFactory
@@ -96,11 +96,11 @@ public class Application extends WebMvcConfigurerAdapter {
                 "loginPage?error");
     }
 
-    @Bean
-    public WebSecurityConfigurerAdapter applicationSecurity() {
-        return new ActivitiApplicationSecurity();
-        // return new SrpActivitiApplicationSecurity();
-    }
+//    @Bean
+//    public WebSecurityConfigurerAdapter applicationSecurity() {
+//        return new ActivitiApplicationSecurity();
+//        // return new SrpActivitiApplicationSecurity();
+//    }
 
     public static void main(String[] args) {
         SpringApplication.run(Application.class, args);

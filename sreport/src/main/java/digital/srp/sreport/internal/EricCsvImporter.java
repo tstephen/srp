@@ -30,7 +30,7 @@ public class EricCsvImporter {
 
         questions = new ArrayList<SurveyQuestion>();
         for (String hdr : headers) {
-            questions.add(new SurveyQuestion().text(hdr));
+            questions.add(new SurveyQuestion().label(hdr));
         }
         LOGGER.debug(String.format("Found %1$d questions", questions.size())); 
 

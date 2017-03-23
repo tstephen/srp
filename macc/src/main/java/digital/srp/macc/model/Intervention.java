@@ -17,7 +17,6 @@ package digital.srp.macc.model;
 
 import java.math.BigDecimal;
 
-import javax.annotation.Nullable;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -30,14 +29,14 @@ import javax.persistence.Table;
 import javax.persistence.Transient;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
-
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import javax.validation.constraints.NotNull;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import digital.srp.macc.maths.Finance;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  * An action or related set of actions aimed at providing Carbon Abatement or
@@ -77,7 +76,7 @@ public class Intervention implements CsvSerializable {
     @Min(value = 0)
     @Max(100)
     @Column(name = "SHARE", nullable = true)
-    @Nullable
+    @NotNull
     private Float shareOfTotal;
 
     @JsonProperty

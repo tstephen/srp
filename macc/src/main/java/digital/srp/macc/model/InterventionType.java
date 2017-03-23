@@ -20,7 +20,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import javax.annotation.Nullable;
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -34,9 +33,6 @@ import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -44,6 +40,8 @@ import org.springframework.beans.factory.annotation.Value;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import digital.srp.macc.maths.Finance;
+import lombok.AllArgsConstructor;
+import lombok.Data;
 
 /**
  * An action or related set of actions aimed at providing Carbon Abatement or
@@ -126,7 +124,7 @@ public class InterventionType implements CsvSerializable {
      */
     @JsonProperty
     @Column(name = "LIFETIME", nullable = true)
-    @Nullable
+    @NotNull
     private Short lifetime;
 
     /**
@@ -144,14 +142,14 @@ public class InterventionType implements CsvSerializable {
     @Min(value = 0)
     @Max(100)
     @Column(name = "UPTAKE", nullable = true)
-    @Nullable
+    @NotNull
     private Short uptake;
 
     @JsonProperty
     @Min(value = 0)
     @Max(100)
     @Column(name = "SCALING", nullable = true)
-    @Nullable
+    @NotNull
     private Float scaling;
 
     /**

@@ -12,8 +12,10 @@ import javax.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.hateoas.Link;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -40,7 +42,6 @@ import digital.srp.sreport.model.SurveyQuestion;
 import digital.srp.sreport.model.SurveyReturn;
 import digital.srp.sreport.model.returns.Eric1516;
 import digital.srp.sreport.model.views.SurveyReturnViews;
-import digital.srp.sreport.model.views.SurveyViews;
 import digital.srp.sreport.repositories.SurveyReturnRepository;
 
 /**
@@ -55,6 +56,9 @@ public class SurveyReturnController {
     private static final Logger LOGGER = LoggerFactory
             .getLogger(SurveyReturnController.class);
     
+    @Value("${spring.data.rest.baseUri}")
+    protected String baseUrl;
+    
     @Autowired
     protected SurveyController surveyController; 
     
@@ -64,6 +68,7 @@ public class SurveyReturnController {
     @PostConstruct
     protected void init() {
         Survey survey = surveyController.findByName(digital.srp.sreport.model.surveys.Eric1516.ID);
+        List<SurveyReturn> existingReturns = findBySurvey(digital.srp.sreport.model.surveys.Eric1516.ID);
         
         InputStreamReader isr = null;
         try {
@@ -78,15 +83,22 @@ public class SurveyReturnController {
                 
                 // merge persisted questions to answers
                 for (SurveyAnswer answer: surveyReturn.answers()) {
-                    answer.question(findMatchingQ(survey, answer));
+                    answer.question(findMatchingQ(survey, answer))
+                            .surveyReturn(surveyReturn);
                 }
                 
-                returnRepo.save(surveyReturn);
+                if (!findBySurveyAndOrg(existingReturns, surveyReturn)) {
+                    returnRepo.save(surveyReturn);
+                }
             }
         } catch (IOException e) {
             String msg = String.format("Unable to load ERIC data from %1$s", Eric1516.DATA_FILE);
             LOGGER.error(msg, e);
             throw new SReportException(msg, e);
+        } catch (Throwable e) {
+            String msg = String.format("Unable to load ERIC data from %1$s", Eric1516.DATA_FILE);
+            LOGGER.error(msg, e);
+//            throw new SReportException(msg, e);
         } finally { 
             try {
                 isr.close();
@@ -96,17 +108,29 @@ public class SurveyReturnController {
         }
     }
     
+    private boolean findBySurveyAndOrg(List<SurveyReturn> existingReturns,
+            SurveyReturn surveyReturn) {
+        for (SurveyReturn ret : existingReturns) {
+            if (ret.name().equals(surveyReturn.name()) 
+                    && ret.org().equals(surveyReturn.org())) {
+                LOGGER.info(String.format("Skipping insert of return for %1$s because %2$d matches name and org", surveyReturn.name(), ret.id()));
+                return true;
+            }
+        }
+        return false;
+    }
+
     private SurveyQuestion findMatchingQ(Survey survey, SurveyAnswer answer) {
         for (SurveyCategory cat : survey.categories()) {
             for (SurveyQuestion q : cat.questions()) {
-                if (q.text().equals(answer.question().text())) {
+                if (q.label().equals(answer.question().label())) {
                     return q;
                 }
             }
         }
         throw new IllegalArgumentException(String.format(
                 "Answer %1$s responds to the unknown question %2$s",
-                answer.id(), answer.question().text()));
+                answer.id(), answer.question().label()));
     }
 
     /**
@@ -117,14 +141,31 @@ public class SurveyReturnController {
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
     @JsonView(SurveyReturnViews.Detailed.class)
     @Transactional
-    public @ResponseBody SurveyReturn findById(@PathVariable("id") Long surveyId) {
-        LOGGER.info(String.format("findById %1$s", surveyId));
+    public @ResponseBody SurveyReturn findById(@PathVariable("id") Long returnId) {
+        LOGGER.info(String.format("findById %1$s", returnId));
 
-        SurveyReturn survey = returnRepo.findOne(surveyId);
+        SurveyReturn rtn = returnRepo.findOne(returnId);
         // use logger for force child load
-        LOGGER.info(String.format("Found return with id %1$d with status %2$s and containing %3$d answers", survey.id(), survey.status(), survey.answers().size()));
+        LOGGER.info(String.format("Found return with id %1$d with status %2$s and containing %3$d answers", rtn.id(), rtn.status(), rtn.answers().size()));
 
-        return survey;
+        return addLinks(rtn);
+    }
+    
+    /**
+     * Returns matching the specified survey and organisation.
+     * 
+     * @return returns. May be more than one because occasionally returns are restated. .
+     */
+    @RequestMapping(value = "/findBySurveyName/{surveyName}", method = RequestMethod.GET)
+    @JsonView(SurveyReturnViews.Detailed.class)
+    @Transactional
+    public @ResponseBody List<SurveyReturn> findBySurvey(
+            @PathVariable("surveyName") String surveyName) {
+        LOGGER.info(String.format("findCurrentBySurvey %1$s", surveyName));
+
+        List<SurveyReturn> returns = returnRepo.findBySurveyName(surveyName);
+
+        return addLinks(returns);
     }
     
     /**
@@ -133,7 +174,7 @@ public class SurveyReturnController {
      * @return returns. May be more than one because occasionally returns are restated. .
      */
     @RequestMapping(value = "/findBySurveyNameAndOrg/{surveyName}/{org}", method = RequestMethod.GET)
-    @JsonView(SurveyViews.Detailed.class)
+    @JsonView(SurveyReturnViews.Detailed.class)
     @Transactional
     public @ResponseBody List<SurveyReturn> findBySurveyAndOrg(
             @PathVariable("surveyName") String surveyName,
@@ -149,16 +190,14 @@ public class SurveyReturnController {
             returns.add(createBlankReturn(surveyName, org));
         }
 
-        return returns;
+        return addLinks(returns);
     }
 
     protected SurveyReturn createBlankReturn(String surveyName, String org) {
-        // create new record ready for filling
+        LOGGER.info(String.format("createBlankReturn of %1$s for %2$s", surveyName, org));
         Survey requested = surveyController.findByName(surveyName);
         List<SurveyAnswer> emptyAnswers = new ArrayList<SurveyAnswer>();
-        for (SurveyQuestion q : requested.questions()) {
-            emptyAnswers.add(new SurveyAnswer().question(q));
-        }
+
         SurveyReturn rtn = new SurveyReturn()
                 .name(String.format("%1$s %2$s", requested.name(),org))
                 .survey(requested)
@@ -166,11 +205,19 @@ public class SurveyReturnController {
                 .applicablePeriod(requested.applicablePeriod())
                 .answers(emptyAnswers);
         returnRepo.save(rtn);
-        return rtn;
+        for (SurveyQuestion q : requested.questions()) {
+            SurveyAnswer answer = new SurveyAnswer().question(q).surveyReturn(rtn);
+            if (q.name().equals("orgCode")) {
+                answer.response(org);
+            }
+            emptyAnswers.add(answer);
+        }
+        
+        return addLinks(rtn);
     }
 
     @RequestMapping(value = "/findCurrentBySurveyNameAndOrg/{surveyName}/{org}", method = RequestMethod.GET)
-    @JsonView(SurveyViews.Detailed.class)
+    @JsonView(SurveyReturnViews.Detailed.class)
     @Transactional
     public @ResponseBody SurveyReturn findCurrentBySurveyAndOrg(
             @PathVariable("surveyName") String surveyName,
@@ -182,7 +229,7 @@ public class SurveyReturnController {
         SurveyReturn rtn = returns.get(returns.size()-1);
         LOGGER.debug(String.format("Found %1$d returns for %2$s,%3$s; returning revision %4$d", returns.size(), surveyName, org, rtn.revision()));
 
-        return rtn;
+        return addLinks(rtn);
     }
     
     /**
@@ -206,7 +253,7 @@ public class SurveyReturnController {
         }
         LOGGER.info(String.format("Found %1$s returns", list.size()));
 
-        return list;
+        return addLinks(list);
     }
 
     /**
@@ -223,7 +270,7 @@ public class SurveyReturnController {
         List<SurveyReturn> list = returnRepo.findByOrg(org);
         LOGGER.info(String.format("Found %1$s returns", list.size()));
 
-        return list;
+        return addLinks(list);
     }
     
     /**
@@ -263,6 +310,10 @@ public class SurveyReturnController {
             throw new IllegalStateException(String.format(
                     "The return %1$d:%2$s has been submitted, you may no longer update. If you've recognised a mistake please re-state the return.", 
                     returnId, existing.name()));
+        }
+        updatedReturn.survey(existing.survey());
+        for (SurveyAnswer answer : updatedReturn.answers()) {
+            answer.surveyReturn(updatedReturn);
         }
         returnRepo.save(updatedReturn);
     }
@@ -310,14 +361,21 @@ public class SurveyReturnController {
     @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
     @Transactional
     public @ResponseBody void delete(
-            @PathVariable("id") Long surveyId) {
-        returnRepo.delete(surveyId);
+            @PathVariable("id") Long returnId) {
+        returnRepo.delete(returnId);
     }
 
-//    private Link linkTo(
-//            @SuppressWarnings("rawtypes") Class<? extends CrudRepository> clazz,
-//            Long id) {
-//        return new Link(clazz.getAnnotation(RepositoryRestResource.class)
-//                .path() + "/" + id);
-//    }
+    private List<SurveyReturn> addLinks(List<SurveyReturn> returns) {
+        for (SurveyReturn rtn : returns) {
+            addLinks(rtn);
+        }
+        return returns;
+    }
+    
+    private SurveyReturn addLinks(SurveyReturn rtn) {
+        List<Link> links = new ArrayList<Link>();
+        links.add(new Link(baseUrl+getClass().getAnnotation(RequestMapping.class).value()[0] + "/" + rtn.id()));
+        
+        return rtn.links(links);
+    }
 }

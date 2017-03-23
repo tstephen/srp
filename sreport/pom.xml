@@ -17,7 +17,6 @@
       <dependency>
         <groupId>org.projectlombok</groupId>
         <artifactId>lombok</artifactId>
-        <version>1.14.8</version>
         <scope>provided</scope>
       </dependency>
       <dependency>
@@ -73,7 +72,7 @@
        <!-- Compiles against SLF4J but this is the implementation of choice -->
       <dependency>
         <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-starter-log4j</artifactId>
+        <artifactId>spring-boot-starter-log4j2</artifactId>
       </dependency>
       <dependency>
         <groupId>org.hibernate</groupId>
@@ -128,6 +127,19 @@
         <artifactId>ractive</artifactId>
         <version>${ractive.version}</version>
       </dependency>
+      
+      <dependency>
+		    <groupId>info.cukes</groupId>
+		    <artifactId>cucumber-junit</artifactId>
+		    <version>1.2.5</version>
+		    <scope>test</scope>
+			</dependency>
+			<dependency>
+		    <groupId>info.cukes</groupId>
+		    <artifactId>cucumber-java</artifactId>
+		    <version>1.2.5</version>
+		    <scope>test</scope>
+			</dependency>
     </dependencies>
     
 </project>

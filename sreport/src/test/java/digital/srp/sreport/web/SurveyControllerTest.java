@@ -25,7 +25,12 @@ public class SurveyControllerTest {
 
     @Autowired
     private SurveyController svc;
-    
+
+    @Test
+    public void givenNoPreq_whenCrud_thenOk() {
+
+    }
+
     @Test
     public void givenNoPreq_whenFirstLoad_thenDefaultSurveys() {
         List<Survey> surveys = svc.list(null, null);

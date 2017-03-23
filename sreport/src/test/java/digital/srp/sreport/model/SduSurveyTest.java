@@ -36,18 +36,18 @@ public class SduSurveyTest {
         SurveyCategory catOrg = new SurveyCategory()
                 .name("Organisation")
                 .questions(Arrays.asList(
-                        new SurveyQuestion().text("Name of organisation").required(true),
-                        new SurveyQuestion().text("Organisation code e.g. RAA").required(true),
-                        new SurveyQuestion().text("Abbreviation or nick name of organisation used").required(false)
+                        new SurveyQuestion().label("Name of organisation").required(true),
+                        new SurveyQuestion().label("Organisation code e.g. RAA").required(true),
+                        new SurveyQuestion().label("Abbreviation or nick name of organisation used").required(false)
                 ));
         assertEquals(3, catOrg.questions().size());
 
         SurveyCategory catPolicy = new SurveyCategory()
                 .name("Policy")
                 .questions(Arrays.asList(
-                        new SurveyQuestion().text("Does your organisation have a current* Board-approved Sustainable Development Management Plan (SDMP) or Carbon Reduction Management Plan (CRMP)?").required(true),
-                        new SurveyQuestion().text("Was the SDMP reviewed or approved by the board in the last 12 months?").required(true),
-                        new SurveyQuestion().text("If your SDMP has a sustainability mission statement, what is it?").required(false)
+                        new SurveyQuestion().label("Does your organisation have a current* Board-approved Sustainable Development Management Plan (SDMP) or Carbon Reduction Management Plan (CRMP)?").required(true),
+                        new SurveyQuestion().label("Was the SDMP reviewed or approved by the board in the last 12 months?").required(true),
+                        new SurveyQuestion().label("If your SDMP has a sustainability mission statement, what is it?").required(false)
                 ));
         assertEquals(3, catPolicy.questions().size());
         

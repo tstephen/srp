@@ -15,19 +15,23 @@ import javax.persistence.Table;
 import javax.persistence.Transient;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import javax.xml.bind.annotation.XmlElement;
 
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+import org.springframework.hateoas.Link;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonView;
 
 import digital.srp.sreport.model.views.SurveyViews;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 import lombok.experimental.Accessors;
 
 
@@ -38,6 +42,8 @@ import lombok.experimental.Accessors;
  */
 @Accessors(fluent=true)
 @Data
+@ToString(exclude = { "id" })
+@EqualsAndHashCode(exclude = { "id", "created", "createdBy", "lastUpdated", "updatedBy" })
 @NoArgsConstructor
 @Entity
 @EntityListeners(AuditingEntityListener.class)
@@ -46,6 +52,7 @@ public class Survey {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name = "id")
     @JsonProperty
     @JsonView(SurveyViews.Summary.class)
     private Long id;
@@ -54,12 +61,14 @@ public class Survey {
     @Size(max = 50)
     @JsonProperty
     @JsonView(SurveyViews.Summary.class)
+    @Column(name = "name")
     private String name;
     
     @NotNull
     @Size(max = 50)
     @JsonProperty
     @JsonView(SurveyViews.Summary.class)
+    @Column(name = "status")
     private String status = "Draft";
     
     /** 
@@ -71,12 +80,19 @@ public class Survey {
     @Size(max = 20)
     @JsonProperty
     @JsonView(SurveyViews.Summary.class)
+    @Column(name = "applicable_period")
     private String applicablePeriod;
 
     @JsonProperty
     @JsonView(SurveyViews.Detailed.class)
-    @OneToMany(orphanRemoval=true, cascade= CascadeType.ALL)
+    @OneToMany(orphanRemoval=true, cascade= CascadeType.ALL, mappedBy = "survey")
     private List<SurveyCategory> categories;
+    
+    @Transient
+    @XmlElement(name = "link", namespace = Link.ATOM_NAMESPACE)
+    @JsonProperty("links")
+    @JsonView(SurveyViews.Summary.class)
+    private List<Link> links;
     
     @Column(name = "created", nullable = false, updatable = false)
     @CreatedDate
@@ -94,6 +110,16 @@ public class Survey {
     @LastModifiedBy
     private String updatedBy;
     
+    public Survey categories(List<SurveyCategory> categories) {
+        this.categories = categories;
+        
+        for (SurveyCategory cat : categories) {
+            cat.survey(this);
+        }
+        
+        return this;
+    }
+    
     @JsonProperty
     @Transient
     public List<SurveyQuestion> questions() {
@@ -103,4 +129,5 @@ public class Survey {
         }
         return questions;
     }
+
 }
