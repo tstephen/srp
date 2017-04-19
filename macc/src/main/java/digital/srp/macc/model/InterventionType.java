@@ -70,44 +70,57 @@ public class InterventionType implements CsvSerializable {
 
     @JsonProperty
     @NotNull
+    @Column(name = "name")
     private String name;
 
     @JsonProperty
+    @Column(name = "description")
     @Lob
     private String description;
 
     @JsonProperty
+    @Column(name = "existing")
     private boolean existing;
 
     @JsonProperty
+    @Column(name = "status")
     private String status;
 
     @JsonProperty
+    @Column(name = "data_status")
     private String dataStatus;
 
     @JsonProperty
+    @Column(name = "analysis_status")
     private String analysisStatus;
 
     @JsonProperty
+    @Column(name = "strategic_focus")
     private String strategicFocus;
 
     @JsonProperty
+    @Column(name = "tactical_driver")
     private String tacticalDriver;
 
     @JsonProperty
+    @Column(name = "operational_sub_category")
     private String operationalSubCategory;
 
     @JsonProperty
+    @Column(name = "classification")
     private String classification;
 
     @JsonProperty
+    @Column(name = "cross_organisation")    
     private boolean crossOrganisation;
 
     @JsonProperty
+    @Column(name = "note")
     @Lob
     private String note;
 
     @JsonProperty
+    @Column(name = "client_note")
     @Lob
     private String clientNote;
 
@@ -117,6 +130,7 @@ public class InterventionType implements CsvSerializable {
     @JsonProperty
     @Min(1970)
     @Max(2099)
+    @Column(name = "modelling_year")
     private int modellingYear;
 
     /**
@@ -158,12 +172,15 @@ public class InterventionType implements CsvSerializable {
     @JsonProperty
     @Min(value = 0)
     @Max(100)
+    @Column(name = "confidence")
     private Short confidence = 50;
 
     @JsonProperty
+    @Column(name = "further_info")
     private String furtherInfo;
 
     @Basic
+    @Column(name = "overlapping_interventions")
     @Lob
     private String overlappingInterventions;
 
@@ -172,19 +189,24 @@ public class InterventionType implements CsvSerializable {
     private double costPerTonneCo2e;
 
     @JsonProperty
+    @Column(name = "annual_cash_inflows")
     private BigDecimal annualCashInflows;
 
     @JsonProperty
+    @Column(name = "annual_cash_inflowsts")
     @Lob
     private String annualCashInflowsTS;
 
     @JsonProperty
+    @Column(name = "cash_outflows_up_front")
     private BigDecimal cashOutflowsUpFront;
 
     @JsonProperty
+    @Column(name = "annual_cash_outflows")
     private BigDecimal annualCashOutflows;
 
     @JsonProperty
+    @Column(name = "annual_cash_outflowsts")
     @Lob
     private String annualCashOutflowsTS;
 
@@ -197,6 +219,7 @@ public class InterventionType implements CsvSerializable {
     private BigDecimal annualTonnesCo2eSaved;
 
     @JsonProperty
+    @Column(name = "annual_tonnes_co2e_savedts")
     @Lob
     private String annualTonnesCo2eSavedTS;
 
@@ -227,6 +250,7 @@ public class InterventionType implements CsvSerializable {
     private String unitDescription;
 
     @JsonProperty
+    @Column(name = "tenant_id")
     private String tenantId;
 
     @JsonProperty

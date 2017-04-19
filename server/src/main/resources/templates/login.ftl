@@ -103,7 +103,7 @@
       <div id="messages" style="display:none;width:100%"></div>
     </div>
     <div class="col-md-offset-6 col-md-6 col-sm-12" id="loginSect">
-      <form class="form-inline" id="loginForm" name="loginForm" action="{{context}}/login" method="POST">
+      <form class="form-inline" id="loginForm" name="loginForm" action="{{context}}/auth/login" method="POST">
         <fieldset>
           <input class="form-control input-lg" type="text" id="username" name="username" placeholder="Username" required/>
           <input class="form-control input-lg" type="password" id="password" name="password" placeholder="Password" required/>

@@ -28,11 +28,11 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * A segmentation of all the organisations in the NHS, public health and social
@@ -55,56 +55,72 @@ public class OrganisationType {
 
     @NotNull
     @JsonProperty
+    @Column(name = "name")
     private String name;
 
     @JsonProperty
+    @Column(name = "sector")
     private String sector;
 
     @JsonProperty
+    @Column(name = "count")
     private int count;
 
     // A set of turnover ranges. TODO Under 10m,
     // 10-50m,50-100m, Over 100m?
     @JsonProperty
+    @Column(name = "annual_turnover")
     private int annualTurnover;
 
     // A set of energy use ranges.
     @JsonProperty
+    @Column(name = "annual_energy_use")
     private int annualEnergyUse;
 
     @JsonProperty
+    @Column(name = "no_of_staff")
     private double noOfStaff;
 
     @JsonProperty
+    @Column(name = "no_of_patient_interactions")
     private int noOfPatientInteractions;
 
     @JsonProperty
+    @Column(name = "no_of_in_patients")
     private int noOfInPatients;
 
     // Useful for quantifying heat and light requirements
     // for various interventions
     @JsonProperty
+    @Column(name = "floor_area")
     private int floorArea;
 
     @JsonProperty
+    @Column(name = "annual_mileage")
     private long annualMileage;
 
     @JsonProperty
+    @Column(name = "typical_journey_distance")
     private int typicalJourneyDistance;
 
     @JsonProperty
+    @Column(name = "no_inhalers_prescribed")
     private int noInhalersPrescribed;
 
     @JsonProperty
+    @Column(name = "icon")
     private String icon;
 
     @JsonProperty
+    @Column(name = "status")
     private String status;
 
     @JsonProperty
+    @Column(name = "commissioner")
     private boolean commissioner;
 
     @JsonProperty
+    @Column(name = "tenant_id")
     private String tenantId;
 
     @OneToMany(cascade = CascadeType.ALL)

@@ -1,0 +1,32 @@
+{"properties": [
+  {
+    "name": "kp.security.tokenBasedUrlPatterns",
+    "type": "java.lang.String",
+    "description": "A description for 'kp.security.tokenBasedUrlPatterns'"
+  },
+  {
+    "name": "kp.cors.allowedOrigins",
+    "type": "java.lang.String",
+    "description": "A description for 'kp.cors.allowedOrigins'"
+  },
+  {
+    "name": "kp.security.tokenBasedUrlPattern",
+    "type": "java.lang.String",
+    "description": "A description for 'kp.security.tokenBasedUrlPattern'"
+  },
+  {
+    "name": "kp.security.tokenBasedPermittedUrlPatterns",
+    "type": "java.lang.String",
+    "description": "A description for 'kp.security.tokenBasedPermittedUrlPatterns'"
+  },
+  {
+    "name": "kp.security.cors.allowedOrigins",
+    "type": "java.lang.String",
+    "description": "A description for 'kp.security.cors.allowedOrigins'"
+  },
+  {
+    "name": "kp.security.jwt.tokenBasedPermittedUrlPatterns",
+    "type": "java.lang.String",
+    "description": "A description for 'kp.security.jwt.tokenBasedPermittedUrlPatterns'"
+  }
+]}

@@ -22,17 +22,17 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import digital.srp.macc.maths.Finance;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  * A segmentation of all the organisations in the NHS, public health and social
@@ -55,43 +55,56 @@ public class OrganisationIntervention {
 
     @NotNull
     @JsonProperty
+    @Column(name = "name")
     private String name;
 
     @JsonProperty
+    @Column(name = "annual_turnover")
     private int annualTurnover;
 
     @JsonProperty
+    @Column(name = "annual_energy_use")
     private int annualEnergyUse;
 
     @JsonProperty
+    @Column(name = "no_of_staff")
     private int noOfStaff;
 
     @JsonProperty
+    @Column(name = "no_of_patient_interactions")
     private int noOfPatientInteractions;
 
     @JsonProperty
+    @Column(name = "no_of_in_patients")
     private int noOfInPatients;
 
     @JsonProperty
+    @Column(name = "floor_area")
     private int floorArea;
 
     @JsonProperty
+    @Column(name = "annual_mileage")
     private long annualMileage;
 
     @JsonProperty
+    @Column(name = "typical_journey_distance")
     private int typicalJourneyDistance;
 
     @JsonProperty
+    @Column(name = "unit_count")
     private double unitCount;
 
     @JsonProperty
+    @Column(name = "logo")
     private String logo;
 
     @JsonProperty
+    @Column(name = "tenant_id")
     private String tenantId;
 
     @JsonProperty
     @ManyToOne
+    @JoinColumn(name = "organisation_type_id")
     private OrganisationType organisationType;
 
     @JsonProperty

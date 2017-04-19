@@ -73,6 +73,12 @@ public class Application extends WebMvcConfigurerAdapter {
             ajpConnector.setAllowTrace(false);
             ajpConnector.setScheme(ajpScheme);
             tomcat.addAdditionalTomcatConnectors(ajpConnector);
+            LOGGER.info("Enabled AJP connector:");
+            LOGGER.info("  port: {}", ajpPort);
+            LOGGER.info("  secure: {}", ajpSecure);
+            LOGGER.info("  scheme: {}", ajpScheme);
+        } else {
+            LOGGER.info("No AJP connector configured, set srp.tomcat.* to enable");
         }
 
         return tomcat;

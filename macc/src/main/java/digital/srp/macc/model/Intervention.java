@@ -80,6 +80,7 @@ public class Intervention implements CsvSerializable {
     private Float shareOfTotal;
 
     @JsonProperty
+    @Column(name = "tenant_id")
     private String tenantId;
 
     public Intervention(InterventionType it, OrganisationType orgType) {

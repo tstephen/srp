@@ -19,9 +19,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -45,6 +42,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import digital.srp.macc.model.OrganisationType;
 import digital.srp.macc.repositories.OrganisationTypeRepository;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 /**
  * REST endpoint for accessing {@link OrganisationType}
@@ -133,12 +132,12 @@ public class OrganisationTypeController {
             @PathVariable("tenantId") String tenantId,
             @PathVariable("status") String status) {
         LOGGER.info(String.format(
-                "List organisations for tenant %1$s with status %2$s",
+                "List organisation types for tenant %1$s with status %2$s",
                 tenantId, status));
 
         List<OrganisationType> list = organisationTypeRepo
                 .findByStatusForTenant(tenantId, status);
-        LOGGER.info(String.format("Found %1$s organisations", list.size()));
+        LOGGER.info(String.format("Found %1$s organisation types", list.size()));
 
         return wrap(list);
     }

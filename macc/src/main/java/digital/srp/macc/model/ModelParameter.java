@@ -27,11 +27,11 @@ import javax.persistence.Lob;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * An action or related set of actions aimed at providing Carbon Abatement or
@@ -53,19 +53,24 @@ public class ModelParameter {
     private Long id;
 
     @JsonProperty
+    @Column(name = "name")
     private String name;
 
     @JsonProperty
+    @Column(name = "description")
     private String description;
 
     @JsonProperty
+    @Column(name = "value")
     private BigDecimal value;
 
     @JsonProperty
+    @Column(name = "valuets")
     @Lob
     private String valueTS;
 
     @JsonProperty
+    @Column(name = "tenant_id")
     private String tenantId;
 
     public ModelParameter(String name, String valueTS) {
