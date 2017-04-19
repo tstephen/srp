@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import javax.annotation.PostConstruct;
+import javax.persistence.EntityManagerFactory;
 import javax.transaction.Transactional;
 
 import org.slf4j.Logger;
@@ -42,7 +43,10 @@ import digital.srp.sreport.model.SurveyQuestion;
 import digital.srp.sreport.model.SurveyReturn;
 import digital.srp.sreport.model.returns.Eric1516;
 import digital.srp.sreport.model.views.SurveyReturnViews;
+import digital.srp.sreport.repositories.SurveyAnswerRepository;
+import digital.srp.sreport.repositories.SurveyQuestionRepository;
 import digital.srp.sreport.repositories.SurveyReturnRepository;
+import digital.srp.sreport.services.Cruncher;
 
 /**
  * REST web service for accessing returned returns.
@@ -60,25 +64,39 @@ public class SurveyReturnController {
     protected String baseUrl;
     
     @Autowired
+    protected Cruncher cruncher;
+    
+    @Autowired
     protected SurveyController surveyController; 
     
     @Autowired
     protected SurveyReturnRepository returnRepo;
 
+    @Autowired
+    protected SurveyQuestionRepository qRepo;
+    
+    @Autowired
+    protected SurveyAnswerRepository answerRepo;
+    
+    @Autowired 
+    protected EntityManagerFactory entityManagerFactory;
+    
     @PostConstruct
     protected void init() {
         Survey survey = surveyController.findByName(digital.srp.sreport.model.surveys.Eric1516.ID);
+        LOGGER.debug("Found survey definition {} ({} containing {} questions", survey.name(), survey.id(), survey.questions().size());
         List<SurveyReturn> existingReturns = findBySurvey(digital.srp.sreport.model.surveys.Eric1516.ID);
+        LOGGER.debug(" ... {} existing returns", existingReturns.size());
         
         InputStreamReader isr = null;
         try {
             isr = new InputStreamReader(getClass().getResourceAsStream(Eric1516.DATA_FILE));
             List<SurveyReturn> returns = new EricCsvImporter()
                     .readEricReturns(isr, Eric1516.HEADERS);
-            LOGGER.info(String.format("Found %1$d ERIC returns, saving...", returns.size()));
+            LOGGER.info("Found {} {} returns to import...", returns.size(), survey.name());
             for (SurveyReturn surveyReturn : returns) {
-                surveyReturn.applicablePeriod("2015-16")
-                        .name(surveyReturn.org()+" 2015-16")
+                surveyReturn.applicablePeriod(digital.srp.sreport.model.surveys.Eric1516.PERIOD)
+                        .name(surveyReturn.org()+" "+digital.srp.sreport.model.surveys.Eric1516.PERIOD)
                         .survey(survey);
                 
                 // merge persisted questions to answers
@@ -218,7 +236,7 @@ public class SurveyReturnController {
 
     @RequestMapping(value = "/findCurrentBySurveyNameAndOrg/{surveyName}/{org}", method = RequestMethod.GET)
     @JsonView(SurveyReturnViews.Detailed.class)
-    @Transactional
+//    @Transactional
     public @ResponseBody SurveyReturn findCurrentBySurveyAndOrg(
             @PathVariable("surveyName") String surveyName,
             @PathVariable("org") String org) {
@@ -227,11 +245,47 @@ public class SurveyReturnController {
         List<SurveyReturn> returns = findBySurveyAndOrg(surveyName, org);
         returns.sort((r1,r2) -> r1.revision().compareTo(r2.revision()));
         SurveyReturn rtn = returns.get(returns.size()-1);
-        LOGGER.debug(String.format("Found %1$d returns for %2$s,%3$s; returning revision %4$d", returns.size(), surveyName, org, rtn.revision()));
+        LOGGER.info("Found {} returns for {},{} returning revision {}", returns.size(), surveyName, org, rtn.revision());
 
+        rtn = saveCalculations(cruncher.calculate(rtn));
+        
         return addLinks(rtn);
     }
     
+    @Transactional//(Transactional.TxType.REQUIRES_NEW)
+    private SurveyReturn saveCalculations(SurveyReturn rtn) {
+//        EntityManager em = entityManagerFactory.createEntityManager();
+//        return em.merge(rtn);
+//        SurveyCategory calcs = em.merge(new SurveyCategory().name("Calculations").survey(rtn.survey()));
+//        ArrayList<SurveyAnswer> savedAnswers = new ArrayList<SurveyAnswer>();
+//        for (SurveyAnswer answer : rtn.answers()) {
+//            answer.question(em.merge(answer.question().category(calcs)));
+//            savedAnswers.add(em.merge(answer));
+//            if (answer.id() == null) {
+//                SurveyAnswer existingAnswer = answerRepo.findByOrgPeriodAndQuestion(rtn.org(), rtn.applicablePeriod(), answer.question().name());
+//                if (existingAnswer == null) {
+//                    answerRepo.save(answer);
+//                } else {
+//                    existingAnswer.response(answer.response());
+//                    if (existingAnswer.question().id() == null) {
+////                    answer.question(qRepo.save(answer.question()));
+////                    org.hibernate.TransientPropertyValueException: object references an unsaved transient instance - save the transient instance before flushing : digital.srp.sreport.model.SurveyAnswer.question -> digital.srp.sreport.model.SurveyQuestion
+//    
+//                        SurveyQuestion q = qRepo.findByName(existingAnswer.question().name());
+//                        if (q == null) {
+//                            q = qRepo.save(q);
+//                        }
+//                        existingAnswer.question(q);
+//                    }
+//                    answerRepo.save(existingAnswer);
+//                    answer = existingAnswer;
+//                }
+//             }
+//        }
+        
+        return returnRepo.save(rtn);
+    }
+
     /**
      * Return a list of survey returns, optionally paged.
      * 
@@ -311,11 +365,24 @@ public class SurveyReturnController {
                     "The return %1$d:%2$s has been submitted, you may no longer update. If you've recognised a mistake please re-state the return.", 
                     returnId, existing.name()));
         }
-        updatedReturn.survey(existing.survey());
         for (SurveyAnswer answer : updatedReturn.answers()) {
-            answer.surveyReturn(updatedReturn);
+            SurveyAnswer existingAnswer = existing.answer(answer.question().name());
+            if (existingAnswer.question().id() == null) {
+                SurveyQuestion q;
+                try {
+                    q = qRepo.findBySurveyAndName(existing.survey().name(), answer.question().name());
+                } catch (Throwable e) {
+                    LOGGER.error("Data issue, more than one question named {}: ", answer.question().name());
+                    throw e;
+                }
+                existingAnswer = answerRepo.save(answer.surveyReturn(existing).question(q));
+                existing.answers().add(existingAnswer);
+            } else {
+                existingAnswer.response(answer.response());
+            }
         }
-        returnRepo.save(updatedReturn);
+//        System.out.println("is the save needed?");
+//        returnRepo.save(existing);
     }
     
     /**
@@ -354,6 +421,21 @@ public class SurveyReturnController {
         returnRepo.save(survey);
     }
 
+    /**
+     * Run all calculations based on the return inputs.
+     */
+    @RequestMapping(value = "/{returnId}/calculate", method = RequestMethod.POST, consumes = "application/json")
+    public @ResponseBody void calculate(
+            @PathVariable("returnId") Long returnId) {
+        LOGGER.info(String.format("Running calculations for %1$s", returnId));
+
+        SurveyReturn rtn = returnRepo.findOne(returnId);
+        
+        rtn = cruncher.calculate(rtn);
+
+        returnRepo.save(rtn);
+    }
+    
     /**
      * Delete an existing return.
      */

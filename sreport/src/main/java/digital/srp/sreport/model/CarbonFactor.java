@@ -1,16 +1,13 @@
 package digital.srp.sreport.model;
 
-import java.util.ArrayList;
+import java.math.BigDecimal;
 import java.util.List;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.EntityListeners;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 import javax.validation.constraints.NotNull;
@@ -21,12 +18,12 @@ import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.annotation.LastModifiedDate;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import org.springframework.hateoas.Link;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonView;
 
+import digital.srp.sreport.model.views.CarbonFactorViews;
 import digital.srp.sreport.model.views.SurveyViews;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -34,10 +31,7 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.experimental.Accessors;
 
-
 /**
- * Root object defining questions and categories to present to user.
- * 
  * @author Tim Stephenson
  */
 @Accessors(fluent=true)
@@ -46,47 +40,68 @@ import lombok.experimental.Accessors;
 @EqualsAndHashCode(exclude = { "id", "created", "createdBy", "lastUpdated", "updatedBy" })
 @NoArgsConstructor
 @Entity
-@EntityListeners(AuditingEntityListener.class)
-@Table(name= "SR_SURVEY")
-public class Survey {
+@Table(name= "SR_CFACTOR")
+public class CarbonFactor {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
+    @JsonProperty
+    @JsonView(CarbonFactorViews.Summary.class)
     @Column(name = "id")
-    @JsonProperty
-    @JsonView(SurveyViews.Summary.class)
     private Long id;
-    
+
     @NotNull
-    @Size(max = 50)
+    @Size(max = 60)
     @JsonProperty
-    @JsonView(SurveyViews.Summary.class)
+    @JsonView(CarbonFactorViews.Summary.class)
     @Column(name = "name")
     private String name;
     
     @NotNull
-    @Size(max = 50)
+    @Size(max = 60)
     @JsonProperty
-    @JsonView(SurveyViews.Summary.class)
-    @Column(name = "status")
-    private String status = "Draft";
+    @JsonView(CarbonFactorViews.Summary.class)
+    @Column(name = "category")
+    private String category;
     
-    /** 
-     * Period this set of responses apply to. 
-     * 
-     * <p>For example: calendar or financial year, quarter etc.
-     */
     @NotNull
-    @Size(max = 20)
+    @Size(max = 255)
     @JsonProperty
-    @JsonView(SurveyViews.Summary.class)
-    @Column(name = "applicable_period")
+    @JsonView(CarbonFactorViews.Summary.class)
+    @Column(name = "comments")
+    private String comments;
+    
+    @Size(max = 10)
+    @JsonProperty
+    @JsonView(CarbonFactorViews.Summary.class)
+    @Column(name = "source")
+    private String source;
+    
+    @NotNull
+    @Size(max = 15)
+    @JsonProperty
+    @JsonView(CarbonFactorViews.Summary.class)
+    @Column(name = "unit")
+    private String unit;
+    
+    @Size(max = 1)
+    @JsonProperty
+    @JsonView(CarbonFactorViews.Summary.class)
+    @Column(name = "scope")
+    private String scope;
+    
+    @NotNull
+    @Size(max = 7)
+    @JsonProperty
+    @JsonView(CarbonFactorViews.Summary.class)
+    @Column(name = "period")
     private String applicablePeriod;
-
+    
+    @NotNull
     @JsonProperty
-    @JsonView(SurveyViews.Detailed.class)
-    @OneToMany(orphanRemoval=true, cascade= CascadeType.ALL, mappedBy = "survey")
-    private List<SurveyCategory> categories;
+    @JsonView(CarbonFactorViews.Summary.class)
+    @Column(name = "val", precision = 9, scale = 6)
+    private BigDecimal value;
     
     @Transient
     @XmlElement(name = "link", namespace = Link.ATOM_NAMESPACE)
@@ -109,43 +124,4 @@ public class Survey {
     @Column(name = "updated_by")
     @LastModifiedBy
     private String updatedBy;
-    
-    public Survey categories(List<SurveyCategory> categories) {
-        this.categories = categories;
-        
-        for (SurveyCategory cat : categories) {
-            cat.survey(this);
-        }
-        
-        return this;
-    }
-    
-    @JsonProperty
-    @Transient
-    public List<SurveyQuestion> questions() {
-        ArrayList<SurveyQuestion> questions = new ArrayList<SurveyQuestion>();
-        for (SurveyCategory cat : categories) {
-            questions.addAll(cat.questions());
-        }
-        return questions;
-    }
-
-    public SurveyQuestion question(String qName) {
-        for (SurveyQuestion q : questions()) {
-            if (qName.equals(q.name())) {
-                return q;
-            }
-        }
-        return null;
-    }
-
-    public SurveyCategory category(String catName) {
-        for (SurveyCategory cat : categories()) {
-            if (catName.equals(cat.name())) {
-                return cat;
-            }
-        }
-        return null;
-    }
-
 }

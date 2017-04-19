@@ -1,5 +1,6 @@
 package digital.srp.sreport.model;
 
+import java.util.Collections;
 import java.util.List;
 
 import javax.persistence.CascadeType;
@@ -45,7 +46,7 @@ public class SurveyCategory {
     @JsonProperty
     @JsonView(SurveyViews.Detailed.class)
     @Column(name = "id")
-    private long id;
+    private Long id;
     
     @NotNull
     @Size(max = 50)
@@ -82,6 +83,23 @@ public class SurveyCategory {
         }
         
         return this;
+    }
+
+    public List<SurveyQuestion> questions() {
+        if (questions == null) {
+            return Collections.emptyList();
+        }
+        
+        return questions;
+    }
+    
+    public SurveyQuestion question(String qName) {
+        for (SurveyQuestion q : questions) {
+            if (qName.equals(q.name())) {
+                return q;
+            }
+        }
+        return null;
     }
     
 //    public boolean equivalent(Object obj) {

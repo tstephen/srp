@@ -39,6 +39,8 @@ import digital.srp.sreport.model.surveys.Sdu1516;
 import digital.srp.sreport.model.surveys.Sdu1617;
 import digital.srp.sreport.model.views.SurveyReturnViews;
 import digital.srp.sreport.model.views.SurveyViews;
+import digital.srp.sreport.repositories.SurveyCategoryRepository;
+import digital.srp.sreport.repositories.SurveyQuestionRepository;
 import digital.srp.sreport.repositories.SurveyRepository;
 import digital.srp.sreport.repositories.SurveyReturnRepository;
 
@@ -60,6 +62,12 @@ public class SurveyController {
     @Autowired
     protected  SurveyRepository surveyRepo;
 
+    @Autowired
+    protected  SurveyCategoryRepository catRepo;
+    
+    @Autowired
+    protected  SurveyQuestionRepository qRepo;
+    
     @Autowired
     protected  SurveyReturnRepository returnRepo;
     
@@ -233,32 +241,82 @@ public class SurveyController {
         return new ResponseEntity(headers, HttpStatus.CREATED);
     }
 
+    @Transactional
     protected void createInternal(Survey survey) {
-        survey = surveyRepo.save(survey);
-        
+//        ArrayList<SurveyCategory> newCats = new ArrayList<SurveyCategory>(survey.categories().size());
         for (SurveyCategory cat : survey.categories()) {
-            cat.survey(survey);
-            
-            for (SurveyQuestion q : cat.questions()) {
-                q.category(cat);
+            if (cat.name()==null) {
+                System.err.println("No name for cat : "+cat);
             }
+            cat.survey(survey);
+//            SurveyCategory foundCat = catRepo.findOne(cat.id());
+//            if (foundCat == null) {
+//                catRepo.save(cat);
+//                ArrayList<SurveyQuestion> newQs = new ArrayList<SurveyQuestion>(cat.questions().size());
+                for (SurveyQuestion q : cat.questions()) {
+//                    SurveyQuestion foundQ = qRepo.findOne(q.id());
+//                    if (foundQ == null) {
+                        q.category(cat);
+//                        newQs.add(qRepo.save(q));
+//                    } else {
+//                        newQs.add(foundQ);
+//                    }
+                }
+//                cat.questions(newQs);
+//                newCats.add(catRepo.save(cat));
+//            } else {
+//                newCats.add(foundCat);
+//            }
         }
+//        survey.categories(newCats);
+//        for (SurveyQuestion q : survey.questions()) {
+//            qRepo.save(q);
+//        }
+        survey = surveyRepo.save(survey);
     }
 
     /**
      * Update an existing survey.
      */
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
-    @RequestMapping(value = "/{id}", method = RequestMethod.PUT, consumes = { "application/json" })
+    @RequestMapping(value = "/{idOrName}", method = RequestMethod.PUT, consumes = { "application/json" })
     @Transactional
     public @ResponseBody void update(
-            @PathVariable("id") Long surveyId,
+            @PathVariable("idOrName") String idOrName,
             @RequestBody Survey updatedSurvey) {
-//        Survey survey = surveyRepo.findOne(surveyId);
-//
-//        NullAwareBeanUtils.copyNonNullProperties(updatedOrder, survey, "id");
+        
+        Survey survey = null;
+        try {
+            Long surveyId = Long.parseLong(idOrName);
+            survey = surveyRepo.findOne(surveyId);
+        } catch (NumberFormatException e) {
+            LOGGER.info("Cannot parse survey id from '{}', assume it's a name", idOrName);
+            survey = surveyRepo.findByName(idOrName);
+        }
+        LOGGER.info("Updated survey '{}' has {} questions, compared to {}", 
+                idOrName, updatedSurvey.questions().size(), survey.questions().size());
+        
+        for (SurveyCategory uCat : updatedSurvey.categories()) {
+            SurveyCategory cat = survey.category(uCat.name());
+            if (cat == null) {
+                uCat.survey(survey);
+                cat = catRepo.save(uCat);
+                survey.categories().add(cat);
+            }
+            for (SurveyQuestion uq : uCat.questions()) {
+                SurveyQuestion q = survey.question(uq.name());
+                if (q == null) {
+                    uq.category(cat);
+                    q = qRepo.save(uq);
+                    cat.questions().add(q);
+                } else {
+                    q.category(cat).hint(uq.hint()).label(uq.label()).required(uq.required()).type(uq.type()).unit(uq.unit());
+                }
+            }
+        }
+        LOGGER.info("... survey now has {} questions", survey.questions().size());
 
-        surveyRepo.save(updatedSurvey);
+        surveyRepo.save(survey);
     }
 
     /**

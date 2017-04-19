@@ -1,16 +1,13 @@
 package digital.srp.sreport.model;
 
-import java.util.ArrayList;
+import java.math.BigDecimal;
 import java.util.List;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.EntityListeners;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 import javax.validation.constraints.NotNull;
@@ -21,22 +18,20 @@ import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.annotation.LastModifiedDate;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import org.springframework.hateoas.Link;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonView;
 
 import digital.srp.sreport.model.views.SurveyViews;
+import digital.srp.sreport.model.views.WeightingFactorViews;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.experimental.Accessors;
 
-
 /**
- * Root object defining questions and categories to present to user.
  * 
  * @author Tim Stephenson
  */
@@ -46,47 +41,74 @@ import lombok.experimental.Accessors;
 @EqualsAndHashCode(exclude = { "id", "created", "createdBy", "lastUpdated", "updatedBy" })
 @NoArgsConstructor
 @Entity
-@EntityListeners(AuditingEntityListener.class)
-@Table(name= "SR_SURVEY")
-public class Survey {
+@Table(name= "SR_WFACTOR")
+public class WeightingFactor {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
+    @JsonProperty
+    @JsonView(WeightingFactorViews.Summary.class)
     @Column(name = "id")
-    @JsonProperty
-    @JsonView(SurveyViews.Summary.class)
     private Long id;
-    
+
     @NotNull
     @Size(max = 50)
     @JsonProperty
-    @JsonView(SurveyViews.Summary.class)
-    @Column(name = "name")
-    private String name;
+    @JsonView(WeightingFactorViews.Summary.class)
+    @Column(name = "org_type")
+    private String orgType;
     
     @NotNull
-    @Size(max = 50)
+    @Size(max = 60)
     @JsonProperty
-    @JsonView(SurveyViews.Summary.class)
-    @Column(name = "status")
-    private String status = "Draft";
+    @JsonView(WeightingFactorViews.Summary.class)
+    @Column(name = "category")
+    private String category;
     
-    /** 
-     * Period this set of responses apply to. 
-     * 
-     * <p>For example: calendar or financial year, quarter etc.
+    /**
+     * Options are GHG,GHG2,GHG4,GHG6,Type1.
+     */
+    @Size(max = 1)
+    @JsonProperty
+    @JsonView(WeightingFactorViews.Summary.class)
+    @Column(name = "scope")
+    private String scope;
+    
+    /**
+     * Currently only done once in 2014-15
      */
     @NotNull
-    @Size(max = 20)
+    @Size(max = 7)
     @JsonProperty
-    @JsonView(SurveyViews.Summary.class)
-    @Column(name = "applicable_period")
+    @JsonView(WeightingFactorViews.Summary.class)
+    @Column(name = "period")
     private String applicablePeriod;
-
+    
+    /**
+     * Volume of carbon emissions in kgCO<sub>2</sub>e.
+     */
+    @NotNull
     @JsonProperty
-    @JsonView(SurveyViews.Detailed.class)
-    @OneToMany(orphanRemoval=true, cascade= CascadeType.ALL, mappedBy = "survey")
-    private List<SurveyCategory> categories;
+    @JsonView(WeightingFactorViews.Summary.class)
+    @Column(name = "c_val", precision = 12, scale = 0)
+    private BigDecimal carbonValue;
+  
+    /**
+     * Value of spend in £s.
+     */
+    @NotNull
+    @JsonProperty
+    @JsonView(WeightingFactorViews.Summary.class)
+    @Column(name = "m_val", precision = 12, scale = 0)
+    private BigDecimal moneyValue;
+    
+    /**
+     * Intensity of carbon emissions in kgCO<sub>2</sub>e / £.
+     */
+    @JsonProperty
+    @JsonView(WeightingFactorViews.Summary.class)
+    @Column(name = "i_val", precision = 6, scale = 3)
+    private BigDecimal intensityValue;
     
     @Transient
     @XmlElement(name = "link", namespace = Link.ATOM_NAMESPACE)
@@ -109,43 +131,15 @@ public class Survey {
     @Column(name = "updated_by")
     @LastModifiedBy
     private String updatedBy;
-    
-    public Survey categories(List<SurveyCategory> categories) {
-        this.categories = categories;
-        
-        for (SurveyCategory cat : categories) {
-            cat.survey(this);
+
+    public BigDecimal intensityValue() {
+        if (carbonValue == null || moneyValue == null || moneyValue.intValue() == 0) {
+            return null;
         }
-        
-        return this;
-    }
-    
-    @JsonProperty
-    @Transient
-    public List<SurveyQuestion> questions() {
-        ArrayList<SurveyQuestion> questions = new ArrayList<SurveyQuestion>();
-        for (SurveyCategory cat : categories) {
-            questions.addAll(cat.questions());
-        }
-        return questions;
+        return carbonValue.divide(moneyValue,3, java.math.RoundingMode.HALF_UP);
     }
 
-    public SurveyQuestion question(String qName) {
-        for (SurveyQuestion q : questions()) {
-            if (qName.equals(q.name())) {
-                return q;
-            }
-        }
-        return null;
+    public void intensityValue(BigDecimal intensityValue) {
+        //this.intensityValue = intensityValue;
     }
-
-    public SurveyCategory category(String catName) {
-        for (SurveyCategory cat : categories()) {
-            if (catName.equals(cat.name())) {
-                return cat;
-            }
-        }
-        return null;
-    }
-
 }

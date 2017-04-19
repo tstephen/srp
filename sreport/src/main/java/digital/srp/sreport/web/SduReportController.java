@@ -16,10 +16,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import digital.srp.sreport.internal.PeriodUtil;
+import digital.srp.sreport.model.Q;
 import digital.srp.sreport.model.SurveyAnswer;
 import digital.srp.sreport.model.TabularDataSet;
 import digital.srp.sreport.model.surveys.SduQuestions;
-import digital.srp.sreport.repositories.AnswerRepository;
+import digital.srp.sreport.repositories.SurveyAnswerRepository;
 import digital.srp.sreport.repositories.SurveyRepository;
 import digital.srp.sreport.repositories.SurveyReturnRepository;
 import digital.srp.sreport.services.TabularDataSetHelper;
@@ -46,7 +47,7 @@ public class SduReportController implements SduQuestions {
     protected SurveyReturnRepository returnRepo;
 
     @Autowired
-    protected AnswerRepository answerRepo;
+    protected SurveyAnswerRepository answerRepo;
 
     @Autowired
     private TabularDataSetHelper tdsHelper;
@@ -63,25 +64,7 @@ public class SduReportController implements SduQuestions {
             @PathVariable("period") String period, Model model) {
         LOGGER.info(String.format("orgTable for %1$s %2$s", org, period));
 
-        // Survey survey = surveyRepo.findByName(sduSurveyFromPeriod(period));
-        String[] headers = new String[] { "floorArea", "noStaff" };
-        List<SurveyAnswer> answers = answerRepo.findByOrgAndQuestion(org,
-                headers);
-        LOGGER.info(
-                String.format("Found %1$s answers about organisation for %2$s",
-                        answers.size(), org));
-
-        // HttpHeaders headers = new HttpHeaders();
-        // HttpEntity<String> response = new HttpEntity<String>("TODO",
-        // headers);
-        TabularDataSet table = tdsHelper.tabulate(headers, answers);
-        model.addAttribute("table", table);
-        model.addAttribute("periods",
-                PeriodUtil.fillBackwards(period, table.rows().length));
-
-        ResourceBundle messages = ResourceBundle
-                .getBundle("digital.srp.sreport.Messages");
-        model.addAttribute("messages", messages);
+        fillModel(org, period, ORG_HDRS, model);
         return "table";
     }
 
@@ -97,12 +80,7 @@ public class SduReportController implements SduQuestions {
             @PathVariable("period") String period, Model model) {
         LOGGER.info(String.format("energyTable for %1$s %2$s", org, period));
 
-        fillModel(org, period,
-                new String[] { ELEC_USED, GAS_USED, OIL_USED, COAL_USED,
-                        STEAM_USED, HOT_WATER_USED, ELEC_USED_GREEN_TARIFF,
-                        "elecUsed3rdPtyRenewable", RENEWABLE_USED,
-                        ELEC_EXPORTED, WATER_VOL },
-                model);
+        fillModel(org, period, ENERGY_HDRS, model);
         return "table";
     }
 
@@ -118,9 +96,7 @@ public class SduReportController implements SduQuestions {
             @PathVariable("period") String period, Model model) {
         LOGGER.info(String.format("energyCsv for %1$s %2$s", org, period));
 
-        fillModel(org, period, new String[] { ELEC_USED, GAS_USED, OIL_USED,
-                COAL_USED, STEAM_USED, HOT_WATER_USED, ELEC_RENEWABLE },
-                model);
+        fillModel(org, period, ENERGY_HDRS, model);
         return "csv";
     }
 
@@ -137,10 +113,7 @@ public class SduReportController implements SduQuestions {
         LOGGER.info(
                 String.format("energyCO2eTable for %1$s %2$s", org, period));
 
-        fillModel(org, period,
-                new String[] { ELEC_CO2E, GAS_CO2E, OIL_CO2E, COAL_CO2E,
-                        STEAM_CO2E, HOT_WATER_CO2E, ELEC_RENEWABLE_CO2E },
-                model);
+        fillModel(org, period, ENERGY_CO2E_HDRS, model);
         return "table";
     }
 
@@ -156,10 +129,7 @@ public class SduReportController implements SduQuestions {
             @PathVariable("period") String period, Model model) {
         LOGGER.info(String.format("energyCO2eCsv for %1$s %2$s", org, period));
 
-        fillModel(org, period,
-                new String[] { ELEC_CO2E, GAS_CO2E, OIL_CO2E, COAL_CO2E,
-                        STEAM_CO2E, HOT_WATER_CO2E, ELEC_RENEWABLE_CO2E },
-                model);
+        fillModel(org, period, ENERGY_CO2E_HDRS, model);
         return "csv";
     }
 
@@ -174,8 +144,7 @@ public class SduReportController implements SduQuestions {
             @PathVariable("period") String period, Model model) {
         LOGGER.info(String.format("travelTable for %1$s %2$s", org, period));
 
-        fillModel(org, period, new String[] { PATIENT_AND_VISITOR_MILEAGE,
-                BIZ_MILEAGE, STAFF_COMMUTE_MILES }, model);
+        fillModel(org, period, TRAVEL_HDRS, model);
         return "table";
     }
 
@@ -183,7 +152,7 @@ public class SduReportController implements SduQuestions {
      * Return a table of travel data emissions (CO2e) for the specified 
      * organisation and period.
      * 
-     * @return HTML table.
+     * @return CSV with header row.
      */
     @RequestMapping(value = "/{org}/{period}/travel-co2e.html", method = RequestMethod.GET, produces = "text/html")
     @Transactional
@@ -191,8 +160,7 @@ public class SduReportController implements SduQuestions {
             @PathVariable("period") String period, Model model) {
         LOGGER.info(String.format("travelCO2eTable for %1$s %2$s", org, period));
 
-        fillModel(org, period, new String[] { PATIENT_AND_VISITOR_MILEAGE_CO2E,
-                BIZ_MILEAGE_CO2E, STAFF_COMMUTE_MILES_CO2E }, model);
+        fillModel(org, period, TRAVEL_HDRS, model);
         return "table";
     }
 
@@ -208,12 +176,26 @@ public class SduReportController implements SduQuestions {
             @PathVariable("period") String period, Model model) {
         LOGGER.info(String.format("wasteTable for %1$s %2$s", org, period));
 
-        fillModel(org, period, new String[] { RECYCLING_WEIGHT,
-                OTHER_RECOVERY_WEIGHT, INCINERATION_WEIGHT, LANDFILL_WEIGHT },
-                model);
+        fillModel(org, period, WASTE_HDRS, model);
         return "table";
     }
+    
+    /**
+     * Return a table of waste (CO2e) for the specified organisation and
+     * period.
+     * 
+     * @return HTML table.
+     */
+    @RequestMapping(value = "/{org}/{period}/waste-co2e.html", method = RequestMethod.GET, produces = "text/html")
+    @Transactional
+    public String wasteCO2eTable(@PathVariable("org") String org,
+            @PathVariable("period") String period, Model model) {
+        LOGGER.info(String.format("wasteCO2eTable for %1$s %2$s", org, period));
 
+        fillModel(org, period, WASTE_CO2E_HDRS, model);
+        return "table";
+    }
+    
     /**
      * Return a table of waste (CO2e) for the specified organisation and
      * period.
@@ -222,13 +204,11 @@ public class SduReportController implements SduQuestions {
      */
     @RequestMapping(value = "/{org}/{period}/waste-co2e.csv", method = RequestMethod.GET, produces = "text/csv")
     @Transactional
-    public String wasteCsv(@PathVariable("org") String org,
+    public String wasteCO2eCsv(@PathVariable("org") String org,
             @PathVariable("period") String period, Model model) {
-        LOGGER.info(String.format("wasteCsv for %1$s %2$s", org, period));
+        LOGGER.info(String.format("wasteCO2eCsv for %1$s %2$s", org, period));
 
-        fillModel(org, period, new String[] { RECYCLING_CO2E, 
-                OTHER_RECOVERY_CO2E, INCINERATION_CO2E, LANDFILL_CO2E },
-                model);
+        fillModel(org, period, WASTE_CO2E_HDRS, model);
         return "csv";
     }
     
@@ -244,9 +224,136 @@ public class SduReportController implements SduQuestions {
             @PathVariable("period") String period, Model model) {
         LOGGER.info(String.format("waterTable for %1$s %2$s", org, period));
 
-        fillModel(org, period, new String[] { WATER_VOL, WASTE_WATER, WATER_COST },
-                model);
+        fillModel(org, period, WATER_HDRS, model);
         return "table";
+    }
+    
+    /**
+     * Return a table of water emissions (CO2e) for the specified organisation and
+     * period.
+     * 
+     * @return HTML table.
+     */
+    @RequestMapping(value = "/{org}/{period}/water-co2e.html", method = RequestMethod.GET, produces = "text/html")
+    @Transactional
+    public String waterCO2eTable(@PathVariable("org") String org,
+            @PathVariable("period") String period, Model model) {
+        LOGGER.info(String.format("waterCO2eTable for %1$s %2$s", org, period));
+
+        fillModel(org, period, WATER_CO2E_HDRS, model);
+        return "table";
+    }
+    
+    /**
+     * Return a table of water emissions (CO2e) for the specified organisation and
+     * period.
+     * 
+     * @return CSV with header row.
+     */
+    @RequestMapping(value = "/{org}/{period}/water-co2e.csv", method = RequestMethod.GET, produces = "text/csv")
+    @Transactional
+    public String waterCO2eCsv(@PathVariable("org") String org,
+            @PathVariable("period") String period, Model model) {
+        LOGGER.info(String.format("waterCO2eCsv for %1$s %2$s", org, period));
+
+        fillModel(org, period, WATER_CO2E_HDRS, model);
+        return "csv";
+    }
+    
+    /**
+     * Return a table of biomass well to tank emissions (CO2e) for the specified organisation and
+     * period.
+     * 
+     * @return HTML table.
+     */
+    @RequestMapping(value = "/{org}/{period}/biomass-co2e-wtt.html", method = RequestMethod.GET, produces = "text/html")
+    @Transactional
+    public String biomassCO2eWttTable(@PathVariable("org") String org,
+            @PathVariable("period") String period, Model model) {
+        LOGGER.info(String.format("biomassCO2eWttTable for %1$s %2$s", org, period));
+
+        fillModel(org, period, BIOMASS_CO2E_WTT_HDRS, model);
+        return "table";
+    }
+    
+    /**
+     * Return a table of biomass well to tank emissions (CO2e) for the specified organisation and
+     * period.
+     * 
+     * @return CSV with header row.
+     */
+    @RequestMapping(value = "/{org}/{period}/biomass-co2e-wtt.csv", method = RequestMethod.GET, produces = "text/csv")
+    @Transactional
+    public String biomassCO2eWttCsv(@PathVariable("org") String org,
+            @PathVariable("period") String period, Model model) {
+        LOGGER.info(String.format("biomassCO2eWttCsv for %1$s %2$s", org, period));
+
+        fillModel(org, period, BIOMASS_CO2E_WTT_HDRS, model);
+        return "csv";
+    }
+    
+    /**
+     * Return a table of biomass out of scope emissions (CO2e) use for the specified organisation and
+     * period.
+     * 
+     * @return HTML table.
+     */
+    @RequestMapping(value = "/{org}/{period}/biomass-co2e-noscope.html", method = RequestMethod.GET, produces = "text/html")
+    @Transactional
+    public String biomassCO2eNoScopeTable(@PathVariable("org") String org,
+            @PathVariable("period") String period, Model model) {
+        LOGGER.info(String.format("biomassCO2eNoScopeTable for %1$s %2$s", org, period));
+
+        fillModel(org, period, BIOMASS_CO2E_NOSCOPE_HDRS, model);
+        return "table";
+    }
+    
+    /**
+     * Return a table of biomass out of scope emissions (CO2e) for the specified organisation and
+     * period.
+     * 
+     * @return CSV with header row.
+     */
+    @RequestMapping(value = "/{org}/{period}/biomass-co2e-noscope.csv", method = RequestMethod.GET, produces = "text/csv")
+    @Transactional
+    public String biomassCO2eNoScopeCsv(@PathVariable("org") String org,
+            @PathVariable("period") String period, Model model) {
+        LOGGER.info(String.format("biomassCO2eNoScopeCsv for %1$s %2$s", org, period));
+
+        fillModel(org, period, BIOMASS_CO2E_NOSCOPE_HDRS, model);
+        return "csv";
+    }
+    
+    /**
+     * Return a table of categorised carbon emissions for the specified
+     * organisation and period.
+     * 
+     * @return HTML table.
+     */
+    @RequestMapping(value = "/{org}/{period}/carbon-footprint.html", method = RequestMethod.GET, produces = "text/html")
+    @Transactional
+    public String footprintTable(@PathVariable("org") String org,
+            @PathVariable("period") String period, Model model) {
+        LOGGER.info(String.format("footprintTable for %1$s %2$s", org, period));
+
+        fillModel(org, period, FOOTPRINT_HDRS, model);
+        return "table";
+    }
+
+    /**
+     * Return a table of categorised carbon emissions for the specified
+     * organisation and period.
+     * 
+     * @return CSV with header row.
+     */
+    @RequestMapping(value = "/{org}/{period}/carbon-footprint.csv", method = RequestMethod.GET, produces = "text/csv")
+    @Transactional
+    public String footprintCsv(@PathVariable("org") String org,
+            @PathVariable("period") String period, Model model) {
+        LOGGER.info(String.format("footprintCsv for %1$s %2$s", org, period));
+
+        fillModel(org, period, FOOTPRINT_HDRS, model);
+        return "csv";
     }
     
     /**
@@ -261,17 +368,7 @@ public class SduReportController implements SduQuestions {
             @PathVariable("period") String period, Model model) {
         LOGGER.info(String.format("emissionsProfileTable for %1$s %2$s", org, period));
 
-        fillModel(org, period,
-                new String[] { COMMISSIONING_CO2E, ANAESTHETIC_GASES_CO2E,
-                        PHARMA_CO2E, PAPER_CO2E, OTHER_PROCUREMENT_CO2E,
-                        OTHER_MANUFACTURED_CO2E, MED_INSTR_CO2E,
-                        CHEMS_AND_GASES_CO2E, ICT_CO2E, FREIGHT_CO2E,
-                        CATERING_CO2E, CONSTUCTION_CO2E, BIZ_SVCS_CO2E,
-                        CAPITAL_CO2E, WATER_CO2E, WASTE_CO2E, TRAVEL_CO2E,
-                        /* TODO should be heat & steam */
-                        ELEC_RENEWABLE_CO2E, STEAM_CO2E, ELEC_CO2E, COAL_CO2E, 
-                        OIL_CO2E, GAS_CO2E},
-                model);
+        fillModel(org, period, PROFILE_HDRS, model);
         return "table";
     }
 
@@ -285,31 +382,119 @@ public class SduReportController implements SduQuestions {
     @Transactional
     public String emissionsProfileCsv(@PathVariable("org") String org,
             @PathVariable("period") String period, Model model) {
-        LOGGER.info(String.format("emissionsProfileTable for %1$s %2$s", org, period));
+        LOGGER.info(String.format("emissionsProfileCsv for %1$s %2$s", org, period));
 
-        fillModel(org, period,
-                new String[] { COMMISSIONING_CO2E, ANAESTHETIC_GASES_CO2E,
-                        PHARMA_CO2E, PAPER_CO2E, OTHER_PROCUREMENT_CO2E,
-                        OTHER_MANUFACTURED_CO2E, MED_INSTR_CO2E,
-                        CHEMS_AND_GASES_CO2E, ICT_CO2E, FREIGHT_CO2E,
-                        CATERING_CO2E, CONSTUCTION_CO2E, BIZ_SVCS_CO2E,
-                        CAPITAL_CO2E, WATER_CO2E, WASTE_CO2E, TRAVEL_CO2E,
-                        /* TODO should be heat an steam */
-                        ELEC_RENEWABLE_CO2E, STEAM_CO2E, ELEC_CO2E, COAL_CO2E, 
-                        OIL_CO2E, GAS_CO2E},
-                model);
+        fillModel(org, period, PROFILE_HDRS, model);
+        return "csv";
+    }
+    
+    /**
+     * Return a table of categorised carbon emissions in ratio to expenditure
+     * for the specified organisation and period.
+     * 
+     * @return HTML table.
+     */
+    @RequestMapping(value = "/{org}/{period}/carbon-by-expenditure.html", method = RequestMethod.GET, produces = "text/html")
+    @Transactional
+    public String carbonByExpenditureTable(@PathVariable("org") String org,
+            @PathVariable("period") String period, Model model) {
+        LOGGER.info(String.format("carbonByExpenditureTable for %1$s %2$s", org, period));
+
+        fillModel(org, period, SPEND_HDRS, model);
+        return "table";
+    }
+
+    /**
+     * Return a table of categorised carbon emissions in ratio to expenditure
+     * for the specified organisation and period.
+     * 
+     * @return CSV with header row.
+     */
+    @RequestMapping(value = "/{org}/{period}/carbon-by-expenditure.csv", method = RequestMethod.GET, produces = "text/csv")
+    @Transactional
+    public String carbonByExpenditureCsv(@PathVariable("org") String org,
+            @PathVariable("period") String period, Model model) {
+        LOGGER.info(String.format("carbonByExpenditureCsv for %1$s %2$s", org, period));
+
+        fillModel(org, period, SPEND_HDRS, model);
+        return "csv";
+    }
+    
+    /***** TREASURY OUPUTS ****/
+    
+    /**
+     * Return a summary table of emissions by scope.
+     * 
+     * @return HTML table.
+     */
+    @RequestMapping(value = "/{org}/{period}/scope-summary.html", method = RequestMethod.GET, produces = "text/html")
+    @Transactional
+    public String scopeSummaryTable(@PathVariable("org") String org,
+            @PathVariable("period") String period, Model model) {
+        LOGGER.info(String.format("scopeSummaryTable for %1$s %2$s", org, period));
+
+        fillModel(org, period, SUMMARY_SCOPE_HDRS, model);
         return "table";
     }
     
-    private void fillModel(String org, String period, String[] headers,
-            Model model) {
-            List<SurveyAnswer> answers = answerRepo.findByOrgAndQuestion(org,
-                headers);
+    /**
+     * Return a summary table of emissions by scope.
+     * 
+     * @return HTML table.
+     */
+    @RequestMapping(value = "/{org}/{period}/scope-1.html", method = RequestMethod.GET, produces = "text/html")
+    @Transactional
+    public String scope1Table(@PathVariable("org") String org,
+            @PathVariable("period") String period, Model model) {
+        LOGGER.info(String.format("scope1Table for %1$s %2$s", org, period));
+
+        fillModel(org, period, SCOPE_1_HDRS, model);
+        return "table";
+    }
+    
+    /**
+     * Return a summary table of emissions by scope.
+     * 
+     * @return HTML table.
+     */
+    @RequestMapping(value = "/{org}/{period}/scope-2.html", method = RequestMethod.GET, produces = "text/html")
+    @Transactional
+    public String scope2Table(@PathVariable("org") String org,
+            @PathVariable("period") String period, Model model) {
+        LOGGER.info(String.format("scope2Table for %1$s %2$s", org, period));
+
+        fillModel(org, period, SCOPE_2_HDRS, model);
+        return "table";
+    }
+    
+    /**
+     * Return a summary table of emissions by scope.
+     * 
+     * @return HTML table.
+     */
+    @RequestMapping(value = "/{org}/{period}/scope-3.html", method = RequestMethod.GET, produces = "text/html")
+    @Transactional
+    public String scope3Table(@PathVariable("org") String org,
+            @PathVariable("period") String period, Model model) {
+        LOGGER.info(String.format("scope3Table for %1$s %2$s", org, period));
+
+        fillModel(org, period, SCOPE_3_HDRS, model);
+        return "table";
+    }
+    
+    private void fillModel(String org, String period, Q[] headers, Model model) {
+        String[] headerNames = new String[headers.length];
+        for (int i = 0 ; i < headers.length ; i++) {
+            headerNames[i] = headers[i].name();
+        }
+        
+        List<SurveyAnswer> answers = answerRepo.findByOrgAndQuestion(org,
+            headerNames);
         LOGGER.info(
                 String.format("Found %1$s answers about organisation for %2$s",
                         answers.size(), org));
 
-        TabularDataSet table = tdsHelper.tabulate(headers, answers);
+        TabularDataSet table = tdsHelper.tabulate(headerNames, answers);
         model.addAttribute("table", table);
         model.addAttribute("periods",
                 PeriodUtil.fillBackwards(period, table.rows().length));

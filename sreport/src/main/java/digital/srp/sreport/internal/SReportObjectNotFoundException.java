@@ -7,7 +7,7 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(callSuper = true)
 public class SReportObjectNotFoundException extends SReportException {
 
-    private static final long serialVersionUID = -5639258797169164350L;
+    protected static final long serialVersionUID = -5639258797169164350L;
 
     private Class<?> type;
 
@@ -17,6 +17,13 @@ public class SReportObjectNotFoundException extends SReportException {
         super();
     }
 
+    public SReportObjectNotFoundException(Class<?> type,
+            Object id) {
+        super();
+        this.type = type;
+        this.id = id;
+    }
+    
     public SReportObjectNotFoundException(String msg) {
         super(msg);
     }

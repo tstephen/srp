@@ -2,8 +2,10 @@ package digital.srp.sreport.internal;
 
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.orm.jpa.EntityScan;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
@@ -17,6 +19,9 @@ import org.springframework.http.converter.json.MappingJackson2HttpMessageConvert
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import digital.srp.sreport.model.mixins.LinkMixIn;
+import digital.srp.sreport.repositories.CarbonFactorRepository;
+import digital.srp.sreport.repositories.WeightingFactorRepository;
+import digital.srp.sreport.services.Cruncher;
 
 @Configuration
 @ComponentScan(basePackages = { "digital.srp.sreport" })
@@ -26,6 +31,17 @@ import digital.srp.sreport.model.mixins.LinkMixIn;
 @EnableJpaAuditing
 public class SReportConfiguration extends RepositoryRestMvcConfiguration {
 
+    @Autowired
+    protected CarbonFactorRepository cFactorRepo;
+    
+    @Autowired
+    protected WeightingFactorRepository wFactorRepo;
+    
+    @Bean
+    public Cruncher cruncher() {
+        return new Cruncher(cFactorRepo.findAll(), wFactorRepo.findAll());
+    }
+    
     @Override
     public void configureMessageConverters(
             List<HttpMessageConverter<?>> converters) {

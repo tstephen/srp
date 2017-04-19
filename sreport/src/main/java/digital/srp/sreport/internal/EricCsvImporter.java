@@ -32,7 +32,7 @@ public class EricCsvImporter {
         for (String hdr : headers) {
             questions.add(new SurveyQuestion().label(hdr));
         }
-        LOGGER.debug(String.format("Found %1$d questions", questions.size())); 
+        LOGGER.debug("Found {} questions", questions.size());
 
         List<SurveyReturn> surveyResponses = new ArrayList<SurveyReturn>();
         Iterable<CSVRecord> records = parser.getRecords();
@@ -56,7 +56,6 @@ public class EricCsvImporter {
     }
 
     private SurveyQuestion getQuestion(int i) {
-        LOGGER.debug(String.format("Looking for question %1$d", i)); 
         return questions.get(i);
     }
 

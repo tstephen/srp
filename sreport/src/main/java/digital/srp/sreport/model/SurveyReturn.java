@@ -20,6 +20,8 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import javax.xml.bind.annotation.XmlElement;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedBy;
@@ -50,7 +52,8 @@ import lombok.experimental.Accessors;
 @Entity
 @Table(name= "SR_RETURN")
 public class SurveyReturn {
-
+    private static final Logger LOGGER = LoggerFactory
+            .getLogger(SurveyReturn.class);
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @JsonProperty
@@ -149,5 +152,15 @@ public class SurveyReturn {
     @JsonView(SurveyReturnViews.Detailed.class)
     @OneToMany(cascade=CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval=true, mappedBy = "surveyReturn")
     private List<SurveyAnswer> answers;
+
+    public SurveyAnswer answer(String qName) {
+        for (SurveyAnswer answer : answers) {
+            if (qName.equals(answer.question().name())) {
+                return answer;
+            }
+        }
+        LOGGER.info("Assuming zero for {}", qName);
+        return new SurveyAnswer().question(new SurveyQuestion().name(qName)).surveyReturn(this).response("0");
+    }
     
 }

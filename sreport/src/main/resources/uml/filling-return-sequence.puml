@@ -1,0 +1,15 @@
+@startuml
+App -> Server: GET survey
+Server --> App: _survey
+
+App -> Server: GET return
+Server --> App: _rtn
+
+App -> App: _fill()
+
+note right of App: Every 5 secs
+
+App -> Server: PUT return
+App <-- Server
+
+@enduml

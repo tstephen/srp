@@ -9,6 +9,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
@@ -31,8 +32,8 @@ import lombok.experimental.Accessors;
  */
 @Accessors(fluent=true)
 @Data
-@ToString(exclude = { "id", "category" })
-@EqualsAndHashCode(exclude = { "id", "category" })
+@ToString(exclude = { "category" })
+@EqualsAndHashCode(exclude = { "category", "id" })
 @NoArgsConstructor
 @Entity
 @Table(name= "SR_QUESTION")
@@ -42,8 +43,15 @@ public class SurveyQuestion {
     @GeneratedValue(strategy = GenerationType.AUTO)
     @JsonProperty
     @JsonView( {SurveyViews.Detailed.class, SurveyReturnViews.Detailed.class} )
-    @Column(name = "id")
-    private long id;
+    @Column(name = "id", columnDefinition = "int(11) NOT NULL")
+    private Long id;
+
+    @Transient
+//    @NotNull
+//    @JsonProperty
+//    @JsonView( {SurveyViews.Detailed.class, SurveyReturnViews.Detailed.class} )
+//    @Column(name = "code")
+    private Q q;
     
     @NotNull
     @JsonProperty
@@ -88,10 +96,19 @@ public class SurveyQuestion {
     @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private SurveyCategory category;
     
-//    public SurveyQuestion category(SurveyCategory category) { 
-//        this.category = category; 
-////        this.categoryId = category.id();
-//        return this;
-//    }
-//    
+//  public SurveyQuestion category(SurveyCategory category) { 
+//      this.category = category; 
+////      this.categoryId = category.id();
+//      return this;
+//  }
+//
+    
+    public SurveyQuestion q(Q q) {
+        this.name = q.name();
+        return this;
+    }
+    
+    public Q q() {
+        return Q.valueOf(name);
+    }
 }

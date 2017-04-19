@@ -3,10 +3,10 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <name>SRP Server</name>
+  <name>Server</name>
   <inceptionYear>2014</inceptionYear>
   
-  <artifactId>server</artifactId>
+  <artifactId>srp-server</artifactId>
   <packaging>jar</packaging>
 
   <parent>
@@ -68,22 +68,22 @@
     <dependency>
       <groupId>digital.srp</groupId>
       <artifactId>macc</artifactId>
-      <version>${project.version}</version>
+      <version>${srp.version}</version>
     </dependency>
     <!-- dependency>
       <groupId>digital.srp</groupId>
       <artifactId>srp</artifactId>
-      <version>${project.version}</version>
+      <version>${srp.version}</version>
     </dependency-->
     <dependency>
       <groupId>digital.srp</groupId>
       <artifactId>sreport</artifactId>
-      <version>${project.version}</version>
+      <version>${srp.version}</version>
     </dependency>
     <dependency>
       <groupId>digital.srp</groupId>
       <artifactId>srp-processes</artifactId>
-      <version>${project.version}</version>
+      <version>${srp.version}</version>
     </dependency>
     <dependency>
       <groupId>io.onedecision</groupId>

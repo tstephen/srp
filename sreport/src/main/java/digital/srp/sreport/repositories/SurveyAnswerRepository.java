@@ -14,8 +14,11 @@ import digital.srp.sreport.model.SurveyAnswer;
  * @author Tim Stephenson
  */
 @RepositoryRestResource(exported = false)
-public interface AnswerRepository extends CrudRepository<SurveyAnswer, Long> {
+public interface SurveyAnswerRepository extends CrudRepository<SurveyAnswer, Long> {
 
     @Query("SELECT o FROM SurveyAnswer o WHERE o.question.name IN :qNames AND o.surveyReturn.org = :org ORDER BY o.surveyReturn.applicablePeriod DESC")
-    List<SurveyAnswer> findByOrgAndQuestion(@Param("org") String org, @Param("qNames") String[] qNames);
+    List<SurveyAnswer> findByOrgAndQuestion(@Param("org") String org, @Param("qNames") String... qNames);
+
+    @Query("SELECT o FROM SurveyAnswer o WHERE o.question.name IN :qNames AND o.surveyReturn.org = :org AND o.surveyReturn.applicablePeriod = :period")
+    SurveyAnswer findByOrgPeriodAndQuestion(@Param("org") String org, @Param("period") String period, @Param("qNames") String... qNames);
 }
