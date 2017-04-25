@@ -47,10 +47,6 @@ public class SurveyQuestion {
     private Long id;
 
     @Transient
-//    @NotNull
-//    @JsonProperty
-//    @JsonView( {SurveyViews.Detailed.class, SurveyReturnViews.Detailed.class} )
-//    @Column(name = "code")
     private Q q;
     
     @NotNull
@@ -63,7 +59,7 @@ public class SurveyQuestion {
     @JsonView(SurveyViews.Detailed.class)
     @Column(name = "label")
     private String label;
-    
+
     @NotNull
     @JsonProperty
     @JsonView(SurveyViews.Detailed.class)
@@ -74,7 +70,12 @@ public class SurveyQuestion {
     @JsonView(SurveyViews.Detailed.class)
     @Column(name = "hint")
     protected String hint;
-    
+
+    @JsonProperty
+    @JsonView(SurveyViews.Detailed.class)
+    @Column(name = "placeholder")
+    protected String placeholder;
+
     @Size(max = 20)
     @JsonProperty
     @JsonView(SurveyViews.Detailed.class)
@@ -86,23 +87,18 @@ public class SurveyQuestion {
     @JsonView(SurveyViews.Detailed.class)
     @Column(name = "unit")
     private String unit;
-//
-//    @JsonProperty
-//    @Transient
-//    private Long categoryId;
+
+    @Size(max = 50)
+    @JsonProperty
+    @JsonView(SurveyViews.Detailed.class)
+    @Column(name = "validation")
+    private String validation;
 
     @JsonProperty
     @JsonBackReference
     @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private SurveyCategory category;
-    
-//  public SurveyQuestion category(SurveyCategory category) { 
-//      this.category = category; 
-////      this.categoryId = category.id();
-//      return this;
-//  }
-//
-    
+
     public SurveyQuestion q(Q q) {
         this.name = q.name();
         return this;
