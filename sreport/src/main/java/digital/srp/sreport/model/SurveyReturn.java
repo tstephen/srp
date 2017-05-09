@@ -10,8 +10,8 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -150,17 +150,26 @@ public class SurveyReturn {
     
     @JsonProperty
     @JsonView(SurveyReturnViews.Detailed.class)
-    @OneToMany(cascade=CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval=true, mappedBy = "surveyReturn")
-    private List<SurveyAnswer> answers;
+//    @Transient
+    @ManyToMany(cascade=CascadeType.ALL, fetch = FetchType.EAGER, mappedBy = "surveyReturns")
+    private List<Answer> answers;
 
-    public SurveyAnswer answer(String qName) {
-        for (SurveyAnswer answer : answers) {
-            if (qName.equals(answer.question().name())) {
+    public Answer answer(Q q, String period) {
+        return answer(q.name(), period);
+    }
+    
+    protected Answer answer(String qName, String period) {
+        for (Answer answer : answers) {
+            if (qName.equals(answer.question().name()) && period.equals(answer.applicablePeriod())) {
                 return answer;
             }
         }
         LOGGER.info("Assuming zero for {}", qName);
-        return new SurveyAnswer().question(new SurveyQuestion().name(qName)).surveyReturn(this).response("0");
+        return new Answer().question(new Question()
+                .name(qName))
+                .applicablePeriod(period)
+                .response("0")
+                .addSurveyReturn(this);
     }
     
 }

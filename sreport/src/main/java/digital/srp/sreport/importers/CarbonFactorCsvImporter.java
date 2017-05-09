@@ -1,14 +1,12 @@
-package digital.srp.sreport.internal;
+package digital.srp.sreport.importers;
 
 import java.io.IOException;
-import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.Reader;
-import java.io.StringReader;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Scanner;
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
@@ -16,20 +14,24 @@ import org.apache.commons.csv.CSVRecord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import digital.srp.sreport.internal.StringUtils;
 import digital.srp.sreport.model.CarbonFactor;
 
-public class CarbonFactorImporter {
+public class CarbonFactorCsvImporter {
 
-    private static final Logger LOGGER = LoggerFactory
-            .getLogger(CarbonFactorImporter.class);
+    static final Logger LOGGER = LoggerFactory
+            .getLogger(CarbonFactorCsvImporter.class);
     
-    public static final String DATA_FILE = "/data/CarbonFactors.csv";
+    public static final String DATA = "/data/CarbonFactors.csv";
     public static final String[] HEADERS = { 
             "category","name","unit","scope","2007-08","2008-09","2009-10","2010-11","2011-12","2012-13","2013-14","2014-15","2015-16","2016-17","comments"};
 
     public List<CarbonFactor> readCarbonFactors()
             throws IOException {
-        return readCarbonFactors(new StringReader(readFile()), HEADERS);
+        try (InputStreamReader isr = new InputStreamReader(
+                getClass().getResourceAsStream(DATA))) {
+            return readCarbonFactors(isr, HEADERS);
+        }
     }
     
     public List<CarbonFactor> readCarbonFactors(Reader in, String[] headers)
@@ -67,23 +69,6 @@ public class CarbonFactorImporter {
         return cfactors;
     }
 
-    @SuppressWarnings("resource")
-    private String readFile() {
-        InputStream is = null;
-        try {
-            is = getClass().getResourceAsStream(CarbonFactorImporter.DATA_FILE);
-            LOGGER.error("Unable to find carbon factors at {}",
-                    CarbonFactorImporter.DATA_FILE);
-
-            return new Scanner(is).useDelimiter("\\A").next();
-        } finally {
-            try {
-                is.close();
-            } catch (Exception e) {
-            }
-        }
-    }
-    
     private CarbonFactor newCarbonFactor(CSVRecord record, String period, int idx) {
         String value = record.get(idx);
         if (value.startsWith(".")) { 

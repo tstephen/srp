@@ -20,9 +20,13 @@ public interface SurveyCategoryRepository extends CrudRepository<SurveyCategory,
     @Query("SELECT o FROM SurveyCategory o WHERE o.name = :name ORDER BY o.name ASC")
     SurveyCategory findByName(@Param("name") String name);
     
+    @Query("SELECT o FROM SurveyCategory o WHERE o.name = :category AND o.survey.name = :survey ORDER BY o.name ASC")
+    SurveyCategory findBySurveyAndCategory(@Param("survey") String survey, @Param("category") String category);
+    
     @Query("SELECT o FROM SurveyCategory o ORDER BY o.name ASC")
     List<SurveyCategory> findAll();
 
     @Query("SELECT o FROM SurveyCategory o ORDER BY o.name ASC")
     List<SurveyCategory> findPage(Pageable pageable);
+
 }

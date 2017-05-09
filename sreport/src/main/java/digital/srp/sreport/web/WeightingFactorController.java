@@ -31,7 +31,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import com.fasterxml.jackson.annotation.JsonView;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import digital.srp.sreport.internal.WeightingFactorImporter;
+import digital.srp.sreport.importers.WeightingFactorCsvImporter;
 import digital.srp.sreport.model.WeightingFactor;
 import digital.srp.sreport.model.views.WeightingFactorViews;
 import digital.srp.sreport.repositories.WeightingFactorRepository;
@@ -57,7 +57,7 @@ public class WeightingFactorController {
     @PostConstruct
     protected void init() throws IOException {
         List<WeightingFactor> existingFactors = wfactorRepo.findAll();
-        List<WeightingFactor> factors = new WeightingFactorImporter().readWeightingFactors();
+        List<WeightingFactor> factors = new WeightingFactorCsvImporter().readWeightingFactors();
         
         for (WeightingFactor factor : factors) {
             if (existingFactors.contains(factor)) {

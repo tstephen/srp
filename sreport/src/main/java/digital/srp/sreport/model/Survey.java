@@ -1,6 +1,7 @@
 package digital.srp.sreport.model;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import javax.persistence.CascadeType;
@@ -110,6 +111,18 @@ public class Survey {
     @LastModifiedBy
     private String updatedBy;
     
+    public List<SurveyCategory> categories() {
+        if (categories == null) {
+            categories = new ArrayList<SurveyCategory>();
+        }
+        return categories;
+    }
+    
+    public Survey categories(SurveyCategory... categories) {
+        categories(Arrays.asList(categories));
+        return this;
+    }
+    
     public Survey categories(List<SurveyCategory> categories) {
         this.categories = categories;
         
@@ -122,16 +135,16 @@ public class Survey {
     
     @JsonProperty
     @Transient
-    public List<SurveyQuestion> questions() {
-        ArrayList<SurveyQuestion> questions = new ArrayList<SurveyQuestion>();
+    public List<Q> questionCodes() {
+        ArrayList<Q> questions = new ArrayList<Q>();
         for (SurveyCategory cat : categories) {
-            questions.addAll(cat.questions());
+            questions.addAll(cat.questionCodes());
         }
         return questions;
     }
 
-    public SurveyQuestion question(String qName) {
-        for (SurveyQuestion q : questions()) {
+    public Q questionCode(String qName) {
+        for (Q q : questionCodes()) {
             if (qName.equals(q.name())) {
                 return q;
             }
@@ -139,6 +152,25 @@ public class Survey {
         return null;
     }
 
+    @JsonProperty
+    @Transient
+    public List<Question> questions() {
+        ArrayList<Question> questions = new ArrayList<Question>();
+        for (SurveyCategory cat : categories) {
+            questions.addAll(cat.questions());
+        }
+        return questions;
+    }
+
+    public Question question(String qName) {
+        for (Question q : questions()) {
+            if (qName.equals(q.name())) {
+                return q;
+            }
+        }
+        return null;
+    }
+    
     public SurveyCategory category(String catName) {
         for (SurveyCategory cat : categories()) {
             if (catName.equals(cat.name())) {

@@ -16,8 +16,8 @@ import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import digital.srp.sreport.internal.CarbonFactorImporter;
-import digital.srp.sreport.internal.WeightingFactorImporter;
+import digital.srp.sreport.importers.CarbonFactorCsvImporter;
+import digital.srp.sreport.importers.WeightingFactorCsvImporter;
 import digital.srp.sreport.model.CarbonFactor;
 import digital.srp.sreport.model.CarbonFactors;
 import digital.srp.sreport.model.Q;
@@ -37,9 +37,9 @@ public class CruncherTest {
     @BeforeClass
     public static void setUpClass() throws IOException {
         objectMapper = new ObjectMapper();
-        cfactors = new CarbonFactorImporter()
+        cfactors = new CarbonFactorCsvImporter()
                 .readCarbonFactors();
-        wfactors = new WeightingFactorImporter()
+        wfactors = new WeightingFactorCsvImporter()
                 .readWeightingFactors();
         cruncher = new Cruncher(cfactors, wfactors);
     }
@@ -57,23 +57,23 @@ public class CruncherTest {
         SurveyReturn rtn = cruncher.calculate(rdr);
         
         assertNotNull(rtn);
-        assertEquals("1,930", rtn.answer(Q.OWNED_BUILDINGS_GAS.name()).response3sf());
-        assertEquals("142", rtn.answer(Q.OWNED_VEHICLES.name()).response3sf());
+        assertEquals("1,930", rtn.answer(Q.OWNED_BUILDINGS_GAS, rtn.applicablePeriod()).response3sf());
+        assertEquals("142", rtn.answer(Q.OWNED_VEHICLES, rtn.applicablePeriod()).response3sf());
         
-        assertEquals("3,720", rtn.answer(Q.DESFLURANE_CO2E.name()).response3sf());
-        assertEquals("1,530", rtn.answer(Q.ISOFLURANE_CO2E.name()).response3sf());
-        assertEquals("594", rtn.answer(Q.SEVOFLURANE_CO2E.name()).response3sf());
-        assertEquals("2.24", rtn.answer(Q.NITROUS_OXIDE_CO2E.name()).response3sf());
-        assertEquals("1.39", rtn.answer(Q.PORTABLE_NITROUS_OXIDE_MIX_CO2E.name()).response3sf());
-        assertEquals("0", rtn.answer(Q.PORTABLE_NITROUS_OXIDE_MIX_MATERNITY_CO2E.name()).response3sf());
+        assertEquals("3,720", rtn.answer(Q.DESFLURANE_CO2E, rtn.applicablePeriod()).response3sf());
+        assertEquals("1,530", rtn.answer(Q.ISOFLURANE_CO2E, rtn.applicablePeriod()).response3sf());
+        assertEquals("594", rtn.answer(Q.SEVOFLURANE_CO2E, rtn.applicablePeriod()).response3sf());
+        assertEquals("2.24", rtn.answer(Q.NITROUS_OXIDE_CO2E, rtn.applicablePeriod()).response3sf());
+        assertEquals("1.39", rtn.answer(Q.PORTABLE_NITROUS_OXIDE_MIX_CO2E, rtn.applicablePeriod()).response3sf());
+        assertEquals("0", rtn.answer(Q.PORTABLE_NITROUS_OXIDE_MIX_MATERNITY_CO2E, rtn.applicablePeriod()).response3sf());
         // Total the 6 above
-        assertEquals("5,840", rtn.answer(Q.ANAESTHETIC_GASES_CO2E.name()).response3sf());
+        assertEquals("5,840", rtn.answer(Q.ANAESTHETIC_GASES_CO2E, rtn.applicablePeriod()).response3sf());
 
-        assertEquals("7,910", rtn.answer(Q.SCOPE_1.name()).response3sf());
+        assertEquals("7,910", rtn.answer(Q.SCOPE_1, rtn.applicablePeriod()).response3sf());
         
-        assertEquals("224", rtn.answer(Q.NET_THERMAL_ENERGY_CO2E.name()).response3sf());
-        assertEquals("339", rtn.answer(Q.NET_ELEC_CO2E.name()).response3sf());
-        assertEquals("563", rtn.answer(Q.SCOPE_2.name()).response3sf());
+        assertEquals("224", rtn.answer(Q.NET_THERMAL_ENERGY_CO2E, rtn.applicablePeriod()).response3sf());
+        assertEquals("339", rtn.answer(Q.NET_ELEC_CO2E, rtn.applicablePeriod()).response3sf());
+        assertEquals("563", rtn.answer(Q.SCOPE_2, rtn.applicablePeriod()).response3sf());
     }
 
     private SurveyReturn readSurveyReturn(String org) {

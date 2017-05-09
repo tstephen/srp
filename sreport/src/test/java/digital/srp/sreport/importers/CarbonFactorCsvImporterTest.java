@@ -1,4 +1,4 @@
-package digital.srp.sreport.internal;
+package digital.srp.sreport.importers;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
@@ -9,14 +9,15 @@ import java.util.List;
 
 import org.junit.Test;
 
+import digital.srp.sreport.importers.CarbonFactorCsvImporter;
 import digital.srp.sreport.model.CarbonFactor;
 
-public class CarbonFactorImporterTest {
+public class CarbonFactorCsvImporterTest {
 
     @Test
     public void testImport() {
         try {
-            List<CarbonFactor> factors = new CarbonFactorImporter()
+            List<CarbonFactor> factors = new CarbonFactorCsvImporter()
                     .readCarbonFactors();
             System.out.println(
                     String.format(" found %1$d factors", factors.size()));

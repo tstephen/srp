@@ -14,12 +14,11 @@ public class PeriodUtil {
     public static List<String> fillBackwards(String period, int count) {
         ArrayList<String> periods = new ArrayList<String>();
 
-        int startYear = startYear(period);
+        int startYear = startYear(period)+1;
         for (int i = 0; i < count; i++, startYear--) {
             periods.add(previous(startYear));
         }
 
-//        Collections.reverse(periods);
         return periods;
     }
 

@@ -43,7 +43,7 @@ import link.omny.custmgmt.CustMgmtConfig;
 @Import({ 
         AuthConfig.class, OneDecisionConfig.class, OneDecisionDomainConfig.class,
         AcctMgmtConfig.class, BpmConfiguration.class, CustMgmtConfig.class,
-        MaccConfig.class, SReportConfiguration.class/*, SrpConfig.class*/ })
+        MaccConfig.class, SReportConfiguration.class, SrpConfig.class })
 public class Application extends WebMvcConfigurerAdapter {
 
     protected static final Logger LOGGER = LoggerFactory

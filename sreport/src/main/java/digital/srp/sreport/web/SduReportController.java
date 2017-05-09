@@ -17,10 +17,10 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 import digital.srp.sreport.internal.PeriodUtil;
 import digital.srp.sreport.model.Q;
-import digital.srp.sreport.model.SurveyAnswer;
+import digital.srp.sreport.model.Answer;
 import digital.srp.sreport.model.TabularDataSet;
 import digital.srp.sreport.model.surveys.SduQuestions;
-import digital.srp.sreport.repositories.SurveyAnswerRepository;
+import digital.srp.sreport.repositories.AnswerRepository;
 import digital.srp.sreport.repositories.SurveyRepository;
 import digital.srp.sreport.repositories.SurveyReturnRepository;
 import digital.srp.sreport.services.TabularDataSetHelper;
@@ -47,7 +47,7 @@ public class SduReportController implements SduQuestions {
     protected SurveyReturnRepository returnRepo;
 
     @Autowired
-    protected SurveyAnswerRepository answerRepo;
+    protected AnswerRepository answerRepo;
 
     @Autowired
     private TabularDataSetHelper tdsHelper;
@@ -488,7 +488,7 @@ public class SduReportController implements SduQuestions {
             headerNames[i] = headers[i].name();
         }
         
-        List<SurveyAnswer> answers = answerRepo.findByOrgAndQuestion(org,
+        List<Answer> answers = answerRepo.findByOrgAndQuestion(org,
             headerNames);
         LOGGER.info(
                 String.format("Found %1$s answers about organisation for %2$s",

@@ -1,14 +1,12 @@
-package digital.srp.sreport.internal;
+package digital.srp.sreport.importers;
 
 import java.io.IOException;
-import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.Reader;
-import java.io.StringReader;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Scanner;
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
@@ -18,12 +16,12 @@ import org.slf4j.LoggerFactory;
 
 import digital.srp.sreport.model.WeightingFactor;
 
-public class WeightingFactorImporter {
+public class WeightingFactorCsvImporter {
 
     private static final Logger LOGGER = LoggerFactory
-            .getLogger(WeightingFactorImporter.class);
+            .getLogger(WeightingFactorCsvImporter.class);
     
-    public static final String DATA_FILE = "/data/WeightingFactors.csv";
+    public static final String DATA = "/data/WeightingFactors.csv";
     public static final String[] HEADERS = { "category",
             "acute_c", "ambulance_c", "care_c", "ccg_c", "community_c",
             "mental_health_learning_disability_c", "social_enterprise_c", 
@@ -34,7 +32,10 @@ public class WeightingFactorImporter {
 
     public List<WeightingFactor> readWeightingFactors()
             throws IOException {
-        return readWeightingFactors(new StringReader(readFile()), HEADERS);
+        try (InputStreamReader isr = new InputStreamReader(
+                getClass().getResourceAsStream(DATA))) {
+            return readWeightingFactors(isr, HEADERS);
+        }
     }
     
     public List<WeightingFactor> readWeightingFactors(Reader in, String[] headers)
@@ -68,23 +69,6 @@ public class WeightingFactorImporter {
         parser.close();
 
         return wfactors;
-    }
-
-    @SuppressWarnings("resource")
-    private String readFile() {
-        InputStream is = null;
-        try {
-            is = getClass().getResourceAsStream(WeightingFactorImporter.DATA_FILE);
-            LOGGER.error("Unable to find weighting factors at {}",
-                    WeightingFactorImporter.DATA_FILE);
-            
-            return new Scanner(is).useDelimiter("\\A").next();
-        } finally {
-            try {
-                is.close();
-            } catch (Exception e) {
-            }
-        }
     }
     
     private WeightingFactor newWeightingFactor(CSVRecord record, int idx) {

@@ -21,7 +21,7 @@ import digital.srp.sreport.model.surveys.Eric1516;
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = Application.class)
 @WebAppConfiguration
-public class SurveyControllerTest {
+public class SurveyControllerITest {
 
     @Autowired
     private SurveyController svc;

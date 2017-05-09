@@ -42,21 +42,21 @@ public class EricSurveyAndResponseTest {
      */
     @Test
     public void create1516EricReturn() {
-        Survey survey = new Eric1516().getSurvey();
+        Survey survey = Eric1516.getSurvey();
         assertSurvey(survey);
         
         assertQuestionJsonFileOk(survey);
         
-        ArrayList<SurveyAnswer> answers = new ArrayList<SurveyAnswer>();
+        ArrayList<Answer> answers = new ArrayList<Answer>();
         for (int i = 0; i < survey.categories().size(); i++) {
             System.out.println(String.format(
                     "  supplying answers for category: %1$s. %2$s", i,
                     survey.categories().get(i).name()));
-            for (int j = 0; j < survey.categories().get(i).questions().size(); j++) {
-                System.out.println(String.format("    question: %1$d. %2$s", j,
-                        survey.categories().get(i).questions().get(j).label()));
-                answers.add(new SurveyAnswer()
-                        .question(survey.categories().get(i).questions().get(j))
+            for (int j = 0; j < survey.categories().get(i).questionCodes().size(); j++) {
+                System.out.println(String.format("    question: %1$d", j,
+                        survey.categories().get(i).questionCodes().get(j)));
+                answers.add(new Answer()
+                        .question(survey.categories().get(i).questionCodes().get(j))
                         .response(ANSWERS[i][j]));
             }
         }
@@ -75,13 +75,13 @@ public class EricSurveyAndResponseTest {
 
     private void assertSurvey(Survey survey) {
         assertEquals(7, survey.categories().size());
-        assertEquals(4, survey.categories().get(0).questions().size());
-        assertEquals(11, survey.categories().get(1).questions().size());
-        assertEquals(7, survey.categories().get(2).questions().size());
-        assertEquals(2, survey.categories().get(3).questions().size());
-        assertEquals(10, survey.categories().get(4).questions().size());
-        assertEquals(3, survey.categories().get(5).questions().size());
-        assertEquals(5, survey.categories().get(6).questions().size());
+        assertEquals(4, survey.categories().get(0).questionCodes().size());
+        assertEquals(11, survey.categories().get(1).questionCodes().size());
+        assertEquals(7, survey.categories().get(2).questionCodes().size());
+        assertEquals(2, survey.categories().get(3).questionCodes().size());
+        assertEquals(10, survey.categories().get(4).questionCodes().size());
+        assertEquals(3, survey.categories().get(5).questionCodes().size());
+        assertEquals(5, survey.categories().get(6).questionCodes().size());
     }
 
     private void assertIsComplete(Survey survey) {
@@ -101,7 +101,7 @@ public class EricSurveyAndResponseTest {
         try {
             Survey survey2 = objectMapper.readValue(resultFile, Survey.class);
             assertEquals(survey.categories().size(), survey2.categories().size());
-            assertEquals(survey.questions().size(), survey2.questions().size());
+            assertEquals(survey.questionCodes().size(), survey2.questionCodes().size());
             assertEquals(survey.hashCode(), survey2.hashCode());
             assertSurvey(survey2);           
         } catch (IOException e) {

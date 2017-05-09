@@ -31,7 +31,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import com.fasterxml.jackson.annotation.JsonView;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import digital.srp.sreport.internal.CarbonFactorImporter;
+import digital.srp.sreport.importers.CarbonFactorCsvImporter;
 import digital.srp.sreport.model.CarbonFactor;
 import digital.srp.sreport.model.views.CarbonFactorViews;
 import digital.srp.sreport.repositories.CarbonFactorRepository;
@@ -57,7 +57,7 @@ public class CarbonFactorController {
     @PostConstruct
     protected void init() throws IOException {
         List<CarbonFactor> existingFactors = cfactorRepo.findAll();
-        List<CarbonFactor> factors = new CarbonFactorImporter().readCarbonFactors();
+        List<CarbonFactor> factors = new CarbonFactorCsvImporter().readCarbonFactors();
         
         for (CarbonFactor factor : factors) {
             if (existingFactors.contains(factor)) {

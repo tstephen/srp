@@ -1,0 +1,223 @@
+package digital.srp.cucumber.sreport;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
+
+import java.util.ArrayList;
+
+import org.springframework.http.HttpStatus;
+
+import com.knowprocess.cucumber.IntegrationTestSupport;
+
+import cucumber.api.PendingException;
+import cucumber.api.java.en.Then;
+import cucumber.api.java.en.When;
+import digital.srp.sreport.model.Answer;
+import digital.srp.sreport.model.Q;
+import digital.srp.sreport.model.Question;
+import digital.srp.sreport.model.Survey;
+import digital.srp.sreport.model.SurveyCategory;
+import digital.srp.sreport.model.SurveyReturn;
+import digital.srp.sreport.model.surveys.Eric1516;
+import digital.srp.sreport.model.surveys.Sdu1617;
+
+public class SustainabilityReturnStepDefs extends IntegrationTestSupport {
+
+    private SurveyReturn rtn;
+
+    private String getSduSurveyName(int startYear, int endYear) {
+        return "SDU-"+startYear+"-"+endYear;
+    }
+    
+    @When("^a list of surveys is requested$")
+    public void a_list_of_surveys_is_requested() throws Throwable {
+        executeGet("/surveys/");
+    }
+
+    @Then("^the list of (\\d+) available surveys is returned$")
+    public void the_list_of_available_surveys_is_returned(int surveyCount) throws Throwable {
+        latestResponse.statusCodeIs(HttpStatus.OK);
+        Survey[] surveys = (Survey[]) latestResponse.parseArray(Survey.class);
+        assertEquals(surveyCount, surveys.length);
+    }
+    
+    @When("^the SDU survey for (\\d+)-(\\d+) is uploaded$")
+    public void the_SDU_survey_for_period_is_uploaded(int startYear, int endYear) throws Throwable {
+        String surveyName = getSduSurveyName(startYear, endYear);
+        Survey survey = null;
+        switch (surveyName) {
+        case Eric1516.ID:
+            survey = Eric1516.getSurvey();
+            break;
+        case Sdu1617.ID:
+            survey = Sdu1617.getSurvey();
+            break;
+        default: 
+            fail("No survey definition for " + surveyName);
+        }
+        for (SurveyCategory cat : survey.categories()) {
+            assertNotNull(cat);
+            assertNotNull(cat.name());
+        }
+        executePut("/surveys/"+surveyName, survey);
+    }
+
+    @Then("^the response code is (\\d+)$")
+    public void the_response_code_is(int statusCode) throws Throwable {
+        latestResponse.statusCodeIs(HttpStatus.valueOf(statusCode));
+    }
+    
+    @When("^the survey ([-\\w]+) is requested$")
+    public void the_survey_is_requested(String surveyName) throws Throwable {
+        executeGet("/surveys/findByName/"+surveyName);
+    }
+    
+    @Then("^the full survey for (\\d+)-(\\d+) comprising (\\d+) questions is returned$")
+    public void the_full_survey_comprising_questions_is_returned(int startYear, int endYear, int qCount) throws Throwable {
+        latestResponse.statusCodeIs(HttpStatus.OK);
+        Survey survey = (Survey) latestResponse.parseObject(Survey.class);
+        assertNotNull(survey.id());
+        assertEquals(getSduSurveyName(startYear, endYear), survey.name());
+        assertEquals(startYear+"-"+endYear, survey.applicablePeriod());
+        assertEquals(qCount, survey.questionCodes().size());
+    }
+    
+    @Then("^all questions have a label$")
+    public void all_questions_have_a_label() throws Throwable {
+        Survey survey = (Survey) latestResponse.parseObject(Survey.class);
+        for (Question q : survey.questions()) {
+            System.err.println("  does q have label?" + q);
+            assertNotNull(String.format("Question $1%s has no label", q.name()), q.label());
+        }
+    }
+
+    @When("^a list of returns is requested for organisation (\\w+)$")
+    public void a_list_of_returns_is_requested_for_organisation(String org) throws Throwable {
+        executeGet("/returns/findByOrg/"+org);
+    }
+
+    @Then("^the list of (\\d+) available survey returns is provided including ([-\\w]+) (\\w+) and ([-\\w]+) (\\w+)$")
+    public void the_list_of_available_survey_returns_is_provided_including(int surveyCount, String survey1, String survey1Status, String survey2, String survey2Status) throws Throwable {
+        latestResponse.statusCodeIs(HttpStatus.OK);
+        SurveyReturn[] returns = (SurveyReturn[]) latestResponse.parseArray(SurveyReturn.class);
+        assertEquals(surveyCount, returns.length);
+        assertEquals(survey1, returns[0].name());
+        assertEquals("2015-16", returns[0].applicablePeriod());
+        assertEquals(survey1Status, returns[0].status());
+        assertEquals(survey2, returns[1].name());
+        assertEquals("2016-17", returns[1].applicablePeriod());
+        assertEquals(survey2Status, returns[1].status());
+    }
+//
+//    @Given("^No return has yet been created$")
+//    public void no_return_has_yet_been_created() throws Throwable {
+//        getForObject("/returns/findByOrg/" + ORG, List.class);
+////        assertEquals(HttpStatus.OK, latestObject.getStatusCode());
+//        List<?> returns = (List<?>) latestObject;
+//        // RestTemplate doesn't seem to deserialize typed list
+//        for (Iterator<?> it = returns.iterator() ; it.hasNext() ; ) {
+//            Map<?, ?> rtn = (Map<?, ?>) it.next();
+//            restTemplate.delete(baseUrl + "/returns/" + rtn.get("id"),
+//                    Collections.emptyMap());
+//        }
+//    }
+
+    @When("^the SDU (\\d+)-(\\d+) return of (\\w+) is requested$")
+    public void the_sdu_return_for_the_current_year_is_requested(int startYear, int endYear, String org) throws Throwable {
+        executeGet("/returns/findCurrentBySurveyNameAndOrg/"+getSduSurveyName(startYear, endYear)+"/"+org);
+    }
+
+    @Then("^an SDU (\\d+)-(\\d+) return containing (\\d+) answers is created if necessary and returned for organisation (\\w+)$")
+    public void an_SDU_return_is_created_if_necessary_and_returned_for_organisation(int startYear, int endYear, int answers, String org) throws Throwable {
+        latestResponse.statusCodeIs(HttpStatus.OK);
+        rtn = (SurveyReturn) latestResponse.parseObject(SurveyReturn.class);
+        assertEquals(startYear+"-"+endYear, rtn.applicablePeriod());
+        assertEquals(org, rtn.org());
+        assertEquals(org, rtn.answer(Q.ORG_CODE, rtn.applicablePeriod()).response());
+        ArrayList<Q> missingAnswers = new ArrayList<Q>();
+        for (Q q : Sdu1617.getSurvey().questionCodes()) {
+            if (rtn.answer(q, rtn.applicablePeriod())==null) {
+                missingAnswers.add(q);
+            }
+        }
+        System.out.println("Missing answers: "+ missingAnswers);
+        assertEquals(0, missingAnswers.size());
+        ArrayList<Q> calculatedAnswers = new ArrayList<Q>();
+        for (Answer a : rtn.answers()) {
+            if (!Sdu1617.getSurvey().questionCodes().contains(a.question().q())) {
+                calculatedAnswers.add(a.question().q());
+            }
+        }
+        System.out.println("Calculated answers: "+ calculatedAnswers);
+        assertEquals(answers, rtn.answers().size());
+    }
+
+    @When("^the updated (\\w+) return is uploaded$")
+    public void the_updated_return_is_submitted(String org) throws Throwable {
+        executePut("/returns/"+rtn.id(), rtn);
+    }
+
+    @Then("^the (\\w+) return for (\\d+)-(\\d+) is available with status '(\\w+)'$")
+    public void the_return_for_is_available_with_expected_status(String org, int startYear, int endYear, String status) throws Throwable {
+        latestResponse.statusCodeIs(HttpStatus.NO_CONTENT);
+        executeGet("/returns/"+rtn.id());
+        assertEquals(startYear+"-"+endYear, rtn.applicablePeriod());
+        assertEquals(status, rtn.status());
+        for (Answer answer : rtn.answers()) {
+            switch(answer.question().name()) {
+            case "orgCode": 
+                assertEquals(org, answer.response());
+            }
+        }
+    }
+    
+    @When("^the SDU (\\d+)-(\\d+) return of (\\w+) for period (\\d+)-(\\d+) is requested$")
+    public void the_SDU_return_of_for_period_is_requested(int qStartYear, int qEndYear, String org, int aStartYear, int aEndYear) throws Throwable {
+        executeGet("/returns/findCurrentBySurveyOrgAndPeriod/"+getSduSurveyName(qStartYear, qEndYear)+"/"+org+"/"+aStartYear+"-"+(aEndYear-2000));
+    }
+
+    @Then("^the (\\w+) (\\d+)-(\\d+) data for (\\d+)-(\\d+) questions is returned$")
+    public void the_RDR_data_for_questions_is_returned(String org, int qStartYear, int qEndYear, int aStartYear, int aEndYear) throws Throwable {
+        latestResponse.statusCodeIs(HttpStatus.OK);
+        rtn = (SurveyReturn) latestResponse.parseObject(SurveyReturn.class);
+        assertEquals(qStartYear+"-"+qEndYear, rtn.applicablePeriod());
+        assertEquals(org, rtn.org());
+        assertEquals(org, rtn.answer(Q.ORG_CODE, rtn.applicablePeriod()).response());
+    }
+
+//    @Given("^the current year's return is complete$")
+//    public void the_current_return_is_complete() throws Throwable {
+//        getForEntity("/returns/findCurrentBySurveyNameAndOrg/"+Sdu1617.ID+"/"+ORG, SurveyReturn.class);
+//        assertEquals(HttpStatus.OK, latestEntity.getStatusCode());
+//        rtn = (SurveyReturn) latestEntity.getBody();
+//        // TODO what constitutes complete?
+//    }
+    
+    @When("^the user submits the return$")
+    public void the_user_submits_the_return() throws Throwable {
+        executePost("/returns/"+rtn.id()+"/submitted", rtn);
+    }
+
+    @Then("^it is no longer available for edit$")
+    public void it_is_no_longer_available_for_edit() throws Throwable {
+        try {
+            executePut("/returns/"+rtn.id(), rtn);
+        } catch (IllegalStateException e) {
+            ; // expected
+        }
+    }
+
+    @When("^the user requests a treasury report for his organisation$")
+    public void the_user_requests_a_treasury_report_for_his_organisation() throws Throwable {
+        // Write code here that turns the phrase above into concrete actions
+        throw new PendingException();
+    }
+
+    @Then("^the RDR treasury report for (\\d+)-(\\d+) is provided$")
+    public void the_RDR_treasury_report_for_is_provided(int arg1, int arg2) throws Throwable {
+        // Write code here that turns the phrase above into concrete actions
+        throw new PendingException();
+    }
+
+}

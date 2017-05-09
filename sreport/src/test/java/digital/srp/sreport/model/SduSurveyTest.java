@@ -13,10 +13,6 @@ import org.junit.Test;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import digital.srp.sreport.model.Survey;
-import digital.srp.sreport.model.SurveyCategory;
-import digital.srp.sreport.model.SurveyQuestion;
-
 public class SduSurveyTest {
 
     private static final File OUT_DIR = new File("target", "test-classes");
@@ -33,28 +29,19 @@ public class SduSurveyTest {
      */
     @Test
     public void create1617Survey() {
-        SurveyCategory catOrg = new SurveyCategory()
-                .name("Organisation")
-                .questions(Arrays.asList(
-                        new SurveyQuestion().label("Name of organisation").required(true),
-                        new SurveyQuestion().label("Organisation code e.g. RAA").required(true),
-                        new SurveyQuestion().label("Abbreviation or nick name of organisation used").required(false)
-                ));
-        assertEquals(3, catOrg.questions().size());
+        SurveyCategory catOrg = new SurveyCategory().name("Organisation")
+                .questionCodes(Q.ORG_NAME, Q.ORG_CODE, Q.ORG_NICKNAME);
+        assertEquals(3, catOrg.questionCodes().size());
 
-        SurveyCategory catPolicy = new SurveyCategory()
-                .name("Policy")
-                .questions(Arrays.asList(
-                        new SurveyQuestion().label("Does your organisation have a current* Board-approved Sustainable Development Management Plan (SDMP) or Carbon Reduction Management Plan (CRMP)?").required(true),
-                        new SurveyQuestion().label("Was the SDMP reviewed or approved by the board in the last 12 months?").required(true),
-                        new SurveyQuestion().label("If your SDMP has a sustainability mission statement, what is it?").required(false)
-                ));
-        assertEquals(3, catPolicy.questions().size());
-        
+        SurveyCategory catPolicy = new SurveyCategory().name("Policy")
+                .questionCodes(Q.SDMP_CRMP, Q.SDMP_BOARD_REVIEW_WITHIN_12_MONTHS,
+                        Q.SDMP_MISSION_STATEMENT);
+        assertEquals(3, catPolicy.questionCodes().size());
+ 
         Survey survey = new Survey().applicablePeriod("2016-17").categories(Arrays.asList(catOrg, catPolicy));
         assertEquals(2, survey.categories().size());
-        assertEquals(3, survey.categories().get(0).questions().size());
-        assertEquals(3, survey.categories().get(1).questions().size());
+        assertEquals(3, survey.categories().get(0).questionCodes().size());
+        assertEquals(3, survey.categories().get(1).questionCodes().size());
         
         File resultFile = new File(OUT_DIR, "Survey1617.json");
         try {
@@ -69,8 +56,8 @@ public class SduSurveyTest {
             Survey survey2 = objectMapper.readValue(resultFile, Survey.class);
             assertEquals(survey, survey2);
             assertEquals(2, survey2.categories().size());
-            assertEquals(3, survey2.categories().get(0).questions().size());
-            assertEquals(3, survey2.categories().get(1).questions().size());            
+            assertEquals(3, survey2.categories().get(0).questionCodes().size());
+            assertEquals(3, survey2.categories().get(1).questionCodes().size());            
         } catch (IOException e) {
             e.printStackTrace();
             fail("Unable to re-read survey from JSON");

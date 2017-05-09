@@ -37,6 +37,10 @@ public interface SurveyReturnRepository extends CrudRepository<SurveyReturn, Lon
     List<SurveyReturn> findBySurveyAndOrg(@Param("surveyName") String surveyName, 
             @Param("org") String org);
     
+//    @Query("SELECT o FROM SurveyReturn o WHERE o.status != 'deleted' AND o.survey.name = :surveyName AND o.org = :org ORDER BY o.name ASC")
+//    List<SurveyReturn> findBySurveyOrgAndPeriod(@Param("surveyName") String surveyName, 
+//            @Param("org") String org, @Param("period") String period);
+    
     @Query("SELECT o FROM SurveyReturn o WHERE o.status != 'deleted' ORDER BY o.name ASC")
     List<SurveyReturn> findPageBySurvey(@Param("surveyId") Long surveyId, Pageable pageable);
     

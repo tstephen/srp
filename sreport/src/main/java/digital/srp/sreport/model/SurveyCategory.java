@@ -1,6 +1,9 @@
 package digital.srp.sreport.model;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 
 import javax.persistence.CascadeType;
@@ -10,9 +13,10 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
@@ -57,8 +61,14 @@ public class SurveyCategory {
     
     @JsonProperty
     @JsonView(SurveyViews.Detailed.class)
-    @OneToMany(orphanRemoval=true, cascade = CascadeType.ALL, mappedBy = "category")
-    private List<SurveyQuestion> questions;
+    @Column(name = "questions")
+    @Lob
+//    @OneToMany(orphanRemoval=true, cascade = CascadeType.ALL, mappedBy = "category")
+    private String questionCodes;
+    
+    @Transient
+    @JsonView(SurveyViews.Detailed.class)
+    private List<Question> questions;
     
 //    @JsonProperty
 //    @Transient
@@ -74,34 +84,54 @@ public class SurveyCategory {
 //        this.surveyId = survey.id();
 //        return this;
 //    }
-    
-    public SurveyCategory questions(List<SurveyQuestion> questions) {
-        this.questions = questions;
-        
-        for (SurveyQuestion q : questions) {
-            q.category(this);
-        }
-        
+
+    public SurveyCategory questionCodes(Q... questions) {
+        questionCodes(Arrays.asList(questions));
         return this;
     }
-
-    public List<SurveyQuestion> questions() {
-        if (questions == null) {
+    
+    public SurveyCategory questionCodes(List<Q> questions) {
+        StringBuilder sb = new StringBuilder();
+        for (Iterator<Q> it = questions.iterator(); it.hasNext();) {
+            Q q = it.next();
+            sb.append(q.code());
+            if (it.hasNext()) {
+                sb.append(',');
+            }
+        }
+        this.questionCodes = sb.toString();
+        return this;
+    }
+    
+    public List<Q> questionCodes() {
+        if (questionCodes == null) {
             return Collections.emptyList();
         }
         
+        ArrayList<Q> list = new ArrayList<Q>();
+        String[] qNames = questionCodes.split(",");
+        for (String name : qNames) {
+            list.add(Q.valueOf(name));
+        }
+        return list;
+    }
+    
+    public List<Question> questions() {
+        if (questions == null) {
+            questions = new ArrayList<Question>(); 
+        }
         return questions;
     }
     
-    public SurveyQuestion question(String qName) {
-        for (SurveyQuestion q : questions) {
-            if (qName.equals(q.name())) {
-                return q;
-            }
-        }
-        return null;
-    }
-    
+//    public SurveyQuestion question(String qName) {
+//        for (SurveyQuestion q : questions) {
+//            if (qName.equals(q.name())) {
+//                return q;
+//            }
+//        }
+//        return null;
+//    }
+//    
 //    public boolean equivalent(Object obj) {
 //        if (this == obj)
 //            return true;

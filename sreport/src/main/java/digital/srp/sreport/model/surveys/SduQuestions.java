@@ -26,7 +26,7 @@ public interface SduQuestions {
             Q.TRAVEL_CO2E_PCT
     };
 
-    Q[] WATER_HDRS = new Q[] { Q.WATER_VOL, Q.WASTE_WATER, Q.WATER_COST };
+    Q[] WATER_HDRS = new Q[] { Q.WATER_VOL, Q.WASTE_WATER, Q.WATER_AND_SEWAGE_COST };
     
     Q[] WATER_CO2E_HDRS = new Q[] { Q.WATER_CO2E, Q.WATER_TREATMENT_CO2E };
     

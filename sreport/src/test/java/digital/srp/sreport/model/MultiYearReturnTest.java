@@ -18,15 +18,15 @@ public class MultiYearReturnTest implements EricQuestions{
 
     @Test
     public void testTabulate() {
-        List<SurveyAnswer> answers = new ArrayList<SurveyAnswer>();
+        List<Answer> answers = new ArrayList<Answer>();
         SurveyReturn rtn1617 = new SurveyReturn().applicablePeriod("2016-17");
         SurveyReturn rtn1516 = new SurveyReturn().applicablePeriod("2015-16");
-        SurveyQuestion floorAreaQ = new SurveyQuestion().name(FLOOR_AREA);
-        SurveyQuestion noStaffQ = new SurveyQuestion().name(NO_STAFF);
-        answers.add(new SurveyAnswer().response("1000").question(floorAreaQ).surveyReturn(rtn1617));
-        answers.add(new SurveyAnswer().response("500").question(noStaffQ).surveyReturn(rtn1617));
-        answers.add(new SurveyAnswer().response("1100").question(floorAreaQ).surveyReturn(rtn1516));
-        answers.add(new SurveyAnswer().response("550").question(noStaffQ).surveyReturn(rtn1516));
+        Question floorAreaQ = new Question().name(FLOOR_AREA);
+        Question noStaffQ = new Question().name(NO_STAFF);
+        answers.add(new Answer().response("1000").question(floorAreaQ).addSurveyReturn(rtn1617));
+        answers.add(new Answer().response("500").question(noStaffQ).addSurveyReturn(rtn1617));
+        answers.add(new Answer().response("1100").question(floorAreaQ).addSurveyReturn(rtn1516));
+        answers.add(new Answer().response("550").question(noStaffQ).addSurveyReturn(rtn1516));
         
         TabularDataSet tds = new TabularDataSetHelper().tabulate(new String[] { FLOOR_AREA, NO_STAFF }, answers);
         
@@ -40,15 +40,15 @@ public class MultiYearReturnTest implements EricQuestions{
 
     @Test
     public void testTabulateMissingData() {
-        List<SurveyAnswer> answers = new ArrayList<SurveyAnswer>();
+        List<Answer> answers = new ArrayList<Answer>();
         SurveyReturn rtn1617 = new SurveyReturn().applicablePeriod("2016-17");
         SurveyReturn rtn1516 = new SurveyReturn().applicablePeriod("2015-16");
-        SurveyQuestion floorAreaQ = new SurveyQuestion().name(FLOOR_AREA);
-        SurveyQuestion noStaffQ = new SurveyQuestion().name(NO_STAFF);
-        answers.add(new SurveyAnswer().response("1000").question(floorAreaQ).surveyReturn(rtn1617));
-        answers.add(new SurveyAnswer().response("500").question(noStaffQ).surveyReturn(rtn1617));
-//        answers.add(new SurveyAnswer().response("1100").question(floorAreaQ).surveyReturn(rtn1516));
-        answers.add(new SurveyAnswer().response("550").question(noStaffQ).surveyReturn(rtn1516));
+        Question floorAreaQ = new Question().name(FLOOR_AREA);
+        Question noStaffQ = new Question().name(NO_STAFF);
+        answers.add(new Answer().response("1000").question(floorAreaQ).addSurveyReturn(rtn1617));
+        answers.add(new Answer().response("500").question(noStaffQ).addSurveyReturn(rtn1617));
+//        answers.add(new SurveyAnswer().response("1100").question(floorAreaQ).addSurveyReturn(rtn1516));
+        answers.add(new Answer().response("550").question(noStaffQ).addSurveyReturn(rtn1516));
         
         TabularDataSet tds = new TabularDataSetHelper().tabulate(new String[] { FLOOR_AREA, NO_STAFF }, answers);
         
