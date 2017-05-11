@@ -55,9 +55,9 @@ PROC_SOC_ASSESSMENT$Do your commissioning, tendering and procurement processes i
 PROC_SUPPLIER_SUSTAINABILITY$Do your commissioning, tendering and procurement processes include: A consideration of the suppliers' sustainability policies?$$SDU$$yesno$$$
 STRATEGIC_SUSTAINABILITY_PARTNERSHIPS$Are you in a strategic partnership with other organisations on sustainability?$$SDU$$yesno$$$
 STRATEGIC_SUSTAINABILITY_PARTNERS$Who are they?$$SDU$$$$$
-GCC_USER$Does your organisation use the Good Corporate Citizenship (GCC) tool?$$SDU$$yesno$$$
+GCC_USER$Does your organisation use the <a href=”http://www.sduhealth.org.uk/gcc/about.aspx”>Good Corporate Citizenship (GCC)</a> tool?$$SDU$$yesno$$$
 LAST_GCC_DATE$When was your last GCC self assessment?$$SDU$$$$$
-LAST_GCC_SCORE$What was your score?$$SDU$$number$$$
+LAST_GCC_SCORE$What was your score?$%$SDU$$number$$$
 PROMOTE_SUSTAINABILITY_TO_STAFF$Does your organisation promote sustainability to its employees?$$SDU$$yesno$$$
 ECLASS_USER$Do you use eClass for procurement?$$SDU$$yesno$$$
 QUANT_ES_IMPACTS$What are the qualitative or quantified social and environmental impacts?$$SDU$$$$$
