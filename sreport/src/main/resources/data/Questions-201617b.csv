@@ -68,7 +68,7 @@ CARBON_REDUCTION_BASELINE_USED$Does your organisation use a baseline year?$$SDU$
 CARBON_REDUCTION_BASE_YEAR$Which year is it?$$SDU$$number$yyyy$$[\\d]{4}
 CARBON_REDUCTION_TARGET_PCT$What is the percentage reduction target?$%$SDU$$number$$$
 CARBON_REDUCTION_DEADLINE_YEAR$What is the deadline year for this target?$$SDU$$number$yyyy$$[\\d]{4}
-PATIENT_CONTACT_MEASURE$Define the measure you have used for patient contacts$$SDU$$yesno$$$
+PATIENT_CONTACT_MEASURE$Define the measure you have used for patient contacts$$SDU$$$$$
 BOARD_LEAD_FOR_SUSTAINABILITY$Is there a Board Level lead for Sustainability on your Board?$$SDU$$yesno$$$
 BOARD_SUSTAINABILITY_AS_RISK$Does your board consider sustainability issues as part of its risk management process?$$SDU$$yesno$$$
 ADAPTATION_PLAN_INC$Do your board approved plans address the potential need to adapt the delivery of your organisation's activities and organisation's infrastructure as a result of climate change and adverse weather events?$$SDU$$yesno$$$

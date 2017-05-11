@@ -16,7 +16,18 @@ public class Sdu1617 {
     public static Survey getSurvey() {
         SurveyCategory catOrg = new SurveyCategory()
                 .name("Organisation")
-                .questionCodes( Q.ORG_NAME,Q.ORG_CODE,Q.ORG_NICKNAME,Q.ORG_TYPE,Q.FLOOR_AREA,Q.POPULATION,Q.NO_STAFF,Q.NO_BEDS,Q.NO_PATIENT_CONTACTS );
+                .questionCodes(
+                        Q.ORG_NAME,
+                        Q.ORG_CODE,
+                        Q.ORG_NICKNAME,
+                        Q.ORG_TYPE,
+                        Q.FLOOR_AREA,
+                        Q.POPULATION,
+                        Q.NO_STAFF,
+                        Q.NO_BEDS,
+                        Q.NO_PATIENT_CONTACTS,
+                        Q.PATIENT_CONTACT_MEASURE
+                );
 
         SurveyCategory catPolicy = new SurveyCategory()
                 .name("Policy")
@@ -50,7 +61,6 @@ public class Sdu1617 {
                         Q.CARBON_REDUCTION_BASE_YEAR,
                         Q.CARBON_REDUCTION_TARGET_PCT,
                         Q.CARBON_REDUCTION_DEADLINE_YEAR,
-                        Q.PATIENT_CONTACT_MEASURE,
                         Q.BOARD_LEAD_FOR_SUSTAINABILITY,
                         Q.BOARD_SUSTAINABILITY_AS_RISK,
                         Q.ADAPTATION_PLAN_INC,
