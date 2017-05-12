@@ -154,9 +154,7 @@ public class Sdu1617 {
                         Q.SEVOFLURANE,
                         Q.NITROUS_OXIDE,
                         Q.PORTABLE_NITROUS_OXIDE_MIX,
-                        Q.PORTABLE_NITROUS_OXIDE_MIX_MATERNITY,
-                        Q.PORTABLE_NITROUS_OXIDE_MIX_TOTAL,
-                        Q.PORTABLE_NITROUS_OXIDE_TOTAL
+                        Q.PORTABLE_NITROUS_OXIDE_MIX_MATERNITY
                 );
         
         SurveyCategory catAdditional = new SurveyCategory()
