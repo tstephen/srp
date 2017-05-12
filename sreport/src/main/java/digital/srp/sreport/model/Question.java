@@ -97,6 +97,11 @@ public class Question {
     @JsonView(SurveyViews.Detailed.class)
     @Column(name = "source")
     protected String source;
+
+    @JsonProperty
+    @JsonView(SurveyViews.Detailed.class)
+    @Column(name = "def_val")
+    protected String defaultValue;
     
     public Question q(Q q) {
         this.name = q.name();
