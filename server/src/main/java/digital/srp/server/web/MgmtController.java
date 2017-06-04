@@ -19,7 +19,8 @@ import digital.srp.sreport.model.Question;
 import digital.srp.sreport.model.Survey;
 import digital.srp.sreport.model.SurveyCategory;
 import digital.srp.sreport.model.SurveyReturn;
-import digital.srp.sreport.model.returns.Eric1516;
+import digital.srp.sreport.model.returns.EricDataSet;
+import digital.srp.sreport.model.returns.EricDataSetFactory;
 import digital.srp.sreport.model.surveys.Sdu1617;
 import digital.srp.sreport.repositories.AnswerRepository;
 import digital.srp.sreport.repositories.QuestionRepository;
@@ -62,19 +63,16 @@ public class MgmtController {
     public String initAndShowStatus(Model model) throws IOException {
         LOGGER.info(String.format("initAndShowStatus"));
 
-        initSurveys();
-        initReturns();
+        initQuestions(model);
+        initSurveys(model);
+        initReturns(model);
         
-        model.addAttribute("questions", qRepo.findAll());
-        model.addAttribute("surveys", surveyRepo.findAll());
-        model.addAttribute("answers", answerRepo.findAll());
-        model.addAttribute("returns", returnRepo.findAll());
         model.addAttribute("orgs", accountRepo.findAllForTenant("sdu"));
-        
         return "jsonStatus";
     }
-    
-    protected void initSurveys() throws IOException {
+
+    @RequestMapping(value = "/questions", method = RequestMethod.GET, headers = "Accept=application/json")
+    public String initQuestions(Model model) throws IOException {
         List<Question> questions = new QuestionCsvImporter().readQuestions();
         List<Question> existingQuestions = qRepo.findAll();
         for (Question question : questions) {
@@ -83,6 +81,21 @@ public class MgmtController {
             }
         }
         
+        model.addAttribute("questions", qRepo.findAll());
+        return "jsonStatus";
+    }
+
+    private Question findMatchingQ(Question question, List<Question> existingQuestions) {
+        for (Question q : existingQuestions) {
+            if (q.name().equals(question.name())) {
+                return q;
+            }
+        }
+        return null;
+    }
+
+    @RequestMapping(value = "/surveys", method = RequestMethod.GET, headers = "Accept=application/json")
+    public String initSurveys(Model model) throws IOException {
         Survey[] expectedSurveys = { digital.srp.sreport.model.surveys.Eric1516.getSurvey(), Sdu1617.getSurvey() };
         for (Survey expected : expectedSurveys) {
             Survey survey = surveyRepo.findByName(expected.name());
@@ -103,62 +116,97 @@ public class MgmtController {
                 }
             }
         }
-    }
-    
-    private Question findMatchingQ(Question question, List<Question> existingQuestions) {
-        for (Question q : existingQuestions) {
-            if (q.name().equals(question.name())) {
-                return q;
-            }
-        }
-        return null;
-    }
-    
-    protected void initReturns() {
-        Survey survey = surveyRepo.findByName(digital.srp.sreport.model.surveys.Eric1516.ID);
-        LOGGER.debug("Found survey definition {} ({} containing {} questions", survey.name(), survey.id(), survey.questionCodes().size());
-        List<SurveyReturn> existingReturns = returnRepo.findBySurveyName(digital.srp.sreport.model.surveys.Eric1516.ID);
-        LOGGER.debug(" ... {} existing returns", existingReturns.size());
         
-        try {
-            List<SurveyReturn> returns = new EricCsvImporter().readEricReturns();
-            LOGGER.info("Found {} {} returns to import...", returns.size(), survey.name());
-            for (SurveyReturn surveyReturn : returns) {
-                surveyReturn.survey(survey);
-                
-                if (!findBySurveyAndOrg(existingReturns, surveyReturn)) {
-                    // merge persisted questions to answers
-                    for (Answer answer: surveyReturn.answers()) {
-                        Question q = qRepo.findByName(answer.question().name());
-                        if (q == null) {
-                            System.out.println("WTF");
-                        }
-                        answer.question(q);
-                    }
-                    answerRepo.save(surveyReturn.answers());
-                    for (Answer answer : surveyReturn.answers()) {
-                        answer.addSurveyReturn(surveyReturn);
-                    }
-                    returnRepo.save(surveyReturn);
+        model.addAttribute("surveys", surveyRepo.findAll());
+        return "jsonStatus";
+    }
+
+//    @RequestMapping(value = "/answers", method = RequestMethod.GET, headers = "Accept=application/json")
+    public String initReturns(Model model) {
+        String[] ericDataSets = { "ERIC-2015-16", "ERIC-2014-15", "ERIC-2013-14" };
+        
+        for (String ericDataSet : ericDataSets) {
+//            LOGGER.debug("Found survey definition {} ({} containing {} questions", survey.name(), survey.id(), survey.questionCodes().size());
+            List<SurveyReturn> existingReturns = returnRepo.findBySurveyName(ericDataSet);
+            LOGGER.debug(" ... {} existing returns", existingReturns.size());
+            
+
+            EricDataSet ericDS = EricDataSetFactory.getInstance(ericDataSet);
+            try {
+                List<SurveyReturn> returns = new EricCsvImporter().readEricReturns(ericDS);
+                LOGGER.info("Found {} {} returns to import...", returns.size(), ericDataSet);
+                Survey survey = surveyRepo.findByName(ericDataSet);
+                if (survey == null) {
+                    survey = new Survey().name(ericDataSet).applicablePeriod(returns.get(0).applicablePeriod());
+                    survey = surveyRepo.save(survey);
                 }
+                importReturns(survey, existingReturns, returns);
+            } catch (Throwable e) {
+                String msg = String.format("Unable to load ERIC data from %1$s", ericDS.getDataFile());
+                LOGGER.error(msg, e);
+                throw new SReportException(msg, e);
             }
-        } catch (Throwable e) {
-            String msg = String.format("Unable to load ERIC data from %1$s", Eric1516.DATA_FILE);
-            LOGGER.error(msg, e);
-            throw new SReportException(msg, e);
+        }
+        model.addAttribute("answers", answerRepo.findAll());
+        model.addAttribute("returns", returnRepo.findAll());
+        return "jsonStatus";
+    }
+
+    private void importReturns(Survey survey,
+            List<SurveyReturn> existingReturns, List<SurveyReturn> returns) {
+        for (SurveyReturn surveyReturn : returns) {
+            surveyReturn.survey(survey);
+            SurveyReturn existingReturn = findBySurveyAndOrg(existingReturns, surveyReturn);
+            if (existingReturn == null) {
+                saveReturnAndAnswers(surveyReturn);
+            } else {
+                LOGGER.debug("Starting to add answers for org: {}", surveyReturn.org());
+                long count = 0;
+                for (Answer answer: surveyReturn.answers()) {
+                    LOGGER.debug("Looking for answer for org: {}, period: {} and question: {}", 
+                            surveyReturn.org(), answer.applicablePeriod(), answer.question().name());
+                    Answer existingAnswer = existingReturn.answer(answer.question().q(), answer.applicablePeriod());
+                    if ((existingAnswer == null || existingAnswer.response().equals("0"))
+                            && answerRepo.findByOrgPeriodAndQuestion(surveyReturn.org(), answer.applicablePeriod(), answer.question().name()) == null) {
+                        answer.question(findQ(answer));
+                        answer.addSurveyReturn(existingReturn);
+                        answer = answerRepo.save(answer);
+                        count++;
+                    }
+                }
+                LOGGER.debug("... added {} answers for org: {}", count, surveyReturn.org());
+            }
         }
     }
+
+    private Question findQ(Answer answer) {
+        LOGGER.info("findQ {}", answer.question().q().name());
+        Question q = qRepo.findByName(answer.question().name());
+        if (q == null) {
+            System.err.println("You must create all questions before attempting to import returns that use them");
+        }
+        return q;
+    }
     
-    private boolean findBySurveyAndOrg(List<SurveyReturn> existingReturns,
+    private void saveReturnAndAnswers(SurveyReturn surveyReturn) {
+        LOGGER.info("Save new return {} for {} with {} answers", surveyReturn.name(), surveyReturn.org(), surveyReturn.answers().size());
+        for (Answer answer : surveyReturn.answers()) {
+            answer.question(findQ(answer));
+            answer.addSurveyReturn(surveyReturn);
+        }
+        returnRepo.save(surveyReturn);
+    }
+
+    private SurveyReturn findBySurveyAndOrg(List<SurveyReturn> existingReturns,
             SurveyReturn surveyReturn) {
-        for (SurveyReturn ret : existingReturns) {
+        for (SurveyReturn ret : existingReturns) { 
             if (ret.name().equals(surveyReturn.name()) 
                     && ret.org().equals(surveyReturn.org())) {
                 LOGGER.info(String.format("Skipping insert of return for %1$s because %2$d matches name and org", surveyReturn.name(), ret.id()));
-                return true;
+                return ret;
             }
         }
-        return false;
+        return null;
     }
 
 }

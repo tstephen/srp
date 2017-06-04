@@ -18,6 +18,9 @@ curl -X GET -v -u tstephen:tstephen -H 'Accept:application/json' http://localhos
 
 curl -X GET -H "X-Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ0c3RlcGhlbiIsInNjb3BlcyI6WyJBZG1pbiIsIlN1cGVyIEFkbWluIiwiVXNlciJdLCJpc3MiOiJodHRwOi8va25vd3Byb2Nlc3MuY29tIiwiaWF0IjoxNDg5NTAxMTYyLCJleHAiOjE0ODk1MDIwNjJ9.YWr5LjayNUnXG8twvDl098i04Rt1L_JJrG3B1DVJZOWwAKbWKuJtTYSMm5af833qTD9pX9kQL5DjmtlXISFnEQ" \
   -H 'Accept:application/json' -H "Cache-Control: no-cache" http://localhost:8083/returns/findBySurveyNameAndOrg/Sdu-201516/RDR
+
+# import ERIC
+
   
 #
 # REPORTS

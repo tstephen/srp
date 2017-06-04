@@ -38,6 +38,7 @@ import digital.srp.sreport.model.SurveyReturn;
 import digital.srp.sreport.model.views.SurveyReturnViews;
 import digital.srp.sreport.repositories.AnswerRepository;
 import digital.srp.sreport.repositories.QuestionRepository;
+import digital.srp.sreport.repositories.SurveyRepository;
 import digital.srp.sreport.repositories.SurveyReturnRepository;
 import digital.srp.sreport.services.Cruncher;
 
@@ -60,7 +61,7 @@ public class SurveyReturnController {
     protected Cruncher cruncher;
     
     @Autowired
-    protected SurveyController surveyController; 
+    protected SurveyRepository surveyRepo; 
     
     @Autowired
     protected SurveyReturnRepository returnRepo;
@@ -155,7 +156,7 @@ public class SurveyReturnController {
 
     protected SurveyReturn createBlankReturn(String surveyName, String org, String period) {
         LOGGER.info(String.format("createBlankReturn of %1$s for %2$s", surveyName, org));
-        Survey requested = surveyController.findByName(surveyName);
+        Survey requested = surveyRepo.findByName(surveyName);
         List<Answer> emptyAnswers = new ArrayList<Answer>();
 
         SurveyReturn rtn = new SurveyReturn()
@@ -180,20 +181,46 @@ public class SurveyReturnController {
     @RequestMapping(value = "/findCurrentBySurveyNameAndOrg/{surveyName}/{org}", method = RequestMethod.GET)
     @JsonView(SurveyReturnViews.Detailed.class)
 //    @Transactional
-    public @ResponseBody SurveyReturn findCurrentBySurveyAndOrg(
+    public @ResponseBody SurveyReturn findCurrentBySurveyNameAndOrg(
             @PathVariable("surveyName") String surveyName,
             @PathVariable("org") String org) {
-        LOGGER.info(String.format("findBySurveyAndOrg %1$s", surveyName));
+        LOGGER.info(String.format("findCurrentBySurveyNameAndOrg %1$s, %2$s", surveyName, org));
 
         List<SurveyReturn> returns = findBySurveyAndOrg(surveyName, org);
         returns.sort((r1,r2) -> r1.revision().compareTo(r2.revision()));
         SurveyReturn rtn = returns.get(returns.size()-1);
         LOGGER.info("Found {} returns for {},{} returning revision {}", returns.size(), surveyName, org, rtn.revision());
 
+        Answer answer = rtn.answer(Q.ORG_CODE, rtn.applicablePeriod());
+        if (answer.response().equals("0")) {
+            rtn.answers().add(answer.question(qRepo.findByName(Q.ORG_CODE.name())).response(rtn.org()));
+        }
         rtn = saveCalculations(cruncher.calculate(rtn));
         
         return addLinks(rtn);
     }
+
+//    @RequestMapping(value = "/findCurrentBySurveyNameAndOrg/{surveyName}", method = RequestMethod.GET)
+//    @JsonView(SurveyReturnViews.Detailed.class)
+////    @Transactional
+//    public @ResponseBody List<SurveyReturn> findCurrentBySurveyName(
+//            @PathVariable("surveyName") String surveyName) {
+//        LOGGER.info(String.format("findCurrentBySurveyName %1$s", surveyName));
+//
+//        List<SurveyReturn> returns = returnRepo.findBySurveyName(surveyName);
+//        LOGGER.info("Found {} returns for {}", returns.size(), surveyName);
+//
+//        for (SurveyReturn rtn : returns) {
+//            Answer answer = rtn.answer(Q.ORG_CODE, rtn.applicablePeriod());
+//            if (answer.response().equals("0")) {
+//                rtn.answers().add(answer.question(qRepo.findByName(Q.ORG_CODE.name())).response(rtn.org()));
+//            }
+//            rtn = saveCalculations(cruncher.calculate(rtn));
+//            
+//            addLinks(rtn);
+//        }
+//        return returns;
+//    }
 
 //    @RequestMapping(value = "/findCurrentBySurveyOrgAndPeriod/{surveyName}/{org}/{period}", method = RequestMethod.GET)
 //    @JsonView(SurveyReturnViews.Detailed.class)
@@ -213,6 +240,20 @@ public class SurveyReturnController {
 //        
 //        return addLinks(rtn);
 //    }
+
+    @RequestMapping(value = "/importEric/{surveyName}/{org}", method = RequestMethod.GET)
+    @JsonView(SurveyReturnViews.Detailed.class)
+    @Transactional
+    public @ResponseBody SurveyReturn importEricAnswers(
+            @PathVariable("surveyName") String surveyName,
+            @PathVariable("org") String org) {
+        SurveyReturn rtn  = findCurrentBySurveyNameAndOrg(surveyName, org);
+        List<Survey> surveys = surveyRepo.findEricSurveys();
+        for (Survey survey : surveys) {
+            returnRepo.importAnswers(rtn.id(), rtn.org(), survey.name());
+        }
+        return findCurrentBySurveyNameAndOrg(surveyName, org);
+    }
 
     @Transactional//(Transactional.TxType.REQUIRES_NEW)
     private SurveyReturn saveCalculations(SurveyReturn rtn) {

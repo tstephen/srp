@@ -47,5 +47,16 @@ public interface SurveyReturnRepository extends CrudRepository<SurveyReturn, Lon
     @Override
     @Query("UPDATE #{#entityName} x set x.status = 'deleted' where x.id = :id")
     @Modifying(clearAutomatically = true)
-    public void delete(@Param("id") Long id);
+    void delete(@Param("id") Long id);
+
+    @Query(value = "INSERT INTO SR_RETURN_ANSWER (survey_return_id, answer_id) "
+            + "SELECT :id, a.id from SR_ANSWER a "
+            + "INNER JOIN SR_RETURN_ANSWER ra ON a.id = ra.answer_id "
+            + "INNER JOIN SR_RETURN r ON ra.survey_return_id = r.id "
+            + "INNER JOIN SR_SURVEY s ON r.survey_id = s.id "
+            + "WHERE r.org = :org "
+            + "AND s.name = :surveyToImport "
+            + "AND a.id NOT IN (SELECT answer_id FROM SR_RETURN_ANSWER WHERE survey_return_id = :id)", nativeQuery = true)
+    @Modifying(clearAutomatically = true)
+    void importAnswers(@Param("id") Long id, @Param("org") String org, @Param("surveyToImport") String surveyToImport);
 }

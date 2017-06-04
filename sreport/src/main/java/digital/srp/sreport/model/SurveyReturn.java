@@ -31,6 +31,7 @@ import org.springframework.hateoas.Link;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonView;
 
+import digital.srp.sreport.model.views.AnswerViews;
 import digital.srp.sreport.model.views.SurveyReturnViews;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -64,7 +65,7 @@ public class SurveyReturn {
     @NotNull
     @Size(max = 50)
     @JsonProperty
-    @JsonView(SurveyReturnViews.Summary.class)
+    @JsonView({ AnswerViews.Detailed.class, SurveyReturnViews.Summary.class })
     @Column(name = "name")
     private String name;
     
@@ -75,7 +76,7 @@ public class SurveyReturn {
     @NotNull
     @Size(max = 50)
     @JsonProperty
-    @JsonView(SurveyReturnViews.Summary.class)
+    @JsonView({ AnswerViews.Detailed.class, SurveyReturnViews.Summary.class })
     @Column(name = "org")
     private String org;
     

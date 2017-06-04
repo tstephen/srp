@@ -119,6 +119,13 @@ public class OrganisationType {
     @Column(name = "commissioner")
     private boolean commissioner;
 
+    /**
+     * If this organisation type is used in sustainability reporting tools.
+     */
+    @JsonProperty
+    @Column(name = "reporting_type")
+    private boolean reportingType;
+    
     @JsonProperty
     @Column(name = "tenant_id")
     private String tenantId;

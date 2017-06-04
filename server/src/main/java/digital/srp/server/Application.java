@@ -37,12 +37,16 @@ import io.onedecision.engine.OneDecisionConfig;
 import io.onedecision.engine.domain.OneDecisionDomainConfig;
 import link.omny.acctmgmt.AcctMgmtConfig;
 import link.omny.acctmgmt.model.SystemConfig;
+import link.omny.catalog.CatalogConfig;
 import link.omny.custmgmt.CustMgmtConfig;
 
+// See https://github.com/spring-projects/spring-boot/issues/6529 for alternative if JMX needed
+//@EnableAutoConfiguration(exclude = { EndpointMBeanExportAutoConfiguration.class })
 @Configuration
 @Import({ 
         AuthConfig.class, OneDecisionConfig.class, OneDecisionDomainConfig.class,
-        AcctMgmtConfig.class, BpmConfiguration.class, CustMgmtConfig.class,
+        AcctMgmtConfig.class, BpmConfiguration.class, 
+        CatalogConfig.class, CustMgmtConfig.class,
         MaccConfig.class, SReportConfiguration.class, SrpConfig.class })
 public class Application extends WebMvcConfigurerAdapter {
 
@@ -83,7 +87,7 @@ public class Application extends WebMvcConfigurerAdapter {
 
         return tomcat;
     }
-
+    
     @Bean
     public SystemConfig systemConfig() {
         return new SystemConfig();
@@ -107,7 +111,7 @@ public class Application extends WebMvcConfigurerAdapter {
 //        return new ActivitiApplicationSecurity();
 //        // return new SrpActivitiApplicationSecurity();
 //    }
-
+    
     public static void main(String[] args) {
         SpringApplication.run(Application.class, args);
     }

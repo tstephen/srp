@@ -104,12 +104,15 @@ public class OrganisationTypeController {
     @RequestMapping(value = "/", method = RequestMethod.GET)
     public @ResponseBody List<ShortOrganisationType> listForTenant(
             @PathVariable("tenantId") String tenantId,
+            @RequestParam(value = "filter", required = false) String filter,
             @RequestParam(value = "page", required = false) Integer page,
             @RequestParam(value = "limit", required = false) Integer limit) {
         LOGGER.info(String.format("List messages for tenant %1$s", tenantId));
 
         List<OrganisationType> list;
-        if (limit == null) {
+        if ("reportingType=true".equals(filter)) {
+            list = organisationTypeRepo.findAllReportingTypeForTenant(tenantId);
+        } else if (limit == null) {
             list = organisationTypeRepo.findAllForTenant(tenantId);
         } else {
             Pageable pageable = new PageRequest(page == null ? 0 : page, limit);

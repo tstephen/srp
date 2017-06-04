@@ -8,10 +8,9 @@
   <link href="/webjars/bootstrap/3.3.5/css/bootstrap.min.css" rel="stylesheet">
   <link href="/webjars/bootstrap/3.3.5/css/bootstrap-theme.min.css" rel="stylesheet">
   <link href="css/jquery.tagit.css" rel="stylesheet" type="text/css">
-  <link href="css/tagit.ui-zendesk.css" rel="stylesheet" type="text/css">
   
-  <link href="2.0.0/css/omny-1.0.0.css" rel="stylesheet">
-  <link href="2.0.0/css/srp.css" rel="stylesheet">
+  <link href="/knowprocess/2.0.0/css/base.css" rel="stylesheet">
+  <link href="/srp/2.0.0/css/srp.css" rel="stylesheet">
 </head>
 <body>
   <div class="clearfix" id="messages"></div>
@@ -19,6 +18,7 @@
   <script id='template' type='text/ractive'>
     {{>profileArea}}
     {{>titleArea}}
+    {{>loginSect}}
     
     <section id="summarySect">
       <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
@@ -126,11 +126,19 @@
 
   <script src="js/autoNumeric.js"></script>
   <script src="js/md5.min.js"></script>
-  <script src="js/login-1.0.0.js"></script>
-  <script src="js/i18n.js"></script>
-  <script src="js/cust-mgmt-1.0.0.js"></script>
-  <script src="js/omny-1.0.0.js"></script>
-  <script src="js/embed.js"></script>
+  
+  <script src="js/env.js"></script>
+  <script src="/workmgmt/2.2.0/js/activity.js"></script>
+  <script src="/workmgmt/2.2.0/js/string-functions.js"></script>
+  <script src="/workmgmt/2.2.0/js/i18n.js"></script>
+
+  <script src="/workmgmt/2.2.0/js/base.js"></script>
+  <script src="/workmgmt/2.2.0/js/custmgmt.js"></script>
+  <script src="/workmgmt/2.2.0/js/auth.js"></script>
+  <script src="/workmgmt/2.2.0/js/support.js"></script>  
+
+  <script src="/srp/2.0.0/js/srp.js"></script>
+  <script src="/srp/2.0.0/js/embed.js"></script>
   
   <script type="text/javascript">
     $(document).ready(function() {

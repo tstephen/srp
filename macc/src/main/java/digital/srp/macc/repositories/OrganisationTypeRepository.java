@@ -41,6 +41,9 @@ public interface OrganisationTypeRepository extends
     List<OrganisationType> findByStatusForTenant(
             @Param("tenantId") String tenantId, @Param("status") String status);
 
+    @Query("SELECT c FROM OrganisationType c WHERE c.reportingType = true AND c.tenantId = :tenantId ORDER BY c.name ASC")
+    List<OrganisationType> findAllReportingTypeForTenant(@Param("tenantId") String tenantId);
+
     @Query("SELECT c FROM OrganisationType c WHERE c.tenantId = :tenantId AND name = :name")
     OrganisationType findByName(@Param("tenantId") String tenantId,
             @Param("name") String name);

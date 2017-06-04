@@ -19,7 +19,6 @@
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <start-class>digital.srp.server.Application</start-class>
-    <kp-auth.version>1.0</kp-auth.version>
   </properties>
 
   <repositories>
@@ -98,6 +97,12 @@
       <optional>true</optional>
     </dependency>
     <dependency>
+      <groupId>io.onedecision</groupId>
+      <artifactId>onedecision-webapp</artifactId>
+      <version>${onedecision.version}</version>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
       <groupId>link.omny.acctmgmt</groupId>
       <artifactId>acctmgmt</artifactId>
       <version>${omny-link.version}</version>
@@ -119,11 +124,6 @@
     </dependency>
 
     <!-- Tenant jars -->
-    <dependency>
-      <groupId>uk.org.sduhealth</groupId>
-      <artifactId>sduhealth-srp</artifactId>
-      <version>1.0-SNAPSHOT</version>
-    </dependency>
   </dependencies>
 
   <build>

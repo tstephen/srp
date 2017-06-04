@@ -2,7 +2,7 @@ name$label$unit$source$hint$type$placeholder$required$validation$defaultValue
 ORG_CODE$Organisation code$$ERIC$$$$$$
 ORG_NAME$Organisation name$$ERIC$$$$$$
 COMMISSIONING_REGION$Commissioning Region$$ERIC$$$$$$
-ORG_TYPE$Organisation type$$ERIC$$select$Please select…$$$
+ORG_TYPE$Primary organisation type$$ERIC$$select$Please select…$$$
 NO_ACUTE_SITES$Number of sites - General acute hospital ()$$ERIC$$number$$$$
 NO_SPECIALIST_SITES$Number of sites - Specialist hospital (acute only) ()$$ERIC$$number$$$$
 NO_MIXED_SITES$Number of sites - Mixed service hospital ()$$ERIC$$number$$$$
@@ -17,22 +17,22 @@ NO_OTHER_SITES$Number of sites - Unreported sites ()$$ERIC$$number$$$$
 ESTATES_DEV_STRATEGY$Estates Development Strategy$$ERIC$$yesno$$$$
 HEALTHY_TRANSPORT_PLAN$Do you have a healthy transport plan?$$ERIC$$yesno$$$$
 BOARD_ADAPTATION_PLAN$Board approved Adaptation Plan$$ERIC$$yesno$$$$
-SDMP_CRMP$Sustainable Development Management Plan/Carbon Reduction Management Plan$$ERIC$$yesno$$$$
+SDMP_CRMP$Sustainable Development Management Plan (SDMP) / Carbon Reduction Management Plan (CRMP)$$ERIC$$yesno$$$$
 CARBON_REDUCTION_TARGET$Carbon reduction target$$ERIC$$yesno$$$$
 PFA_ASSESSMENT$NHS Premises and Facilities Assurance - Assessment/Approval$$ERIC$$select$$$$
 PFA_ACTION_PLAN$NHS Premises and Facilities Assurance - action plan$$ERIC$$select$$$$
-CONTRACTING_OUT_VAL$Value of contracted out services (£)$$ERIC$$number$$$$
-CONTRACTING_OUT_PCT$Percentage of hard FM (estates) and soft FM (hotel services) contracted out (%)$$ERIC$$number$$$$
-CAPITAL_NEW_BUILD$Capital investment for new build (£)$$ERIC$$number$$$$
-CAPITAL_IMPROVING_EXISTING$Capital investment for improving existing buildings (£)$$ERIC$$number$$$$
-CAPITAL_EQUIPMENT$Capital investment for equipment (£)$$ERIC$$number$$$$
-PRIVATE_SECTOR$Private Sector investment (£)$$ERIC$$number$$$$
-BACKLOG_MAINTENANCE_VAL$Investment to reduce backlog maintenance (£)$$ERIC$$number$$$$
-PFA_ACTION_PLAN_VAL$Cost to meet NHS Premises and Facilities Assurance action plan (£)$$ERIC$$number$$$$
-NON_EMERGENCY_TRANSPORT_VAL$Non-emergency patient transport (£)$$ERIC$$number$$$$
-INCOME_CATERING$Income from services provided to other organisations - catering (£)$$ERIC$$number$$$$
-INCOME_LAUNDRY$Income from services provided to other organisations - laundry and linen (£)$$ERIC$$number$$$$
-INCOME_OTHER$Income from services provided to other organisations - other (£)$$ERIC$$number$$$$
+CONTRACTING_OUT_VAL$Value of contracted out services$$ERIC$$number$$$$
+CONTRACTING_OUT_PCT$Percentage of hard FM (estates) and soft FM (hotel services) contracted out$$ERIC$$number$$$$
+CAPITAL_NEW_BUILD$Capital investment for new build$$ERIC$$number$$$$
+CAPITAL_IMPROVING_EXISTING$Capital investment for improving existing buildings$$ERIC$$number$$$$
+CAPITAL_EQUIPMENT$Capital investment for equipment$$ERIC$$number$$$$
+PRIVATE_SECTOR$Private Sector investment$$ERIC$$number$$$$
+BACKLOG_MAINTENANCE_VAL$Investment to reduce backlog maintenance$$ERIC$$number$$$$
+PFA_ACTION_PLAN_VAL$Cost to meet NHS Premises and Facilities Assurance action plan$$ERIC$$number$$$$
+NON_EMERGENCY_TRANSPORT_VAL$Non-emergency patient transport$$ERIC$$number$$$$
+INCOME_CATERING$Income from services provided to other organisations - catering$$ERIC$$number$$$$
+INCOME_LAUNDRY$Income from services provided to other organisations - laundry and linen$$ERIC$$number$$$$
+INCOME_OTHER$Income from services provided to other organisations - other$$ERIC$$number$$$$
 NO_RIDDOR_INCIDENTS$RIDDOR incidents ()$$ERIC$$number$$$$
 NO_FM_INCIDENTS$Estates and facilities related incidents ()$$ERIC$$number$$$$
 NO_FM_CLINICAL_INCIDENTS$Clinical service incidents caused by estates and infrastructure failure ()$$ERIC$$number$$$$
@@ -55,9 +55,8 @@ PROC_SOC_ASSESSMENT$Do your commissioning, tendering and procurement processes i
 PROC_SUPPLIER_SUSTAINABILITY$Do your commissioning, tendering and procurement processes include a consideration of the suppliers' sustainability policies?$$SDU$$yesno$$$$
 STRATEGIC_SUSTAINABILITY_PARTNERSHIPS$Are you in a strategic partnership with other organisations on sustainability?$$SDU$$yesno$$$$
 STRATEGIC_SUSTAINABILITY_PARTNERS$Who are they?$$SDU$$$$$$
-GCC_USER$Does your organisation use the <a href=”http://www.sduhealth.org.uk/gcc/about.aspx”>Good Corporate Citizenship (GCC)</a> tool?$$SDU$$yesno$$$$
-LAST_GCC_DATE$When was your last GCC self assessment?$$SDU$$$$$$
-LAST_GCC_SCORE$What was your score?$%$SDU$$number$$$$
+LAST_GCC_DATE$If your organinsation uses the <a href=”http://www.sduhealth.org.uk/gcc/about.aspx”>Good Corporate Citizenship (GCC)</a> tool when was your last self assessment?$$SDU$$number$yyyy$$[\\d]{4}$
+LAST_GCC_SCORE$And what was your GCC score?$%$SDU$$number$$$$
 PROMOTE_SUSTAINABILITY_TO_STAFF$Does your organisation promote sustainability to its employees?$$SDU$$yesno$$$$
 ECLASS_USER$Do you use eClass for procurement?$$SDU$$yesno$$$$
 QUANT_ES_IMPACTS$What are the qualitative or quantified social and environmental impacts?$$SDU$$$$$$
@@ -69,12 +68,14 @@ CARBON_REDUCTION_BASE_YEAR$Which year is it?$$SDU$$number$yyyy$$[\\d]{4}$2007
 CARBON_REDUCTION_TARGET_PCT$What is the percentage reduction target?$%$SDU$$number$$$$34
 CARBON_REDUCTION_DEADLINE_YEAR$What is the deadline year for this target?$$SDU$$number$yyyy$$[\\d]{4}$2020
 PATIENT_CONTACT_MEASURE$Define the measure you have used for patient contacts$$SDU$$$$$$
-BOARD_LEAD_FOR_SUSTAINABILITY$Is there a Board Level lead for Sustainability on your Board?$$SDU$$yesno$$$$
+BOARD_LEAD_FOR_SUSTAINABILITY$If you have a Board Level lead for Sustainability, please enter their name and/or role here$$SDU$$yesno$$$$
 BOARD_SUSTAINABILITY_AS_RISK$Does your board consider sustainability issues as part of its risk management process?$$SDU$$yesno$$$$
 ADAPTATION_PLAN_INC$Do your board approved plans address the potential need to adapt the delivery of your organisation's activities and organisation's infrastructure as a result of climate change and adverse weather events?$$SDU$$yesno$$$$
 CCGS_SERVED$We provide services to the following CCGs$$SDU$$$$$$
 PROVIDERS_COMMISSIONED$We commission services from the following providers$$SDU$$$$$$
 TOTAL_ENERGY_COST$Total Energy Cost (all energy supplies)$£$ERIC S08_01$The total cost of electricity, gas, oil, and coal from all sources (including utility supplier, local source, renewable source), net of any costs that are charged to other organisations for which the trust provides energy (see apportionment rules). $number$$$$
+WATER_COST$Water Cost$£$ERIC S09_01$The total cost for water whether metred or not inclusive of bore hole, maintenance and operational costs together with billed amounts and water ratesWater and sewage costs associated with on-site central processing unit(s) (e.g. laundry) should be apportioned in accordance with the percentage output used by the trust for its own purposes. (E.g. if the trusts uses 30% of the processing unit output then the figure used should be 30% of the total cost of water supplied to the processing unit.) Where Water and Sewage costs are billed as a single amount, information on the method of calculating the separate charges should be sought from the supplier. If this is not available, trusts should provide an estimate of the split.$number$$$$
+SEWAGE_COST$Sewage Cost$£$ERIC S09_02$The total sewage cost whether metred or not, inclusive of maintenance and operational costs together with billed amounts and water rates. Water and sewage costs associated with on-site central processing unit(s) (e.g. laundry) should be apportioned in accordance with the percentage output used by the trust for its own purposes. (E.g. if the trusts uses 30% of the processing unit output then the figure used should be 30% of the total cost of water supplied to the processing unit.) Where Water and Sewage costs are billed as a single amount, information on the method of calculating the separate charges should be sought from the supplier. If this is not available, trusts should provide an estimate of the split.$number$$$$
 WATER_AND_SEWAGE_COST$Water & Sewage Cost$£$ERIC S09_01 + S09_02 merged$The total cost for water whether metred or not inclusive of bore hole, maintenance and operational costs together with billed amounts and water rates plus the total sewage cost whether metred or not, inclusive of maintenance and operational costs together with billed amounts and water rates. Water and sewage costs associated with on-site central processing unit(s) (e.g. laundry) should be apportioned in accordance with the percentage output used by the trust for its own purposes. (E.g. if the trusts uses 30% of the processing unit output then the figure used should be 30% of the total cost of water supplied to the processing unit.) Where Water and Sewage costs are billed as a single amount, information on the method of calculating the separate charges should be sought from the supplier. If this is not available, trusts should provide an estimate of the split.$number$$$$
 WASTE_RECYLING_COST$Waste recycling, recovery and preparing for re-use Cost$£$ERIC S10_01 + S10_03 + S10_05 + S10_07$The total cost of disposing of waste by landfill, Incineration, recycling and other recovery . See ERIC definitions 2016/17 Annex G for further information. The cost should relate to the billed amount and include VAT. The cost should include the cost involved in any off site disposal including transport and disposal together with the cost of on-site destruction. The cost should not include on-site local collection and handling costs.$number$$$$
 TOTAL_BIZ_TRAVEL_COST$Total Business Travel Cost$£$SDU$Total cost all business travel including owned fleet, grey fleet, public transport, cycling, air travel and taxis  - finance department$number$$$$
@@ -152,3 +153,94 @@ PAPER_SPEND$Paper products$tCO2e$SDU$$number$$$$
 PHARMA_SPEND$Pharmaceuticals$tCO2e$SDU$$number$$$$
 TRAVEL_SPEND$Travel$tCO2e$SDU$$number$$$$
 COMMISSIONING_SPEND$Commissioning$tCO2e$SDU$$number$$$$
+HARD_FM_COSTS$Hard FM (Estates) costs$£$ERIC$$number$$$$
+SOFT_FM_COSTS$Soft FM (Hotel services) costs$£$ERIC$$number$$$$
+FM_FINANCE_COSTS$Estates and facilities finance costs$£$ERIC$$number$$$$
+MAINT_COSTS$Maintenance service costs$£$ERIC$$number$$$$
+INCOME_RETAIL$Income received for area leased out for retail sales$£$ERIC$$number$$$$
+AREA_RETAIL$Area leased out for retail sales ()$m²$ERIC$$number$$$$
+OCCUPIED_FLOOR_AREA$Occupied floor area$m²$ERIC$$number$$$$
+NHS_OCCUPIED_FLOOR_AREA$NHS estate occupied floor area$%$ERIC$$number$$$$
+HEATED_VOL$Site heated volume$m³$ERIC$$number$$$$
+BLDG_FOOTPRINT$Building footprint$m²$ERIC$$number$$$$
+SITE_FOOTPRINT$Site land area$Hectare$ERIC$$number$$$$
+CLINICAL_FLOOR_AREA$Clinical space$m²$ERIC$$number$$$$
+NON_CLINICAL_FLOOR_AREA$Non-clinical space$m²$ERIC$$number$$$$
+UNSUITABLE_OCCUPIED_FLOOR_AREA$Not functionally suitable - occupied floor area$%$ERIC$$number$$$$
+UNSUITABLE_PATIENT_OCCUPIED_FLOOR_AREA$Not functionally suitable - patient occupied floor area$%$ERIC$$number$$$$
+EMPTY_FLOOR_AREA$Floor area - empty$%$ERIC$$number$$$$
+UNDER_USED_FLOOR_AREA$Floor area - under used$%$ERIC$$number$$$$
+SINGLE_BED_WITH_EN_SUITE$Single bedrooms for patients with en-suite facilities $$ERIC$$number$$$$
+SINGLE_BED_WITHOUT_EN_SUITE$Single bedrooms for patients without en-suite facilities $$ERIC$$number$$$$
+AGE_PROFILE_1948_1954$Age profile - 2015 to 2024$%$ERIC$$number$$$$
+AGE_PROFILE_1955_1964$Age profile - 2005 to 2014$%$ERIC$$number$$$$
+AGE_PROFILE_1965_1974$Age profile - 1995 to 2004$%$ERIC$$number$$$$
+AGE_PROFILE_1975_1984$Age profile - 1985 to 1994$%$ERIC$$number$$$$
+AGE_PROFILE_1985_1994$Age profile - 1975 to 1984$%$ERIC$$number$$$$
+AGE_PROFILE_1995_2004$Age profile - 1965 to 1974$%$ERIC$$number$$$$
+AGE_PROFILE_2005_2014$Age profile - 1955 to 1964$%$ERIC$$number$$$$
+AGE_PROFILE_2015_2024$Age profile - 1948 to 1954$%$ERIC$$number$$$$
+AGE_PROFILE_PRE_1948$Age profile - pre 1948$%$ERIC$$number$$$$
+AGE_PROFILE_TOTAL$Age profile - total (must equal 100%)$%$ERIC$$number$$$$
+ERADICATE_HIGH_RISK_BACKLOG_COST$Cost to eradicate high risk backlog$£$ERIC$$number$$$$
+ERADICATE_SIG_RISK_BACKLOG_COST$Cost to eradicate significant risk backlog$£$ERIC$$number$$$$
+ERADICATE_MOD_RISK_BACKLOG_COST$Cost to eradicate moderate risk backlog$£$ERIC$$number$$$$
+ERADICATE_LOW_RISK_BACKLOG_COST$Cost to eradicate low risk backlog$£$ERIC$$number$$$$
+RISK_ADJUSTED_BACKLOG_COST$Risk adjusted backlog cost$£$ERIC$$number$$$$
+ERADICATE_BACKLOG_COST$Cost to eradicate backlog$£$ERIC$$number$$$$
+FOSSIL_USED_IN_CHP$Fossil energy input to CHP system/s (kWh)$kWh$ERIC$$number$$$$
+CHP_THERMAL_OUTPUT$Thermal energy output of CHP system/s (kWh)$kWh$ERIC$$number$$$$
+SEWAGE_COST$Sewage cost$£$ERIC$$number$$$$
+CLINICAL_WASTE_COST$Clinical waste cost$£$ERIC$$number$$$$
+CLINICAL_WASTE_WEIGHT$Clinical waste volume$tonnes$ERIC$$number$$$$
+SPECIAL_WASTE_COST$Special waste cost$£$ERIC$$number$$$$
+SPECIAL_WASTE_WEIGHT$Special waste volume$tonnes$ERIC$$number$$$$
+DOMESTIC_WASTE_COST$Domestic waste cost$£$ERIC$$number$$$$
+PARKING_SPACES$Parking spaces available $$ERIC$$number$$$$
+DISABLED_PARKING_SPACES$Designated disabled parking spaces $$ERIC$$number$$$$
+AVG_PARKING_FEE$Average fee charged per hour for patient/visitor parking$£$ERIC$$number$$$$
+AVG_STAFF_PARKING_FEE$Average fee charged per hour for staff parking$£$ERIC$$number$$$$
+CLEANING_COST$Cleaning service cost$£$ERIC$$number$$$$
+NO_CLEANING_STAFF$Cleaning staff (WTE)$WTE$ERIC$$number$$$$
+VH_RISK_CLEANING_COST$Cost of cleaning occupied floor area assessed as Red/Very High Risk$£$ERIC$$number$$$$
+VH_RISK_CLEANING_AREA$Occupied floor area assessed as Red/Very High Risk$%$ERIC$$number$$$$
+VH_RISK_CLEANING_AREA_ACTUAL_PCT$Required standard for occupied floor area assessed as Red/Very High Risk$%$ERIC$$number$$$$
+VH_RISK_CLEANING_AREA_REQD_PCT$Achieved standard for occupied floor area identified as Red/Very High Risk$%$ERIC$$number$$$$
+HS_RISK_CLEANING_COST$Cost of cleaning occupied floor area assessed as Amber/High and Significant Risk$£$ERIC$$number$$$$
+HS_RISK_CLEANING_AREA$Occupied floor area assessed as Amber/High and Significant Risk$%$ERIC$$number$$$$
+HS_RISK_CLEANING_AREA_ACTUAL_PCT$Required standard for occupied floor area assessed as Amber/High and Significant Risk$%$ERIC$$number$$$$
+HS_RISK_CLEANING_AREA_REQD_PCT$Achieved standard for occupied floor area identified as Amber/High and Significant Risk$%$ERIC$$number$$$$
+L_RISK_CLEANING_AREA$Cost of cleaning occupied floor area assessed as Green/Low Risk$%$ERIC$$number$$$$
+L_RISK_CLEANING_AREA_ACTUAL_PCT$Occupied floor area assessed as Green/Low Risk$%$ERIC$$number$$$$
+L_RISK_CLEANING_AREA_REQD_PCT$Required standard for occupied floor area assessed as Green/Low Risk$%$ERIC$$number$$$$
+L_RISK_CLEANING_COST$Achieved standard for occupied floor area identified as Green/Low Risk$%$ERIC$$number$$$$
+INFREQ_CLEANING_COST$Cost of cleaning the occupied floor area not requiring regular cleaning$%$ERIC$$number$$$$
+INFREQ_CLEANING_AREA$Occupied floor area not requiring regular cleaning$%$ERIC$$number$$$$
+NO_MEALS$Inpatient main meals requested $$ERIC$$number$$$$
+PER_PATIENT_DAY_MEAL_COST$Cost of feeding one inpatient per day (inpatient meal day)$£$ERIC$$number$$$$
+LAUNDRY_COST$Laundry and linen service cost$£$ERIC$$number$$$$
+NO_LAUNDRY_ITEMS$Pieces per annum $$ERIC$$number$$$$
+PORTERING_COST$Portering service cost$£$ERIC$$number$$$$
+NO_PORTERING_STAFF$Portering staff (WTE)$WTE$ERIC$$number$$$$
+PATIENT_OCCUPIED_FLOOR_AREA$Patient occupied floor area$m²$ERIC$$number$$$$
+NON_PATIENT_OCCUPIED_FLOOR_AREA$Non-patient occupied floor area$m²$ERIC$$number$$$$
+AVAIL_BEDS$Available beds$$ERIC$$number$$$$
+OCCUPIED_BEDS$Occupied beds$$ERIC$$number$$$$
+ELEC_USED_LOCAL$Electricity consumed – local$kWh$ERIC$$number$$$$
+NO_CHP_UNITS$Number of CHP units operated on the site$$ERIC$$number$$$$
+ELEC_GENERATION$Total full load rating of the electrical generator plant$kW$ERIC$$number$$$$
+HIGH_TEMP_DISPOSAL_WEIGHT$High temperature disposal waste weight$tonnes$ERIC$$number$$$$
+ALT_WASTE_DISPOSAL_WEIGHT$Non burn treatment (alternative treatment plant) disposal waste weight$tonnes$ERIC$$number$$$$
+WEEE_WASTE_WEIGHT$Waste electrical and electronic equipment (WEEE) weight$tonnes$ERIC$$number$$$$
+REUSE_WASTE_WEIGHT$Preparing for re-use volume$tonnes$ERIC$$number$$$$
+LANDFILL_WEIGHT$Landfill disposal waste weight$tonnes$ERIC$$number$$$$
+OTHER_RECOVERY_WEIGHT$Other recovery volume$tonnes$ERIC$$number$$$$
+RECYCLING_WEIGHT$Waste recycling volume$tonnes$ERIC$$number$$$$
+WASTE_RECYLING_COST$Waste recycling, recovery and preparing for re-use Cost$£$ERIC$$number$$$$
+TOTAL_WASTE_COST$Total waste cost$£$ERIC$$number$$$$
+PATIENT_AND_VISITOR_CONCESSION_SCHEME$Patient/visitor concession scheme provided (Yes/No/None) $$ERIC$$number$$$$
+DISABLED_STAFF_PARKING_SPACES$Designated parking spaces available for staff$$ERIC$$number$$$$
+WARD_FOOD_WASTE$Ward food waste - unserved meals$%$ERIC$$number$$$$
+INCOME_ALL$$$ERIC$$number$$$$
+PFI_CHARGES$PFI Unitary charges$£$ERIC$$number$$$$
+HIGH_TEMP_DISPOSAL_WITH_RECOVERY_WEIGHT$High temperature disposal waste weight involving combustion with energy recovery$tonnes$ERIC$$number$$$$

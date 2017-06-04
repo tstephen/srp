@@ -12,12 +12,12 @@ import org.apache.commons.csv.CSVRecord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import digital.srp.sreport.model.Answer;
 import digital.srp.sreport.model.Q;
 import digital.srp.sreport.model.Question;
 import digital.srp.sreport.model.StatusType;
-import digital.srp.sreport.model.Answer;
 import digital.srp.sreport.model.SurveyReturn;
-import digital.srp.sreport.model.returns.Eric1516;
+import digital.srp.sreport.model.returns.EricDataSet;
 
 public class EricCsvImporter {
 
@@ -26,17 +26,17 @@ public class EricCsvImporter {
 
     private List<Question> questions;
 
-    public List<SurveyReturn> readEricReturns() throws IOException {
+    public List<SurveyReturn> readEricReturns(EricDataSet ericDataSet) throws IOException {
         try (InputStreamReader isr = new InputStreamReader(
-                getClass().getResourceAsStream(Eric1516.DATA_FILE))) {
-            return readEricReturns(isr, Eric1516.HEADERS, "2015-16");
+                getClass().getResourceAsStream(ericDataSet.getDataFile()))) {
+            return readEricReturns(isr, ericDataSet.getHeaders(), ericDataSet.getPeriod());
         }
     }
 
     public List<SurveyReturn> readEricReturns(Reader in, String[] headers, String period)
             throws IOException {
         final CSVParser parser = new CSVParser(in,
-                CSVFormat.EXCEL.withHeader(headers));
+                CSVFormat.EXCEL.withHeader(headers).withDelimiter('$'));
         LOGGER.info(String.format("readEricReturns"));
 
         questions = new ArrayList<Question>();
@@ -141,6 +141,8 @@ public class EricCsvImporter {
             return Q.INCOME_CATERING;
         case "Income from services provided to other organisations - laundry and linen (£)":
             return Q.INCOME_LAUNDRY;
+        case "Income from services provided to other organisations (£)":
+            return Q.INCOME_ALL;
         case "Income from services provided to other organisations - other (£)":
             return Q.INCOME_OTHER;
         case "RIDDOR incidents (No.)":
@@ -159,6 +161,256 @@ public class EricCsvImporter {
             return Q.NO_FIRE_INJURIES;
         case "Number of patients sustaining injuries during evacuation (No.)":
             return Q.NO_EVAC_INJURIES;
+        case "Hard FM (Estates) costs (£)":
+            return Q.HARD_FM_COSTS;
+        case "Soft FM (Hotel Services) costs (£)":
+        case "Soft FM (Hotel services) costs (£)":
+            return Q.SOFT_FM_COSTS;
+        case "Estates and facilities finance costs (£)":
+            return Q.FM_FINANCE_COSTS;
+        case "Maintenance service costs (£)":
+            return Q.MAINT_COSTS;
+        case "Income received for area leased out for retail sales (£)":
+            return Q.INCOME_RETAIL;
+        case "Area leased out for retail sales (m²)":
+            return Q.AREA_RETAIL;
+        case "Gross internal site floor area (m²)":
+        case "Gross internal floor area (m²)":
+            return Q.FLOOR_AREA;
+        case "Occupied floor area (m²)":
+            return Q.OCCUPIED_FLOOR_AREA;
+        case "NHS estate occupied floor area (%)":
+            return Q.NHS_OCCUPIED_FLOOR_AREA;
+        case "Site heated volume (m³)":
+            return Q.HEATED_VOL;
+        case "Building footprint (m²)":
+            return Q.BLDG_FOOTPRINT;
+        case "Site footprint (m²)":
+        case "Site land area (Hectare)":
+            return Q.SITE_FOOTPRINT;
+        case "Patient occupied floor area (m²)":
+            return Q.PATIENT_OCCUPIED_FLOOR_AREA;
+        case "Non-patient occupied floor area (m²)":
+            return Q.NON_PATIENT_OCCUPIED_FLOOR_AREA;
+        case "Clinical space (m²)":
+            return Q.CLINICAL_FLOOR_AREA;
+        case "Non-clinical space (m²)":
+            return Q.NON_CLINICAL_FLOOR_AREA;
+        case "Not functionally suitable - occupied floor area (%)":
+            return Q.UNSUITABLE_OCCUPIED_FLOOR_AREA;
+        case "Not functionally suitable - patient occupied floor area (%)":
+            return Q.UNSUITABLE_PATIENT_OCCUPIED_FLOOR_AREA;
+        case "Un-utilised space (%)":
+        case "Floor area - empty (%)":
+            return Q.EMPTY_FLOOR_AREA;
+        case "Floor area - under used (%)":
+            return Q.UNDER_USED_FLOOR_AREA;
+        case "Available beds (No.)":
+            return Q.AVAIL_BEDS;
+        case "Occupied beds (No.)":
+            return Q.OCCUPIED_BEDS;
+        case "Single bedrooms for patients with en-suite facilities (No.)":
+            return Q.SINGLE_BED_WITH_EN_SUITE;
+        case "Single bedrooms for patients without en-suite facilities (No.)":
+            return Q.SINGLE_BED_WITHOUT_EN_SUITE;
+        case "Age profile - 2015 to present (%)":
+        case "Age profile - 2015 to 2024 (%)":
+            return Q.AGE_PROFILE_2015_2024;
+        case "Age profile - 2005 to present (%)":
+        case "Age profile - 2005 to 2014 (%)":
+            return Q.AGE_PROFILE_2005_2014;
+        case "Age profile - 1995 to 2004 (%)":
+            return Q.AGE_PROFILE_1995_2004;
+        case "Age profile - 1985 to 1994 (%)":
+            return Q.AGE_PROFILE_1985_1994;
+        case "Age profile - 1975 to 1984 (%)":
+            return Q.AGE_PROFILE_1975_1984;
+        case "Age profile - 1965 to 1974 (%)":
+            return Q.AGE_PROFILE_1965_1974;
+        case "Age profile - 1955 to 1964 (%)":
+            return Q.AGE_PROFILE_1955_1964;
+        case "Age profile - 1948 to 1954 (%)":
+            return Q.AGE_PROFILE_1948_1954;
+        case "Age profile - pre 1948 (%)":
+            return Q.AGE_PROFILE_PRE_1948;
+        case "Age profile - total (must equal 100%) (%)":
+            return Q.AGE_PROFILE_TOTAL;
+        case "Cost to eradicate high risk backlog (£)":
+            return Q.ERADICATE_HIGH_RISK_BACKLOG_COST;
+        case "Cost to eradicate significant risk backlog (£)":
+            return Q.ERADICATE_SIG_RISK_BACKLOG_COST;
+        case "Cost to eradicate moderate risk backlog (£)":
+            return Q.ERADICATE_MOD_RISK_BACKLOG_COST;
+        case "Cost to eradicate low risk backlog (£)":
+            return Q.ERADICATE_LOW_RISK_BACKLOG_COST;
+        case "Risk adjusted backlog cost (£)":
+            return Q.RISK_ADJUSTED_BACKLOG_COST;
+        case "Cost to eradicate backlog (£)":
+            return Q.ERADICATE_BACKLOG_COST;
+        case "Energy cost (all energy supplies) (£)":
+        case "Total energy cost (all energy supplies, utility, local and renewable) (£)":
+        case "Energy costs (all energy supplies) (£)":
+            return Q.TOTAL_ENERGY_COST;
+        case "Electricity consumed - utility (kWh)":
+        case "Electricity consumed (kWh)":
+            return Q.ELEC_USED;
+        case "Gas consumed - utility (kWh)":
+        case "Gas consumed (kWh)":
+            return Q.GAS_USED;
+        case "Oil  consumed - utility (kWh)":
+        case "Oil consumed (kWh)":
+            return Q.OIL_USED;
+        case "Coal consumed (kWh)":
+        case "Coal consumed - utility (kWh)":
+            return Q.COAL_USED;
+        case "Steam consumed - local (kWh)":
+        case "Steam consumed (kWh)":
+            return Q.STEAM_USED;
+        case "Hot water consumed - local (kWh)":
+        case "Hot water consumed (kWh)":
+            return Q.HOT_WATER_USED;
+        case "Electricity consumed - local (kWh)": 
+            return Q.ELEC_USED_LOCAL;
+        case "Electricity consumed - renewable (kWh)":
+            return Q.ELEC_RENEWABLE_USED;
+        case "Non-fossil fuel consumed - renewable (kWh)":
+            return Q.ELEC_RENEWABLE_USED;
+        case "Fossil energy input to the CHP system/s (kWh)":
+        case "Total fossil energy input to the CHP system/s (kWh)":
+        case "Fossil energy input to CHP system/s (kWh)":
+            return Q.FOSSIL_USED_IN_CHP;
+        case "Thermal energy output of the CHP system/s (kWh)":
+        case "Total thermal energy output of the CHP system/s (kWh)":
+        case "Thermal energy output of CHP system/s (kWh)":
+            return Q.CHP_THERMAL_OUTPUT;
+        case "Electrical energy output of the CHP system/s (kWh)":
+        case "Total electrical energy output of the CHP system/s (kWh)":            
+        case "Electrical energy output of CHP system/s (kWh)":
+            return Q.CHP_ELECTRICAL_OUTPUT;
+        case "Exported electricity (kWh)":
+        case "Total exported electricity for the site (kWh)":
+            return Q.ELEC_EXPORTED;
+        case "CHP units operated on the site (No.)":
+        case "Number of CHP units operated on the site (No.)":
+            return Q.NO_CHP_UNITS;
+        case "Total exported thermal energy for the site (kWh)":
+        case "Exported thermal energy (kWh)":
+            return Q.EXPORTED_THERMAL_ENERGY;
+        case "Full load rating of the electrical generator plant (kW)":
+        case "Total full load rating of the electrical generator plant (kW)":
+            return Q.ELEC_GENERATION;
+        case "Water cost (£)":
+            return Q.WATER_COST;
+        case "Water and sewage cost (£)":
+            return Q.WATER_AND_SEWAGE_COST;
+        case "Sewage cost (£)":
+            return Q.SEWAGE_COST;
+        case "Water volume (including borehole) (m³)":
+            return Q.WATER_VOL;
+        case "Clinical waste cost (£)":
+            return Q.CLINICAL_WASTE_COST;
+        case "Clinical waste volume (Tonnes)":
+            return Q.CLINICAL_WASTE_WEIGHT;
+        case "Special waste cost (£)":
+            return Q.SPECIAL_WASTE_COST;
+        case "Special waste volume (Tonnes)":
+            return Q.SPECIAL_WASTE_WEIGHT;
+        case "Domestic waste cost (£)":
+            return Q.DOMESTIC_WASTE_COST;
+        case "Waste recycling, recovery cost (£)":
+            return Q.WASTE_RECYLING_COST;
+        case "High temperature disposal waste weight involving combustion with energy recovery (Tonnes)":
+            return Q.HIGH_TEMP_DISPOSAL_WITH_RECOVERY_WEIGHT;
+        case "High temperature disposal waste weight (Tonnes)":
+            return Q.HIGH_TEMP_DISPOSAL_WEIGHT;
+        case "Non burn treatment (alternative treatment plant) disposal waste weight (Tonnes)":
+            return Q.ALT_WASTE_DISPOSAL_WEIGHT;
+        case "Waste electrical and electronic equipment (WEEE) weight (Tonnes)":
+            return Q.WEEE_WASTE_WEIGHT;
+        case "Preparing for re-use volume (Tonnes)":
+            return Q.REUSE_WASTE_WEIGHT;
+        case "Landfill disposal waste weight (Tonnes)":
+            return Q.LANDFILL_WEIGHT;
+        case "Other recovery volume (Tonnes)":
+            return Q.OTHER_RECOVERY_WEIGHT;
+        case "Waste recycling volume (Tonnes)":
+            return Q.RECYCLING_WEIGHT;
+        case "Waste recycling, recovery and preparing for re-use cost (£)":
+            return Q.WASTE_RECYLING_COST;
+        case "Waste cost (£)":
+        case "Total waste cost (£)":
+            return Q.TOTAL_WASTE_COST;
+        case "Patient/visitor concession scheme provided (Yes/No/None)": 
+            return Q.PATIENT_AND_VISITOR_CONCESSION_SCHEME;
+        case "Total parking spaces available (No.)":
+        case "Parking spaces available (No.)":
+            return Q.PARKING_SPACES;
+        case "Designated parking spaces available for patients/visitors (No.)":
+        case "Designated disabled parking spaces (No.)":
+            return Q.DISABLED_PARKING_SPACES;
+        case "Designated parking spaces available for staff (No.)":
+            return Q.DISABLED_STAFF_PARKING_SPACES;
+        case "Average fee charged per hour for patient/visitor parking (£)":
+            return Q.AVG_PARKING_FEE;
+        case "Average fee charged per hour for Staff parking (£)":
+        case "Average fee charged per hour for staff parking (£)":
+            return Q.AVG_STAFF_PARKING_FEE;
+        case "Cleaning service cost (£)":
+            return Q.CLEANING_COST;
+        case "Cleaning staff (WTE)":
+            return Q.NO_CLEANING_STAFF;            
+        case "Cost of cleaning occupied floor area assessed as Red/Very High Risk (£)":
+            return Q.VH_RISK_CLEANING_COST;
+        case "Occupied floor area assessed as Red/Very High Risk (%)":
+            return Q.VH_RISK_CLEANING_AREA;
+        case "Required standard for occupied floor area assessed as Red/Very High Risk (%)":
+            return Q.VH_RISK_CLEANING_AREA_REQD_PCT;
+        case "Achieved standard for occupied floor area identified as Red/Very High Risk (%)":
+            return Q.VH_RISK_CLEANING_AREA_ACTUAL_PCT;
+        case "Cost of cleaning occupied floor area assessed as Amber/High and Significant Risk (£)":
+            return Q.HS_RISK_CLEANING_COST;
+        case "Occupied floor area assessed as Amber/High and Significant Risk (%)":
+            return Q.HS_RISK_CLEANING_AREA;
+        case "Required standard for occupied floor area assessed as Amber/High and Significant Risk (%)":
+            return Q.HS_RISK_CLEANING_AREA_REQD_PCT;
+        case "Achieved standard for occupied floor area identified as Amber/High and Significant Risk (%)":
+            return Q.HS_RISK_CLEANING_AREA_ACTUAL_PCT;
+        case "Cost of cleaning occupied floor area assessed as Green/Low Risk (£)":
+            return Q.L_RISK_CLEANING_COST;
+        case "Occupied floor area assessed as Green/Low Risk (%)":
+            return Q.L_RISK_CLEANING_AREA;
+        case "Required standard for occupied floor area assessed as Green/Low Risk (%)":
+            return Q.L_RISK_CLEANING_AREA_REQD_PCT;
+        case "Achieved standard for occupied floor area identified as Green/Low Risk (%)":
+            return Q.L_RISK_CLEANING_AREA_ACTUAL_PCT;
+        case "Cost of cleaning the occupied floor area not requiring regular cleaning (£)":
+            return Q.INFREQ_CLEANING_COST;
+        case "Occupied floor area not requiring regular cleaning (%)":
+            return Q.INFREQ_CLEANING_AREA;
+        case "In-patient food services cost (£)":
+        case "Gross cost of in-patient services (£)":
+        case "Inpatient food service cost (£)":
+            return Q.CATERING_SPEND;
+        case "In-patient main meals requested (No.)":
+        case "Total in-patient main meals requested (No.)":
+        case "Inpatient main meals requested (No.)":
+            return Q.NO_MEALS;
+        case "Cost of feeding one in-patient per day (in-patient meal day) (£)":
+        case "Cost of feeding one inpatient per day (inpatient meal day) (£)":
+            return Q.PER_PATIENT_DAY_MEAL_COST;
+        case "Ward food waste - unserved meals (%)":
+            return Q.WARD_FOOD_WASTE;
+        case "Laundry and linen service cost (£)":
+            return Q.LAUNDRY_COST;
+        case "Pieces per annum (No.)":
+            return Q.NO_LAUNDRY_ITEMS;
+        case "Portering (internal patient transport) service cost (£)":
+        case "Portering service cost (£)":
+            return Q.PORTERING_COST;
+        case "Portering staff (WTE)":
+            return Q.NO_PORTERING_STAFF;
+        case "PFI Unitary charges (£)":
+            return Q.PFI_CHARGES;     
         }
         throw new IllegalArgumentException(
                 String.format("ERIC data not expected to include %1$s", hdr));

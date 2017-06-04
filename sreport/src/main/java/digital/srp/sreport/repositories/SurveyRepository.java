@@ -26,9 +26,13 @@ public interface SurveyRepository extends CrudRepository<Survey, Long> {
 
     @Query("SELECT o FROM Survey o WHERE o.status != 'deleted' ORDER BY o.name ASC")
     List<Survey> findPage(Pageable pageable);
+
+    @Query("SELECT o FROM Survey o WHERE o.status != 'deleted' AND o.name LIKE 'ERIC%' ORDER BY o.name ASC")
+    List<Survey> findEricSurveys();
     
     @Override
     @Query("UPDATE #{#entityName} x set x.status = 'deleted' where x.id = :id")
     @Modifying(clearAutomatically = true)
     public void delete(@Param("id") Long id);
+
 }

@@ -1,0 +1,24 @@
+@startuml
+!include ../stylesheet.puml.txt
+ 
+node "Web app" {
+  [Browser] - [SRP] : JSON over HTTP
+} 
+
+cloud "SRP" {
+  [nfr]
+  [macc]
+
+  database "MySQL" {
+    [macc tables]
+    [nfr tables]
+  }
+  
+  
+  [macc] --> [macc tables]
+  [nfr] --> [nfr tables]
+}
+
+
+
+@enduml

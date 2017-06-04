@@ -1,5 +1,7 @@
 package digital.srp.sreport.model;
 
+import java.util.List;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -10,10 +12,15 @@ import javax.persistence.Table;
 import javax.persistence.Transient;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import javax.xml.bind.annotation.XmlElement;
+
+import org.springframework.hateoas.Link;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonView;
 
+import digital.srp.sreport.model.views.AnswerViews;
+import digital.srp.sreport.model.views.QuestionViews;
 import digital.srp.sreport.model.views.SurveyReturnViews;
 import digital.srp.sreport.model.views.SurveyViews;
 import lombok.Data;
@@ -48,12 +55,12 @@ public class Question {
     
     @NotNull
     @JsonProperty
-    @JsonView( {SurveyViews.Detailed.class, SurveyReturnViews.Detailed.class} )
+    @JsonView( { AnswerViews.Summary.class, SurveyViews.Detailed.class, SurveyReturnViews.Detailed.class} )
     @Column(name = "name")
     private String name;
     
     @JsonProperty
-    @JsonView(SurveyViews.Detailed.class)
+    @JsonView({ AnswerViews.Summary.class, SurveyViews.Detailed.class })
     @Column(name = "label")
     private String label;
 
@@ -102,6 +109,12 @@ public class Question {
     @JsonView(SurveyViews.Detailed.class)
     @Column(name = "def_val")
     protected String defaultValue;
+    
+    @Transient
+    @XmlElement(name = "link", namespace = Link.ATOM_NAMESPACE)
+    @JsonProperty("links")
+    @JsonView(QuestionViews.Summary.class)
+    private List<Link> links;
     
     public Question q(Q q) {
         this.name = q.name();
