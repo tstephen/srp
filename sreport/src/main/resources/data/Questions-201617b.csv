@@ -63,8 +63,7 @@ QUANT_ES_IMPACTS$What are the qualitative or quantified social and environmental
 QUANT_TRAVEL_IMPACTS$Does your organisation quantify the health impacts of travel and transport?$$SDU$$yesno$$$$
 MOD_SLAVERY$If your organisation has a Modern Slavery statement, what is it?$$SDU$$$$$$
 SIA$Does your business case process include a Sustainability Impact Assessment?$$SDU$$yesno$$$$
-CARBON_REDUCTION_BASELINE_USED$Does your organisation use a baseline year?$$SDU$$yesno$$$$
-CARBON_REDUCTION_BASE_YEAR$Which year is it?$$SDU$$number$yyyy$$[\\d]{4}$2007
+CARBON_REDUCTION_BASE_YEAR$What is your organisation's baseline year?$$SDU$$number$yyyy$$[\\d]{4}$2007
 CARBON_REDUCTION_TARGET_PCT$What is the percentage reduction target?$%$SDU$$number$$$$34
 CARBON_REDUCTION_DEADLINE_YEAR$What is the deadline year for this target?$$SDU$$number$yyyy$$[\\d]{4}$2020
 PATIENT_CONTACT_MEASURE$Define the measure you have used for patient contacts$$SDU$$$$$$
