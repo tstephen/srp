@@ -102,7 +102,7 @@ public class SurveyController {
         // TODO fetch all questions to optimise db access?
 //        List<SurveyQuestion> surveyQuestions = qRepo.findBySurvey(survey.name());
         for (SurveyCategory cat : survey.categories()) {
-            for (Q q : cat.questionCodes()) {
+            for (Q q : cat.questionEnums()) {
                 cat.questions().add(questionRepo.findByName(q.name()));
             }
         }

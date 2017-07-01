@@ -2,7 +2,7 @@
 !include stylesheet.puml.txt
 
 Survey "1" *-- "1..*" SurveyCategory : contains
-SurveyCategory "1" *-- "1..*" SurveyQuestion : contains
+SurveyCategory "0..1" -- "0..*" SurveyQuestion : refers
 Survey "1" -right- "0..*" SurveyReturn : attracts
 SurveyReturn "*" -right- "1" Organisation : belong to 
 Organisation "1" -right- "1..*" Submitter : may have

@@ -16,7 +16,7 @@ public class Sdu1617 {
     public static Survey getSurvey() {
         SurveyCategory catOrg = new SurveyCategory()
                 .name("Organisation")
-                .questionCodes(
+                .questionEnums(
                         Q.ORG_NAME,
                         Q.ORG_CODE,
                         Q.ORG_NICKNAME,
@@ -31,7 +31,7 @@ public class Sdu1617 {
 
         SurveyCategory catPolicy = new SurveyCategory()
                 .name("Policy")
-                .questionCodes(
+                .questionEnums(
                         Q.SDMP_CRMP,
                         Q.SDMP_BOARD_REVIEW_WITHIN_12_MONTHS,
                         Q.SDMP_MISSION_STATEMENT,
@@ -55,7 +55,7 @@ public class Sdu1617 {
 
         SurveyCategory catPerf = new SurveyCategory()
                 .name("Performance")
-                .questionCodes(
+                .questionEnums(
                         Q.CARBON_REDUCTION_TARGET,
                         Q.CARBON_REDUCTION_BASELINE_USED,
                         Q.CARBON_REDUCTION_BASE_YEAR,
@@ -70,7 +70,7 @@ public class Sdu1617 {
         
         SurveyCategory catFinancial = new SurveyCategory()
                 .name("Spend")
-                .questionCodes(
+                .questionEnums(
                         // TODO could be calculated? Or used as check?
                         Q.TOTAL_ENERGY_COST,
                         Q.WATER_AND_SEWAGE_COST,
@@ -83,7 +83,7 @@ public class Sdu1617 {
 
         SurveyCategory catEnergy = new SurveyCategory()
                 .name("Energy")
-                .questionCodes(
+                .questionEnums(
                         Q.ELEC_USED,
                         Q.GAS_USED,
                         Q.OIL_USED,
@@ -98,7 +98,7 @@ public class Sdu1617 {
         
         SurveyCategory catWaste = new SurveyCategory()
                 .name("Waste")
-                .questionCodes(
+                .questionEnums(
                         Q.DURABLES_INTERNAL_REUSE,
                         Q.DURABLES_EXTERNAL_REUSE,
                         Q.PAPER_USED,
@@ -110,14 +110,14 @@ public class Sdu1617 {
 
         SurveyCategory catWater = new SurveyCategory()
                 .name("Water")
-                .questionCodes(
+                .questionEnums(
                         Q.WATER_VOL,
                         Q.WASTE_WATER
                 );
         
         SurveyCategory catBizTravel = new SurveyCategory()
                 .name("Business Travel")
-                .questionCodes(
+                .questionEnums(
                         Q.PERSONAL_ROAD_MILES,
                         Q.FLEET_ROAD_MILES,
                         Q._3RD_PTY_ROAD_MILES,
@@ -137,7 +137,7 @@ public class Sdu1617 {
         
         SurveyCategory catOtherTravel = new SurveyCategory()
                 .name("Other Travel")
-                .questionCodes(
+                .questionEnums(
                         Q.PATIENT_MILEAGE,
                         Q.VISITOR_MILEAGE,
                         Q.TOTAL_EMPLOYEES,
@@ -148,7 +148,7 @@ public class Sdu1617 {
         
         SurveyCategory catGases = new SurveyCategory()
                 .name("Gases")
-                .questionCodes(
+                .questionEnums(
                         Q.DESFLURANE,
                         Q.ISOFLURANE,
                         Q.SEVOFLURANE,
@@ -159,7 +159,7 @@ public class Sdu1617 {
         
         SurveyCategory catAdditional = new SurveyCategory()
                 .name("Additional")
-                .questionCodes(
+                .questionEnums(
                         Q.CHP_ELECTRICAL_OUTPUT,
                         Q.EXPORTED_THERMAL_ENERGY,
                         Q.WOOD_LOGS_USED,
@@ -173,7 +173,7 @@ public class Sdu1617 {
         
         SurveyCategory catSpendProfile = new SurveyCategory()
                 .name("Spend Profile")
-                .questionCodes(
+                .questionEnums(
                         Q.BIZ_SVC_SPEND,
                         Q.CONSTRUCTION_SPEND,
                         Q.CATERING_SPEND,

@@ -52,11 +52,11 @@ public class EricSurveyAndResponseTest {
             System.out.println(String.format(
                     "  supplying answers for category: %1$s. %2$s", i,
                     survey.categories().get(i).name()));
-            for (int j = 0; j < survey.categories().get(i).questionCodes().size(); j++) {
+            for (int j = 0; j < survey.categories().get(i).questionEnums().size(); j++) {
                 System.out.println(String.format("    question: %1$d", j,
-                        survey.categories().get(i).questionCodes().get(j)));
+                        survey.categories().get(i).questionEnums().get(j)));
                 answers.add(new Answer()
-                        .question(survey.categories().get(i).questionCodes().get(j))
+                        .question(survey.categories().get(i).questionEnums().get(j))
                         .response(ANSWERS[i][j]));
             }
         }
@@ -75,13 +75,13 @@ public class EricSurveyAndResponseTest {
 
     private void assertSurvey(Survey survey) {
         assertEquals(7, survey.categories().size());
-        assertEquals(4, survey.categories().get(0).questionCodes().size());
-        assertEquals(11, survey.categories().get(1).questionCodes().size());
-        assertEquals(7, survey.categories().get(2).questionCodes().size());
-        assertEquals(2, survey.categories().get(3).questionCodes().size());
-        assertEquals(10, survey.categories().get(4).questionCodes().size());
-        assertEquals(3, survey.categories().get(5).questionCodes().size());
-        assertEquals(5, survey.categories().get(6).questionCodes().size());
+        assertEquals(4, survey.categories().get(0).questionEnums().size());
+        assertEquals(11, survey.categories().get(1).questionEnums().size());
+        assertEquals(7, survey.categories().get(2).questionEnums().size());
+        assertEquals(2, survey.categories().get(3).questionEnums().size());
+        assertEquals(10, survey.categories().get(4).questionEnums().size());
+        assertEquals(3, survey.categories().get(5).questionEnums().size());
+        assertEquals(5, survey.categories().get(6).questionEnums().size());
     }
 
     private void assertIsComplete(Survey survey) {

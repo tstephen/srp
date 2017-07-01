@@ -18,7 +18,7 @@ public class Eric1516 implements EricQuestions {
     public static Survey getSurvey() {
         SurveyCategory catOrg = new SurveyCategory()
                 .name("Organisation")
-                .questionCodes(
+                .questionEnums(
                         Q.ORG_CODE,
                         Q.ORG_NAME,
                         Q.COMMISSIONING_REGION,
@@ -27,7 +27,7 @@ public class Eric1516 implements EricQuestions {
 
         SurveyCategory catProfile = new SurveyCategory()
                 .name("Trust Profile")
-                .questionCodes(
+                .questionEnums(
                         Q.NO_ACUTE_SITES,
                         Q.NO_SPECIALIST_SITES,
                         Q.NO_MIXED_SITES,
@@ -43,7 +43,7 @@ public class Eric1516 implements EricQuestions {
         
         SurveyCategory catStrategy = new SurveyCategory()
                 .name("Strategies and Policies")
-                .questionCodes(
+                .questionEnums(
                         Q.ESTATES_DEV_STRATEGY,
                         Q.HEALTHY_TRANSPORT_PLAN,
                         Q.BOARD_ADAPTATION_PLAN,
@@ -55,14 +55,14 @@ public class Eric1516 implements EricQuestions {
 
         SurveyCategory catContractingOut = new SurveyCategory()
                 .name("Contracted Out Services")
-                .questionCodes(
+                .questionEnums(
                         Q.CONTRACTING_OUT_VAL,
                         Q.CONTRACTING_OUT_PCT
                 );
 
         SurveyCategory catFinance = new SurveyCategory()
                 .name("Finance")
-                .questionCodes(
+                .questionEnums(
                         Q.CAPITAL_NEW_BUILD,
                         Q.CAPITAL_IMPROVING_EXISTING,
                         Q.CAPITAL_EQUIPMENT,
@@ -77,7 +77,7 @@ public class Eric1516 implements EricQuestions {
         
         SurveyCategory catSafety = new SurveyCategory()
                 .name("Safety")
-                .questionCodes(
+                .questionEnums(
                         Q.NO_RIDDOR_INCIDENTS,
                         Q.NO_FM_INCIDENTS,
                         Q.NO_FM_CLINICAL_INCIDENTS
@@ -85,7 +85,7 @@ public class Eric1516 implements EricQuestions {
 
         SurveyCategory catFireSafety = new SurveyCategory()
                 .name("Fire Safety")
-                .questionCodes(
+                .questionEnums(
                         Q.NO_FIRES,
                         Q.NO_FALSE_ALARMS,
                         Q.NO_FIRE_DEATHS,

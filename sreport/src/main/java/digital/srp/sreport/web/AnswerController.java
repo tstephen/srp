@@ -1,6 +1,7 @@
 package digital.srp.sreport.web;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 import javax.persistence.EntityManager;
@@ -14,6 +15,7 @@ import javax.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.hateoas.Link;
@@ -30,12 +32,16 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import com.fasterxml.jackson.annotation.JsonView;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import digital.srp.sreport.ResultSetTooLargeException;
 import digital.srp.sreport.model.Answer;
 import digital.srp.sreport.model.Criterion;
+import digital.srp.sreport.model.Q;
 import digital.srp.sreport.model.Question;
+import digital.srp.sreport.model.SurveyCategory;
 import digital.srp.sreport.model.SurveyReturn;
 import digital.srp.sreport.model.views.AnswerViews;
 import digital.srp.sreport.repositories.AnswerRepository;
+import digital.srp.sreport.repositories.SurveyCategoryRepository;
 
 /**
  * REST web service for accessing answers.
@@ -57,6 +63,12 @@ public class AnswerController {
 
     @Autowired
     protected AnswerRepository answerRepo;
+
+    @Autowired
+    protected SurveyCategoryRepository catRepo;
+
+    @Value("${srp.reporting.maxRows:5000}")
+    private int maxAnswers;
 
     /**
      * Return just the specified answer.
@@ -97,7 +109,24 @@ public class AnswerController {
         }
         LOGGER.info(String.format("Found %1$s answers", list.size()));
 
+        addQuestionCategory(list);
         return list;
+    }
+
+    private void addQuestionCategory(List<Answer> list) {
+        List<SurveyCategory> categories = catRepo.findAll();
+        for (Answer answer : list) {
+            answer.question().categories(new ArrayList<String>());
+            for (SurveyCategory cat : categories) {
+                LOGGER.debug("Does {} contain {}?", cat.name(), answer.question().name());
+                if (cat.questionEnums().contains(answer.question().q())) {
+                    answer.question().categories().add(cat.name());
+                }
+            }
+            if (answer.question().categories().size() == 0) {
+                answer.question().categories().add("Unspecified");
+            }
+        }
     }
 
     @RequestMapping(value = "/findByCriteria", method = RequestMethod.POST)
@@ -105,7 +134,8 @@ public class AnswerController {
     public @ResponseBody List<Answer> findByCriteria(
             @RequestBody List<Criterion> criteria,
             @RequestParam(value = "page", required = false) Integer page,
-            @RequestParam(value = "limit", required = false) Integer limit) {
+            @RequestParam(value = "limit", required = false) Integer limit)
+    throws Exception {
         LOGGER.info(String.format("List answers by criteria %1$s", criteria));
 
         CriteriaBuilder builder = entityManager.getCriteriaBuilder();
@@ -113,18 +143,30 @@ public class AnswerController {
         Root<Answer> answer = cq.from(Answer.class);
         Join<Answer, Question> questions = answer.join("question");
         Join<Answer, SurveyReturn> surveyReturns = answer.join("surveyReturns");
-//        cq.select(answer);
 
         Predicate predicate = builder.conjunction();
 
         for (Criterion criterion : criteria) {
             switch (criterion.getField()) {
+            case "category":
+                SurveyCategory category = catRepo.findByName(
+                        criterion.getValue());
+
+                predicate = questions.get("name").in(
+                        ((Object[]) category.questionNames().split(",")));
+                break;
             case "org":
+            case "organisation":
                 predicate = builder.and(
                         predicate,
                         builder.equal(
                                 surveyReturns.get("org"),
                                 criterion.getValue().toString()));
+                break;
+            case "orgType":
+            case "organisation type":
+                predicate = surveyReturns.get("org")
+                        .in(getOrgsMatching(Q.ORG_TYPE).toArray());
                 break;
             case "period":
                 predicate = builder.and(
@@ -140,7 +182,12 @@ public class AnswerController {
                                 questions.get("name"),
                                 criterion.getValue().toString()));
                 break;
+            case "region":
+                predicate = surveyReturns.get("org")
+                        .in(getOrgsMatching(Q.COMMISSIONING_REGION).toArray());
+                break;
             default:
+                // e.g. status
                 predicate = builder.and(
                         predicate,
                         builder.equal(
@@ -150,10 +197,26 @@ public class AnswerController {
         }
         cq.where(predicate);
 
-        // TODO how to ensure result set is not too large? No count option
-        List<Answer> result = entityManager.createQuery(cq).getResultList();
-        LOGGER.info("... found {} answers", result.size());
-        return result;
+        List<Answer> list = entityManager.createQuery(cq).getResultList();
+        LOGGER.info("... found {} answers", list.size());
+
+        if (list.size() > maxAnswers) {
+            throw new ResultSetTooLargeException(criteria, list.size());
+        } else {
+            addQuestionCategory(list);
+            return list;
+        }
+    }
+
+    private HashSet<String> getOrgsMatching(Q q) {
+        HashSet<String> orgs = new HashSet<String>();
+        List<Answer> answers = answerRepo.findByQuestion(q.code());
+        for (Answer a : answers) {
+            for (SurveyReturn rtn : a.surveyReturns()) {
+                orgs.add(rtn.org());
+            }
+        }
+        return orgs;
     }
 
     /**
@@ -178,6 +241,7 @@ public class AnswerController {
         }
         LOGGER.info(String.format("Found %1$s answers", list.size()));
 
+        addQuestionCategory(list);
         return list;
     }
 

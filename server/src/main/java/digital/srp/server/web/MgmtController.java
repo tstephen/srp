@@ -111,7 +111,7 @@ public class MgmtController {
                     if (existingCat == null) { 
                         catRepo.save(cat.survey(survey));
                     } else {
-                        catRepo.save(existingCat.questionCodes(cat.questionCodes()));
+                        catRepo.save(existingCat.questionEnums(cat.questionEnums()));
                     }
                 }
             }

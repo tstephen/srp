@@ -146,6 +146,7 @@ public class SurveyReturn {
     private String updatedBy;
 
     @JsonProperty
+    @JsonView({ AnswerViews.Detailed.class, SurveyReturnViews.Summary.class })
     @ManyToOne(fetch = FetchType.EAGER)
     private Survey survey;
     

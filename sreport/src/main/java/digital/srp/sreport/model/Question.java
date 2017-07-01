@@ -55,61 +55,66 @@ public class Question {
     
     @NotNull
     @JsonProperty
-    @JsonView( { AnswerViews.Summary.class, SurveyViews.Detailed.class, SurveyReturnViews.Detailed.class} )
+    @JsonView( { AnswerViews.Summary.class, QuestionViews.Summary.class, SurveyViews.Detailed.class, SurveyReturnViews.Detailed.class} )
     @Column(name = "name")
     private String name;
     
     @JsonProperty
-    @JsonView({ AnswerViews.Summary.class, SurveyViews.Detailed.class })
+    @JsonView({ AnswerViews.Summary.class, QuestionViews.Summary.class, SurveyViews.Detailed.class })
     @Column(name = "label")
     private String label;
 
     @NotNull
     @JsonProperty
-    @JsonView(SurveyViews.Detailed.class)
+    @JsonView({ QuestionViews.Detailed.class, SurveyViews.Detailed.class })
     @Column(name = "required")
     private boolean required;
     
     @JsonProperty
-    @JsonView(SurveyViews.Detailed.class)
+    @JsonView({ QuestionViews.Detailed.class, SurveyViews.Detailed.class })
     @Column(name = "hint")
     @Lob
     protected String hint;
 
     @JsonProperty
-    @JsonView(SurveyViews.Detailed.class)
+    @JsonView({ QuestionViews.Detailed.class, SurveyViews.Detailed.class })
     @Column(name = "placeholder")
     protected String placeholder;
 
     @Size(max = 20)
     @JsonProperty
-    @JsonView(SurveyViews.Detailed.class)
+    @JsonView({ QuestionViews.Detailed.class, SurveyViews.Detailed.class })
     @Column(name = "type")
     protected String type;
     
     @Size(max = 20)
     @JsonProperty
-    @JsonView(SurveyViews.Detailed.class)
+    @JsonView({ QuestionViews.Detailed.class, SurveyViews.Detailed.class })
     @Column(name = "unit")
     private String unit;
 
     @Size(max = 50)
     @JsonProperty
-    @JsonView(SurveyViews.Detailed.class)
+    @JsonView({ QuestionViews.Detailed.class, SurveyViews.Detailed.class })
     @Column(name = "validation")
     private String validation;
 
     @Size(max = 50)
     @JsonProperty
-    @JsonView(SurveyViews.Detailed.class)
+    @JsonView({ QuestionViews.Detailed.class, SurveyViews.Detailed.class })
     @Column(name = "source")
     protected String source;
 
     @JsonProperty
-    @JsonView(SurveyViews.Detailed.class)
+    @JsonView({ QuestionViews.Detailed.class, SurveyViews.Detailed.class })
     @Column(name = "def_val")
     protected String defaultValue;
     
+    @Transient
+    @JsonProperty("categories")
+    @JsonView({ QuestionViews.Detailed.class, AnswerViews.Detailed.class })
+    private List<String> categories;
+
     @Transient
     @XmlElement(name = "link", namespace = Link.ATOM_NAMESPACE)
     @JsonProperty("links")

@@ -28,6 +28,8 @@ import org.springframework.hateoas.Link;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonView;
 
+import digital.srp.sreport.model.views.AnswerViews;
+import digital.srp.sreport.model.views.SurveyReturnViews;
 import digital.srp.sreport.model.views.SurveyViews;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -61,7 +63,7 @@ public class Survey {
     @NotNull
     @Size(max = 50)
     @JsonProperty
-    @JsonView(SurveyViews.Summary.class)
+    @JsonView({ AnswerViews.Detailed.class, SurveyReturnViews.Summary.class, SurveyViews.Summary.class })
     @Column(name = "name")
     private String name;
     
@@ -138,7 +140,7 @@ public class Survey {
     public List<Q> questionCodes() {
         ArrayList<Q> questions = new ArrayList<Q>();
         for (SurveyCategory cat : categories) {
-            questions.addAll(cat.questionCodes());
+            questions.addAll(cat.questionEnums());
         }
         return questions;
     }

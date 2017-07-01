@@ -19,11 +19,15 @@ import javax.persistence.Table;
 import javax.persistence.Transient;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import javax.xml.bind.annotation.XmlElement;
+
+import org.springframework.hateoas.Link;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonView;
 
+import digital.srp.sreport.model.views.SurveyCategoryViews;
 import digital.srp.sreport.model.views.SurveyViews;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -48,49 +52,45 @@ public class SurveyCategory {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @JsonProperty
-    @JsonView(SurveyViews.Detailed.class)
+    @JsonView({ SurveyCategoryViews.Summary.class, SurveyViews.Detailed.class })
     @Column(name = "id")
     private Long id;
     
     @NotNull
     @Size(max = 50)
     @JsonProperty
-    @JsonView(SurveyViews.Detailed.class)
+    @JsonView({ SurveyCategoryViews.Summary.class, SurveyViews.Detailed.class })
     @Column(name = "name")
     private String name;
     
     @JsonProperty
-    @JsonView(SurveyViews.Detailed.class)
+    @JsonView({ SurveyCategoryViews.Summary.class, SurveyViews.Detailed.class })
     @Column(name = "questions")
     @Lob
 //    @OneToMany(orphanRemoval=true, cascade = CascadeType.ALL, mappedBy = "category")
-    private String questionCodes;
+    private String questionNames;
     
     @Transient
-    @JsonView(SurveyViews.Detailed.class)
+    @JsonView({ SurveyCategoryViews.Detailed.class, SurveyViews.Detailed.class })
     private List<Question> questions;
     
-//    @JsonProperty
-//    @Transient
-//    private Long surveyId;
-
     @JsonProperty
     @JsonBackReference
     @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private Survey survey;
-    
-//    public SurveyCategory category(Survey survey) { 
-//        this.survey = survey; 
-//        this.surveyId = survey.id();
-//        return this;
-//    }
 
-    public SurveyCategory questionCodes(Q... questions) {
-        questionCodes(Arrays.asList(questions));
+    @Transient
+    @XmlElement(name = "link", namespace = Link.ATOM_NAMESPACE)
+    @JsonProperty("links")
+    @JsonView({ SurveyCategoryViews.Summary.class, SurveyViews.Detailed.class })
+    private List<Link> links;
+
+    public SurveyCategory questionEnums(Q... questions) {
+        questionEnums(Arrays.asList(questions));
         return this;
     }
     
-    public SurveyCategory questionCodes(List<Q> questions) {
+    public SurveyCategory questionEnums(List<Q> questions) {
         StringBuilder sb = new StringBuilder();
         for (Iterator<Q> it = questions.iterator(); it.hasNext();) {
             Q q = it.next();
@@ -99,17 +99,17 @@ public class SurveyCategory {
                 sb.append(',');
             }
         }
-        this.questionCodes = sb.toString();
+        this.questionNames = sb.toString();
         return this;
     }
     
-    public List<Q> questionCodes() {
-        if (questionCodes == null) {
+    public List<Q> questionEnums() {
+        if (questionNames == null) {
             return Collections.emptyList();
         }
         
         ArrayList<Q> list = new ArrayList<Q>();
-        String[] qNames = questionCodes.split(",");
+        String[] qNames = questionNames.split(",");
         for (String name : qNames) {
             list.add(Q.valueOf(name));
         }

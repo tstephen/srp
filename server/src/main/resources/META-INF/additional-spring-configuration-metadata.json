@@ -28,5 +28,20 @@
     "name": "kp.security.jwt.tokenBasedPermittedUrlPatterns",
     "type": "java.lang.String",
     "description": "A description for 'kp.security.jwt.tokenBasedPermittedUrlPatterns'"
+  },
+  {
+    "name": "kp.security.jwt.tokenBasedPermittedUrlPatterns",
+    "type": "java.lang.String",
+    "description": "A description for 'kp.security.jwt.tokenBasedPermittedUrlPatterns'"
+  },
+  {
+    "name": "kp.security.cors.allowedOrigins",
+    "type": "java.lang.String",
+    "description": "A description for 'kp.security.cors.allowedOrigins'"
+  },
+  {
+    "name": "srp.reporting.maxRows",
+    "type": "java.lang.String",
+    "description": "A description for 'srp.reporting.maxRows'"
   }
 ]}

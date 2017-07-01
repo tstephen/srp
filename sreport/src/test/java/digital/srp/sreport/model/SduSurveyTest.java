@@ -30,18 +30,18 @@ public class SduSurveyTest {
     @Test
     public void create1617Survey() {
         SurveyCategory catOrg = new SurveyCategory().name("Organisation")
-                .questionCodes(Q.ORG_NAME, Q.ORG_CODE, Q.ORG_NICKNAME);
-        assertEquals(3, catOrg.questionCodes().size());
+                .questionEnums(Q.ORG_NAME, Q.ORG_CODE, Q.ORG_NICKNAME);
+        assertEquals(3, catOrg.questionEnums().size());
 
         SurveyCategory catPolicy = new SurveyCategory().name("Policy")
-                .questionCodes(Q.SDMP_CRMP, Q.SDMP_BOARD_REVIEW_WITHIN_12_MONTHS,
+                .questionEnums(Q.SDMP_CRMP, Q.SDMP_BOARD_REVIEW_WITHIN_12_MONTHS,
                         Q.SDMP_MISSION_STATEMENT);
-        assertEquals(3, catPolicy.questionCodes().size());
+        assertEquals(3, catPolicy.questionEnums().size());
  
         Survey survey = new Survey().applicablePeriod("2016-17").categories(Arrays.asList(catOrg, catPolicy));
         assertEquals(2, survey.categories().size());
-        assertEquals(3, survey.categories().get(0).questionCodes().size());
-        assertEquals(3, survey.categories().get(1).questionCodes().size());
+        assertEquals(3, survey.categories().get(0).questionEnums().size());
+        assertEquals(3, survey.categories().get(1).questionEnums().size());
         
         File resultFile = new File(OUT_DIR, "Survey1617.json");
         try {
@@ -56,8 +56,8 @@ public class SduSurveyTest {
             Survey survey2 = objectMapper.readValue(resultFile, Survey.class);
             assertEquals(survey, survey2);
             assertEquals(2, survey2.categories().size());
-            assertEquals(3, survey2.categories().get(0).questionCodes().size());
-            assertEquals(3, survey2.categories().get(1).questionCodes().size());            
+            assertEquals(3, survey2.categories().get(0).questionEnums().size());
+            assertEquals(3, survey2.categories().get(1).questionEnums().size());            
         } catch (IOException e) {
             e.printStackTrace();
             fail("Unable to re-read survey from JSON");
