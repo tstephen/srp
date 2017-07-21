@@ -1,5 +1,6 @@
 package digital.srp.sreport.services;
 
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -26,11 +27,16 @@ public class PropertiesFixerTest {
             for (Entry<Object, Object> entry : props.entrySet()) {
                 newProps.put(StringUtils.camelCaseToConst((String) entry.getKey()), entry.getValue());
             }
-            os = new FileOutputStream("messages.properties");
+            os = new FileOutputStream(new File("target","messages.properties"));
             newProps.store(os, "");
         } catch (Exception e) {
             try {
                 is.close();
+            } catch (IOException e1) {
+                ;
+            }
+            try {
+                os.close();
             } catch (IOException e1) {
                 ;
             }

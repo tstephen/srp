@@ -3,6 +3,7 @@ package digital.srp.sreport.model;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,12 +29,13 @@ public class MultiYearReturnTest implements EricQuestions{
         answers.add(new Answer().response("1100").question(floorAreaQ).addSurveyReturn(rtn1516));
         answers.add(new Answer().response("550").question(noStaffQ).addSurveyReturn(rtn1516));
         
-        TabularDataSet tds = new TabularDataSetHelper().tabulate(new String[] { FLOOR_AREA, NO_STAFF }, answers);
+        TabularDataSet tds = new TabularDataSetHelper()
+                .tabulate(new String[] { FLOOR_AREA, NO_STAFF }, answers, new DecimalFormat("#,###"));
         
         assertEquals(2, tds.rows().length);
-        assertEquals("1000", tds.rows()[0][0]);
+        assertEquals("1,000", tds.rows()[0][0]);
         assertEquals("500", tds.rows()[0][1]);
-        assertEquals("1100", tds.rows()[1][0]);
+        assertEquals("1,100", tds.rows()[1][0]);
         assertEquals("550", tds.rows()[1][1]);
         System.out.println(tds.toString());
     }
@@ -50,10 +52,10 @@ public class MultiYearReturnTest implements EricQuestions{
 //        answers.add(new SurveyAnswer().response("1100").question(floorAreaQ).addSurveyReturn(rtn1516));
         answers.add(new Answer().response("550").question(noStaffQ).addSurveyReturn(rtn1516));
         
-        TabularDataSet tds = new TabularDataSetHelper().tabulate(new String[] { FLOOR_AREA, NO_STAFF }, answers);
+        TabularDataSet tds = new TabularDataSetHelper().tabulate(new String[] { FLOOR_AREA, NO_STAFF }, answers, new DecimalFormat());
         
         assertEquals(2, tds.rows().length);
-        assertEquals("1000", tds.rows()[0][0]);
+        assertEquals("1,000", tds.rows()[0][0]);
         assertEquals("500", tds.rows()[0][1]);
         assertNull(tds.rows()[1][0]);
         assertEquals("550", tds.rows()[1][1]);

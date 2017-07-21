@@ -28,4 +28,24 @@ public class TabularDataSet {
     public void set(int row, int col, String value) {
         rows[row][col] = value;
     }
+    
+    public TabularDataSet transpose() {
+        // empty or unset array, nothing do to here
+        if (rows == null || rows.length == 0) {
+            return this;
+        }
+
+        int width = rows.length;
+        int height = rows[0].length;
+
+        String[][] transposed = new String[height][width];
+
+        for (int x = 0; x < width; x++) {
+            for (int y = 0; y < height; y++) {
+                transposed[y][x] = rows[x][y];
+            }
+        }
+        this.rows = transposed;
+        return this;
+    }
 }

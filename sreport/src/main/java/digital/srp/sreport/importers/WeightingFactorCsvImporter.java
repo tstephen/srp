@@ -15,6 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import digital.srp.sreport.model.WeightingFactor;
+import digital.srp.sreport.model.WeightingFactors;
 
 public class WeightingFactorCsvImporter {
 
@@ -26,7 +27,9 @@ public class WeightingFactorCsvImporter {
             "acute_c", "ambulance_c", "care_c", "ccg_c", "community_c",
             "mental_health_learning_disability_c", "social_enterprise_c", 
             "acute_m", "ambulance_m", "care_m", "ccg_m", "community_m",
-            "mental_health_learning_disability_m", "social_enterprise_m" };
+            "mental_health_learning_disability_m", "social_enterprise_m",
+            "acute_p", "ambulance_p", "care_p", "ccg_p", "community_p",
+            "mental_health_learning_disability_p", "social_enterprise_p"};
 
     public static final int NO_ORG_TYPES = 7;
 
@@ -60,9 +63,7 @@ public class WeightingFactorCsvImporter {
                     wfactors.add(newWeightingFactor(record, 6));
                     wfactors.add(newWeightingFactor(record, 7));
                 } catch (Exception e) {
-                    System.err.println(String.format("Problem with record: %1$d", record.getRecordNumber()));
                     LOGGER.error(String.format("Problem with record: %1$d: %2$s", record.getRecordNumber(), e.getMessage()));
-                    e.printStackTrace();
                 }
             }
         }
@@ -78,14 +79,90 @@ public class WeightingFactorCsvImporter {
         }
         LOGGER.debug("value: %1$s", value);
         
-        WeightingFactor factor = new WeightingFactor().category(record.get(0))
+        String category = record.get(0);
+        switch(category) {
+        case "Energy":
+            category = WeightingFactors.ENERGY.name();
+            break;
+        case "Gas":
+            category = WeightingFactors.GAS.name();
+            break;
+        case "Electricity":
+            category = WeightingFactors.ELEC.name();
+            break;
+        case "Oil":
+            category = WeightingFactors.OIL.name();
+            break;
+        case "Coal":
+            category = WeightingFactors.COAL.name();
+            break;
+        case "Business services":
+            category = WeightingFactors.BIZ_SVCS.name();
+            break;
+        case "Construction":
+            category = WeightingFactors.CONSTRUCTION.name();
+            break;
+        case "Food and catering":
+            category = WeightingFactors.CATERING.name();
+            break;
+        case "Freight transport":
+            category = WeightingFactors.FREIGHT.name();
+            break;
+        case "Information and communication technologies":
+            category = WeightingFactors.ICT.name();
+            break;
+        case "Manufactured fuels chemicals and gases":
+            category = WeightingFactors.FUEL_CHEM_AND_GASES.name();
+            break;
+        case "Medical Instruments /equipment":
+            category = WeightingFactors.MED_INSTRUMENTS.name();
+            break;
+        case "Other manufactured products":
+            category = WeightingFactors.OTHER_MANUFACTURING.name();
+            break;
+        case "Other procurement":
+            category = WeightingFactors.OTHER_PROCURMENT.name();
+            break;
+        case "Paper products":
+            category = WeightingFactors.PAPER.name();
+            break;
+        case "Pharmaceuticals":
+            category = WeightingFactors.PHARMA.name();
+            break;
+        case "Waste products and recycling":
+            category = WeightingFactors.WASTE.name();
+            break;
+        case "Water and sanitation":
+            category = WeightingFactors.WATER.name();
+            break;
+        case "Anaesthetic gases":
+            category = WeightingFactors.ANAESTHETIC_GASES.name();
+            break;
+        case "Patient Travel":
+            category = WeightingFactors.PATIENT_TRAVEL.name();
+            break;
+        case "Visitor Travel":
+            category = WeightingFactors.VISITOR_TRAVEL.name();
+            break;
+        case "Staff Travel":
+            category = WeightingFactors.STAFF_TRAVEL.name();
+            break;
+        case "Business Travel and fleet":
+            category = WeightingFactors.BIZ_TRAVEL.name();
+            break;
+        case "Commissioned health and social care services":
+            category = WeightingFactors.COMMISSIONING.name();
+            break;
+        }
+
+        WeightingFactor factor = new WeightingFactor()
+                .category(category)
                 .applicablePeriod("2014-15")
                 .orgType(HEADERS[idx].substring(0, 1).toUpperCase()+HEADERS[idx].substring(1, HEADERS[idx].length()-2).replace('_', ' '))
                 .carbonValue(new BigDecimal(record.get(idx).trim()).setScale(0, RoundingMode.HALF_UP))
-                .moneyValue(new BigDecimal(record.get(idx+NO_ORG_TYPES).trim()).multiply(new BigDecimal("1000")).setScale(0, RoundingMode.HALF_UP));
-        if (record.get(3).trim().matches("[123]")) {
-            factor.scope(record.get(3).trim());
-        }
+                .moneyValue(new BigDecimal(record.get(idx+NO_ORG_TYPES).trim()).multiply(new BigDecimal("1000")).setScale(0, RoundingMode.HALF_UP))
+                .proportionOfTotal(new BigDecimal(record.get(idx+(NO_ORG_TYPES*2)).trim()).setScale(3, RoundingMode.HALF_UP));
+        
         return factor;
     }
 

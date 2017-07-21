@@ -12,7 +12,7 @@
       <tr>
         <td>${periods[row?index]}</td>
         <#list row as col>
-          <td>${col!"n/a"}</td>
+          <td class="number">${col!"n/a"}</td>
         </#list>
       </tr>
     </#list>

@@ -230,7 +230,7 @@ NO_CHP_UNITS$Number of CHP units operated on the site$$ERIC$$number$$$$
 ELEC_GENERATION$Total full load rating of the electrical generator plant$kW$ERIC$$number$$$$
 HIGH_TEMP_DISPOSAL_WEIGHT$High temperature disposal waste weight$tonnes$ERIC$$number$$$$
 ALT_WASTE_DISPOSAL_WEIGHT$Non burn treatment (alternative treatment plant) disposal waste weight$tonnes$ERIC$$number$$$$
-WEEE_WASTE_WEIGHT$Waste electrical and electronic equipment (WEEE) weight$tonnes$ERIC$$number$$$$
+WEEE_WEIGHT$Waste electrical and electronic equipment (WEEE) weight$tonnes$ERIC$$number$$$$
 REUSE_WASTE_WEIGHT$Preparing for re-use volume$tonnes$ERIC$$number$$$$
 LANDFILL_WEIGHT$Landfill disposal waste weight$tonnes$ERIC$$number$$$$
 OTHER_RECOVERY_WEIGHT$Other recovery volume$tonnes$ERIC$$number$$$$

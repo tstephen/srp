@@ -18,6 +18,7 @@ import digital.srp.sreport.model.Question;
 import digital.srp.sreport.model.StatusType;
 import digital.srp.sreport.model.SurveyReturn;
 import digital.srp.sreport.model.WeightingFactor;
+import digital.srp.sreport.model.WeightingFactors;
 import digital.srp.sreport.repositories.AnswerRepository;
 import digital.srp.sreport.repositories.QuestionRepository;
 import digital.srp.sreport.repositories.SurveyCategoryRepository;
@@ -53,18 +54,23 @@ public class Cruncher implements digital.srp.sreport.model.surveys.SduQuestions 
         calcScope1(rtn);
         calcScope2(rtn);
         
-        crunchScope3(rtn);
+        calcScope3(rtn);
+        rtn.answers().add(
+                sumAnswers(rtn, Q.SCOPE_ALL, Q.SCOPE_1, Q.SCOPE_2, Q.SCOPE_3));
         
         // TODO Outside scopes -Breakdown - not included in carbon emissions totals
         
-        calcScope3SduMethod(rtn);
-        calcScope3EClassMethod(rtn);
+        if (Boolean.parseBoolean(rtn.answer(Q.ECLASS_USER, rtn.applicablePeriod()).response())) {
+            calcCarbonProfileEClassMethod(rtn);
+        } else {
+            calcCarbonProfileSduMethod(rtn);
+        }        
+        calcTrendOverTime(rtn);
         
         return rtn;
     }
 
-
-    private void crunchScope3(SurveyReturn rtn) {
+    private void calcScope3(SurveyReturn rtn) {
         crunchScope3Travel(rtn);
         crunchScope3Water(rtn);
         crunchScope3Waste(rtn);
@@ -80,13 +86,20 @@ public class Cruncher implements digital.srp.sreport.model.surveys.SduQuestions 
 
     private void crunchScope3Water(SurveyReturn rtn) {
         try {
+            // If necessary estimate waste water as 0% of incoming
+            Answer wasteWater = getAnswer(rtn,Q.WASTE_WATER);
+            if (wasteWater.response() == null || wasteWater.response().equals(BigDecimal.ZERO)) {
+                wasteWater.response(
+                        new BigDecimal(rtn.answer(Q.WATER_VOL, rtn.applicablePeriod()).response())
+                        .multiply(new BigDecimal("0.80")));
+            }
+            
             // Treasury row 57: Water Use
             CarbonFactor cFactor = cFactor(CarbonFactors.WATER_SUPPLY, rtn.applicablePeriod());
             BigDecimal waterUseCo2e = new BigDecimal(rtn.answer(Q.WATER_VOL, rtn.applicablePeriod()).response())
                     .multiply(cFactor.value())
                     .divide(new BigDecimal("1000"), 0, RoundingMode.HALF_UP);
-            rtn.answers().add(getAnswer(rtn,Q.WATER_CO2E)
-                    .response(waterUseCo2e));
+            rtn.answers().add(getAnswer(rtn,Q.WATER_CO2E).response(waterUseCo2e));
     
             // Treasury row 58: Water Treatment
             cFactor = cFactor(CarbonFactors.WATER_TREATMENT, rtn.applicablePeriod());
@@ -143,10 +156,9 @@ public class Cruncher implements digital.srp.sreport.model.surveys.SduQuestions 
         }
     }
 
-
     private Answer getAnswer(SurveyReturn rtn, Q q) {
         if (answerRepo == null) { // unit test calcs not persistence
-            return new Answer().addSurveyReturn(rtn).question(q);
+            return new Answer().addSurveyReturn(rtn).applicablePeriod(rtn.applicablePeriod()).question(q);
         } else { 
             Answer answer = answerRepo.findByOrgPeriodAndQuestion(rtn.org(), rtn.applicablePeriod(), q.name());
             if (answer==null) {
@@ -163,6 +175,7 @@ public class Cruncher implements digital.srp.sreport.model.surveys.SduQuestions 
             return answer;
         }
     }
+    
     private void crunchScope3BiomassWtt(SurveyReturn rtn) {
         try {
             // Treasury row 72: Wood logs
@@ -336,7 +349,9 @@ public class Cruncher implements digital.srp.sreport.model.surveys.SduQuestions 
         rtn.answers().add(crunchCO2e(rtn, Q.FLEET_ROAD_MILES, oneThousandth(cFactor), Q.OWNED_VEHICLES)); 
         crunchAnaestheticGases(rtn);
         
-        rtn.answers().add(sumAnswers(rtn, Q.SCOPE_1, SCOPE_1_HDRS));        
+        rtn.answers().add(sumAnswers(rtn, Q.SCOPE_1, 
+                Q.OWNED_BUILDINGS, Q.LEASED_ASSETS_ENERGY_USE, 
+                Q.OWNED_VEHICLES, Q.ANAESTHETIC_GASES_CO2E));        
     }
 
     private void calcScope2(SurveyReturn rtn) {
@@ -346,20 +361,78 @@ public class Cruncher implements digital.srp.sreport.model.surveys.SduQuestions 
         rtn.answers().add(sumAnswers(rtn, Q.SCOPE_2, Q.NET_THERMAL_ENERGY_CO2E, Q.NET_ELEC_CO2E));        
     }
 
-    private void calcScope3SduMethod(SurveyReturn rtn) {
+    private void calcCarbonProfileSduMethod(SurveyReturn rtn) {
+        rtn.answers().add(sumAnswers(rtn, Q.WASTE_AND_WATER_CO2E, Q.SCOPE_3_WASTE, Q.SCOPE_3_WATER));     
         
-//    TODO
+        String orgType = rtn.answer(Q.ORG_TYPE, rtn.applicablePeriod()).response();
+        if (orgType == null) {
+            LOGGER.warn("Cannot model carbon profile of {} as no org type specified", rtn.org());
+            return;
+        }
+        BigDecimal nonPaySpend = new BigDecimal(rtn.answer(Q.NON_PAY_SPEND, rtn.applicablePeriod()).response());
+        
+        WeightingFactor wFactor = wFactor(WeightingFactors.BIZ_SVCS, rtn.applicablePeriod(), orgType);
+        rtn.answers().add(crunchWeighting(rtn, nonPaySpend, Q.BIZ_SVCS_SPEND, wFactor, Q.BIZ_SVCS_CO2E)); 
+        wFactor = wFactor(WeightingFactors.CONSTRUCTION, rtn.applicablePeriod(), orgType);
+        rtn.answers().add(crunchWeighting(rtn, nonPaySpend, Q.CONSTRUCTION_SPEND, wFactor, Q.CONSTRUCTION_CO2E)); 
+        wFactor = wFactor(WeightingFactors.CATERING, rtn.applicablePeriod(), orgType);
+        rtn.answers().add(crunchWeighting(rtn, nonPaySpend, Q.CATERING_SPEND, wFactor, Q.CATERING_CO2E)); 
+        wFactor = wFactor(WeightingFactors.FREIGHT, rtn.applicablePeriod(), orgType);
+        rtn.answers().add(crunchWeighting(rtn, nonPaySpend, Q.FREIGHT_SPEND, wFactor, Q.FREIGHT_CO2E)); 
+        wFactor = wFactor(WeightingFactors.ICT, rtn.applicablePeriod(), orgType);
+        rtn.answers().add(crunchWeighting(rtn, nonPaySpend, Q.ICT_SPEND, wFactor, Q.ICT_CO2E)); 
+        wFactor = wFactor(WeightingFactors.FUEL_CHEM_AND_GASES, rtn.applicablePeriod(), orgType);
+        rtn.answers().add(crunchWeighting(rtn, nonPaySpend, Q.CHEM_AND_GAS_SPEND, wFactor, Q.CHEM_AND_GAS_CO2E)); 
+        wFactor = wFactor(WeightingFactors.MED_INSTRUMENTS, rtn.applicablePeriod(), orgType);
+        rtn.answers().add(crunchWeighting(rtn, nonPaySpend, Q.MED_INSTR_SPEND, wFactor, Q.MED_INSTR_CO2E)); 
+        wFactor = wFactor(WeightingFactors.OTHER_MANUFACTURING, rtn.applicablePeriod(), orgType);
+        rtn.answers().add(crunchWeighting(rtn, nonPaySpend, Q.OTHER_MANUFACTURED_SPEND, wFactor, Q.OTHER_MANUFACTURED_CO2E)); 
+        wFactor = wFactor(WeightingFactors.OTHER_PROCURMENT, rtn.applicablePeriod(), orgType);
+        rtn.answers().add(crunchWeighting(rtn, nonPaySpend, Q.OTHER_SPEND, wFactor, Q.OTHER_PROCUREMENT_CO2E)); 
+        wFactor = wFactor(WeightingFactors.PAPER, rtn.applicablePeriod(), orgType);
+        rtn.answers().add(crunchWeighting(rtn, nonPaySpend, Q.PAPER_SPEND, wFactor, Q.PAPER_CO2E)); 
+        wFactor = wFactor(WeightingFactors.PHARMA, rtn.applicablePeriod(), orgType);
+        rtn.answers().add(crunchWeighting(rtn, nonPaySpend, Q.PHARMA_SPEND, wFactor, Q.PHARMA_CO2E)); 
+        wFactor = wFactor(WeightingFactors.BIZ_TRAVEL, rtn.applicablePeriod(), orgType);
+        rtn.answers().add(crunchWeighting(rtn, nonPaySpend, Q.TRAVEL_SPEND, wFactor, Q.TRAVEL_CO2E)); 
+        wFactor = wFactor(WeightingFactors.COMMISSIONING, rtn.applicablePeriod(), orgType);
+        rtn.answers().add(crunchWeighting(rtn, nonPaySpend, Q.COMMISSIONING_SPEND, wFactor, Q.COMMISSIONING_CO2E)); 
+        
+        // intentionally omit waste and water and travel here
+        rtn.answers().add(sumAnswers(rtn, Q.PROCUREMENT_CO2E,
+                Q.BIZ_SVCS_CO2E, Q.CONSTRUCTION_CO2E, 
+                Q.CATERING_CO2E, Q.FREIGHT_CO2E, Q.ICT_CO2E, Q.CHEM_AND_GAS_CO2E,
+                Q.MED_INSTR_CO2E, Q.OTHER_MANUFACTURED_CO2E, 
+                Q.OTHER_PROCUREMENT_CO2E, Q.PAPER_CO2E, Q.PHARMA_CO2E, 
+                Q.COMMISSIONING_CO2E));
     }
 
-    private void calcScope3EClassMethod(SurveyReturn rtn) {
-        
+    private void calcCarbonProfileEClassMethod(SurveyReturn rtn) {
 //    TODO        
-  }
+    }
+
+    private void calcTrendOverTime(SurveyReturn rtn) {
+        rtn.answers().add(sumAnswers(rtn, Q.CORE_CO2E,
+                /* All energy */
+                Q.OWNED_BUILDINGS_GAS, Q.OWNED_BUILDINGS_OIL, Q.OWNED_BUILDINGS_COAL,
+                Q.NET_ELEC_CO2E, Q.NET_THERMAL_ENERGY_CO2E,
+                Q.SCOPE_3_BIOMASS, Q.WOOD_CHIPS_WTT_CO2E, Q.WOOD_CHIPS_WTT_CO2E, Q.WOOD_CHIPS_WTT_CO2E,
+                /* water and waste */
+                Q.WASTE_AND_WATER_CO2E, Q.ANAESTHETIC_GASES_CO2E,
+                /* all travel excepting individual citizens (patients, visitors and staff) */
+                Q.BIZ_MILEAGE_CO2E, Q.BIZ_MILEAGE_ROAD_CO2E,
+                Q.BIZ_MILEAGE_RAIL_CO2E, Q.BIZ_MILEAGE_AIR_CO2E,
+                Q.OWNED_FLEET_TRAVEL_CO2E));
+
+        rtn.answers().add(sumAnswers(rtn, Q.CITIZEN_CO2E,
+                Q.STAFF_COMMUTE_MILES_CO2E, Q.PATIENT_AND_VISITOR_MILEAGE_CO2E));
+    
+    }
     
     private void crunchHeatSteam(SurveyReturn rtn) {
         CarbonFactor cFactor = cFactor(CarbonFactors.ONSITE_HEAT_AND_STEAM, rtn.applicablePeriod());
         rtn.answers().add(crunchCO2e(rtn, Q.STEAM_USED, oneThousandth(cFactor), Q.STEAM_CO2E)); 
-         cFactor = cFactor(CarbonFactors.ONSITE_HEAT_AND_STEAM, rtn.applicablePeriod());
+        cFactor = cFactor(CarbonFactors.ONSITE_HEAT_AND_STEAM, rtn.applicablePeriod());
         rtn.answers().add(crunchCO2e(rtn, Q.HOT_WATER_USED, oneThousandth(cFactor), Q.HOT_WATER_CO2E)); 
         cFactor = cFactor(CarbonFactors.ONSITE_HEAT_AND_STEAM, rtn.applicablePeriod());
         rtn.answers().add(crunchCO2e(rtn, Q.EXPORTED_THERMAL_ENERGY, oneThousandth(cFactor), Q.EXPORTED_THERMAL_ENERGY_CO2E));
@@ -458,7 +531,6 @@ public class Cruncher implements digital.srp.sreport.model.surveys.SduQuestions 
         return getAnswer(rtn, trgtQ).response(calcVal.toPlainString());
     }
 
-
     CarbonFactor cFactor(CarbonFactors cfName, String period) {
         for (CarbonFactor cfactor : cfactors) {
             if (cfName.name().equals(cfactor.name()) && period.equals(cfactor.applicablePeriod())) {
@@ -469,4 +541,43 @@ public class Cruncher implements digital.srp.sreport.model.surveys.SduQuestions 
         throw new SReportObjectNotFoundException(CarbonFactor.class, cfName);
     }
 
+    private Answer crunchWeighting(SurveyReturn rtn, BigDecimal nonPaySpend,
+            Q srcQ, WeightingFactor wFactor, Q trgtQ) {
+        BigDecimal calcVal = new BigDecimal("0.00");
+        try {
+            String spend = rtn.answer(srcQ, rtn.applicablePeriod()).response();
+            if (spend == null || "0".equals(spend)) {
+                calcVal = nonPaySpend.multiply(wFactor.proportionOfTotal());
+            } else {
+                calcVal = new BigDecimal(spend);
+            }
+            calcVal = calcVal.multiply(wFactor.intensityValue());
+        } catch (NullPointerException e) {
+            LOGGER.warn("Insufficient data to estimate CO2e from spend");
+        } catch (NumberFormatException e) {
+            LOGGER.error("Cannot estimate CO2e from spend");
+        }
+        return getAnswer(rtn, trgtQ).response(calcVal.toPlainString());
+    }
+
+    WeightingFactor wFactor(WeightingFactors wName, String period, String orgType) {
+        for (WeightingFactor wfactor : wfactors) {
+            if (wName.name().equals(wfactor.category()) 
+                    && period.equals(wfactor.applicablePeriod()) 
+                    && orgType.equals(wfactor.orgType())) {
+                return wfactor;
+            }
+        }
+        LOGGER.warn("Unable to find exact Weighting Factor, now looking for {} and org type {} alone", 
+                wName, orgType);
+        for (WeightingFactor wfactor : wfactors) {
+            if (wName.name().equals(wfactor.category()) 
+                    && orgType.equals(wfactor.orgType())) {
+                return wfactor;
+            }
+        }
+        LOGGER.error("Unable to find Weighting Factor {} for period {} and org type {}", 
+                wName, period, orgType);
+        throw new SReportObjectNotFoundException(WeightingFactor.class, wName);
+    }
 }

@@ -127,6 +127,11 @@
         <artifactId>ractive</artifactId>
         <version>${ractive.version}</version>
       </dependency>
+      <dependency>
+        <groupId>com.knowprocess</groupId>
+        <artifactId>auth</artifactId>
+        <version>${kp-auth.version}</version>
+      </dependency>
     </dependencies>
     
 </project>

@@ -1,5 +1,6 @@
 package digital.srp.sreport.web;
 
+import java.text.DecimalFormat;
 import java.util.List;
 import java.util.ResourceBundle;
 
@@ -16,8 +17,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import digital.srp.sreport.internal.PeriodUtil;
-import digital.srp.sreport.model.Q;
 import digital.srp.sreport.model.Answer;
+import digital.srp.sreport.model.Q;
 import digital.srp.sreport.model.TabularDataSet;
 import digital.srp.sreport.model.surveys.SduQuestions;
 import digital.srp.sreport.repositories.AnswerRepository;
@@ -52,8 +53,11 @@ public class SduReportController implements SduQuestions {
     @Autowired
     private TabularDataSetHelper tdsHelper;
 
+    private DecimalFormat rawDecimalFormat = new DecimalFormat("#");
+    private DecimalFormat prettyPrintDecimalFormat = new DecimalFormat("#,###");
+
     /**
-     * Return a table of organisation data for the specified organisation and
+     * A table of organisation data for the specified organisation and
      * period.
      * 
      * @return HTML table.
@@ -64,12 +68,12 @@ public class SduReportController implements SduQuestions {
             @PathVariable("period") String period, Model model) {
         LOGGER.info(String.format("orgTable for %1$s %2$s", org, period));
 
-        fillModel(org, period, ORG_HDRS, model);
-        return "table";
+        fillModel(org, period, ORG_HDRS, model, false, prettyPrintDecimalFormat);
+        return "table-period-as-row";
     }
 
     /**
-     * Return a table of energy use (kWh) for the specified organisation and
+     * A table of energy use (kWh) for the specified organisation and
      * period.
      * 
      * @return HTML table.
@@ -80,12 +84,12 @@ public class SduReportController implements SduQuestions {
             @PathVariable("period") String period, Model model) {
         LOGGER.info(String.format("energyTable for %1$s %2$s", org, period));
 
-        fillModel(org, period, ENERGY_HDRS, model);
-        return "table";
+        fillModel(org, period, ENERGY_HDRS, model, false, prettyPrintDecimalFormat);
+        return "table-period-as-row";
     }
 
     /**
-     * Return a table of energy use (kWh) for the specified organisation and
+     * A table of energy use (kWh) for the specified organisation and
      * period.
      * 
      * @return CSV with header row.
@@ -96,12 +100,12 @@ public class SduReportController implements SduQuestions {
             @PathVariable("period") String period, Model model) {
         LOGGER.info(String.format("energyCsv for %1$s %2$s", org, period));
 
-        fillModel(org, period, ENERGY_HDRS, model);
+        fillModel(org, period, ENERGY_HDRS, model, false, rawDecimalFormat);
         return "csv";
     }
 
     /**
-     * Return a table of energy use (CO2e) for the specified organisation and
+     * A table of energy use (CO2e) for the specified organisation and
      * period.
      * 
      * @return HTML table.
@@ -113,12 +117,12 @@ public class SduReportController implements SduQuestions {
         LOGGER.info(
                 String.format("energyCO2eTable for %1$s %2$s", org, period));
 
-        fillModel(org, period, ENERGY_CO2E_HDRS, model);
-        return "table";
+        fillModel(org, period, ENERGY_CO2E_HDRS, model, false, prettyPrintDecimalFormat);
+        return "table-period-as-row";
     }
 
     /**
-     * Return a table of energy use (CO2e) for the specified organisation and
+     * A table of energy use (CO2e) for the specified organisation and
      * period.
      * 
      * @return CSV with header row.
@@ -129,12 +133,12 @@ public class SduReportController implements SduQuestions {
             @PathVariable("period") String period, Model model) {
         LOGGER.info(String.format("energyCO2eCsv for %1$s %2$s", org, period));
 
-        fillModel(org, period, ENERGY_CO2E_HDRS, model);
+        fillModel(org, period, ENERGY_CO2E_HDRS, model, false, rawDecimalFormat);
         return "csv";
     }
 
     /**
-     * Return a table of travel data for the specified organisation and period.
+     * A table of travel data for the specified organisation and period.
      * 
      * @return HTML table.
      */
@@ -144,12 +148,12 @@ public class SduReportController implements SduQuestions {
             @PathVariable("period") String period, Model model) {
         LOGGER.info(String.format("travelTable for %1$s %2$s", org, period));
 
-        fillModel(org, period, TRAVEL_HDRS, model);
-        return "table";
+        fillModel(org, period, TRAVEL_HDRS, model, false, prettyPrintDecimalFormat);
+        return "table-period-as-row";
     }
 
     /**
-     * Return a table of travel data emissions (CO2e) for the specified 
+     * A table of travel data emissions (CO2e) for the specified 
      * organisation and period.
      * 
      * @return CSV with header row.
@@ -160,12 +164,12 @@ public class SduReportController implements SduQuestions {
             @PathVariable("period") String period, Model model) {
         LOGGER.info(String.format("travelCO2eTable for %1$s %2$s", org, period));
 
-        fillModel(org, period, TRAVEL_HDRS, model);
-        return "table";
+        fillModel(org, period, TRAVEL_HDRS, model, false, prettyPrintDecimalFormat);
+        return "table-period-as-row";
     }
 
     /**
-     * Return a table of waste (tonnes) for the specified organisation and
+     * A table of waste (tonnes) for the specified organisation and
      * period.
      * 
      * @return HTML table.
@@ -176,12 +180,12 @@ public class SduReportController implements SduQuestions {
             @PathVariable("period") String period, Model model) {
         LOGGER.info(String.format("wasteTable for %1$s %2$s", org, period));
 
-        fillModel(org, period, WASTE_HDRS, model);
-        return "table";
+        fillModel(org, period, WASTE_HDRS, model, false, prettyPrintDecimalFormat);
+        return "table-period-as-row";
     }
     
     /**
-     * Return a table of waste (CO2e) for the specified organisation and
+     * A table of waste (CO2e) for the specified organisation and
      * period.
      * 
      * @return HTML table.
@@ -192,12 +196,12 @@ public class SduReportController implements SduQuestions {
             @PathVariable("period") String period, Model model) {
         LOGGER.info(String.format("wasteCO2eTable for %1$s %2$s", org, period));
 
-        fillModel(org, period, WASTE_CO2E_HDRS, model);
-        return "table";
+        fillModel(org, period, WASTE_CO2E_HDRS, model, false, prettyPrintDecimalFormat);
+        return "table-period-as-row";
     }
     
     /**
-     * Return a table of waste (CO2e) for the specified organisation and
+     * A table of waste (CO2e) for the specified organisation and
      * period.
      * 
      * @return CSV with header row.
@@ -208,12 +212,12 @@ public class SduReportController implements SduQuestions {
             @PathVariable("period") String period, Model model) {
         LOGGER.info(String.format("wasteCO2eCsv for %1$s %2$s", org, period));
 
-        fillModel(org, period, WASTE_CO2E_HDRS, model);
+        fillModel(org, period, WASTE_CO2E_HDRS, model, false, rawDecimalFormat);
         return "csv";
     }
     
     /**
-     * Return a table of water use for the specified organisation and
+     * A table of water use for the specified organisation and
      * period.
      * 
      * @return HTML table.
@@ -224,12 +228,12 @@ public class SduReportController implements SduQuestions {
             @PathVariable("period") String period, Model model) {
         LOGGER.info(String.format("waterTable for %1$s %2$s", org, period));
 
-        fillModel(org, period, WATER_HDRS, model);
-        return "table";
+        fillModel(org, period, WATER_HDRS, model, false, prettyPrintDecimalFormat);
+        return "table-period-as-row";
     }
     
     /**
-     * Return a table of water emissions (CO2e) for the specified organisation and
+     * A table of water emissions (CO2e) for the specified organisation and
      * period.
      * 
      * @return HTML table.
@@ -240,12 +244,12 @@ public class SduReportController implements SduQuestions {
             @PathVariable("period") String period, Model model) {
         LOGGER.info(String.format("waterCO2eTable for %1$s %2$s", org, period));
 
-        fillModel(org, period, WATER_CO2E_HDRS, model);
-        return "table";
+        fillModel(org, period, WATER_CO2E_HDRS, model, false, prettyPrintDecimalFormat);
+        return "table-period-as-row";
     }
     
     /**
-     * Return a table of water emissions (CO2e) for the specified organisation and
+     * A table of water emissions (CO2e) for the specified organisation and
      * period.
      * 
      * @return CSV with header row.
@@ -256,12 +260,12 @@ public class SduReportController implements SduQuestions {
             @PathVariable("period") String period, Model model) {
         LOGGER.info(String.format("waterCO2eCsv for %1$s %2$s", org, period));
 
-        fillModel(org, period, WATER_CO2E_HDRS, model);
+        fillModel(org, period, WATER_CO2E_HDRS, model, false, rawDecimalFormat);
         return "csv";
     }
     
     /**
-     * Return a table of biomass well to tank emissions (CO2e) for the specified organisation and
+     * A table of biomass well to tank emissions (CO2e) for the specified organisation and
      * period.
      * 
      * @return HTML table.
@@ -272,12 +276,12 @@ public class SduReportController implements SduQuestions {
             @PathVariable("period") String period, Model model) {
         LOGGER.info(String.format("biomassCO2eWttTable for %1$s %2$s", org, period));
 
-        fillModel(org, period, BIOMASS_CO2E_WTT_HDRS, model);
-        return "table";
+        fillModel(org, period, BIOMASS_CO2E_WTT_HDRS, model, true, prettyPrintDecimalFormat);
+        return "table-period-as-col";
     }
     
     /**
-     * Return a table of biomass well to tank emissions (CO2e) for the specified organisation and
+     * A table of biomass well to tank emissions (CO2e) for the specified organisation and
      * period.
      * 
      * @return CSV with header row.
@@ -288,12 +292,12 @@ public class SduReportController implements SduQuestions {
             @PathVariable("period") String period, Model model) {
         LOGGER.info(String.format("biomassCO2eWttCsv for %1$s %2$s", org, period));
 
-        fillModel(org, period, BIOMASS_CO2E_WTT_HDRS, model);
+        fillModel(org, period, BIOMASS_CO2E_WTT_HDRS, model, false, rawDecimalFormat);
         return "csv";
     }
     
     /**
-     * Return a table of biomass out of scope emissions (CO2e) use for the specified organisation and
+     * A table of biomass out of scope emissions (CO2e) use for the specified organisation and
      * period.
      * 
      * @return HTML table.
@@ -304,12 +308,12 @@ public class SduReportController implements SduQuestions {
             @PathVariable("period") String period, Model model) {
         LOGGER.info(String.format("biomassCO2eNoScopeTable for %1$s %2$s", org, period));
 
-        fillModel(org, period, BIOMASS_CO2E_NOSCOPE_HDRS, model);
-        return "table";
+        fillModel(org, period, BIOMASS_CO2E_NOSCOPE_HDRS, model, false, prettyPrintDecimalFormat);
+        return "table-period-as-row";
     }
     
     /**
-     * Return a table of biomass out of scope emissions (CO2e) for the specified organisation and
+     * A table of biomass out of scope emissions (CO2e) for the specified organisation and
      * period.
      * 
      * @return CSV with header row.
@@ -320,12 +324,12 @@ public class SduReportController implements SduQuestions {
             @PathVariable("period") String period, Model model) {
         LOGGER.info(String.format("biomassCO2eNoScopeCsv for %1$s %2$s", org, period));
 
-        fillModel(org, period, BIOMASS_CO2E_NOSCOPE_HDRS, model);
+        fillModel(org, period, BIOMASS_CO2E_NOSCOPE_HDRS, model, false, rawDecimalFormat);
         return "csv";
     }
     
     /**
-     * Return a table of categorised carbon emissions for the specified
+     * A table of categorised carbon emissions for the specified
      * organisation and period.
      * 
      * @return HTML table.
@@ -336,12 +340,12 @@ public class SduReportController implements SduQuestions {
             @PathVariable("period") String period, Model model) {
         LOGGER.info(String.format("footprintTable for %1$s %2$s", org, period));
 
-        fillModel(org, period, FOOTPRINT_HDRS, model);
-        return "table";
+        fillModel(org, period, FOOTPRINT_HDRS, model, false, prettyPrintDecimalFormat);
+        return "table-period-as-row";
     }
 
     /**
-     * Return a table of categorised carbon emissions for the specified
+     * A table of categorised carbon emissions for the specified
      * organisation and period.
      * 
      * @return CSV with header row.
@@ -352,12 +356,12 @@ public class SduReportController implements SduQuestions {
             @PathVariable("period") String period, Model model) {
         LOGGER.info(String.format("footprintCsv for %1$s %2$s", org, period));
 
-        fillModel(org, period, FOOTPRINT_HDRS, model);
+        fillModel(org, period, FOOTPRINT_HDRS, model, false, rawDecimalFormat);
         return "csv";
     }
     
     /**
-     * Return a table of categorised carbon emissions for the specified
+     * A table of categorised carbon emissions for the specified
      * organisation and period.
      * 
      * @return HTML table.
@@ -368,12 +372,12 @@ public class SduReportController implements SduQuestions {
             @PathVariable("period") String period, Model model) {
         LOGGER.info(String.format("emissionsProfileTable for %1$s %2$s", org, period));
 
-        fillModel(org, period, PROFILE_HDRS, model);
-        return "table";
+        fillModel(org, period, PROFILE_HDRS, model, true, prettyPrintDecimalFormat);
+        return "table-period-as-col";
     }
 
     /**
-     * Return a table of categorised carbon emissions for the specified
+     * A table of categorised carbon emissions for the specified
      * organisation and period.
      * 
      * @return CSV with header row.
@@ -384,12 +388,12 @@ public class SduReportController implements SduQuestions {
             @PathVariable("period") String period, Model model) {
         LOGGER.info(String.format("emissionsProfileCsv for %1$s %2$s", org, period));
 
-        fillModel(org, period, PROFILE_HDRS, model);
+        fillModel(org, period, PROFILE_HDRS, model, false, rawDecimalFormat);
         return "csv";
     }
     
     /**
-     * Return a table of categorised carbon emissions in ratio to expenditure
+     * A table of categorised carbon emissions in ratio to expenditure
      * for the specified organisation and period.
      * 
      * @return HTML table.
@@ -400,12 +404,12 @@ public class SduReportController implements SduQuestions {
             @PathVariable("period") String period, Model model) {
         LOGGER.info(String.format("carbonByExpenditureTable for %1$s %2$s", org, period));
 
-        fillModel(org, period, SPEND_HDRS, model);
-        return "table";
+        fillModel(org, period, SPEND_HDRS, model, false, prettyPrintDecimalFormat);
+        return "table-period-as-row";
     }
 
     /**
-     * Return a table of categorised carbon emissions in ratio to expenditure
+     * A table of categorised carbon emissions in ratio to expenditure
      * for the specified organisation and period.
      * 
      * @return CSV with header row.
@@ -416,14 +420,14 @@ public class SduReportController implements SduQuestions {
             @PathVariable("period") String period, Model model) {
         LOGGER.info(String.format("carbonByExpenditureCsv for %1$s %2$s", org, period));
 
-        fillModel(org, period, SPEND_HDRS, model);
+        fillModel(org, period, SPEND_HDRS, model, false, rawDecimalFormat);
         return "csv";
     }
     
     /***** TREASURY OUPUTS ****/
     
     /**
-     * Return a summary table of emissions by scope.
+     * A summary table of emissions by scope.
      * 
      * @return HTML table.
      */
@@ -433,12 +437,12 @@ public class SduReportController implements SduQuestions {
             @PathVariable("period") String period, Model model) {
         LOGGER.info(String.format("scopeSummaryTable for %1$s %2$s", org, period));
 
-        fillModel(org, period, SUMMARY_SCOPE_HDRS, model);
-        return "table";
+        fillModel(org, period, SUMMARY_SCOPE_HDRS, model, true, prettyPrintDecimalFormat);
+        return "table-period-as-col";
     }
     
     /**
-     * Return a summary table of emissions by scope.
+     * A summary table of emissions by scope.
      * 
      * @return HTML table.
      */
@@ -448,12 +452,12 @@ public class SduReportController implements SduQuestions {
             @PathVariable("period") String period, Model model) {
         LOGGER.info(String.format("scope1Table for %1$s %2$s", org, period));
 
-        fillModel(org, period, SCOPE_1_HDRS, model);
-        return "table";
+        fillModel(org, period, SCOPE_1_HDRS, model, true, prettyPrintDecimalFormat);
+        return "table-period-as-col";
     }
     
     /**
-     * Return a summary table of emissions by scope.
+     * A summary table of emissions by scope.
      * 
      * @return HTML table.
      */
@@ -463,12 +467,12 @@ public class SduReportController implements SduQuestions {
             @PathVariable("period") String period, Model model) {
         LOGGER.info(String.format("scope2Table for %1$s %2$s", org, period));
 
-        fillModel(org, period, SCOPE_2_HDRS, model);
-        return "table";
+        fillModel(org, period, SCOPE_2_HDRS, model, true, prettyPrintDecimalFormat);
+        return "table-period-as-col";
     }
     
     /**
-     * Return a summary table of emissions by scope.
+     * A summary table of emissions by scope.
      * 
      * @return HTML table.
      */
@@ -478,11 +482,72 @@ public class SduReportController implements SduQuestions {
             @PathVariable("period") String period, Model model) {
         LOGGER.info(String.format("scope3Table for %1$s %2$s", org, period));
 
-        fillModel(org, period, SCOPE_3_HDRS, model);
-        return "table";
+        fillModel(org, period, SCOPE_3_HDRS, model, true, prettyPrintDecimalFormat);
+        return "table-period-as-col";
     }
     
-    private void fillModel(String org, String period, Q[] headers, Model model) {
+    /**
+     * A summary table of emissions by scope.
+     * 
+     * @return HTML table.
+     */
+    @RequestMapping(value = "/{org}/{period}/sdu-carbon-profile.html", method = RequestMethod.GET, produces = "text/html")
+    @Transactional
+    public String sduCarbonProfileTable(@PathVariable("org") String org,
+            @PathVariable("period") String period, Model model) {
+        LOGGER.info(String.format("sduCarbonProfileTable for %1$s %2$s", org, period));
+
+        fillModel(org, period, SDU_CARBON_PROFILE_HDRS, model, true, prettyPrintDecimalFormat);
+        return "table-period-as-col";
+    }
+    
+    /**
+     * A summary table of emissions by E-Class.
+     * 
+     * @return HTML table.
+     */
+    @RequestMapping(value = "/{org}/{period}/eclass-carbon-profile.html", method = RequestMethod.GET, produces = "text/html")
+    @Transactional
+    public String eclassCarbonProfileTable(@PathVariable("org") String org,
+            @PathVariable("period") String period, Model model) {
+        LOGGER.info(String.format("eclassCarbonProfileTable for %1$s %2$s", org, period));
+
+        fillModel(org, period, ECLASS_PROFILE_HDRS, model, true, prettyPrintDecimalFormat);
+        return "table-period-as-col";
+    }
+
+    /**
+     * A trajectory table of emissions by SDU groupings.
+     * 
+     * @return HTML table.
+     */
+    @RequestMapping(value = "/{org}/{period}/carbon-trajectory.html", method = RequestMethod.GET, produces = "text/html")
+    @Transactional
+    public String carbonTrajectoryTable(@PathVariable("org") String org,
+            @PathVariable("period") String period, Model model) {
+        LOGGER.info(String.format("carbonTrajectoryTable for %1$s %2$s", org, period));
+
+        fillModel(org, period, SDU_TREND_HDRS, model, true, prettyPrintDecimalFormat);
+        return "table-period-as-col";
+    }
+    
+    /**
+     * A table of categorised carbon emissions compared to target for the 
+     * specified organisation and period.
+     * 
+     * @return CSV with header row.
+     */
+    @RequestMapping(value = "/{org}/{period}/carbon-trajectory.csv", method = RequestMethod.GET, produces = "text/csv")
+    @Transactional
+    public String carbonTrajectoryCsv(@PathVariable("org") String org,
+            @PathVariable("period") String period, Model model) {
+        LOGGER.info(String.format("carbonTrajectoryCsv for %1$s %2$s", org, period));
+
+        fillModel(org, period, SDU_TREND_HDRS, model, false, rawDecimalFormat);
+        return "csv";
+    }
+    
+    private void fillModel(String org, String period, Q[] headers, Model model, boolean periodAsCol, DecimalFormat decimalFormat) {
         String[] headerNames = new String[headers.length];
         for (int i = 0 ; i < headers.length ; i++) {
             headerNames[i] = headers[i].name();
@@ -494,27 +559,18 @@ public class SduReportController implements SduQuestions {
                 String.format("Found %1$s answers about organisation for %2$s",
                         answers.size(), org));
 
-        TabularDataSet table = tdsHelper.tabulate(headerNames, answers);
+        TabularDataSet table = tdsHelper.tabulate(headerNames, answers, decimalFormat);
+        if (periodAsCol) {
+            table = table.transpose();
+            model.addAttribute("periods",
+                    PeriodUtil.fillBackwards(period, table.rows().length/headers.length));
+        } else {
+            model.addAttribute("periods",
+                    PeriodUtil.fillBackwards(period, table.rows().length));
+        }
         model.addAttribute("table", table);
-        model.addAttribute("periods",
-                PeriodUtil.fillBackwards(period, table.rows().length));
         model.addAttribute("messages",
                 ResourceBundle.getBundle("digital.srp.sreport.Messages"));
     }
 
-    // private List<SurveyReturn> addLinks(List<SurveyReturn> returns) {
-    // for (SurveyReturn rtn : returns) {
-    // addLinks(rtn);
-    // }
-    // return returns;
-    // }
-    //
-    // private SurveyReturn addLinks(SurveyReturn rtn) {
-    // List<Link> links = new ArrayList<Link>();
-    // links.add(new
-    // Link(baseUrl+getClass().getAnnotation(RequestMapping.class).value()[0] +
-    // "/" + rtn.id()));
-    //
-    // return rtn.links(links);
-    // }
 }

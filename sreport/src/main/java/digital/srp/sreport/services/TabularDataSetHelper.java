@@ -1,8 +1,12 @@
 package digital.srp.sreport.services;
 
+import java.math.BigDecimal;
+import java.text.Format;
 import java.util.Arrays;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import digital.srp.sreport.model.Answer;
@@ -10,8 +14,12 @@ import digital.srp.sreport.model.TabularDataSet;
 
 @Component
 public class TabularDataSetHelper {
-
-    public TabularDataSet tabulate(String[] headers, List<Answer> answers) {
+    
+    private static final Logger LOGGER = LoggerFactory
+            .getLogger(TabularDataSetHelper.class);
+    
+    public TabularDataSet tabulate(String[] headers, List<Answer> answers, 
+            Format formatter) {
         List<String> hList = Arrays.asList(headers);
         int colCount = headers.length;
         int rowCount = answers.size()/colCount;
@@ -24,7 +32,12 @@ public class TabularDataSetHelper {
             Answer answer = answers.get(i);
             int col = hList.indexOf(answer.question().name());
             int row = i/headers.length;
-            tds.set(row,col,answer.response());
+            try {
+                tds.set(row, col, formatter.format(new BigDecimal(answer.response())));
+            } catch (IllegalArgumentException e) {
+                LOGGER.warn("Cannot format {} using {}", answer.response(), formatter.getClass().getName());
+                tds.set(row, col, answer.response());
+            }
         }
         
         return tds;

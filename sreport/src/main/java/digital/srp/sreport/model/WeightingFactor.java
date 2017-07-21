@@ -66,15 +66,6 @@ public class WeightingFactor {
     private String category;
     
     /**
-     * Options are GHG,GHG2,GHG4,GHG6,Type1.
-     */
-    @Size(max = 1)
-    @JsonProperty
-    @JsonView(WeightingFactorViews.Summary.class)
-    @Column(name = "scope")
-    private String scope;
-    
-    /**
      * Currently only done once in 2014-15
      */
     @NotNull
@@ -101,6 +92,15 @@ public class WeightingFactor {
     @JsonView(WeightingFactorViews.Summary.class)
     @Column(name = "m_val", precision = 12, scale = 0)
     private BigDecimal moneyValue;
+
+    
+    /**
+     * Proportion of total spending spent on this category (derived empirically).
+     */
+    @JsonProperty
+    @JsonView(WeightingFactorViews.Summary.class)
+    @Column(name = "p_val", precision = 6, scale = 3)
+    private BigDecimal proportionOfTotal;
     
     /**
      * Intensity of carbon emissions in kgCO<sub>2</sub>e / £.
@@ -142,4 +142,5 @@ public class WeightingFactor {
     public void intensityValue(BigDecimal intensityValue) {
         //this.intensityValue = intensityValue;
     }
+
 }

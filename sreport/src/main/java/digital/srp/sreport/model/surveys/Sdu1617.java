@@ -174,13 +174,13 @@ public class Sdu1617 {
         SurveyCategory catSpendProfile = new SurveyCategory()
                 .name("Spend Profile")
                 .questionEnums(
-                        Q.BIZ_SVC_SPEND,
+                        Q.BIZ_SVCS_SPEND,
                         Q.CONSTRUCTION_SPEND,
                         Q.CATERING_SPEND,
                         Q.FREIGHT_SPEND,
                         Q.ICT_SPEND,
                         Q.CHEM_AND_GAS_SPEND,
-                        Q.MED_INSTRUMENTS_SPEND,
+                        Q.MED_INSTR_SPEND,
                         Q.OTHER_MANUFACTURED_SPEND,
                         Q.OTHER_SPEND,
                         Q.PAPER_SPEND,

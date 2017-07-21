@@ -326,9 +326,9 @@ public class EricCsvImporter {
         case "Non burn treatment (alternative treatment plant) disposal waste weight (Tonnes)":
             return Q.ALT_WASTE_DISPOSAL_WEIGHT;
         case "Waste electrical and electronic equipment (WEEE) weight (Tonnes)":
-            return Q.WEEE_WASTE_WEIGHT;
+            return Q.WEEE_WEIGHT;
         case "Preparing for re-use volume (Tonnes)":
-            return Q.REUSE_WASTE_WEIGHT;
+            return Q.REUSE_WEIGHT;
         case "Landfill disposal waste weight (Tonnes)":
             return Q.LANDFILL_WEIGHT;
         case "Other recovery volume (Tonnes)":
