@@ -17,36 +17,35 @@ package digital.srp.macc.web;
 
 import java.io.IOException;
 import java.io.StringReader;
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.repository.CrudRepository;
-import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 import org.springframework.hateoas.Link;
-import org.springframework.hateoas.ResourceSupport;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.fasterxml.jackson.annotation.JsonView;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import digital.srp.macc.internal.CsvImporter;
 import digital.srp.macc.model.InterventionType;
 import digital.srp.macc.repositories.InterventionTypeRepository;
+import digital.srp.macc.views.InterventionTypeViews;
 
 /**
  * REST endpoint for accessing {@link InterventionType}
@@ -137,7 +136,7 @@ public class InterventionTypeController {
      * @return interventions for that tenant.
      */
     @RequestMapping(value = "/", method = RequestMethod.GET, produces = "application/json")
-    public @ResponseBody List<ShortInterventionType> listForTenant(
+    public @ResponseBody List<InterventionType> listForTenant(
             @PathVariable("tenantId") String tenantId,
             @RequestParam(value = "page", required = false) Integer page,
             @RequestParam(value = "limit", required = false) Integer limit) {
@@ -151,9 +150,23 @@ public class InterventionTypeController {
             Pageable pageable = new PageRequest(page == null ? 0 : page, limit);
             list = interventionTypeRepo.findPageForTenant(tenantId, pageable);
         }
-        LOGGER.info(String.format("Found %1$s interventions", list.size()));
+        LOGGER.info(String.format("Found %1$s intervention types", list.size()));
 
-        return wrap(list);
+        return addLinks(list);
+    }
+
+    /**
+     * @return The specified intervention type.
+     */
+    @RequestMapping(value = "/{id}", method = RequestMethod.GET)
+    @JsonView(InterventionTypeViews.Detailed.class)
+    public @ResponseBody InterventionType findById(
+            @PathVariable("id") Long interventionTypeId) {
+        LOGGER.info(String.format("findById %1$s", interventionTypeId));
+
+        InterventionType interventionType = interventionTypeRepo.findOne(interventionTypeId);
+
+        return addLinks(interventionType);
     }
 
     /**
@@ -161,6 +174,7 @@ public class InterventionTypeController {
      * 
      * @return interventionTypes for that tenant.
      */
+    @JsonView(InterventionTypeViews.Detailed.class)
     @RequestMapping(value = "/", method = RequestMethod.GET, produces = "text/csv")
     public @ResponseBody List<InterventionType> exportAsCsv(
             @PathVariable("tenantId") String tenantId,
@@ -188,8 +202,9 @@ public class InterventionTypeController {
      * @status Comma separated list of status to include.
      * @return interventions for that tenant.
      */
+    @JsonView(InterventionTypeViews.Summary.class)
     @RequestMapping(value = "/status/{status}", method = RequestMethod.GET)
-    public @ResponseBody List<ShortInterventionType> findByStatusForTenant(
+    public @ResponseBody List<InterventionType> findByStatusForTenant(
             @PathVariable("tenantId") String tenantId,
             @PathVariable("status") String status) {
         LOGGER.info(String.format(
@@ -200,115 +215,37 @@ public class InterventionTypeController {
                 .findByStatusForTenant(tenantId, status);
         LOGGER.info(String.format("Found %1$s interventions", list.size()));
 
-        return wrap(list);
+        return addLinks(list);
     }
 
-    private List<ShortInterventionType> wrap(List<InterventionType> list) {
-        List<ShortInterventionType> resources = new ArrayList<ShortInterventionType>(
-                list.size());
-        for (InterventionType message : list) {
-            resources.add(wrap(message));
+    /**
+     * Update an existing intervention type.
+     */
+    @ResponseStatus(value = HttpStatus.NO_CONTENT)
+    @RequestMapping(value = "/{id}", method = RequestMethod.PUT, consumes = { "application/json" })
+    public @ResponseBody void update(@PathVariable("tenantId") String tenantId,
+            @PathVariable("id") Long interventionTypeId,
+            @RequestBody InterventionType updatedIntvnType) {
+        InterventionType intvnType = interventionTypeRepo.findOne(interventionTypeId);
+
+        BeanUtils.copyProperties(updatedIntvnType, intvnType, "id");
+        intvnType.setTenantId(tenantId);
+        interventionTypeRepo.save(intvnType);
+    }
+
+    private List<InterventionType> addLinks(
+            final List<InterventionType> interventionTypes) {
+        for (InterventionType intType : interventionTypes) {
+            addLinks(intType);
         }
-        return resources;
+        return interventionTypes;
     }
 
-    private ShortInterventionType wrap(InterventionType interventionType) {
-        ShortInterventionType resource = new ShortInterventionType();
-        // BeanUtils.copyProperties(intervention, resource);
+    private InterventionType addLinks(final InterventionType interventionType) {
+        List<Link> links = new ArrayList<Link>();
+        links.add(new Link(String.format("/%1$s/intervention-types/%2$d", interventionType.getTenantId(), interventionType.getId())));
 
-        int targetYear = interventionType.getTargetYearIndex();
-        resource.setName(interventionType.getName());
-        resource.setCashOutflowsUpFront(interventionType
-                .getCashOutflowsUpFront());
-        resource.setCashOutflowsUpFrontNational(interventionType
-                .getCashOutflowsUpFrontNational());
-        resource.setAnnualCashInflowsTargetYear(interventionType
-                .getAnnualCashInflows(targetYear));
-        resource.setAnnualCashInflowsNationalTargetYear(interventionType
-                .getAnnualCashInflowsNationalTargetYear());
-        resource.setAnnualCashOutflowsTargetYear(interventionType
-                .getAnnualCashOutflows(targetYear));
-        resource.setAnnualCashOutflowsNationalTargetYear(interventionType
-                .getAnnualCashOutflowsNationalTargetYear());
-        resource.setAnnualTonnesCo2eSaved(interventionType
-                .getAnnualTonnesCo2eSaved());
-        resource.setAnnualElecSaved(interventionType.getAnnualElecSaved());
-
-        // System.out.println("  tonnes TY: "
-        // + intervention.getTonnesCo2eSavedTargetYear());
-        // System.out.println("  mac: " + intervention.getCostPerTonneCo2e());
-        //
-        // System.out.println("  Mean total outflows: "
-        // + intervention.getTotalCashOutflows());
-        // System.out.println("  Mean cash inflows: "
-        // + intervention.getMeanCashInflows());
-        // System.out.println("  NPV: " + intervention.getTotalNpv());
-        resource.setTonnesCo2eSavedTargetYear(interventionType
-                .getTonnesCo2eSavedTargetYear().longValue());
-        resource.setCostPerTonneCo2e(interventionType.getCostPerTonneCo2e());
-        resource.setTargetYearSavings(interventionType.getTargetYearSavings()
-                .longValue());
-        // Apparently BeanUtils does not use accessor
-        resource.setTotalNpv(interventionType.getTotalNpv());
-
-        resource.setName(interventionType.getName());
-        resource.setDescription(interventionType.getDescription());
-        resource.setStatus(interventionType.getStatus());
-        resource.setClassification(interventionType.getClassification());
-        resource.setConfidence(interventionType.getConfidence());
-        resource.setModellingYear(interventionType.getModellingYear());
-        resource.setLifetime(interventionType.getLifetime());
-        resource.setLeadTime(interventionType.getLeadTime());
-        resource.setUptake(interventionType.getUptake());
-        resource.setScaling(interventionType.getScaling());
-        resource.setFurtherInfo(interventionType.getFurtherInfo());
-
-        resource.setOverlappingInterventionList(interventionType
-                .getOverlappingInterventionList());
-
-        Link detail = linkTo(InterventionTypeRepository.class,
-                interventionType.getId()).withSelfRel();
-        resource.add(detail);
-        resource.setSelfRef(detail.getHref());
-        return resource;
-    }
-    
-    
-    private Link linkTo(
-            @SuppressWarnings("rawtypes") Class<? extends CrudRepository> clazz,
-            Long id) {
-        return new Link(clazz.getAnnotation(RepositoryRestResource.class)
-                .path() + "/" + id);
-    }
-
-    @Data
-    @EqualsAndHashCode(callSuper = true)
-    public static class ShortInterventionType extends ResourceSupport {
-        private String selfRef;
-        private String name;
-        private String description;
-        private String status;
-        private String classification;
-        private Short confidence;
-        private int modellingYear;
-        private Short lifetime;
-        private int leadTime;
-        private Short uptake;
-        private Float scaling;
-        private BigDecimal cashOutflowsUpFront;
-        private BigDecimal cashOutflowsUpFrontNational;
-        private BigDecimal annualCashInflowsNationalTargetYear;
-        private BigDecimal annualCashInflowsTargetYear;
-        private BigDecimal annualCashOutflowsNationalTargetYear;
-        private BigDecimal annualCashOutflowsTargetYear;
-        private BigDecimal annualTonnesCo2eSaved;
-        private BigDecimal annualElecSaved;
-        private Long tonnesCo2eSavedTargetYear;
-        private BigDecimal costPerTonneCo2e;
-        private BigDecimal totalNpv;
-        private Long targetYearSavings;
-        private String furtherInfo;
-        private boolean crossOrganisation;
-        private List<String> overlappingInterventionList;
+        interventionType.setLinks(links);
+        return interventionType;
     }
 }

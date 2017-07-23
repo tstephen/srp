@@ -26,9 +26,14 @@ import javax.persistence.Id;
 import javax.persistence.Lob;
 import javax.persistence.Table;
 import javax.persistence.Transient;
+import javax.xml.bind.annotation.XmlElement;
+
+import org.springframework.hateoas.Link;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonView;
 
+import digital.srp.macc.views.ModelParameterViews;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -50,28 +55,40 @@ public class ModelParameter {
     @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.AUTO)
     @JsonProperty
+    @JsonView({ ModelParameterViews.Summary.class })
     private Long id;
 
     @JsonProperty
+    @JsonView({ ModelParameterViews.Summary.class })
     @Column(name = "name")
     private String name;
 
     @JsonProperty
+    @JsonView({ ModelParameterViews.Detailed.class })
     @Column(name = "description")
     private String description;
 
     @JsonProperty
+    @JsonView({ ModelParameterViews.Summary.class })
     @Column(name = "value")
     private BigDecimal value;
 
     @JsonProperty
+    @JsonView({ ModelParameterViews.Detailed.class })
     @Column(name = "valuets")
     @Lob
     private String valueTS;
 
     @JsonProperty
+    @JsonView({ ModelParameterViews.Summary.class })
     @Column(name = "tenant_id")
     private String tenantId;
+
+    @Transient
+    @XmlElement(name = "link", namespace = Link.ATOM_NAMESPACE)
+    @JsonProperty("links")
+    @JsonView({ ModelParameterViews.Summary.class })
+    private List<Link> links;
 
     public ModelParameter(String name, String valueTS) {
         super();

@@ -16,6 +16,8 @@
 package digital.srp.macc.web;
 
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,25 +27,27 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.repository.CrudRepository;
-import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 import org.springframework.hateoas.Link;
-import org.springframework.hateoas.ResourceSupport;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.fasterxml.jackson.annotation.JsonView;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import digital.srp.macc.model.OrganisationType;
 import digital.srp.macc.repositories.OrganisationTypeRepository;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import digital.srp.macc.views.OrganisationTypeViews;
 
 /**
  * REST endpoint for accessing {@link OrganisationType}
@@ -64,7 +68,7 @@ public class OrganisationTypeController {
     private ObjectMapper objectMapper;
 
     /**
-     * Imports JSON representation of messages.
+     * Imports JSON representation of organistion types.
      * 
      * <p>
      * This is a handy link: http://shancarter.github.io/mr-data-converter/
@@ -80,37 +84,60 @@ public class OrganisationTypeController {
             @PathVariable("tenantId") String tenantId,
             @RequestParam(value = "file", required = true) MultipartFile file)
             throws IOException {
-        LOGGER.info(String.format("Uploading messages for: %1$s", tenantId));
+        LOGGER.info(String.format("Uploading org types for: %1$s", tenantId));
         String content = new String(file.getBytes());
 
         List<OrganisationType> list = objectMapper.readValue(content,
                 new TypeReference<List<OrganisationType>>() {
                 });
-        LOGGER.info(String.format("  found %1$d messages", list.size()));
-        for (OrganisationType message : list) {
-            message.setTenantId(tenantId);
+        LOGGER.info(String.format("  found %1$d org types", list.size()));
+        for (OrganisationType orgType : list) {
+            orgType.setTenantId(tenantId);
         }
 
         Iterable<OrganisationType> result = organisationTypeRepo.save(list);
         LOGGER.info("  saved.");
         return result;
     }
+    
+    /**
+     * Create a new organisation type.
+     *
+     * @return
+     * @throws URISyntaxException
+     */
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+    @ResponseStatus(value = HttpStatus.CREATED)
+    @RequestMapping(value = "/", method = RequestMethod.POST)
+    public @ResponseBody ResponseEntity<? extends OrganisationType> create(
+            @PathVariable("tenantId") String tenantId,
+            @RequestBody OrganisationType orgType) throws Exception {
+        orgType.setTenantId(tenantId);
+
+        orgType = organisationTypeRepo.save(orgType);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setLocation(new URI(getTenantUri(orgType)));
+
+        return new ResponseEntity(orgType, headers, HttpStatus.CREATED);
+    }
 
     /**
-     * Return just the messages for a specific tenant.
+     * Return just the organisation types for a specific tenant.
      * 
-     * @return messages for that tenant.
+     * @return organisation types for that tenant.
      */
     @RequestMapping(value = "/", method = RequestMethod.GET)
-    public @ResponseBody List<ShortOrganisationType> listForTenant(
+    @JsonView({ OrganisationTypeViews.Summary.class })
+    public @ResponseBody List<OrganisationType> listForTenant(
             @PathVariable("tenantId") String tenantId,
             @RequestParam(value = "filter", required = false) String filter,
             @RequestParam(value = "page", required = false) Integer page,
             @RequestParam(value = "limit", required = false) Integer limit) {
-        LOGGER.info(String.format("List messages for tenant %1$s", tenantId));
+        LOGGER.info(String.format("List organisation types for tenant %1$s", tenantId));
 
         List<OrganisationType> list;
-        if ("reportingType=true".equals(filter)) {
+        if ("reportingType".equals(filter)) {
             list = organisationTypeRepo.findAllReportingTypeForTenant(tenantId);
         } else if (limit == null) {
             list = organisationTypeRepo.findAllForTenant(tenantId);
@@ -118,11 +145,24 @@ public class OrganisationTypeController {
             Pageable pageable = new PageRequest(page == null ? 0 : page, limit);
             list = organisationTypeRepo.findPageForTenant(tenantId, pageable);
         }
-        LOGGER.info(String.format("Found %1$s messages", list.size()));
+        LOGGER.info(String.format("Found %1$s organisation types", list.size()));
 
-        return wrap(list);
+        return addLinks(list);
     }
 
+    /**
+     * @return one organisation type with the provided id.
+     */
+    @RequestMapping(value = "/{id}", method = RequestMethod.GET)
+    @JsonView({ OrganisationTypeViews.Summary.class })
+    public @ResponseBody OrganisationType findById(
+            @PathVariable("tenantId") String tenantId,
+            @PathVariable("id") Long id) {
+        LOGGER.info(String.format("Find organisation types for tenant %1$s with id %2$d", tenantId, id));
+
+        return addLinks(organisationTypeRepo.findOne(id));
+    }
+    
     /**
      * Return just the matching organisation types for a specific tenant.
      * 
@@ -130,8 +170,9 @@ public class OrganisationTypeController {
      * @status Comma separated list of status to include.
      * @return interventions for that tenant.
      */
+    @JsonView({ OrganisationTypeViews.Summary.class })
     @RequestMapping(value = "/status/{status}", method = RequestMethod.GET)
-    public @ResponseBody List<ShortOrganisationType> findByStatusForTenant(
+    public @ResponseBody List<OrganisationType> findByStatusForTenant(
             @PathVariable("tenantId") String tenantId,
             @PathVariable("status") String status) {
         LOGGER.info(String.format(
@@ -142,20 +183,18 @@ public class OrganisationTypeController {
                 .findByStatusForTenant(tenantId, status);
         LOGGER.info(String.format("Found %1$s organisation types", list.size()));
 
-        return wrap(list);
+        return addLinks(list);
     }
 
     /**
-     * Export all contacts for the tenant.
-     * 
-     * @return contacts for that tenant.
+     * @return All organisation types for that tenant.
      */
     @RequestMapping(value = "/", method = RequestMethod.GET, produces = "text/csv")
     public @ResponseBody List<OrganisationType> exportAsCsv(
             @PathVariable("tenantId") String tenantId,
             @RequestParam(value = "page", required = false) Integer page,
             @RequestParam(value = "limit", required = false) Integer limit) {
-        LOGGER.info(String.format("Export messages for tenant %1$s", tenantId));
+        LOGGER.info(String.format("Export organisation types for tenant %1$s", tenantId));
 
         List<OrganisationType> list;
         if (limit == null) {
@@ -164,46 +203,43 @@ public class OrganisationTypeController {
             Pageable pageable = new PageRequest(page == null ? 0 : page, limit);
             list = organisationTypeRepo.findPageForTenant(tenantId, pageable);
         }
-        LOGGER.info(String.format("Found %1$s messages", list.size()));
+        LOGGER.info(String.format("Found %1$s organisation types", list.size()));
 
         return list;
     }
 
-    private List<ShortOrganisationType> wrap(List<OrganisationType> list) {
-        List<ShortOrganisationType> resources = new ArrayList<ShortOrganisationType>(
-                list.size());
-        for (OrganisationType message : list) {
-            resources.add(wrap(message));
+    /**
+     * Update an existing organisation type.
+     */
+    @ResponseStatus(value = HttpStatus.NO_CONTENT)
+    @RequestMapping(value = "/{id}", method = RequestMethod.PUT, consumes = { "application/json" })
+    public @ResponseBody void update(@PathVariable("tenantId") String tenantId,
+            @PathVariable("id") Long orgTypeId,
+            @RequestBody OrganisationType updatedOrgType) {
+        OrganisationType orgType = organisationTypeRepo.findOne(orgTypeId);
+
+        BeanUtils.copyProperties(updatedOrgType, orgType, "id");
+        orgType.setTenantId(tenantId);
+        organisationTypeRepo.save(orgType);
+    }
+
+    private List<OrganisationType> addLinks(List<OrganisationType> orgTypes) {
+        for (OrganisationType orgType : orgTypes) {
+            addLinks(orgType);
         }
-        return resources;
+        return orgTypes;
     }
 
-    private ShortOrganisationType wrap(OrganisationType message) {
-        ShortOrganisationType resource = new ShortOrganisationType();
-        BeanUtils.copyProperties(message, resource);
-        Link detail = linkTo(OrganisationTypeRepository.class, message.getId())
-                .withSelfRel();
-        resource.add(detail);
-        resource.setSelfRef(detail.getHref());
-        return resource;
-    }
-    
-    
-    private Link linkTo(
-            @SuppressWarnings("rawtypes") Class<? extends CrudRepository> clazz,
-            Long id) {
-        return new Link(clazz.getAnnotation(RepositoryRestResource.class)
-                .path() + "/" + id);
+    private OrganisationType addLinks(final OrganisationType orgType) {
+        List<Link> links = new ArrayList<Link>();
+        links.add(new Link(getTenantUri(orgType)));
+
+        orgType.setLinks(links);
+        return orgType;
     }
 
-    @Data
-    @EqualsAndHashCode(callSuper = true)
-    public static class ShortOrganisationType extends ResourceSupport {
-        private String selfRef;
-        private String name;
-        private Integer count;
-        private String sector;
-        private String icon;
-        private boolean commissioner;
-      }
+    private String getTenantUri(final OrganisationType orgType) {
+        return String.format("/%1$s/organisation-types/%2$s",
+                orgType.getTenantId(), orgType.getId());
+    }
 }

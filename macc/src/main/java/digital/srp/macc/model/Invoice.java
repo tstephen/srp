@@ -24,11 +24,10 @@ import java.util.List;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
-import lombok.Data;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-//import com.knowprocess.jpa.FindByExampleHelper;
+
+import lombok.Data;
 
 @Data
 public class Invoice implements Serializable {

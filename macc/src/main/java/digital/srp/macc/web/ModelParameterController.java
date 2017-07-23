@@ -18,30 +18,28 @@ package digital.srp.macc.web;
 import java.util.ArrayList;
 import java.util.List;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.repository.CrudRepository;
-import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 import org.springframework.hateoas.Link;
-import org.springframework.hateoas.ResourceSupport;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.annotation.JsonView;
 
 import digital.srp.macc.model.ModelParameter;
 import digital.srp.macc.repositories.ModelParameterRepository;
+import digital.srp.macc.views.ModelParameterViews;
 
 /**
  * REST endpoint for accessing {@link ModelParameter}
@@ -58,16 +56,14 @@ public class ModelParameterController {
     @Autowired
     private ModelParameterRepository modelParamRepo;
 
-    @Autowired
-    private ObjectMapper objectMapper;
-
     /**
      * Return just the messages for a specific tenant.
      * 
      * @return messages for that tenant.
      */
     @RequestMapping(value = "/", method = RequestMethod.GET)
-    public @ResponseBody List<ShortModelParameters> listForTenant(
+    @JsonView(ModelParameterViews.Summary.class)
+    public @ResponseBody List<ModelParameter> listForTenant(
             @PathVariable("tenantId") String tenantId,
             @RequestParam(value = "page", required = false) Integer page,
             @RequestParam(value = "limit", required = false) Integer limit) {
@@ -82,7 +78,21 @@ public class ModelParameterController {
         }
         LOGGER.info(String.format("Found %1$s messages", list.size()));
 
-        return wrap(list);
+        return addLinks(list);
+    }
+
+    /**
+     * @return The specified parameter.
+     */
+    @RequestMapping(value = "/{id}", method = RequestMethod.GET)
+    @JsonView(ModelParameterViews.Detailed.class)
+    public @ResponseBody ModelParameter findById(
+            @PathVariable("id") Long parameterId) {
+        LOGGER.info(String.format("findById %1$s", parameterId));
+
+        ModelParameter parameter = modelParamRepo.findOne(parameterId);
+
+        return addLinks(parameter);
     }
 
     /**
@@ -109,38 +119,33 @@ public class ModelParameterController {
         return list;
     }
 
-    private List<ShortModelParameters> wrap(List<ModelParameter> list) {
-        List<ShortModelParameters> resources = new ArrayList<ShortModelParameters>(
-                list.size());
-        for (ModelParameter message : list) {
-            resources.add(wrap(message));
+    /**
+     * Update an existing parameter.
+     */
+    @ResponseStatus(value = HttpStatus.NO_CONTENT)
+    @RequestMapping(value = "/{id}", method = RequestMethod.PUT, consumes = { "application/json" })
+    public @ResponseBody void update(@PathVariable("tenantId") String tenantId,
+            @PathVariable("id") Long paramId,
+            @RequestBody ModelParameter updatedParam) {
+        ModelParameter param = modelParamRepo.findOne(paramId);
+
+        BeanUtils.copyProperties(updatedParam, param, "id");
+        param.setTenantId(tenantId);
+        modelParamRepo.save(param);
+    }
+
+    private List<ModelParameter> addLinks(List<ModelParameter> params) {
+        for (ModelParameter param : params) {
+            addLinks(param);
         }
-        return resources;
-    }
-
-    private ShortModelParameters wrap(ModelParameter message) {
-        ShortModelParameters resource = new ShortModelParameters();
-        BeanUtils.copyProperties(message, resource);
-        Link detail = linkTo(ModelParameterRepository.class, message.getId())
-                .withSelfRel();
-        resource.add(detail);
-        resource.setSelfRef(detail.getHref());
-        return resource;
+        return params;
     }
     
-    
-    private Link linkTo(
-            @SuppressWarnings("rawtypes") Class<? extends CrudRepository> clazz,
-            Long id) {
-        return new Link(clazz.getAnnotation(RepositoryRestResource.class)
-                .path() + "/" + id);
-    }
+    private ModelParameter addLinks(ModelParameter modelParameter) {
+        List<Link> links = new ArrayList<Link>();
+        links.add(new Link(String.format("/%1$s/parameters/%2$d", modelParameter.getTenantId(), modelParameter.getId())));
 
-    @Data
-    @EqualsAndHashCode(callSuper = true)
-    public static class ShortModelParameters extends ResourceSupport {
-        private String selfRef;
-        private String name;
-        private Number value;
-      }
+        modelParameter.setLinks(links);
+        return modelParameter;
+    }
 }

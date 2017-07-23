@@ -23,36 +23,26 @@ import javax.persistence.TemporalType;
 import javax.validation.constraints.NotNull;
 
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
+@NoArgsConstructor
 public class ReportingYear {
 
-    /**
-     */
     @NotNull
     @Column(unique = true)
     private String name;
 
-    /**
-     */
     @NotNull
     @Temporal(TemporalType.TIMESTAMP)
     private Date startDate;
 
-    /**
-     */
     @NotNull
     @Temporal(TemporalType.TIMESTAMP)
     private Date endDate;
 
-    /**
-     */
     @OneToOne
     private AnnualizedCost annualizedCost;
-
-    public ReportingYear() {
-        super();
-    }
 
     public ReportingYear(String name, Date startDate, Date endDate) {
         super();
