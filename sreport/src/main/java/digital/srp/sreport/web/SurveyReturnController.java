@@ -114,7 +114,6 @@ public class SurveyReturnController {
      */
     @RequestMapping(value = "/findBySurveyNameAndOrg/{surveyName}/{org}", method = RequestMethod.GET)
     @JsonView(SurveyReturnViews.Detailed.class)
-    @Transactional
     public @ResponseBody List<SurveyReturn> findBySurveyAndOrg(
             @PathVariable("surveyName") String surveyName,
             @PathVariable("org") String org) {

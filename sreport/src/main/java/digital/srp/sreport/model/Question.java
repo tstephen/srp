@@ -1,5 +1,7 @@
 package digital.srp.sreport.model;
 
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import javax.persistence.Column;
@@ -38,6 +40,7 @@ import lombok.experimental.Accessors;
 @Data
 @ToString(exclude = {  })
 @EqualsAndHashCode(exclude = { "id" })
+//@JsonIgnoreProperties(value={ "optionNamesAsList" }, allowGetters=true)
 @NoArgsConstructor
 @Entity
 @Table(name= "SR_QUESTION")
@@ -83,7 +86,7 @@ public class Question {
 
     @Size(max = 20)
     @JsonProperty
-    @JsonView({ QuestionViews.Detailed.class, SurveyViews.Detailed.class })
+    @JsonView({ QuestionViews.Detailed.class, SurveyViews.Detailed.class, SurveyReturnViews.Summary.class })
     @Column(name = "type")
     protected String type;
     
@@ -109,7 +112,10 @@ public class Question {
     @JsonView({ QuestionViews.Detailed.class, SurveyViews.Detailed.class })
     @Column(name = "def_val")
     protected String defaultValue;
-    
+
+    @Column(name = "options")
+    protected String optionNames;
+
     @Transient
     @JsonProperty("categories")
     @JsonView({ QuestionViews.Detailed.class, AnswerViews.Detailed.class })
@@ -128,5 +134,30 @@ public class Question {
     
     public Q q() {
         return Q.valueOf(name);
+    }
+
+    @JsonProperty("optionNames")
+    @JsonView({ QuestionViews.Detailed.class, SurveyViews.Detailed.class })
+    public List<String> optionNames() {
+        if (optionNames == null) {
+            return Collections.emptyList();
+        } else {
+            return Arrays.asList(optionNames.split(","));
+        }
+    }
+
+    @JsonProperty("optionNames")
+    @JsonView({ QuestionViews.Detailed.class, SurveyViews.Detailed.class })
+    public Question optionNames(List<String> optionNames) {
+        if (optionNames != null && optionNames.size() > 0) {
+            StringBuilder sb = new StringBuilder();
+            for (String option : optionNames) {
+                sb.append(option.trim()).append(",");
+            }
+            if (!this.optionNames.equals(sb.toString())) {
+                this.optionNames = sb.toString();
+            }
+        }
+        return this;
     }
 }

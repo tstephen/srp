@@ -88,7 +88,6 @@ public class SurveyController {
      */
     @RequestMapping(value = "/findByName/{name}", method = RequestMethod.GET)
     @JsonView(SurveyViews.Detailed.class)
-    @Transactional
     public @ResponseBody Survey findByName(
             @PathVariable("name") String name) {
         LOGGER.info(String.format("findByName %1$s", name));
