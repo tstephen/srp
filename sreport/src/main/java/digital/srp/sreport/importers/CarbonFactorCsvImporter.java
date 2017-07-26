@@ -74,7 +74,7 @@ public class CarbonFactorCsvImporter {
         if (value.startsWith(".")) { 
             value = "0" + value;
         }
-        LOGGER.debug("value: %1$s", value);
+        LOGGER.debug("value: {}", value);
         
         CarbonFactor factor = new CarbonFactor().category(record.get(0))
                 .name(StringUtils.toConst(record.get(1))).unit(record.get(2))

@@ -77,7 +77,7 @@ public class WeightingFactorCsvImporter {
         if (value.startsWith(".")) { 
             value = "0" + value;
         }
-        LOGGER.debug("value: %1$s", value);
+        LOGGER.debug("value: {}", value);
         
         String category = record.get(0);
         switch(category) {
