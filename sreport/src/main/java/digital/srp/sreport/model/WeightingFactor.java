@@ -134,7 +134,7 @@ public class WeightingFactor {
 
     public BigDecimal intensityValue() {
         if (carbonValue == null || moneyValue == null || moneyValue.intValue() == 0) {
-            return null;
+            return BigDecimal.ZERO;
         }
         return carbonValue.divide(moneyValue,3, java.math.RoundingMode.HALF_UP);
     }
