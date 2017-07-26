@@ -16,7 +16,7 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <activiti.version>5.18.0.20151117</activiti.version>
     <activiti.bdd.version>5.19.0.20160314</activiti.bdd.version>
-    <kp-auth.version>1.0.0</kp-auth.version>
+    <kp-auth.version>1.1.0</kp-auth.version>
     <omny-link.version>2.1.0-SNAPSHOT</omny-link.version>
     <onedecision.version>1.2.0-RC1</onedecision.version>
     <ractive.version>0.7.3</ractive.version>
