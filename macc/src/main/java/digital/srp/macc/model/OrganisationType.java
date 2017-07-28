@@ -36,6 +36,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonView;
 
 import digital.srp.macc.views.InterventionViews;
+import digital.srp.macc.views.OrganisationInterventionViews;
 import digital.srp.macc.views.OrganisationTypeViews;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -63,7 +64,7 @@ public class OrganisationType {
 
     @NotNull
     @JsonProperty
-    @JsonView({ OrganisationTypeViews.Summary.class, InterventionViews.Summary.class })
+    @JsonView({ OrganisationInterventionViews.Summary.class, OrganisationTypeViews.Summary.class, InterventionViews.Summary.class })
     @Column(name = "name")
     private String name;
 

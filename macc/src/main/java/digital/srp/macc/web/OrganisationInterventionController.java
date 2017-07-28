@@ -28,6 +28,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.fasterxml.jackson.annotation.JsonView;
+
 import digital.srp.macc.model.Intervention;
 import digital.srp.macc.model.InterventionType;
 import digital.srp.macc.model.OrganisationIntervention;
@@ -35,6 +37,7 @@ import digital.srp.macc.model.OrganisationType;
 import digital.srp.macc.repositories.InterventionRepository;
 import digital.srp.macc.repositories.InterventionTypeRepository;
 import digital.srp.macc.repositories.OrganisationTypeRepository;
+import digital.srp.macc.views.OrganisationInterventionViews;
 
 /**
  * REST endpoint for accessing {@link OrganisationIntervention}
@@ -61,6 +64,7 @@ public class OrganisationInterventionController {
      * @return Just the plan with the specified id.
      */
     @RequestMapping(value = "/plan/{orgTypeName}", method = RequestMethod.GET)
+    @JsonView(OrganisationInterventionViews.Detailed.class)
     public @ResponseBody List<OrganisationIntervention> getPlan(
             @PathVariable("orgTypeName") String orgTypeName,
             @PathVariable("tenantId") String tenantId) {
@@ -75,6 +79,7 @@ public class OrganisationInterventionController {
             OrganisationIntervention orgIntvn = new OrganisationIntervention();
             orgIntvn.setIntervention(intervention);
             orgIntvn.setOrganisationType(intervention.getOrganisationType());
+            orgIntvn.setTenantId(tenantId);
 
             if (intervention.getOrganisationType().isCommissioner()) {
 
@@ -121,11 +126,11 @@ public class OrganisationInterventionController {
         return orgInterventions;
     }
 
-    private OrganisationIntervention addLinks(OrganisationIntervention orgIntervention) {
+    private OrganisationIntervention addLinks(OrganisationIntervention oi) {
         List<Link> links = new ArrayList<Link>();
-        links.add(new Link(String.format("/%1$s/organisation-interventions/%2$d", orgIntervention.getTenantId(), orgIntervention.getId())));
+        links.add(new Link(String.format("/%1$s/organisation-interventions/%2$d", oi.getTenantId(), oi.getId())));
 
-        orgIntervention.setLinks(links);
-        return orgIntervention;
+        oi.setLinks(links);
+        return oi;
     }
 }

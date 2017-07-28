@@ -112,7 +112,7 @@ public class OrganisationInterventionTest {
         assertEquals(ACTIVE_TRAVEL_UP_FRONT
                 .multiply(ACTIVE_TRAVEL_UPTAKE)
                 .multiply(staffRatio).doubleValue(),
-                SignificantFiguresFormat.round(plan.getCashOutflowUpFront())
+                SignificantFiguresFormat.round(plan.getCashOutflowsUpFront())
                         .doubleValue(), 10);
         assertEquals(ACTIVE_TRAVEL_ANNUAL_IN
                 .multiply(ACTIVE_TRAVEL_UPTAKE)
@@ -181,7 +181,7 @@ public class OrganisationInterventionTest {
         System.out.println(String.format("  %1$s (PER ORG)", interventionType
                 .getName().toUpperCase()));
         System.out.println(String.format("    capital costs: %1$f",
-                plan.getCashOutflowUpFront()));
+                plan.getCashOutflowsUpFront()));
         System.out.println(String.format("    annual costs: %1$f",
                 plan.getAnnualCashOutflowsTargetYear()));
         System.out.println(String.format("    annual costs savings: %1$f",

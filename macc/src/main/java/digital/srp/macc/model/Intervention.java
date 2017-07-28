@@ -211,12 +211,6 @@ public class Intervention implements CsvSerializable {
 
     @JsonProperty
     @JsonView({ InterventionViews.Detailed.class })
-    public BigDecimal getCostPerTonneCo2e() {
-        return getInterventionType().getCostPerTonneCo2e();
-    }
-
-    @JsonProperty
-    @JsonView({ InterventionViews.Detailed.class })
     public Long getTargetYearSavings() {
         return getShareAsBigDecimal().multiply(
                 new BigDecimal(getInterventionType().getTargetYearSavings()
@@ -230,6 +224,97 @@ public class Intervention implements CsvSerializable {
         Integer unitCount = getInterventionType().getUnitCount();
         return getShareAsBigDecimal().multiply(
                 new BigDecimal(unitCount == null ? "0" : unitCount.toString()));
+    }
+
+    /** Convenience method to access intervention type's name. */
+    @JsonProperty
+    @JsonView({ InterventionViews.Detailed.class })
+    public String getName() {
+        return getInterventionType().getName();
+    }
+
+    /** Convenience method to access intervention type's description. */
+    @JsonProperty
+    @JsonView({ InterventionViews.Detailed.class })
+    public String getDescription() {
+        return getInterventionType().getDescription();
+    }
+
+    /** Convenience method to access intervention type's further info URL. */
+    @JsonProperty
+    @JsonView({ InterventionViews.Detailed.class })
+    public String getFurtherInfo() {
+        return getInterventionType().getFurtherInfo();
+    }
+
+    /** Convenience method to access intervention type's unit. */
+    @JsonProperty
+    @JsonView({ InterventionViews.Detailed.class })
+    public String getUnit() {
+        return getInterventionType().getUnit();
+    }
+
+    /** Convenience method to access intervention type's (aka national) unit count. */
+    @JsonProperty
+    @JsonView({ InterventionViews.Detailed.class })
+    public Integer getUnitCountNational() {
+        return getInterventionType().getUnitCount();
+    }
+
+    /** Convenience method to access description of intervention type's unit. */
+    @JsonProperty
+    @JsonView({ InterventionViews.Detailed.class })
+    public String getUnitDescription() {
+        return getInterventionType().getUnitDescription();
+    }
+
+    /** Convenience method to access description of intervention type's uptake. */
+    @JsonProperty
+    @JsonView({ InterventionViews.Detailed.class })
+    public Short getUptake() {
+        return getInterventionType().getUptake();
+    }
+
+    /** Convenience method to access intervention type's data. */
+    @JsonProperty
+    @JsonView({ InterventionViews.Detailed.class })
+    public BigDecimal getCashOutflowsUpFrontNational() {
+        return getInterventionType().getCashOutflowsUpFrontNational();
+    }
+
+    /** Convenience method to access intervention type's data. */
+    @JsonProperty
+    @JsonView({ InterventionViews.Detailed.class })
+    public BigDecimal getAnnualCashOutflowsNationalTargetYear() {
+        return getInterventionType().getAnnualCashOutflowsNationalTargetYear();
+    }
+
+    /** Convenience method to access intervention type's data. */
+    @JsonProperty
+    @JsonView({ InterventionViews.Detailed.class })
+    public BigDecimal getAnnualCashInflowsNationalTargetYear() {
+        return getInterventionType().getAnnualCashInflowsNationalTargetYear();
+    }
+
+    /** Convenience method to access intervention type's data. */
+    @JsonProperty
+    @JsonView({ InterventionViews.Detailed.class })
+    public BigDecimal getCostPerTonneCo2e() {
+        return getInterventionType().getCostPerTonneCo2e();
+    }
+
+    /** Convenience method to access intervention type's data. */
+    @JsonProperty
+    @JsonView({ InterventionViews.Detailed.class })
+    public Short getConfidence() {
+        return getInterventionType().getConfidence();
+    }
+
+    /** Convenience method to access intervention type's data. */
+    @JsonProperty
+    @JsonView({ InterventionViews.Detailed.class })
+    public String getSlug() {
+        return getInterventionType().getSlug();
     }
 
     @Override

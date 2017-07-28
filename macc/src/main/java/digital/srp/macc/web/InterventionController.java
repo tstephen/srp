@@ -175,6 +175,7 @@ public class InterventionController {
      * @return interventions for that tenant.
      */
     @RequestMapping(value = "/status/{status}/{orgTypeName}", method = RequestMethod.GET)
+    @JsonView(InterventionViews.Detailed.class)
     public @ResponseBody List<Intervention> findByStatusForTenantAndOrgType(
             @PathVariable("tenantId") String tenantId,
             @PathVariable("status") String status,

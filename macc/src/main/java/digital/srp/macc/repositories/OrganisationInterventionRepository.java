@@ -28,8 +28,6 @@ import digital.srp.macc.model.OrganisationIntervention;
 public interface OrganisationInterventionRepository extends
         CrudRepository<OrganisationIntervention, Long> {
 
-    List<OrganisationIntervention> findByName(@Param("name") String name);
-
     @Query("SELECT oi FROM OrganisationIntervention oi LEFT OUTER JOIN oi.intervention i INNER JOIN oi.organisationType ot WHERE ot.name = :orgTypeName AND oi.tenantId = :tenantId ORDER BY ot.name ASC")
     List<OrganisationIntervention> findByOrgType(
             @Param("orgTypeName") String orgTypeName,
