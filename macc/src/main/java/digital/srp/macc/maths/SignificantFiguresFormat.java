@@ -47,8 +47,8 @@ public class SignificantFiguresFormat {
 
     public static BigDecimal round(BigDecimal bd) {
         try {
-        return bd.round(new MathContext(NO_SIGNIFICANT_FIGURES,
-                RoundingMode.HALF_UP));
+            return bd.round(new MathContext(NO_SIGNIFICANT_FIGURES,
+                    RoundingMode.HALF_UP));
         } catch (NullPointerException e) {
             return new BigDecimal(0.00);
         }

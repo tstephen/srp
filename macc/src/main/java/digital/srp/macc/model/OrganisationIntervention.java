@@ -36,6 +36,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonView;
 
 import digital.srp.macc.maths.Finance;
+import digital.srp.macc.maths.SignificantFiguresFormat;
 import digital.srp.macc.views.OrganisationInterventionViews;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -170,9 +171,10 @@ public class OrganisationIntervention {
         if (unitCount == 0 && getOrganisationType().getCount() == 0) {
             return null;
         } else if (unitCount == 0) {
-            return getIntervention().getUnitCount().divide(
+            return SignificantFiguresFormat.round(
+                    getIntervention().getUnitCount().divide(
                     new BigDecimal(getOrganisationType().getCount()),
-                    Finance.ROUND_MODE);
+                    Finance.ROUND_MODE));
         } else {
             return new BigDecimal(unitCount);
         }

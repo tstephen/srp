@@ -342,7 +342,7 @@ public class InterventionType implements CsvSerializable {
 
     /** A sanitised version of the name for use as an identifier. */
     public String getSlug() {
-        return getName().toLowerCase().replaceAll("\\s", "-");
+        return getName().toLowerCase().replaceAll("[\\s-&/]", "_");
     }
 
     public int getModellingYear() {
