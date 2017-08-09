@@ -66,8 +66,10 @@ public class Cruncher implements digital.srp.sreport.model.surveys.SduQuestions 
                 calcCarbonProfileSduMethod(rtn);
             }
             calcTrendOverTime(rtn);
-        } catch (IllegalStateException e) {
+        } catch (IllegalStateException | SReportObjectNotFoundException e) {
             LOGGER.warn(e.getMessage());
+        } catch (Exception e) {
+            LOGGER.error(e.getMessage());
         }
 
         return rtn;
@@ -374,7 +376,7 @@ public class Cruncher implements digital.srp.sreport.model.surveys.SduQuestions 
         rtn.answers().add(sumAnswers(rtn, Q.WASTE_AND_WATER_CO2E, Q.SCOPE_3_WASTE, Q.SCOPE_3_WATER));
 
         String orgType = rtn.answer(Q.ORG_TYPE, rtn.applicablePeriod()).response();
-        if (orgType == null) {
+        if (isEmpty(orgType)) {
             String msg = String.format("Cannot model carbon profile of %1$s as no org type specified", rtn.org());
             throw new IllegalStateException(msg);
         }
@@ -428,13 +430,18 @@ public class Cruncher implements digital.srp.sreport.model.surveys.SduQuestions 
     private BigDecimal calcNonPaySpendFromOpEx(SurveyReturn rtn) {
         String orgType = rtn.answer(Q.ORG_TYPE, rtn.applicablePeriod()).response();
         String opEx = rtn.answer(Q.OP_EX, rtn.applicablePeriod()).response();
-        if (opEx == null || orgType == null) {
+        if (isEmpty(opEx) || isEmpty(orgType)) {
             throw new IllegalStateException(String.format("Cannot calc non-pay spend from op-ex for %1$s (%2$s) in %3$s. Either op-ex or org type is missing.",
                     rtn.org(), orgType, rtn.applicablePeriod()));
         }
         WeightingFactor wFactor = wFactor(WeightingFactors.NON_PAY_OP_EX_PORTION, rtn.applicablePeriod(), orgType);
 
         return new BigDecimal(opEx).multiply(wFactor.moneyValue());
+    }
+
+
+    private boolean isEmpty(String value) {
+        return value == null || "0".equals(value);
     }
 
 
@@ -577,7 +584,7 @@ public class Cruncher implements digital.srp.sreport.model.surveys.SduQuestions 
         BigDecimal calcVal = new BigDecimal("0.00");
         try {
             String spend = rtn.answer(srcQ, rtn.applicablePeriod()).response();
-            if (spend == null || "0".equals(spend)) {
+            if (isEmpty(spend)) {
                 calcVal = nonPaySpend.multiply(wFactor.proportionOfTotal());
             } else {
                 calcVal = new BigDecimal(spend);
@@ -591,7 +598,7 @@ public class Cruncher implements digital.srp.sreport.model.surveys.SduQuestions 
         return getAnswer(rtn, trgtQ).response(calcVal.toPlainString());
     }
 
-    WeightingFactor wFactor(WeightingFactors wName, String period, String orgType) {
+    private WeightingFactor wFactor(WeightingFactors wName, String period, String orgType) {
         switch (orgType.toLowerCase()) {
         case "acute":
         case "acute - small":
