@@ -1,7 +1,22 @@
 Feature: Sustainability Returns
 
-#  Scenario: CRUD Question
-#  
+  Scenario: CRUD Question
+    Given the user is logged in
+     When a list of questions is requested
+     Then the list of 308 available questions is returned
+     When a new question named "TEST" is added
+     Then the new question's identifier is returned
+     When the question's identifier is requested
+     Then the question with name "TEST" is returned with type = "null", placeholder = "null" and hint = "null"
+     When the question's type is set to "number", placeholder to "Enter a number" and hint to "This is a helpful hint"
+      And the question's identifier is requested
+     Then the question with name "TEST" is returned with type = "number", placeholder = "Enter a number" and hint = "This is a helpful hint"
+     When a list of questions is requested
+     Then the list of 309 available questions is returned
+     When question is deleted
+      And a list of questions is requested
+     Then the list of 308 available questions is returned
+
 #  Scenario: CRUD Survey
 #  
 #  Scenario: Assign questions to survey and categorise
@@ -38,7 +53,7 @@ Feature: Sustainability Returns
     Given the user is logged in
      When the SDU 2016-17 return of RDR is requested
           # Different to no. of questions in survey by the calculated and  imported ones
-     Then an SDU 2016-17 return containing 248 answers is created if necessary and returned for organisation RDR
+     Then an SDU 2016-17 return containing 438 answers is created if necessary and returned for organisation RDR
      When the RDR return is updated with ELEC_USED, GAS_USED and WATER_VOL and uploaded
      Then the RDR return for 2016-17 is available with status 'Draft'
      When historic ERIC data is imported for RDR 2016-17

@@ -251,7 +251,7 @@ public class SustainabilityReturnStepDefs extends IntegrationTestSupport {
     @Given("^the current year's return of (\\w+) is complete$")
     public void the_current_return_is_complete(String org) throws Throwable {
         executeGet("/returns/findCurrentBySurveyNameAndOrg/"+Sdu1617.ID+"/"+org);
-        assertEquals(HttpStatus.OK, latestEntity.getStatusCode());
+        latestResponse.statusCodeIs(HttpStatus.OK);
         rtn = (SurveyReturn) latestResponse.parseObject(SurveyReturn.class);
         // TODO what constitutes complete?
     }

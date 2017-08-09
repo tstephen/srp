@@ -38,7 +38,7 @@ import lombok.experimental.Accessors;
  */
 @Accessors(fluent=true)
 @Data
-@ToString(exclude = {  })
+@ToString
 @EqualsAndHashCode(exclude = { "id" })
 //@JsonIgnoreProperties(value={ "optionNamesAsList" }, allowGetters=true)
 @NoArgsConstructor
@@ -51,27 +51,27 @@ public class Question {
     @JsonProperty
     @JsonView( {SurveyViews.Detailed.class, SurveyReturnViews.Detailed.class} )
     @Column(name = "id", columnDefinition = "int(11) NOT NULL")
-    private Long id;
+    protected Long id;
 
     @Transient
-    private Q q;
+    protected Q q;
     
     @NotNull
     @JsonProperty
     @JsonView( { AnswerViews.Summary.class, QuestionViews.Summary.class, SurveyViews.Detailed.class, SurveyReturnViews.Detailed.class} )
     @Column(name = "name")
-    private String name;
+    protected String name;
     
     @JsonProperty
     @JsonView({ AnswerViews.Summary.class, QuestionViews.Summary.class, SurveyViews.Detailed.class })
     @Column(name = "label")
-    private String label;
+    protected String label;
 
     @NotNull
     @JsonProperty
-    @JsonView({ QuestionViews.Detailed.class, SurveyViews.Detailed.class })
+    @JsonView({ QuestionViews.Summary.class, SurveyViews.Detailed.class })
     @Column(name = "required")
-    private boolean required;
+    protected boolean required;
     
     @JsonProperty
     @JsonView({ QuestionViews.Detailed.class, SurveyViews.Detailed.class })
@@ -86,7 +86,7 @@ public class Question {
 
     @Size(max = 20)
     @JsonProperty
-    @JsonView({ QuestionViews.Detailed.class, SurveyViews.Detailed.class, SurveyReturnViews.Summary.class })
+    @JsonView({ QuestionViews.Summary.class, SurveyViews.Detailed.class, SurveyReturnViews.Summary.class })
     @Column(name = "type")
     protected String type;
     
@@ -94,17 +94,17 @@ public class Question {
     @JsonProperty
     @JsonView({ QuestionViews.Detailed.class, SurveyViews.Detailed.class })
     @Column(name = "unit")
-    private String unit;
+    protected String unit;
 
     @Size(max = 50)
     @JsonProperty
     @JsonView({ QuestionViews.Detailed.class, SurveyViews.Detailed.class })
     @Column(name = "validation")
-    private String validation;
+    protected String validation;
 
     @Size(max = 50)
     @JsonProperty
-    @JsonView({ QuestionViews.Detailed.class, SurveyViews.Detailed.class })
+    @JsonView({ QuestionViews.Summary.class, SurveyViews.Detailed.class })
     @Column(name = "source")
     protected String source;
 
@@ -113,19 +113,26 @@ public class Question {
     @Column(name = "def_val")
     protected String defaultValue;
 
+    @JsonProperty
+    @JsonView({ QuestionViews.Detailed.class, SurveyViews.Detailed.class })
     @Column(name = "options")
     protected String optionNames;
+
+    @JsonProperty
+    @JsonView({ QuestionViews.Detailed.class })
+    @Column(name = "tenant_id")
+    protected String tenantId;
 
     @Transient
     @JsonProperty("categories")
     @JsonView({ QuestionViews.Detailed.class, AnswerViews.Detailed.class })
-    private List<String> categories;
+    protected List<String> categories;
 
     @Transient
     @XmlElement(name = "link", namespace = Link.ATOM_NAMESPACE)
     @JsonProperty("links")
     @JsonView(QuestionViews.Summary.class)
-    private List<Link> links;
+    protected List<Link> links;
     
     public Question q(Q q) {
         this.name = q.name();
@@ -159,5 +166,133 @@ public class Question {
             }
         }
         return this;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public Q getQ() {
+        return q;
+    }
+
+    public void setQ(Q q) {
+        this.q = q;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getLabel() {
+        return label;
+    }
+
+    public void setLabel(String label) {
+        this.label = label;
+    }
+
+    public boolean isRequired() {
+        return required;
+    }
+
+    public void setRequired(boolean required) {
+        this.required = required;
+    }
+
+    public String getHint() {
+        return hint;
+    }
+
+    public void setHint(String hint) {
+        this.hint = hint;
+    }
+
+    public String getPlaceholder() {
+        return placeholder;
+    }
+
+    public void setPlaceholder(String placeholder) {
+        this.placeholder = placeholder;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public String getUnit() {
+        return unit;
+    }
+
+    public void setUnit(String unit) {
+        this.unit = unit;
+    }
+
+    public String getValidation() {
+        return validation;
+    }
+
+    public void setValidation(String validation) {
+        this.validation = validation;
+    }
+
+    public String getSource() {
+        return source;
+    }
+
+    public void setSource(String source) {
+        this.source = source;
+    }
+
+    public String getDefaultValue() {
+        return defaultValue;
+    }
+
+    public void setDefaultValue(String defaultValue) {
+        this.defaultValue = defaultValue;
+    }
+
+    public String getOptionNames() {
+        return optionNames;
+    }
+
+    public void setOptionNames(String optionNames) {
+        this.optionNames = optionNames;
+    }
+
+    public String getTenantId() {
+        return tenantId;
+    }
+
+    public void setTenantId(String tenantId) {
+        this.tenantId = tenantId;
+    }
+
+    public List<String> getCategories() {
+        return categories;
+    }
+
+    public void setCategories(List<String> categories) {
+        this.categories = categories;
+    }
+
+    public List<Link> getLinks() {
+        return links;
+    }
+
+    public void setLinks(List<Link> links) {
+        this.links = links;
     }
 }

@@ -139,13 +139,13 @@ WOOD_PELLETS_USED$Non-fossil fuel Consumed - renewable (wood pellets)$kWh$SDU$Pa
 LEASED_ASSETS_ENERGY_USE$Percentage of green tariff supply proven as additional$%$SDU$Where green tariff supplies are proven as additional please record the %, by default this figure should be 0% unless known otherwise, as per the DEFRA guidelines all green tariff energy will be treated as grid average conversion factor inclusive of all scopes$number$$$$
 GREEN_TARIFF_ADDITIONAL_PCT$Percentage of third party owned supply proven as additional$%$SDU$Where Third party owned supplies are proven as additional please record the %, by default this figure should be 0% unless known otherwise, as per the DEFRA guidelines all Third party owned supplies  will be treated as grid average conversion factor exclusive of Well to Tank emissions and Transmission and distribution. $number$$$$
 THIRD_PARTY_ADDITIONAL_PCT$Leased Assets Energy Use(Upstream - Gas, Coal & Electricity)$tCO2e$SDU$Please provide a figure where known. $number$$$$
-BIZ_SVC_SPEND$Business services$tCO2e$SDU$$number$$$$
+BIZ_SVCS_SPEND$Business services$tCO2e$SDU$$number$$$$
 CONSTRUCTION_SPEND$Construction$tCO2e$SDU$$number$$$$
 CATERING_SPEND$Food and catering$tCO2e$SDU$$number$$$$
 FREIGHT_SPEND$Freight transport$tCO2e$SDU$$number$$$$
 ICT_SPEND$Information and communication technologies$tCO2e$SDU$$number$$$$
 CHEM_AND_GAS_SPEND$Manufactured fuels chemicals and gases$tCO2e$SDU$$number$$$$
-MED_INSTRUMENTS_SPEND$Medical Instruments /equipment$tCO2e$SDU$$number$$$$
+MED_INSTR_SPEND$Medical Instruments /equipment$tCO2e$SDU$$number$$$$
 OTHER_MANUFACTURED_SPEND$Other manufactured products$tCO2e$SDU$$number$$$$
 OTHER_SPEND$Other procurement$tCO2e$SDU$$number$$$$
 PAPER_SPEND$Paper products$tCO2e$SDU$$number$$$$
@@ -231,7 +231,7 @@ ELEC_GENERATION$Total full load rating of the electrical generator plant$kW$ERIC
 HIGH_TEMP_DISPOSAL_WEIGHT$High temperature disposal waste weight$tonnes$ERIC$$number$$$$
 ALT_WASTE_DISPOSAL_WEIGHT$Non burn treatment (alternative treatment plant) disposal waste weight$tonnes$ERIC$$number$$$$
 WEEE_WEIGHT$Waste electrical and electronic equipment (WEEE) weight$tonnes$ERIC$$number$$$$
-REUSE_WASTE_WEIGHT$Preparing for re-use volume$tonnes$ERIC$$number$$$$
+REUSE_WEIGHT$Preparing for re-use volume$tonnes$ERIC$$number$$$$
 LANDFILL_WEIGHT$Landfill disposal waste weight$tonnes$ERIC$$number$$$$
 OTHER_RECOVERY_WEIGHT$Other recovery volume$tonnes$ERIC$$number$$$$
 RECYCLING_WEIGHT$Waste recycling volume$tonnes$ERIC$$number$$$$

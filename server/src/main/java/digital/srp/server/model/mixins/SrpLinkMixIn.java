@@ -7,6 +7,7 @@ import digital.srp.macc.views.InterventionViews;
 import digital.srp.macc.views.ModelParameterViews;
 import digital.srp.macc.views.OrganisationInterventionViews;
 import digital.srp.macc.views.OrganisationTypeViews;
+import digital.srp.sreport.model.views.QuestionViews;
 import digital.srp.sreport.model.views.SurveyReturnViews;
 import digital.srp.sreport.model.views.SurveyViews;
 import link.omny.catalog.views.FeedbackViews;
@@ -37,12 +38,14 @@ public abstract class SrpLinkMixIn {
         OrganisationTypeViews.Summary.class,
 
         // sreport
-        SurveyViews.Summary.class, SurveyReturnViews.Summary.class
+        QuestionViews.Summary.class,
+        SurveyViews.Summary.class,
+        SurveyReturnViews.Summary.class
     } )
     private long rel;
 
     @JsonView( {
-     // catalog
+        // catalog
         FeedbackViews.Summary.class,
         MediaResourceViews.Summary.class,
         OrderViews.Summary.class,
@@ -60,7 +63,9 @@ public abstract class SrpLinkMixIn {
         OrganisationTypeViews.Summary.class,
 
         //sreport
-        SurveyViews.Summary.class, SurveyReturnViews.Summary.class
+        QuestionViews.Summary.class,
+        SurveyViews.Summary.class,
+        SurveyReturnViews.Summary.class
     } )
     private long href;
 
