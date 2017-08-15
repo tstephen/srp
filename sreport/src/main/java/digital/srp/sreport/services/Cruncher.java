@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import digital.srp.sreport.internal.PeriodUtil;
 import digital.srp.sreport.internal.SReportObjectNotFoundException;
 import digital.srp.sreport.model.Answer;
 import digital.srp.sreport.model.CarbonFactor;
@@ -43,6 +44,9 @@ public class Cruncher implements digital.srp.sreport.model.surveys.SduQuestions 
     @Autowired
     protected AnswerRepository answerRepo;
 
+    // TODO parameterise
+    protected int yearsToCrunch = 4;
+
     public Cruncher(final List<CarbonFactor> cfactors2,
             final List<WeightingFactor> wfactors2) {
         this.cfactors = cfactors2;
@@ -51,27 +55,35 @@ public class Cruncher implements digital.srp.sreport.model.surveys.SduQuestions 
 
 
     public SurveyReturn calculate(SurveyReturn rtn) {
-        calcScope1(rtn);
-        calcScope2(rtn);
+        String currentPeriod = rtn.applicablePeriod();
+        List<String> periods = PeriodUtil.fillBackwards(currentPeriod, 4);
+        for (int i = 0; i < periods.size(); i++) {
+            rtn.applicablePeriod(periods.get(i));
+            calcScope1(rtn);
+            calcScope2(rtn);
 
-        calcScope3(rtn);
-        rtn.answers().add(
-                sumAnswers(rtn, Q.SCOPE_ALL, Q.SCOPE_1, Q.SCOPE_2, Q.SCOPE_3));
+            calcScope3(rtn);
+            rtn.answers().add(sumAnswers(rtn, Q.SCOPE_ALL, Q.SCOPE_1, Q.SCOPE_2,
+                    Q.SCOPE_3));
 
-        // TODO Outside scopes -Breakdown - not included in carbon emissions totals
-        try {
-            if (Boolean.parseBoolean(rtn.answer(Q.ECLASS_USER, rtn.applicablePeriod()).response())) {
-                calcCarbonProfileEClassMethod(rtn);
-            } else {
-                calcCarbonProfileSduMethod(rtn);
+            // TODO Outside scopes -Breakdown - not included in carbon emissions
+            // totals
+            try {
+                if (Boolean.parseBoolean(
+                        rtn.answer(Q.ECLASS_USER, currentPeriod).response())) {
+                    calcCarbonProfileEClassMethod(rtn);
+                } else {
+                    calcCarbonProfileSduMethod(rtn);
+                }
+                calcTrendOverTime(rtn);
+            } catch (IllegalStateException | SReportObjectNotFoundException e) {
+                LOGGER.warn(e.getMessage());
+            } catch (Exception e) {
+                LOGGER.error(e.getMessage());
             }
-            calcTrendOverTime(rtn);
-        } catch (IllegalStateException | SReportObjectNotFoundException e) {
-            LOGGER.warn(e.getMessage());
-        } catch (Exception e) {
-            LOGGER.error(e.getMessage());
         }
 
+        rtn.applicablePeriod(currentPeriod);
         return rtn;
     }
 

@@ -17,6 +17,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import digital.srp.sreport.importers.CarbonFactorCsvImporter;
 import digital.srp.sreport.importers.WeightingFactorCsvImporter;
+import digital.srp.sreport.internal.PeriodUtil;
 import digital.srp.sreport.model.CarbonFactor;
 import digital.srp.sreport.model.CarbonFactors;
 import digital.srp.sreport.model.Q;
@@ -25,10 +26,112 @@ import digital.srp.sreport.model.WeightingFactor;
 
 public class CruncherTest {
 
-    private static final String DATA_FILE = "/returns/%1$s.json";
+    private /* static final */String[] ANAESTHETIC_GASES_CO2E = { "5,840",
+            "6,430", "10,500", "13,100", "0", "0", "0", "0", "0", "0" };
+
+    private /* static final */String[] CITIZEN_CO2E = { "122", "135", "125",
+            "157", "0", "0", "0", "0", "0", "0" };
+
+    private /* static final */String[] PROCUREMENT_CO2E = { "17,500", "19,200",
+            "20,900", "21,500", "0", "0", "0", "0", "0", "0" };
+
+    private /* static final */String[] CORE_CO2E = { "8,720", "9,650", "13,900",
+            "17,000", "0", "0", "0", "0", "0", "0" };
+
+    private /* static final */String[] COMMISSIONING_CO2E = { "1,250", "1,370",
+            "1,490", "1,530", "0", "0", "0", "0", "0", "0" };
+
+    private /* static final */String[] TRAVEL_CO2E = { "2,370", "2,610",
+            "2,840", "2,920", "0", "0", "0", "0", "0", "0" };
+
+    private /* static final */String[] PHARMA_CO2E = { "94.6", "104", "113",
+            "116", "0", "0", "0", "0", "0", "0" };
+
+    private /* static final */String[] PAPER_CO2E = { "997", "1,100", "1,190",
+            "1,230", "0", "0", "0", "0", "0", "0" };
+
+    private /* static final */String[] OTHER_MANUFACTURED_CO2E = { "508", "558",
+            "608", "624", "0", "0", "0", "0", "0", "0" };
+
+    private /* static final */String[] MED_INSTR_CO2E = { "4,450", "4,890",
+            "5,330", "5,470", "0", "0", "0", "0", "0", "0" };
+
+    private /* static final */String[] CHEM_AND_GAS_CO2E = { "1,220", "1,340",
+            "1,460", "1,500", "0", "0", "0", "0", "0", "0" };
+
+    private /* static final */String[] ICT_CO2E = { "379", "416", "453", "466",
+            "0", "0", "0", "0", "0", "0" };
+
+    private /* static final */String[] FREIGHT_CO2E = { "2,140", "2,350",
+            "2,560", "2,630", "0", "0", "0", "0", "0", "0" };
+
+    private /* static final */String[] CATERING_CO2E = { "1,430", "1,570",
+            "1,720", "1,760", "0", "0", "0", "0", "0", "0" };
+
+    private /* static final */String[] CONSTRUCTION_CO2E = { "829", "911",
+            "992", "1,020", "0", "0", "0", "0", "0", "0" };
+
+    private /* static final */String[] BIZ_SVCS_CO2E = { "4,180", "4,600",
+            "5,010", "5,140", "0", "0", "0", "0", "0", "0" };
+
+    private /* static final */String[] WASTE_AND_WATER_CO2E = { "68", "74",
+            "80", "90", "0", "0", "0", "0", "0", "0" };
+
+    private /* static final */String[] SCOPE_3_WASTE = { "3", "3", "3", "5",
+            "0", "0", "0", "0", "0", "0" };
+
+    private /* static final */String[] SCOPE_3_WATER = { "65", "71", "77", "85",
+            "0", "0", "0", "0", "0", "0" };
+
+    private /* static final */String[] WATER_TREATMENT_CO2E = { "43", "47",
+            "51", "57", "0", "0", "0", "0", "0", "0" };
+
+    private /* static final */String[] WATER_CO2E = { "22", "24", "26", "28",
+            "0", "0", "0", "0", "0", "0" };
+
+    private /* static final */String[] SCOPE_2 = { "563", "666", "653", "743",
+            "0", "0", "0", "0", "0", "0" };
+
+    private /* static final */String[] NET_ELEC_CO2E = { "339", "398", "394",
+            "435", "0", "0", "0", "0", "0", "0" };
+
+    private /* static final */String[] NET_THERMAL_ENERGY_CO2E = { "224", "268",
+            "259", "308", "0", "0", "0", "0", "0", "0" };
+
+    private /* static final */String[] SCOPE_1 = { "7,910", "8,710", "13,000",
+            "16,000", "0", "0", "0", "0", "0", "0" };
+
+    private /* static final */String[] PORTABLE_NITROUS_OXIDE_MIX_MATERNITY_CO2E = {
+            "0", "0", "0", "0", "0", "0", "0", "0", "0", "0" };
+
+    private /* static final */String[] PORTABLE_NITROUS_OXIDE_MIX_CO2E = {
+            "1.39", "1.53", "1.67", "1.95", "0", "0", "0", "0", "0", "0" };
+
+    private /* static final */String[] NITROUS_OXIDE_CO2E = { "2.24", "2.46",
+            "2.8", "3.3", "0", "0", "0", "0", "0", "0" };
+
+    private /* static final */String[] SEVOFLURANE_CO2E = { "594", "653", "791",
+            "752", "0", "0", "0", "0", "0", "0" };
+
+    private /* static final */String[] ISOFLURANE_CO2E = { "1,530", "1,680",
+            "2,290", "3,050", "0", "0", "0", "0", "0", "0" };
+
+    private /* static final */String[] DESFLURANE_CO2E = { "3,720", "4,090",
+            "7,440", "9,300", "0", "0", "0", "0", "0", "0" };
+
+    private /* static final */String[] OWNED_VEHICLES = { "142", "157", "171",
+            "188", "0", "0", "0", "0", "0", "0" };
+
+    private /* static final */String[] OWNED_BUILDINGS_GAS = { "1,930", "2,120",
+            "2,290", "2,680", "0", "0", "0", "0", "0", "0" };
+
+    private /* static final */String DATA_FILE = "/returns/%1$s.json";
+
+    private /* static final */String[] OTHER_PROCUREMENT_CO2E = { "0", "0", "0",
+            "0", "0", "0", "0", "0", "0", "0" };
 
     private static ObjectMapper objectMapper;
-    
+
     private static List<CarbonFactor> cfactors;
     private static List<WeightingFactor> wfactors;
     private static Cruncher cruncher;
@@ -36,88 +139,167 @@ public class CruncherTest {
     @BeforeClass
     public static void setUpClass() throws IOException {
         objectMapper = new ObjectMapper();
-        cfactors = new CarbonFactorCsvImporter()
-                .readCarbonFactors();
-        wfactors = new WeightingFactorCsvImporter()
-                .readWeightingFactors();
+        cfactors = new CarbonFactorCsvImporter().readCarbonFactors();
+        wfactors = new WeightingFactorCsvImporter().readWeightingFactors();
         cruncher = new Cruncher(cfactors, wfactors);
     }
-    
-    
+
     @Test
     public void testFindCFactorByName() {
-        assertEquals(new BigDecimal("0.183997"), 
+        assertEquals(new BigDecimal("0.183997"),
                 cruncher.cFactor(CarbonFactors.NATURAL_GAS, "2016-17").value());
     }
-    
+
     @Test
     public void testCrunchRDR() {
         SurveyReturn rdr = readSurveyReturn("RDR");
         SurveyReturn rtn = cruncher.calculate(rdr);
-        
+
         assertNotNull(rtn);
-        assertEquals("RDR", rtn.answer(Q.ORG_CODE, rtn.applicablePeriod()).response());
+        List<String> periods = PeriodUtil.fillBackwards(rtn.applicablePeriod(),
+                4);
+        for (int i = 0; i < periods.size(); i++) {
+            String period = periods.get(i);
+            // Performance and Policy only relevant to current year
+            if (i == 0) {
+                assertEquals(String.format("Assertion for period %1$d", i),
+                        "RDR", rtn.answer(Q.ORG_CODE, period).response());
+            }
 
-        // SCOPE 1: DIRECT
-        assertEquals("1,930", rtn.answer(Q.OWNED_BUILDINGS_GAS, rtn.applicablePeriod()).response3sf());
-        assertEquals("142", rtn.answer(Q.OWNED_VEHICLES, rtn.applicablePeriod()).response3sf());
-        
-        // ANAESTHETIC GASES
-        assertEquals("3,720", rtn.answer(Q.DESFLURANE_CO2E, rtn.applicablePeriod()).response3sf());
-        assertEquals("1,530", rtn.answer(Q.ISOFLURANE_CO2E, rtn.applicablePeriod()).response3sf());
-        assertEquals("594", rtn.answer(Q.SEVOFLURANE_CO2E, rtn.applicablePeriod()).response3sf());
-        assertEquals("2.24", rtn.answer(Q.NITROUS_OXIDE_CO2E, rtn.applicablePeriod()).response3sf());
-        assertEquals("1.39", rtn.answer(Q.PORTABLE_NITROUS_OXIDE_MIX_CO2E, rtn.applicablePeriod()).response3sf());
-        assertEquals("0", rtn.answer(Q.PORTABLE_NITROUS_OXIDE_MIX_MATERNITY_CO2E, rtn.applicablePeriod()).response3sf());
-        // Total the 6 above
-        assertEquals("5,840", rtn.answer(Q.ANAESTHETIC_GASES_CO2E, rtn.applicablePeriod()).response3sf());
+            // SCOPE 1: DIRECT
+            assertEquals(String.format("Assertion for period %1$d", i),
+                    OWNED_BUILDINGS_GAS[i],
+                    rtn.answer(Q.OWNED_BUILDINGS_GAS, period).response3sf());
+            assertEquals(String.format("Assertion for period %1$d", i),
+                    OWNED_VEHICLES[i],
+                    rtn.answer(Q.OWNED_VEHICLES, period).response3sf());
 
-        assertEquals("7,910", rtn.answer(Q.SCOPE_1, rtn.applicablePeriod()).response3sf());
-        // END SCOPE 1
-        
-        // SCOPE 2: INDIRECT
-        assertEquals("224", rtn.answer(Q.NET_THERMAL_ENERGY_CO2E, rtn.applicablePeriod()).response3sf());
-        assertEquals("339", rtn.answer(Q.NET_ELEC_CO2E, rtn.applicablePeriod()).response3sf());
-        assertEquals("563", rtn.answer(Q.SCOPE_2, rtn.applicablePeriod()).response3sf());
-        
-        // SCOPE 3: INDIRECT (SUPPLY CHAIN)
-        assertEquals("22", rtn.answer(Q.WATER_CO2E, rtn.applicablePeriod()).response3sf());
-        assertEquals("43", rtn.answer(Q.WATER_TREATMENT_CO2E, rtn.applicablePeriod()).response3sf());
-        assertEquals("65", rtn.answer(Q.SCOPE_3_WATER, rtn.applicablePeriod()).response3sf());
-        // RDR 15-16 example has 29 but questions don't match, this is a subset
-        assertEquals("3", rtn.answer(Q.SCOPE_3_WASTE, rtn.applicablePeriod()).response3sf());
-        
-        // ECLASS_USER must be false or missing to get SDU procurement estimates
-        assertTrue(!Boolean.parseBoolean(rtn.answer(Q.ECLASS_USER, rtn.applicablePeriod()).response()));
-        // These numbers don't match the RDR 15-16 spreadsheet, but close. Rounding? Or slightly updated factors?
-        assertEquals("68", rtn.answer(Q.WASTE_AND_WATER_CO2E, rtn.applicablePeriod()).response3sf());
-        assertEquals("4,180", rtn.answer(Q.BIZ_SVCS_CO2E, rtn.applicablePeriod()).response3sf());
-        assertEquals("829", rtn.answer(Q.CONSTRUCTION_CO2E, rtn.applicablePeriod()).response3sf());
-        assertEquals("1,430", rtn.answer(Q.CATERING_CO2E, rtn.applicablePeriod()).response3sf());
-        assertEquals("2,140", rtn.answer(Q.FREIGHT_CO2E, rtn.applicablePeriod()).response3sf());
-        assertEquals("379", rtn.answer(Q.ICT_CO2E, rtn.applicablePeriod()).response3sf());
-        assertEquals("1,220", rtn.answer(Q.CHEM_AND_GAS_CO2E, rtn.applicablePeriod()).response3sf());
-        assertEquals("4,450", rtn.answer(Q.MED_INSTR_CO2E, rtn.applicablePeriod()).response3sf());
-        assertEquals("508", rtn.answer(Q.OTHER_MANUFACTURED_CO2E, rtn.applicablePeriod()).response3sf());
-        assertEquals("0", rtn.answer(Q.OTHER_PROCUREMENT_CO2E, rtn.applicablePeriod()).response3sf());
-        assertEquals("997", rtn.answer(Q.PAPER_CO2E, rtn.applicablePeriod()).response3sf());
-        assertEquals("94.6", rtn.answer(Q.PHARMA_CO2E, rtn.applicablePeriod()).response3sf());
-        assertEquals("2,370", rtn.answer(Q.TRAVEL_CO2E, rtn.applicablePeriod()).response3sf());
-        assertEquals("1,250", rtn.answer(Q.COMMISSIONING_CO2E, rtn.applicablePeriod()).response3sf());
+            // ANAESTHETIC GASES
+            assertEquals(String.format("Assertion for period %1$d", i),
+                    DESFLURANE_CO2E[i],
+                    rtn.answer(Q.DESFLURANE_CO2E, period).response3sf());
+            assertEquals(String.format("Assertion for period %1$d", i),
+                    ISOFLURANE_CO2E[i],
+                    rtn.answer(Q.ISOFLURANE_CO2E, period).response3sf());
+            assertEquals(String.format("Assertion for period %1$d", i),
+                    SEVOFLURANE_CO2E[i],
+                    rtn.answer(Q.SEVOFLURANE_CO2E, period).response3sf());
+            assertEquals(String.format("Assertion for period %1$d", i),
+                    NITROUS_OXIDE_CO2E[i],
+                    rtn.answer(Q.NITROUS_OXIDE_CO2E, period).response3sf());
+            assertEquals(String.format("Assertion for period %1$d", i),
+                    PORTABLE_NITROUS_OXIDE_MIX_CO2E[i],
+                    rtn.answer(Q.PORTABLE_NITROUS_OXIDE_MIX_CO2E, period)
+                            .response3sf());
+            assertEquals(String.format("Assertion for period %1$d", i),
+                    PORTABLE_NITROUS_OXIDE_MIX_MATERNITY_CO2E[i],
+                    rtn.answer(Q.PORTABLE_NITROUS_OXIDE_MIX_MATERNITY_CO2E,
+                            period).response3sf());
+            // Total the 6 above
+            assertEquals(String.format("Assertion for period %1$d", i),
+                    ANAESTHETIC_GASES_CO2E[i],
+                    rtn.answer(Q.ANAESTHETIC_GASES_CO2E, period).response3sf());
 
-        assertEquals("8,720", rtn.answer(Q.CORE_CO2E, rtn.applicablePeriod()).response3sf());
-        assertEquals("17,500", rtn.answer(Q.PROCUREMENT_CO2E, rtn.applicablePeriod()).response3sf());
-        assertEquals("122", rtn.answer(Q.CITIZEN_CO2E, rtn.applicablePeriod()).response3sf());
-        
+            assertEquals(String.format("Assertion for period %1$d", i),
+                    SCOPE_1[i], rtn.answer(Q.SCOPE_1, period).response3sf());
+            // END SCOPE 1
+
+            // // SCOPE 2: INDIRECT
+            assertEquals(String.format("Assertion for period %1$d", i),
+                    NET_THERMAL_ENERGY_CO2E[i],
+                    rtn.answer(Q.NET_THERMAL_ENERGY_CO2E, period)
+                            .response3sf());
+            assertEquals(String.format("Assertion for period %1$d", i),
+                    NET_ELEC_CO2E[i],
+                    rtn.answer(Q.NET_ELEC_CO2E, period).response3sf());
+            assertEquals(String.format("Assertion for period %1$d", i),
+                    SCOPE_2[i], rtn.answer(Q.SCOPE_2, period).response3sf());
+
+            // SCOPE 3: INDIRECT (SUPPLY CHAIN)
+            assertEquals(String.format("Assertion for period %1$d", i),
+                    WATER_CO2E[i],
+                    rtn.answer(Q.WATER_CO2E, period).response3sf());
+            assertEquals(String.format("Assertion for period %1$d", i),
+                    WATER_TREATMENT_CO2E[i],
+                    rtn.answer(Q.WATER_TREATMENT_CO2E, period).response3sf());
+            assertEquals(String.format("Assertion for period %1$d", i),
+                    SCOPE_3_WATER[i],
+                    rtn.answer(Q.SCOPE_3_WATER, period).response3sf());
+            // RDR 15-16 example has 29 but questions don't match, this is a
+            // subset
+            assertEquals(String.format("Assertion for period %1$d", i),
+                    SCOPE_3_WASTE[i],
+                    rtn.answer(Q.SCOPE_3_WASTE, period).response3sf());
+
+            // ECLASS_USER must be false or missing to get SDU procurement
+            // estimates
+            assertTrue(!Boolean.parseBoolean(
+                    rtn.answer(Q.ECLASS_USER, period).response()));
+            // These numbers don't match the RDR 15-16 spreadsheet, but close.
+            // Rounding? Or slightly updated factors?
+            assertEquals(String.format("Assertion for period %1$d", i),
+                    WASTE_AND_WATER_CO2E[i],
+                    rtn.answer(Q.WASTE_AND_WATER_CO2E, period).response3sf());
+            assertEquals(String.format("Assertion for period %1$d", i),
+                    BIZ_SVCS_CO2E[i],
+                    rtn.answer(Q.BIZ_SVCS_CO2E, period).response3sf());
+            assertEquals(String.format("Assertion for period %1$d", i),
+                    CONSTRUCTION_CO2E[i],
+                    rtn.answer(Q.CONSTRUCTION_CO2E, period).response3sf());
+            assertEquals(String.format("Assertion for period %1$d", i),
+                    CATERING_CO2E[i],
+                    rtn.answer(Q.CATERING_CO2E, period).response3sf());
+            assertEquals(String.format("Assertion for period %1$d", i),
+                    FREIGHT_CO2E[i],
+                    rtn.answer(Q.FREIGHT_CO2E, period).response3sf());
+            assertEquals(String.format("Assertion for period %1$d", i),
+                    ICT_CO2E[i], rtn.answer(Q.ICT_CO2E, period).response3sf());
+            assertEquals(String.format("Assertion for period %1$d", i),
+                    CHEM_AND_GAS_CO2E[i],
+                    rtn.answer(Q.CHEM_AND_GAS_CO2E, period).response3sf());
+            assertEquals(String.format("Assertion for period %1$d", i),
+                    MED_INSTR_CO2E[i],
+                    rtn.answer(Q.MED_INSTR_CO2E, period).response3sf());
+            assertEquals(String.format("Assertion for period %1$d", i),
+                    OTHER_MANUFACTURED_CO2E[i],
+                    rtn.answer(Q.OTHER_MANUFACTURED_CO2E, period)
+                            .response3sf());
+            assertEquals(String.format("Assertion for period %1$d", i),
+                    OTHER_PROCUREMENT_CO2E[i],
+                    rtn.answer(Q.OTHER_PROCUREMENT_CO2E, period).response3sf());
+            assertEquals(String.format("Assertion for period %1$d", i),
+                    PAPER_CO2E[i],
+                    rtn.answer(Q.PAPER_CO2E, period).response3sf());
+            assertEquals(String.format("Assertion for period %1$d", i),
+                    PHARMA_CO2E[i],
+                    rtn.answer(Q.PHARMA_CO2E, period).response3sf());
+            assertEquals(String.format("Assertion for period %1$d", i),
+                    TRAVEL_CO2E[i],
+                    rtn.answer(Q.TRAVEL_CO2E, period).response3sf());
+            assertEquals(String.format("Assertion for period %1$d", i),
+                    COMMISSIONING_CO2E[i],
+                    rtn.answer(Q.COMMISSIONING_CO2E, period).response3sf());
+
+            assertEquals(String.format("Assertion for period %1$d", i),
+                    CORE_CO2E[i],
+                    rtn.answer(Q.CORE_CO2E, period).response3sf());
+            assertEquals(String.format("Assertion for period %1$d", i),
+                    PROCUREMENT_CO2E[i],
+                    rtn.answer(Q.PROCUREMENT_CO2E, period).response3sf());
+            assertEquals(String.format("Assertion for period %1$d", i),
+                    CITIZEN_CO2E[i],
+                    rtn.answer(Q.CITIZEN_CO2E, period).response3sf());
+        }
     }
 
     private SurveyReturn readSurveyReturn(String org) {
         String dataFile = String.format(DATA_FILE, org.toLowerCase());
         try (InputStream is = getClass().getResourceAsStream(dataFile)) {
-            assertNotNull(String.format("Unable to find test data at %1$s",
-                    dataFile), is);
+            assertNotNull(
+                    String.format("Unable to find test data at %1$s", dataFile),
+                    is);
 
-             return objectMapper.readValue(is, SurveyReturn.class);
+            return objectMapper.readValue(is, SurveyReturn.class);
         } catch (IOException e) {
             e.printStackTrace();
             fail();
