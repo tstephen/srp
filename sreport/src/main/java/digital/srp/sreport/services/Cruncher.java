@@ -190,6 +190,7 @@ public class Cruncher implements digital.srp.sreport.model.surveys.SduQuestions 
                             .applicablePeriod(period)
                             .status(StatusType.Draft.name());
 //                    answerRepo.save(answer);
+                    rtn.answers().add(answer);
                 }
                 return answer;
             } catch (Exception e) {
@@ -507,7 +508,7 @@ public class Cruncher implements digital.srp.sreport.model.surveys.SduQuestions 
 
             BigDecimal elecFactor = oneThousandth(cFactor(CarbonFactors.ELECTRICITY_UK, period));
             BigDecimal elecUsed = nonRenewableElecUsed.add(greenTariffUsed).add(thirdPtyRenewableUsed).multiply(elecFactor);
-            getAnswer(period,rtn, Q.ELEC_USED_CO2E).response(elecUsed.toPlainString());
+            getAnswer(period,rtn, Q.ELEC_CO2E).response(elecUsed.toPlainString());
 
             BigDecimal elecExported = new BigDecimal(rtn.answer(Q.ELEC_EXPORTED, period).response()).multiply(oneThousandth(cFactor(CarbonFactors.GAS_FIRED_CHP, period)));
             getAnswer(period,rtn, Q.ELEC_EXPORTED_CO2E).response(elecExported.toPlainString());
@@ -556,7 +557,7 @@ public class Cruncher implements digital.srp.sreport.model.surveys.SduQuestions 
             try {
                 calcVal = calcVal.add(new BigDecimal(rtn.answer(src, period).response()));
             } catch (NullPointerException e) {
-                LOGGER.warn("Insufficient data to calculate CO2e from %1$s", src);
+                LOGGER.warn("Insufficient data to calculate CO2e from {}", src);
             }
         }
         return getAnswer(period, rtn, trgtQName).response(calcVal.toPlainString());
@@ -570,9 +571,9 @@ public class Cruncher implements digital.srp.sreport.model.surveys.SduQuestions 
             calcVal = new BigDecimal(rtn.answer(srcQ, period).response())
                     .multiply(cFactor);
         } catch (NullPointerException e) {
-            LOGGER.warn("Insufficient data to calculate CO2e from %1$s", srcQ);
+            LOGGER.warn("Insufficient data to calculate CO2e from {}", srcQ);
         } catch (NumberFormatException e) {
-            LOGGER.error("Cannot calculate CO2e from %1$s", srcQ);
+            LOGGER.error("Cannot calculate CO2e from {}", srcQ);
         }
         return getAnswer(period, rtn, trgtQ).response(calcVal.toPlainString());
     }

@@ -31,8 +31,9 @@ import digital.srp.sreport.model.SurveyCategory;
 import digital.srp.sreport.model.SurveyReturn;
 import digital.srp.sreport.model.surveys.Eric1516;
 import digital.srp.sreport.model.surveys.Sdu1617;
+import digital.srp.sreport.model.surveys.SduQuestions;
 
-public class SustainabilityReturnStepDefs extends IntegrationTestSupport {
+public class SustainabilityReturnStepDefs extends IntegrationTestSupport implements SduQuestions {
 
     private SurveyReturn rtn;
 
@@ -261,7 +262,28 @@ public class SustainabilityReturnStepDefs extends IntegrationTestSupport {
         assertTrue("Last updated date is not set to today", DateUtils.isToday(rtn.lastUpdated()));
         assertNotNull("Last updated by is not set", rtn.updatedBy());
     }
-    
+
+    protected void specified_calculations_are_present(Q[] headers, int minNoOfYears) throws Throwable {
+        List<String> periods = PeriodUtil.fillBackwards(rtn.applicablePeriod(), minNoOfYears);
+        for (String p : periods) {
+            for (Q q : headers) {
+                Answer answer = rtn.answer(q, p);
+                assertNotNull(String.format("Missing %1$s for %2$s", q.name(), p), answer);
+                assertNotNull(answer.response());
+            }
+        }
+    }
+
+    @Then("^calculations for Energy emissions are present for (\\d+) years \\(at least\\)$")
+    public void calculations_for_energy_emissions_are_present_for_years_at_least(int minNoOfYears) throws Throwable {
+        specified_calculations_are_present(ENERGY_CO2E_HDRS, minNoOfYears);
+    }
+
+    @Then("^calculations for SDU Carbon profile are present for (\\d+) years \\(at least\\)$")
+    public void calculations_for_SDU_Carbon_profile_are_present(int minNoOfYears) throws Throwable {
+        specified_calculations_are_present(SDU_CARBON_PROFILE_HDRS, minNoOfYears);
+    }
+
     @When("^the SDU (\\d+)-(\\d+) return of (\\w+) for period (\\d+)-(\\d+) is requested$")
     public void the_SDU_return_of_for_period_is_requested(int qStartYear, int qEndYear, String org, int aStartYear, int aEndYear) throws Throwable {
         executeGet("/returns/findCurrentBySurveyOrgAndPeriod/"+getSduSurveyName(qStartYear, qEndYear)+"/"+org+"/"+aStartYear+"-"+(aEndYear-2000));

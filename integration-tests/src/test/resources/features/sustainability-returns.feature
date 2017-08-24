@@ -18,11 +18,11 @@ Feature: Sustainability Returns
      Then the list of 308 available questions is returned
 
 #  Scenario: CRUD Survey
-#  
+#
 #  Scenario: Assign questions to survey and categorise
-# 
+#
 #  Scenario: Import answers for single org, survey type and period
- 
+
   Scenario: List available surveys
     Given the user is logged in
      When a list of surveys is requested
@@ -38,7 +38,7 @@ Feature: Sustainability Returns
      When the survey SDU-2016-17 is requested
      Then the full survey for 2016-17 comprising 114 questions is returned
       And all questions have a label
-  
+
   Scenario: List available returns
     Given the user is logged in
      When a list of returns is requested for organisation RDR
@@ -52,14 +52,16 @@ Feature: Sustainability Returns
       And the return contains pro-forma answers for 4 years (at least)
      When the RDR return is updated with ELEC_USED, GAS_USED and WATER_VOL and uploaded
      Then the RDR return for 2016-17 is available with status 'Draft' and audit data is set
+      And calculations for Energy emissions are present for 4 years (at least)
+      And calculations for SDU Carbon profile are present for 4 years (at least)
      When historic ERIC data is imported for RDR 2016-17
      Then 4 years answers exist for ELEC_USED, GAS_USED and WATER_VOL
 
-  Scenario: Submit return
-    Given the user is logged in
-      And the SDU 2016-17 return of RDR is complete
-     When the user submits the return
-     Then the RDR return for 2016-17 is available with status 'Submitted' and audit data is set
-      And it is no longer available for edit
-     When the user restates the return
-     Then the RDR return for 2016-17 is available with status 'Draft' and audit data is set
+#  Scenario: Submit return
+#    Given the user is logged in
+#      And the SDU 2016-17 return of RDR is complete
+#     When the user submits the return
+#     Then the RDR return for 2016-17 is available with status 'Submitted' and audit data is set
+#      And it is no longer available for edit
+#     When the user restates the return
+#     Then the RDR return for 2016-17 is available with status 'Draft' and audit data is set

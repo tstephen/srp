@@ -18,7 +18,7 @@ select * from SR_ANSWER where id not in (Select answer_id from SR_RETURN_ANSWER)
 
 /* find non-unique answers */
 select count(id), question_id from SR_ANSWER where id in (
-  Select answer_id from SR_RETURN_ANSWER where survey_return_id = 956)
+  Select answer_id from SR_RETURN_ANSWER where survey_return_id = 480)
 group by question_id having count(id) > 1;
 
 select count(id), question_id from SR_ANSWER where id in (
@@ -43,11 +43,24 @@ AND s.name = 'ERIC-2015-16';
 /*
  * Investigate duplicated answers
  */
-select a.id,a.revision,r.org,q.id,q.name,response
+select a.id,a.revision,r.org,r.survey_id,q.id,q.name,response
   from SR_ANSWER a
     INNER JOIN SR_RETURN_ANSWER ra on ra.answer_id = a.id
     INNER JOIN SR_RETURN r on r.id = ra.survey_return_id
     INNER JOIN SR_QUESTION q on q.id = a.question_id
-  where q.name = 'OWNED_BUILDINGS_GAS' and a.applicable_period = '2016-17';
+  where q.name = 'ELEC_USED'
+  -- and a.applicable_period = '2015-16'
+  and org = 'RD1'
+  order by org;
+
+select a.revision,r.org,q.id,q.name,response,a.applicable_period,count(a.id) as cnt
+  from SR_ANSWER a
+    INNER JOIN SR_RETURN_ANSWER ra on ra.answer_id = a.id
+    INNER JOIN SR_RETURN r on r.id = ra.survey_return_id
+    INNER JOIN SR_QUESTION q on q.id = a.question_id
+where org = 'RD1'
+GROUP BY a.revision,r.org,q.id,q.name,a.applicable_period,response
+HAVING cnt>1
+ORDER BY q.name,a.applicable_period;
 
 
