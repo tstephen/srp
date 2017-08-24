@@ -156,15 +156,7 @@ public class Question {
     @JsonProperty("optionNames")
     @JsonView({ QuestionViews.Detailed.class, SurveyViews.Detailed.class })
     public Question optionNames(List<String> optionNames) {
-        if (optionNames != null && optionNames.size() > 0) {
-            StringBuilder sb = new StringBuilder();
-            for (String option : optionNames) {
-                sb.append(option.trim()).append(",");
-            }
-            if (!this.optionNames.equals(sb.toString())) {
-                this.optionNames = sb.toString();
-            }
-        }
+        this.optionNames = String.join(",", optionNames);
         return this;
     }
 

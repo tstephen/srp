@@ -1,6 +1,7 @@
 package digital.srp.sreport.model;
 
 import java.math.BigDecimal;
+import java.security.Principal;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -8,6 +9,7 @@ import java.util.Set;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EntityListeners;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -28,7 +30,11 @@ import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.domain.AuditorAware;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import org.springframework.hateoas.Link;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonView;
@@ -55,8 +61,9 @@ import lombok.experimental.Accessors;
 @EqualsAndHashCode(exclude = { "id", "surveyReturns" })
 @NoArgsConstructor
 @Entity
+@EntityListeners(AuditingEntityListener.class)
 @Table(name= "SR_ANSWER")
-public class Answer {
+public class Answer implements AuditorAware<String> {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -122,7 +129,7 @@ public class Answer {
     @JsonView({ AnswerViews.Detailed.class })
     @Column(name = "created", nullable = false, updatable = false)
     @CreatedDate
-    private long created;
+    private Date created;
 
     @JsonView({ AnswerViews.Detailed.class })
     @Column(name = "created_by")
@@ -132,7 +139,7 @@ public class Answer {
     @JsonView({ AnswerViews.Detailed.class })
     @Column(name = "last_updated")
     @LastModifiedDate
-    private long lastUpdated;
+    private Date lastUpdated;
 
     @JsonView({ AnswerViews.Detailed.class })
     @Column(name = "updated_by")
@@ -203,6 +210,113 @@ public class Answer {
     public Answer addSurveyReturn(SurveyReturn rtn) {
         surveyReturns().add(rtn);
         return this;
+    }
+
+    @Override
+    public String getCurrentAuditor() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        if (authentication == null || !authentication.isAuthenticated()) {
+          return null;
+        }
+
+        return ((Principal) authentication.getPrincipal()).getName();
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getResponse() {
+        return response;
+    }
+
+    public void setResponse(String response) {
+        this.response = response;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public String getApplicablePeriod() {
+        return applicablePeriod;
+    }
+
+    public void setApplicablePeriod(String applicablePeriod) {
+        this.applicablePeriod = applicablePeriod;
+    }
+
+    public Short getRevision() {
+        return revision;
+    }
+
+    public void setRevision(Short revision) {
+        this.revision = revision;
+    }
+
+    public Date getSubmittedDate() {
+        return submittedDate;
+    }
+
+    public void setSubmittedDate(Date submittedDate) {
+        this.submittedDate = submittedDate;
+    }
+
+    public String getSubmittedBy() {
+        return submittedBy;
+    }
+
+    public void setSubmittedBy(String submittedBy) {
+        this.submittedBy = submittedBy;
+    }
+
+    public Date getCreated() {
+        return created;
+    }
+
+    public void setCreated(Date created) {
+        this.created = created;
+    }
+
+    public String getCreatedBy() {
+        return createdBy;
+    }
+
+    public void setCreatedBy(String createdBy) {
+        this.createdBy = createdBy;
+    }
+
+    public Date getLastUpdated() {
+        return lastUpdated;
+    }
+
+    public void setLastUpdated(Date lastUpdated) {
+        this.lastUpdated = lastUpdated;
+    }
+
+    public String getUpdatedBy() {
+        return updatedBy;
+    }
+
+    public void setUpdatedBy(String updatedBy) {
+        this.updatedBy = updatedBy;
+    }
+
+    public List<Link> getLinks() {
+        return links;
+    }
+
+    public void setLinks(List<Link> links) {
+        this.links = links;
     }
 
 }

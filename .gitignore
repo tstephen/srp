@@ -4,6 +4,7 @@
 .springBeans
 .DS_Store
 *.bak
+*.dis
 *.log
 *.log.*
 */application.properties

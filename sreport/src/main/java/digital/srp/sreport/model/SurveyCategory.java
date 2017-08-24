@@ -122,6 +122,38 @@ public class SurveyCategory {
         }
         return questions;
     }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getQuestionNames() {
+        return questionNames;
+    }
+
+    public void setQuestionNames(String questionNames) {
+        this.questionNames = questionNames;
+    }
+
+    public List<Link> getLinks() {
+        return links;
+    }
+
+    public void setLinks(List<Link> links) {
+        this.links = links;
+    }
     
 //    public SurveyQuestion question(String qName) {
 //        for (SurveyQuestion q : questions) {

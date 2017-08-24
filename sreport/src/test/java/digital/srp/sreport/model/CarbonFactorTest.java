@@ -21,9 +21,9 @@ public class CarbonFactorTest {
                 .value(new BigDecimal("0.46673"))
                 .applicablePeriod("2007-08")
                 .scope("2")
-                .created(new Date().getTime())
+                .created(new Date())
                 .createdBy("tstephen")
-                .lastUpdated(new Date().getTime());
+                .lastUpdated(new Date());
 
         CarbonFactor factor2 = new CarbonFactor()
                 .category("Electricity generated")

@@ -1,6 +1,7 @@
 package digital.srp.sreport.web;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
@@ -29,6 +30,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import com.fasterxml.jackson.annotation.JsonView;
 
+import digital.srp.sreport.internal.NullAwareBeanUtils;
 import digital.srp.sreport.model.Answer;
 import digital.srp.sreport.model.Q;
 import digital.srp.sreport.model.Question;
@@ -179,7 +181,6 @@ public class SurveyReturnController {
 
     @RequestMapping(value = "/findCurrentBySurveyNameAndOrg/{surveyName}/{org}", method = RequestMethod.GET)
     @JsonView(SurveyReturnViews.Detailed.class)
-//    @Transactional
     public @ResponseBody SurveyReturn findCurrentBySurveyNameAndOrg(
             @PathVariable("surveyName") String surveyName,
             @PathVariable("org") String org) {
@@ -357,7 +358,6 @@ public class SurveyReturnController {
      */
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
     @RequestMapping(value = "/{id}", method = RequestMethod.PUT, consumes = { "application/json" })
-    @Transactional
     public @ResponseBody void update(
             @PathVariable("id") Long returnId,
             @RequestBody SurveyReturn updatedReturn) {
@@ -367,6 +367,17 @@ public class SurveyReturnController {
                     "The return %1$d:%2$s has been submitted, you may no longer update. If you've recognised a mistake please re-state the return.", 
                     returnId, existing.name()));
         }
+        int changeCount = createOrMergeAnswers(updatedReturn, existing);
+        NullAwareBeanUtils.copyNonNullProperties(updatedReturn, existing);
+        if (changeCount > 0) {
+            existing.setLastUpdated(new Date());
+        }
+        returnRepo.save(existing);
+    }
+
+    private int createOrMergeAnswers(SurveyReturn updatedReturn,
+            SurveyReturn existing) {
+        int changeCount = 0;
         for (Answer answer : updatedReturn.answers()) {
             Answer existingAnswer = existing.answer(answer.question().q(), answer.applicablePeriod());
             if (existingAnswer.question().id() == null) {
@@ -379,10 +390,14 @@ public class SurveyReturnController {
                 }
                 existingAnswer = answerRepo.save(answer.question(q).addSurveyReturn(existing));
                 existing.answers().add(existingAnswer);
-            } else {
+                changeCount++;
+            } else if (answer.response() != null && !answer.response().equals(existingAnswer.response())) {
+                // note that Hibernate / Spring Data will skip any update if not actually needed
+                changeCount++;
                 existingAnswer.response(answer.response());
             }
         }
+        return changeCount;
     }
     
     /**
@@ -393,16 +408,33 @@ public class SurveyReturnController {
     @Transactional
     public @ResponseBody void restate(
             @PathVariable("id") Long returnId,
-            @RequestBody SurveyReturn updatedReturn) {
+            @RequestBody SurveyReturn updatedRtn) {
         SurveyReturn existing = returnRepo.findOne(returnId);
         existing.status(StatusType.Superceded.name());
+        for (Answer a : existing.answers()) {
+            a.status(StatusType.Superceded.name());
+        }
         returnRepo.save(existing);
         
-        SurveyReturn restatedRtn = createBlankReturn(updatedReturn.survey().name(), updatedReturn.org(), updatedReturn.applicablePeriod())
-                .revision((short) (existing.revision()+1));
-        for (int i = 0; i < restatedRtn.answers().size(); i++) {
-            restatedRtn.answers().get(i)
-                    .response(updatedReturn.answers().get(i).response());
+        SurveyReturn restatedRtn = new SurveyReturn()
+                .name(updatedRtn.name())
+                .org(updatedRtn.org())
+                .status(StatusType.Draft.name())
+                .applicablePeriod(updatedRtn.applicablePeriod())
+                .revision(new Integer(updatedRtn.revision()+1).shortValue())
+                .survey(existing.survey());
+//        SurveyReturn restatedRtn = new SurveyReturn(updatedRtn.name(), 
+//                updatedRtn.org(), StatusType.Draft.name(), updatedRtn.applicablePeriod(),
+//                new Integer(updatedRtn.revision()+1).shortValue())
+//                .survey(existing.survey());
+        for (Answer a : updatedRtn.answers()) {
+            restatedRtn.answers().add(new Answer()
+                    .applicablePeriod(a.applicablePeriod())
+                    .revision(new Integer(a.revision()+1).shortValue())
+                    .status(StatusType.Draft.name())
+                    .response(a.response())
+                    .question(a.question())
+                    .addSurveyReturn(restatedRtn));
         }
         returnRepo.save(restatedRtn);
     }
@@ -418,7 +450,38 @@ public class SurveyReturnController {
                 returnId, status));
 
         SurveyReturn survey = returnRepo.findOne(returnId).status(status);
+        switch (StatusType.valueOf(status)) {
+        case Published:
+            publish(survey);
+            break;
+        case Submitted:
+            submit(survey);
+            break;
+        default:
+            String msg = String.format("Setting return %1$d to %2$s is not allowed", returnId, status);
+            throw new IllegalArgumentException(msg );
+        }
+
         returnRepo.save(survey);
+    }
+
+    protected void submit(SurveyReturn survey) {
+        survey.status(StatusType.Submitted.name());
+        for (Answer a : survey.answers()) {
+            // Cannot overwrite published answers without calling restate
+            if (!a.status().equals(StatusType.Published.name())) {
+                a.setStatus(StatusType.Submitted.name());
+            } else {
+                LOGGER.warn("Cannot set status of answer {} to {} because it's been published", a.id(), a.status());
+            }
+        }
+    }
+
+    protected void publish(SurveyReturn survey) {
+        survey.status(StatusType.Published.name());
+        for (Answer a : survey.answers()) {
+            a.setStatus(StatusType.Published.name());
+        }
     }
 
     /**

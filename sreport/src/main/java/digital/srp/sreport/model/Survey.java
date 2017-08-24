@@ -2,6 +2,7 @@ package digital.srp.sreport.model;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 import javax.persistence.CascadeType;
@@ -18,6 +19,8 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import javax.xml.bind.annotation.XmlElement;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedBy;
@@ -52,6 +55,8 @@ import lombok.experimental.Accessors;
 @EntityListeners(AuditingEntityListener.class)
 @Table(name= "SR_SURVEY")
 public class Survey {
+    
+    private static final Logger LOGGER = LoggerFactory.getLogger(Survey.class);
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -99,7 +104,7 @@ public class Survey {
     
     @Column(name = "created", nullable = false, updatable = false)
     @CreatedDate
-    private long created;
+    private Date created;
  
     @Column(name = "created_by")
     @CreatedBy
@@ -107,7 +112,7 @@ public class Survey {
  
     @Column(name = "last_updated")
     @LastModifiedDate
-    private long lastUpdated;
+    private Date lastUpdated;
 
     @Column(name = "updated_by")
     @LastModifiedBy
@@ -139,8 +144,12 @@ public class Survey {
     @Transient
     public List<Q> questionCodes() {
         ArrayList<Q> questions = new ArrayList<Q>();
-        for (SurveyCategory cat : categories) {
-            questions.addAll(cat.questionEnums());
+        try {
+            for (SurveyCategory cat : categories) {
+                questions.addAll(cat.questionEnums());
+            }
+        } catch (NullPointerException e) {
+            LOGGER.warn("Have no categories in survey {} ({})", name(), id());
         }
         return questions;
     }
@@ -158,8 +167,12 @@ public class Survey {
     @Transient
     public List<Question> questions() {
         ArrayList<Question> questions = new ArrayList<Question>();
-        for (SurveyCategory cat : categories) {
-            questions.addAll(cat.questions());
+        try {
+            for (SurveyCategory cat : categories) {
+                questions.addAll(cat.questions());
+            }
+        } catch (NullPointerException e) {
+            LOGGER.warn("Have no categories in survey {} ({})", name(), id());
         }
         return questions;
     }
@@ -180,6 +193,78 @@ public class Survey {
             }
         }
         return null;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public String getApplicablePeriod() {
+        return applicablePeriod;
+    }
+
+    public void setApplicablePeriod(String applicablePeriod) {
+        this.applicablePeriod = applicablePeriod;
+    }
+
+    public List<Link> getLinks() {
+        return links;
+    }
+
+    public void setLinks(List<Link> links) {
+        this.links = links;
+    }
+
+    public Date getCreated() {
+        return created;
+    }
+
+    public void setCreated(Date created) {
+        this.created = created;
+    }
+
+    public String getCreatedBy() {
+        return createdBy;
+    }
+
+    public void setCreatedBy(String createdBy) {
+        this.createdBy = createdBy;
+    }
+
+    public Date getLastUpdated() {
+        return lastUpdated;
+    }
+
+    public void setLastUpdated(Date lastUpdated) {
+        this.lastUpdated = lastUpdated;
+    }
+
+    public String getUpdatedBy() {
+        return updatedBy;
+    }
+
+    public void setUpdatedBy(String updatedBy) {
+        this.updatedBy = updatedBy;
     }
 
 }

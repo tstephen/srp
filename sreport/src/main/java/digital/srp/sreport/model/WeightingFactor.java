@@ -1,6 +1,7 @@
 package digital.srp.sreport.model;
 
 import java.math.BigDecimal;
+import java.util.Date;
 import java.util.List;
 
 import javax.persistence.Column;
@@ -118,7 +119,7 @@ public class WeightingFactor {
     
     @Column(name = "created", nullable = false, updatable = false)
     @CreatedDate
-    private long created;
+    private Date created;
  
     @Column(name = "created_by")
     @CreatedBy
@@ -126,7 +127,7 @@ public class WeightingFactor {
  
     @Column(name = "last_updated")
     @LastModifiedDate
-    private long lastUpdated;
+    private Date lastUpdated;
 
     @Column(name = "updated_by")
     @LastModifiedBy
@@ -141,6 +142,110 @@ public class WeightingFactor {
 
     public void intensityValue(BigDecimal intensityValue) {
         //this.intensityValue = intensityValue;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getOrgType() {
+        return orgType;
+    }
+
+    public void setOrgType(String orgType) {
+        this.orgType = orgType;
+    }
+
+    public String getCategory() {
+        return category;
+    }
+
+    public void setCategory(String category) {
+        this.category = category;
+    }
+
+    public String getApplicablePeriod() {
+        return applicablePeriod;
+    }
+
+    public void setApplicablePeriod(String applicablePeriod) {
+        this.applicablePeriod = applicablePeriod;
+    }
+
+    public BigDecimal getCarbonValue() {
+        return carbonValue;
+    }
+
+    public void setCarbonValue(BigDecimal carbonValue) {
+        this.carbonValue = carbonValue;
+    }
+
+    public BigDecimal getMoneyValue() {
+        return moneyValue;
+    }
+
+    public void setMoneyValue(BigDecimal moneyValue) {
+        this.moneyValue = moneyValue;
+    }
+
+    public BigDecimal getProportionOfTotal() {
+        return proportionOfTotal;
+    }
+
+    public void setProportionOfTotal(BigDecimal proportionOfTotal) {
+        this.proportionOfTotal = proportionOfTotal;
+    }
+
+    public BigDecimal getIntensityValue() {
+        return intensityValue;
+    }
+
+    public void setIntensityValue(BigDecimal intensityValue) {
+        this.intensityValue = intensityValue;
+    }
+
+    public List<Link> getLinks() {
+        return links;
+    }
+
+    public void setLinks(List<Link> links) {
+        this.links = links;
+    }
+
+    public Date getCreated() {
+        return created;
+    }
+
+    public void setCreated(Date created) {
+        this.created = created;
+    }
+
+    public String getCreatedBy() {
+        return createdBy;
+    }
+
+    public void setCreatedBy(String createdBy) {
+        this.createdBy = createdBy;
+    }
+
+    public Date getLastUpdated() {
+        return lastUpdated;
+    }
+
+    public void setLastUpdated(Date lastUpdated) {
+        this.lastUpdated = lastUpdated;
+    }
+
+    public String getUpdatedBy() {
+        return updatedBy;
+    }
+
+    public void setUpdatedBy(String updatedBy) {
+        this.updatedBy = updatedBy;
     }
 
 }

@@ -1,24 +1,31 @@
 package digital.srp.cucumber.sreport;
 
+import static org.hamcrest.CoreMatchers.anyOf;
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.springframework.http.HttpStatus;
 
 import com.knowprocess.cucumber.IntegrationTestSupport;
 
-import cucumber.api.PendingException;
 import cucumber.api.java.en.Given;
 import cucumber.api.java.en.Then;
 import cucumber.api.java.en.When;
+import digital.srp.sreport.internal.PeriodUtil;
 import digital.srp.sreport.model.Answer;
 import digital.srp.sreport.model.Q;
 import digital.srp.sreport.model.Question;
+import digital.srp.sreport.model.StatusType;
 import digital.srp.sreport.model.Survey;
 import digital.srp.sreport.model.SurveyCategory;
 import digital.srp.sreport.model.SurveyReturn;
@@ -43,7 +50,6 @@ public class SustainabilityReturnStepDefs extends IntegrationTestSupport {
         latestResponse.statusCodeIs(HttpStatus.OK);
         // for example: { "questions": 250, "surveys": 2, "answers": 71,220, "returns": 238, "orgs": 3 }
         String json = latestResponse.getBody();
-        System.out.println("JSON: "+json);
         int start = json.indexOf("\"questions\":")+"\"questions\":".length();
         assertEquals(qCount, Integer.parseInt(json.substring(start, json.indexOf(',', start)).trim()));
         start = json.indexOf("\"answers\":")+"\"answers\":".length();
@@ -128,7 +134,6 @@ public class SustainabilityReturnStepDefs extends IntegrationTestSupport {
                 periods.add(answer.applicablePeriod());
             }
         }
-        assertEquals(yearCount, periods.size());
         for (String period : periods) {
             assertNotNull(
                     String.format("No answer for %1$s in %2$s", q1, period),
@@ -140,6 +145,7 @@ public class SustainabilityReturnStepDefs extends IntegrationTestSupport {
                     String.format("No answer for %1$s in %2$s", q3, period),
                     rtn.answer(Q.valueOf(q3), period));
         }
+        assertTrue(periods.size() >= yearCount);
     }
     
     @When("^a list of returns is requested for organisation (\\w+)$")
@@ -147,11 +153,11 @@ public class SustainabilityReturnStepDefs extends IntegrationTestSupport {
         executeGet("/returns/findByOrg/"+org);
     }
 
-    @Then("^the list of (\\d+) available survey returns is provided including ([-\\w]+) (\\w+) and ([-\\w]+) (\\w+)$")
-    public void the_list_of_available_survey_returns_is_provided_including(int surveyCount, String survey1, String survey1Status, String survey2, String survey2Status) throws Throwable {
+    @Then("^the list of available survey returns provided includes ([-\\w]+) (\\w+) and ([-\\w]+) (\\w+)$")
+    public void the_list_of_available_survey_returns_is_provided_including(String survey1, String survey1Status, String survey2, String survey2Status) throws Throwable {
         latestResponse.statusCodeIs(HttpStatus.OK);
         SurveyReturn[] returns = (SurveyReturn[]) latestResponse.parseArray(SurveyReturn.class);
-        assertEquals(surveyCount, returns.length);
+        assertTrue(returns.length >= 2);
         for (SurveyReturn surveyReturn : returns) {
             if (surveyReturn.name().equals(survey1)) {
                 assertEquals(survey1, surveyReturn.name());
@@ -164,32 +170,27 @@ public class SustainabilityReturnStepDefs extends IntegrationTestSupport {
             }
         }
     }
-//
-//    @Given("^No return has yet been created$")
-//    public void no_return_has_yet_been_created() throws Throwable {
-//        getForObject("/returns/findByOrg/" + ORG, List.class);
-////        assertEquals(HttpStatus.OK, latestObject.getStatusCode());
-//        List<?> returns = (List<?>) latestObject;
-//        // RestTemplate doesn't seem to deserialize typed list
-//        for (Iterator<?> it = returns.iterator() ; it.hasNext() ; ) {
-//            Map<?, ?> rtn = (Map<?, ?>) it.next();
-//            restTemplate.delete(baseUrl + "/returns/" + rtn.get("id"),
-//                    Collections.emptyMap());
-//        }
-//    }
 
     @When("^the SDU (\\d+)-(\\d+) return of (\\w+) is requested$")
     public void the_sdu_return_for_the_current_year_is_requested(int startYear, int endYear, String org) throws Throwable {
         executeGet("/returns/findCurrentBySurveyNameAndOrg/"+getSduSurveyName(startYear, endYear)+"/"+org);
-    }
-
-    @Then("^an SDU (\\d+)-(\\d+) return containing (\\d+) answers is created if necessary and returned for organisation (\\w+)$")
-    public void an_SDU_return_is_created_if_necessary_and_returned_for_organisation(int startYear, int endYear, int answers, String org) throws Throwable {
         latestResponse.statusCodeIs(HttpStatus.OK);
         rtn = (SurveyReturn) latestResponse.parseObject(SurveyReturn.class);
+    }
+
+    @Then("^an SDU (\\d+)-(\\d+) return for (\\w+) with correct header information is returned$")
+    public void an_SDU_return_for_the_organisation_is_returned(int startYear, 
+            int endYear, String org) throws Throwable {
+        assertNotNull(rtn);
         assertEquals(startYear+"-"+endYear, rtn.applicablePeriod());
         assertEquals(org, rtn.org());
         assertEquals(org, rtn.answer(Q.ORG_CODE, rtn.applicablePeriod()).response());
+    }
+    
+
+    @Then("^the return contains pro-forma answers for (\\d+) years \\(at least\\)$")
+    public void the_return_contains_header_information_and_pro_forma_answers_for_the_expected_years(int minNoOfYears) throws Throwable {
+        Set<String> years = new HashSet<String>();
         ArrayList<Q> missingAnswers = new ArrayList<Q>();
         for (Q q : Sdu1617.getSurvey().questionCodes()) {
             if (rtn.answer(q, rtn.applicablePeriod())==null) {
@@ -203,10 +204,15 @@ public class SustainabilityReturnStepDefs extends IntegrationTestSupport {
             if (!Sdu1617.getSurvey().questionCodes().contains(a.question().q())) {
                 calculatedAnswers.add(a.question().q());
             }
+            years.add(a.applicablePeriod());
         }
         System.out.println("Calculated answers: "+ calculatedAnswers);
-        assertEquals(answers, rtn.answers().size());
-      }
+        assertTrue(years.size() >= minNoOfYears);
+        List<String> periods = PeriodUtil.fillBackwards(rtn.applicablePeriod(), minNoOfYears);
+        for (String p : periods) {
+            assertTrue(years.contains(p));
+        }
+    }
 
     @When("^the (\\w+) return is updated with (\\w+), (\\w+) and (\\w+) and uploaded$")
     public void the_return_is_updated_with_x_y_and_z_and_submitted(String org, String q1, String q2, String q3) throws Throwable {
@@ -220,18 +226,40 @@ public class SustainabilityReturnStepDefs extends IntegrationTestSupport {
         return new Date().getTime();
     }
 
-    @Then("^the (\\w+) return for (\\d+)-(\\d+) is available with status '(\\w+)'$")
+    @Then("^the (\\w+) return for (\\d+)-(\\d+) is available with status '(\\w+)' and audit data is set$")
     public void the_return_for_is_available_with_expected_status(String org, int startYear, int endYear, String status) throws Throwable {
-        latestResponse.statusCodeIs(HttpStatus.NO_CONTENT);
-        executeGet("/returns/"+rtn.id());
+        executeGet("/returns/findCurrentBySurveyNameAndOrg/"+getSduSurveyName(startYear, endYear)+"/"+org);
+        latestResponse.statusCodeIs(HttpStatus.OK);
+        rtn = (SurveyReturn) latestResponse.parseObject(SurveyReturn.class);
+//        executeGet("/returns/"+rtn.id());
+        System.out.println("Found return with id:"+rtn.id());
         assertEquals(startYear+"-"+endYear, rtn.applicablePeriod());
         assertEquals(status, rtn.status());
         for (Answer answer : rtn.answers()) {
+            System.out.println("Checking status of "+answer.id());
+            switch (StatusType.valueOf(rtn.status())) {
+            case Draft:
+                assertThat(answer.status(), anyOf(equalTo(StatusType.Draft.name()), equalTo(StatusType.Published.name())));
+                break;
+            case Published:
+            case Submitted:
+                // TODO Calculations always appear to be draft, that may need to be fixed
+                assertThat(answer.status(), anyOf(equalTo(StatusType.Draft.name()), equalTo(StatusType.Published.name()), equalTo(StatusType.Submitted.name())));
+                break;
+            case Superceded:
+                assertEquals(StatusType.Superceded.name(), answer.status());
+                break;
+            default:
+                // fail?
+                break;
+            }
             switch(answer.question().name()) {
             case "orgCode": 
                 assertEquals(org, answer.response());
             }
         }
+        assertTrue("Last updated date is not set to today", DateUtils.isToday(rtn.lastUpdated()));
+        assertNotNull("Last updated by is not set", rtn.updatedBy());
     }
     
     @When("^the SDU (\\d+)-(\\d+) return of (\\w+) for period (\\d+)-(\\d+) is requested$")
@@ -248,17 +276,20 @@ public class SustainabilityReturnStepDefs extends IntegrationTestSupport {
         assertEquals(org, rtn.answer(Q.ORG_CODE, rtn.applicablePeriod()).response());
     }
 
-    @Given("^the current year's return of (\\w+) is complete$")
-    public void the_current_return_is_complete(String org) throws Throwable {
+    @Given("^the SDU (\\d+)-(\\d+) return of (\\w+) is complete$")
+    public void the_SDU_return_is_complete(int startYear, int endYear, String org) throws Throwable {
         executeGet("/returns/findCurrentBySurveyNameAndOrg/"+Sdu1617.ID+"/"+org);
         latestResponse.statusCodeIs(HttpStatus.OK);
         rtn = (SurveyReturn) latestResponse.parseObject(SurveyReturn.class);
-        // TODO what constitutes complete?
+        
+        assertTrue(rtn.isComplete());
+        assertEquals(StatusType.Draft.name(), rtn.status());
     }
     
     @When("^the user submits the return$")
     public void the_user_submits_the_return() throws Throwable {
-        executePost("/returns/"+rtn.id()+"/submitted", rtn);
+        executePost("/returns/"+rtn.id()+"/status", "Submitted");
+        latestResponse.statusCodeIs(HttpStatus.OK);
     }
 
     @Then("^it is no longer available for edit$")
@@ -269,17 +300,10 @@ public class SustainabilityReturnStepDefs extends IntegrationTestSupport {
             ; // expected
         }
     }
-
-    @When("^the user requests a treasury report for his organisation$")
-    public void the_user_requests_a_treasury_report_for_his_organisation() throws Throwable {
-        // Write code here that turns the phrase above into concrete actions
-        throw new PendingException();
-    }
-
-    @Then("^the RDR treasury report for (\\d+)-(\\d+) is provided$")
-    public void the_RDR_treasury_report_for_is_provided(int arg1, int arg2) throws Throwable {
-        // Write code here that turns the phrase above into concrete actions
-        throw new PendingException();
+    
+    @When("^the user restates the return$")
+    public void the_user_restates_the_return() throws Throwable {
+        executePut("/returns/"+rtn.id()+"/restate", rtn);
     }
 
 }

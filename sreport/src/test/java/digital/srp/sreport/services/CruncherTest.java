@@ -162,72 +162,72 @@ public class CruncherTest {
             String period = periods.get(i);
             // Performance and Policy only relevant to current year
             if (i == 0) {
-                assertEquals(String.format("Assertion for period %1$d", i),
+                assertEquals(String.format("Incorrect value of %2$s for period %1$s", period, Q.ORG_CODE),
                         "RDR", rtn.answer(Q.ORG_CODE, period).response());
             }
 
             // SCOPE 1: DIRECT
-            assertEquals(String.format("Assertion for period %1$d", i),
+            assertEquals(String.format("Incorrect value of %2$s for period %1$s", period, Q.OWNED_BUILDINGS_GAS),
                     OWNED_BUILDINGS_GAS[i],
                     rtn.answer(Q.OWNED_BUILDINGS_GAS, period).response3sf());
-            assertEquals(String.format("Assertion for period %1$d", i),
+            assertEquals(String.format("Incorrect value of %2$s for period %1$s", period, Q.OWNED_VEHICLES),
                     OWNED_VEHICLES[i],
                     rtn.answer(Q.OWNED_VEHICLES, period).response3sf());
 
             // ANAESTHETIC GASES
-            assertEquals(String.format("Assertion for period %1$d", i),
+            assertEquals(String.format("Incorrect value of %2$s for period %1$s", period, Q.DESFLURANE_CO2E),
                     DESFLURANE_CO2E[i],
                     rtn.answer(Q.DESFLURANE_CO2E, period).response3sf());
-            assertEquals(String.format("Assertion for period %1$d", i),
+            assertEquals(String.format("Incorrect value of %2$s for period %1$s", period, Q.ISOFLURANE_CO2E),
                     ISOFLURANE_CO2E[i],
                     rtn.answer(Q.ISOFLURANE_CO2E, period).response3sf());
-            assertEquals(String.format("Assertion for period %1$d", i),
+            assertEquals(String.format("Incorrect value of %2$s for period %1$s", period, Q.SEVOFLURANE_CO2E),
                     SEVOFLURANE_CO2E[i],
                     rtn.answer(Q.SEVOFLURANE_CO2E, period).response3sf());
-            assertEquals(String.format("Assertion for period %1$d", i),
+            assertEquals(String.format("Incorrect value of %2$s for period %1$s", period, Q.NITROUS_OXIDE_CO2E),
                     NITROUS_OXIDE_CO2E[i],
                     rtn.answer(Q.NITROUS_OXIDE_CO2E, period).response3sf());
-            assertEquals(String.format("Assertion for period %1$d", i),
+            assertEquals(String.format("Incorrect value of %2$s for period %1$s", period, Q.PORTABLE_NITROUS_OXIDE_MIX_CO2E),
                     PORTABLE_NITROUS_OXIDE_MIX_CO2E[i],
                     rtn.answer(Q.PORTABLE_NITROUS_OXIDE_MIX_CO2E, period)
                             .response3sf());
-            assertEquals(String.format("Assertion for period %1$d", i),
+            assertEquals(String.format("Incorrect value of %2$s for period %1$s", period, Q.PORTABLE_NITROUS_OXIDE_MIX_MATERNITY_CO2E),
                     PORTABLE_NITROUS_OXIDE_MIX_MATERNITY_CO2E[i],
                     rtn.answer(Q.PORTABLE_NITROUS_OXIDE_MIX_MATERNITY_CO2E,
                             period).response3sf());
             // Total the 6 above
-            assertEquals(String.format("Assertion for period %1$d", i),
+            assertEquals(String.format("Incorrect value of %2$s for period %1$s", period, Q.ANAESTHETIC_GASES_CO2E),
                     ANAESTHETIC_GASES_CO2E[i],
                     rtn.answer(Q.ANAESTHETIC_GASES_CO2E, period).response3sf());
 
-            assertEquals(String.format("Assertion for period %1$d", i),
+            assertEquals(String.format("Incorrect value of %2$s for period %1$s", period, Q.SCOPE_1),
                     SCOPE_1[i], rtn.answer(Q.SCOPE_1, period).response3sf());
             // END SCOPE 1
 
             // // SCOPE 2: INDIRECT
-            assertEquals(String.format("Assertion for period %1$d", i),
+            assertEquals(String.format("Incorrect value of %2$s for period %1$s", period, Q.NET_THERMAL_ENERGY_CO2E),
                     NET_THERMAL_ENERGY_CO2E[i],
                     rtn.answer(Q.NET_THERMAL_ENERGY_CO2E, period)
                             .response3sf());
-            assertEquals(String.format("Assertion for period %1$d", i),
+            assertEquals(String.format("Incorrect value of %2$s for period %1$s", period, Q.NET_ELEC_CO2E),
                     NET_ELEC_CO2E[i],
                     rtn.answer(Q.NET_ELEC_CO2E, period).response3sf());
-            assertEquals(String.format("Assertion for period %1$d", i),
+            assertEquals(String.format("Incorrect value of %2$s for period %1$s", period, Q.SCOPE_2),
                     SCOPE_2[i], rtn.answer(Q.SCOPE_2, period).response3sf());
 
             // SCOPE 3: INDIRECT (SUPPLY CHAIN)
-            assertEquals(String.format("Assertion for period %1$d", i),
+            assertEquals(String.format("Incorrect value of %2$s for period %1$s", period, Q.WATER_CO2E),
                     WATER_CO2E[i],
                     rtn.answer(Q.WATER_CO2E, period).response3sf());
-            assertEquals(String.format("Assertion for period %1$d", i),
+            assertEquals(String.format("Incorrect value of %2$s for period %1$s", period, Q.WATER_TREATMENT_CO2E),
                     WATER_TREATMENT_CO2E[i],
                     rtn.answer(Q.WATER_TREATMENT_CO2E, period).response3sf());
-            assertEquals(String.format("Assertion for period %1$d", i),
+            assertEquals(String.format("Incorrect value of %2$s for period %1$s", period, Q.SCOPE_3_WATER),
                     SCOPE_3_WATER[i],
                     rtn.answer(Q.SCOPE_3_WATER, period).response3sf());
             // RDR 15-16 example has 29 but questions don't match, this is a
             // subset
-            assertEquals(String.format("Assertion for period %1$d", i),
+            assertEquals(String.format("Incorrect value of %2$s for period %1$s", period, Q.SCOPE_3_WASTE),
                     SCOPE_3_WASTE[i],
                     rtn.answer(Q.SCOPE_3_WASTE, period).response3sf());
 
@@ -237,56 +237,56 @@ public class CruncherTest {
                     rtn.answer(Q.ECLASS_USER, period).response()));
             // These numbers don't match the RDR 15-16 spreadsheet, but close.
             // Rounding? Or slightly updated factors?
-            assertEquals(String.format("Assertion for period %1$d", i),
+            assertEquals(String.format("Incorrect value of %2$s for period %1$s", period, Q.WASTE_AND_WATER_CO2E),
                     WASTE_AND_WATER_CO2E[i],
                     rtn.answer(Q.WASTE_AND_WATER_CO2E, period).response3sf());
-            assertEquals(String.format("Assertion for period %1$d", i),
+            assertEquals(String.format("Incorrect value of %2$s for period %1$s", period, Q.BIZ_SVCS_CO2E),
                     BIZ_SVCS_CO2E[i],
                     rtn.answer(Q.BIZ_SVCS_CO2E, period).response3sf());
-            assertEquals(String.format("Assertion for period %1$d", i),
+            assertEquals(String.format("Incorrect value of %2$s for period %1$s", period, Q.CONSTRUCTION_CO2E),
                     CONSTRUCTION_CO2E[i],
                     rtn.answer(Q.CONSTRUCTION_CO2E, period).response3sf());
-            assertEquals(String.format("Assertion for period %1$d", i),
+            assertEquals(String.format("Incorrect value of %2$s for period %1$s", period, Q.CATERING_CO2E),
                     CATERING_CO2E[i],
                     rtn.answer(Q.CATERING_CO2E, period).response3sf());
-            assertEquals(String.format("Assertion for period %1$d", i),
+            assertEquals(String.format("Incorrect value of %2$s for period %1$s", period, Q.FREIGHT_CO2E),
                     FREIGHT_CO2E[i],
                     rtn.answer(Q.FREIGHT_CO2E, period).response3sf());
-            assertEquals(String.format("Assertion for period %1$d", i),
+            assertEquals(String.format("Incorrect value of %2$s for period %1$s", period, Q.ICT_CO2E),
                     ICT_CO2E[i], rtn.answer(Q.ICT_CO2E, period).response3sf());
-            assertEquals(String.format("Assertion for period %1$d", i),
+            assertEquals(String.format("Incorrect value of %2$s for period %1$s", period, Q.CHEM_AND_GAS_CO2E),
                     CHEM_AND_GAS_CO2E[i],
                     rtn.answer(Q.CHEM_AND_GAS_CO2E, period).response3sf());
-            assertEquals(String.format("Assertion for period %1$d", i),
+            assertEquals(String.format("Incorrect value of %2$s for period %1$s", period, Q.MED_INSTR_CO2E),
                     MED_INSTR_CO2E[i],
                     rtn.answer(Q.MED_INSTR_CO2E, period).response3sf());
-            assertEquals(String.format("Assertion for period %1$d", i),
+            assertEquals(String.format("Incorrect value of %2$s for period %1$s", period, Q.OTHER_MANUFACTURED_CO2E),
                     OTHER_MANUFACTURED_CO2E[i],
                     rtn.answer(Q.OTHER_MANUFACTURED_CO2E, period)
                             .response3sf());
-            assertEquals(String.format("Assertion for period %1$d", i),
+            assertEquals(String.format("Incorrect value of %2$s for period %1$s", period, Q.OTHER_PROCUREMENT_CO2E),
                     OTHER_PROCUREMENT_CO2E[i],
                     rtn.answer(Q.OTHER_PROCUREMENT_CO2E, period).response3sf());
-            assertEquals(String.format("Assertion for period %1$d", i),
+            assertEquals(String.format("Incorrect value of %2$s for period %1$s", period, Q.PAPER_CO2E),
                     PAPER_CO2E[i],
                     rtn.answer(Q.PAPER_CO2E, period).response3sf());
-            assertEquals(String.format("Assertion for period %1$d", i),
+            assertEquals(String.format("Incorrect value of %2$s for period %1$s", period, Q.PHARMA_CO2E),
                     PHARMA_CO2E[i],
                     rtn.answer(Q.PHARMA_CO2E, period).response3sf());
-            assertEquals(String.format("Assertion for period %1$d", i),
+            assertEquals(String.format("Incorrect value of %2$s for period %1$s", period, Q.TRAVEL_CO2E),
                     TRAVEL_CO2E[i],
                     rtn.answer(Q.TRAVEL_CO2E, period).response3sf());
-            assertEquals(String.format("Assertion for period %1$d", i),
+            assertEquals(String.format("Incorrect value of %2$s for period %1$s", period, Q.COMMISSIONING_CO2E),
                     COMMISSIONING_CO2E[i],
                     rtn.answer(Q.COMMISSIONING_CO2E, period).response3sf());
 
-            assertEquals(String.format("Assertion for period %1$d", i),
+            assertEquals(String.format("Incorrect value of %2$s for period %1$s", period, Q.CORE_CO2E),
                     CORE_CO2E[i],
                     rtn.answer(Q.CORE_CO2E, period).response3sf());
-            assertEquals(String.format("Assertion for period %1$d", i),
+            assertEquals(String.format("Incorrect value of %2$s for period %1$s", period, Q.PROCUREMENT_CO2E),
                     PROCUREMENT_CO2E[i],
                     rtn.answer(Q.PROCUREMENT_CO2E, period).response3sf());
-            assertEquals(String.format("Assertion for period %1$d", i),
+            assertEquals(String.format("Incorrect value of %2$s for period %1$s", period, Q.CITIZEN_CO2E),
                     CITIZEN_CO2E[i],
                     rtn.answer(Q.CITIZEN_CO2E, period).response3sf());
         }
