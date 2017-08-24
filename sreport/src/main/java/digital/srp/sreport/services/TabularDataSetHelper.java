@@ -34,6 +34,8 @@ public class TabularDataSetHelper {
             int row = i/headers.length;
             try {
                 tds.set(row, col, formatter.format(new BigDecimal(answer.response())));
+            } catch (NullPointerException e) {
+                tds.set(row, col, " n/a ");
             } catch (IllegalArgumentException e) {
                 LOGGER.warn("Cannot format {} using {}", answer.response(), formatter.getClass().getName());
                 tds.set(row, col, answer.response());

@@ -15,6 +15,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import digital.srp.sreport.internal.PeriodUtil;
 import digital.srp.sreport.model.Answer;
@@ -65,11 +66,13 @@ public class SduReportController implements SduQuestions {
     @RequestMapping(value = "/{org}/{period}/org.html", method = RequestMethod.GET, produces = "text/html")
     @Transactional
     public String orgTable(@PathVariable("org") String org,
-            @PathVariable("period") String period, Model model) {
+            @PathVariable("period") String period,
+            @RequestParam(value = "maxPeriods", required = false) Integer maxPeriods,
+            Model model) {
         LOGGER.info(String.format("orgTable for %1$s %2$s", org, period));
 
-        fillModel(org, period, ORG_HDRS, model, false, prettyPrintDecimalFormat);
-        return "table-period-as-row";
+        fillModel(org, period, ORG_HDRS, model, true, prettyPrintDecimalFormat, maxPeriods);
+        return "table-period-as-col";
     }
 
     /**
@@ -81,11 +84,13 @@ public class SduReportController implements SduQuestions {
     @RequestMapping(value = "/{org}/{period}/energy.html", method = RequestMethod.GET, produces = "text/html")
     @Transactional
     public String energyTable(@PathVariable("org") String org,
-            @PathVariable("period") String period, Model model) {
+            @PathVariable("period") String period,
+            @RequestParam(value = "maxPeriods", required = false) Integer maxPeriods,
+            Model model) {
         LOGGER.info(String.format("energyTable for %1$s %2$s", org, period));
 
-        fillModel(org, period, ENERGY_HDRS, model, false, prettyPrintDecimalFormat);
-        return "table-period-as-row";
+        fillModel(org, period, ENERGY_HDRS, model, true, prettyPrintDecimalFormat, maxPeriods);
+        return "table-period-as-col";
     }
 
     /**
@@ -97,10 +102,11 @@ public class SduReportController implements SduQuestions {
     @RequestMapping(value = "/{org}/{period}/energy.csv", method = RequestMethod.GET, produces = "text/csv")
     @Transactional
     public String energyCsv(@PathVariable("org") String org,
-            @PathVariable("period") String period, Model model) {
+            @PathVariable("period") String period, @RequestParam(value = "maxPeriods", required = false) Integer maxPeriods,
+            Model model) {
         LOGGER.info(String.format("energyCsv for %1$s %2$s", org, period));
 
-        fillModel(org, period, ENERGY_HDRS, model, false, rawDecimalFormat);
+        fillModel(org, period, ENERGY_HDRS, model, false, rawDecimalFormat, maxPeriods);
         return "csv";
     }
 
@@ -113,12 +119,13 @@ public class SduReportController implements SduQuestions {
     @RequestMapping(value = "/{org}/{period}/energy-co2e.html", method = RequestMethod.GET, produces = "text/html")
     @Transactional
     public String energyCO2eTable(@PathVariable("org") String org,
-            @PathVariable("period") String period, Model model) {
+            @PathVariable("period") String period, @RequestParam(value = "maxPeriods", required = false) Integer maxPeriods,
+            Model model) {
         LOGGER.info(
                 String.format("energyCO2eTable for %1$s %2$s", org, period));
 
-        fillModel(org, period, ENERGY_CO2E_HDRS, model, false, prettyPrintDecimalFormat);
-        return "table-period-as-row";
+        fillModel(org, period, ENERGY_CO2E_HDRS, model, true, prettyPrintDecimalFormat, maxPeriods);
+        return "table-period-as-col";
     }
 
     /**
@@ -130,10 +137,11 @@ public class SduReportController implements SduQuestions {
     @RequestMapping(value = "/{org}/{period}/energy-co2e.csv", method = RequestMethod.GET, produces = "text/csv")
     @Transactional
     public String energyCO2eCsv(@PathVariable("org") String org,
-            @PathVariable("period") String period, Model model) {
+            @PathVariable("period") String period, @RequestParam(value = "maxPeriods", required = false) Integer maxPeriods,
+            Model model) {
         LOGGER.info(String.format("energyCO2eCsv for %1$s %2$s", org, period));
 
-        fillModel(org, period, ENERGY_CO2E_HDRS, model, false, rawDecimalFormat);
+        fillModel(org, period, ENERGY_CO2E_HDRS, model, false, rawDecimalFormat, maxPeriods);
         return "csv";
     }
 
@@ -145,11 +153,12 @@ public class SduReportController implements SduQuestions {
     @RequestMapping(value = "/{org}/{period}/travel.html", method = RequestMethod.GET, produces = "text/html")
     @Transactional
     public String travelTable(@PathVariable("org") String org,
-            @PathVariable("period") String period, Model model) {
+            @PathVariable("period") String period, @RequestParam(value = "maxPeriods", required = false) Integer maxPeriods,
+            Model model) {
         LOGGER.info(String.format("travelTable for %1$s %2$s", org, period));
 
-        fillModel(org, period, TRAVEL_HDRS, model, false, prettyPrintDecimalFormat);
-        return "table-period-as-row";
+        fillModel(org, period, TRAVEL_HDRS, model, true, prettyPrintDecimalFormat, maxPeriods);
+        return "table-period-as-col";
     }
 
     /**
@@ -161,11 +170,12 @@ public class SduReportController implements SduQuestions {
     @RequestMapping(value = "/{org}/{period}/travel-co2e.html", method = RequestMethod.GET, produces = "text/html")
     @Transactional
     public String travelCO2eTable(@PathVariable("org") String org,
-            @PathVariable("period") String period, Model model) {
+            @PathVariable("period") String period, @RequestParam(value = "maxPeriods", required = false) Integer maxPeriods,
+            Model model) {
         LOGGER.info(String.format("travelCO2eTable for %1$s %2$s", org, period));
 
-        fillModel(org, period, TRAVEL_HDRS, model, false, prettyPrintDecimalFormat);
-        return "table-period-as-row";
+        fillModel(org, period, TRAVEL_HDRS, model, true, prettyPrintDecimalFormat, maxPeriods);
+        return "table-period-as-col";
     }
 
     /**
@@ -177,11 +187,12 @@ public class SduReportController implements SduQuestions {
     @RequestMapping(value = "/{org}/{period}/waste.html", method = RequestMethod.GET, produces = "text/html")
     @Transactional
     public String wasteTable(@PathVariable("org") String org,
-            @PathVariable("period") String period, Model model) {
+            @PathVariable("period") String period, @RequestParam(value = "maxPeriods", required = false) Integer maxPeriods,
+            Model model) {
         LOGGER.info(String.format("wasteTable for %1$s %2$s", org, period));
 
-        fillModel(org, period, WASTE_HDRS, model, false, prettyPrintDecimalFormat);
-        return "table-period-as-row";
+        fillModel(org, period, WASTE_HDRS, model, true, prettyPrintDecimalFormat, maxPeriods);
+        return "table-period-as-col";
     }
     
     /**
@@ -193,11 +204,12 @@ public class SduReportController implements SduQuestions {
     @RequestMapping(value = "/{org}/{period}/waste-co2e.html", method = RequestMethod.GET, produces = "text/html")
     @Transactional
     public String wasteCO2eTable(@PathVariable("org") String org,
-            @PathVariable("period") String period, Model model) {
+            @PathVariable("period") String period, @RequestParam(value = "maxPeriods", required = false) Integer maxPeriods,
+            Model model) {
         LOGGER.info(String.format("wasteCO2eTable for %1$s %2$s", org, period));
 
-        fillModel(org, period, WASTE_CO2E_HDRS, model, false, prettyPrintDecimalFormat);
-        return "table-period-as-row";
+        fillModel(org, period, WASTE_CO2E_HDRS, model, true, prettyPrintDecimalFormat, maxPeriods);
+        return "table-period-as-col";
     }
     
     /**
@@ -209,10 +221,11 @@ public class SduReportController implements SduQuestions {
     @RequestMapping(value = "/{org}/{period}/waste-co2e.csv", method = RequestMethod.GET, produces = "text/csv")
     @Transactional
     public String wasteCO2eCsv(@PathVariable("org") String org,
-            @PathVariable("period") String period, Model model) {
+            @PathVariable("period") String period, @RequestParam(value = "maxPeriods", required = false) Integer maxPeriods,
+            Model model) {
         LOGGER.info(String.format("wasteCO2eCsv for %1$s %2$s", org, period));
 
-        fillModel(org, period, WASTE_CO2E_HDRS, model, false, rawDecimalFormat);
+        fillModel(org, period, WASTE_CO2E_HDRS, model, false, rawDecimalFormat, maxPeriods);
         return "csv";
     }
     
@@ -225,11 +238,12 @@ public class SduReportController implements SduQuestions {
     @RequestMapping(value = "/{org}/{period}/water.html", method = RequestMethod.GET, produces = "text/html")
     @Transactional
     public String waterTable(@PathVariable("org") String org,
-            @PathVariable("period") String period, Model model) {
+            @PathVariable("period") String period, @RequestParam(value = "maxPeriods", required = false) Integer maxPeriods,
+            Model model) {
         LOGGER.info(String.format("waterTable for %1$s %2$s", org, period));
 
-        fillModel(org, period, WATER_HDRS, model, false, prettyPrintDecimalFormat);
-        return "table-period-as-row";
+        fillModel(org, period, WATER_HDRS, model, true, prettyPrintDecimalFormat, maxPeriods);
+        return "table-period-as-col";
     }
     
     /**
@@ -241,11 +255,12 @@ public class SduReportController implements SduQuestions {
     @RequestMapping(value = "/{org}/{period}/water-co2e.html", method = RequestMethod.GET, produces = "text/html")
     @Transactional
     public String waterCO2eTable(@PathVariable("org") String org,
-            @PathVariable("period") String period, Model model) {
+            @PathVariable("period") String period, @RequestParam(value = "maxPeriods", required = false) Integer maxPeriods,
+            Model model) {
         LOGGER.info(String.format("waterCO2eTable for %1$s %2$s", org, period));
 
-        fillModel(org, period, WATER_CO2E_HDRS, model, false, prettyPrintDecimalFormat);
-        return "table-period-as-row";
+        fillModel(org, period, WATER_CO2E_HDRS, model, true, prettyPrintDecimalFormat, maxPeriods);
+        return "table-period-as-col";
     }
     
     /**
@@ -257,10 +272,11 @@ public class SduReportController implements SduQuestions {
     @RequestMapping(value = "/{org}/{period}/water-co2e.csv", method = RequestMethod.GET, produces = "text/csv")
     @Transactional
     public String waterCO2eCsv(@PathVariable("org") String org,
-            @PathVariable("period") String period, Model model) {
+            @PathVariable("period") String period, @RequestParam(value = "maxPeriods", required = false) Integer maxPeriods,
+            Model model) {
         LOGGER.info(String.format("waterCO2eCsv for %1$s %2$s", org, period));
 
-        fillModel(org, period, WATER_CO2E_HDRS, model, false, rawDecimalFormat);
+        fillModel(org, period, WATER_CO2E_HDRS, model, false, rawDecimalFormat, maxPeriods);
         return "csv";
     }
     
@@ -273,10 +289,11 @@ public class SduReportController implements SduQuestions {
     @RequestMapping(value = "/{org}/{period}/biomass-co2e-wtt.html", method = RequestMethod.GET, produces = "text/html")
     @Transactional
     public String biomassCO2eWttTable(@PathVariable("org") String org,
-            @PathVariable("period") String period, Model model) {
+            @PathVariable("period") String period, @RequestParam(value = "maxPeriods", required = false) Integer maxPeriods,
+            Model model) {
         LOGGER.info(String.format("biomassCO2eWttTable for %1$s %2$s", org, period));
 
-        fillModel(org, period, BIOMASS_CO2E_WTT_HDRS, model, true, prettyPrintDecimalFormat);
+        fillModel(org, period, BIOMASS_CO2E_WTT_HDRS, model, true, prettyPrintDecimalFormat, maxPeriods);
         return "table-period-as-col";
     }
     
@@ -289,10 +306,11 @@ public class SduReportController implements SduQuestions {
     @RequestMapping(value = "/{org}/{period}/biomass-co2e-wtt.csv", method = RequestMethod.GET, produces = "text/csv")
     @Transactional
     public String biomassCO2eWttCsv(@PathVariable("org") String org,
-            @PathVariable("period") String period, Model model) {
+            @PathVariable("period") String period, @RequestParam(value = "maxPeriods", required = false) Integer maxPeriods,
+            Model model) {
         LOGGER.info(String.format("biomassCO2eWttCsv for %1$s %2$s", org, period));
 
-        fillModel(org, period, BIOMASS_CO2E_WTT_HDRS, model, false, rawDecimalFormat);
+        fillModel(org, period, BIOMASS_CO2E_WTT_HDRS, model, false, rawDecimalFormat, maxPeriods);
         return "csv";
     }
     
@@ -305,11 +323,12 @@ public class SduReportController implements SduQuestions {
     @RequestMapping(value = "/{org}/{period}/biomass-co2e-noscope.html", method = RequestMethod.GET, produces = "text/html")
     @Transactional
     public String biomassCO2eNoScopeTable(@PathVariable("org") String org,
-            @PathVariable("period") String period, Model model) {
+            @PathVariable("period") String period, @RequestParam(value = "maxPeriods", required = false) Integer maxPeriods,
+            Model model) {
         LOGGER.info(String.format("biomassCO2eNoScopeTable for %1$s %2$s", org, period));
 
-        fillModel(org, period, BIOMASS_CO2E_NOSCOPE_HDRS, model, false, prettyPrintDecimalFormat);
-        return "table-period-as-row";
+        fillModel(org, period, BIOMASS_CO2E_NOSCOPE_HDRS, model, true, prettyPrintDecimalFormat, maxPeriods);
+        return "table-period-as-col";
     }
     
     /**
@@ -321,10 +340,11 @@ public class SduReportController implements SduQuestions {
     @RequestMapping(value = "/{org}/{period}/biomass-co2e-noscope.csv", method = RequestMethod.GET, produces = "text/csv")
     @Transactional
     public String biomassCO2eNoScopeCsv(@PathVariable("org") String org,
-            @PathVariable("period") String period, Model model) {
+            @PathVariable("period") String period, @RequestParam(value = "maxPeriods", required = false) Integer maxPeriods,
+            Model model) {
         LOGGER.info(String.format("biomassCO2eNoScopeCsv for %1$s %2$s", org, period));
 
-        fillModel(org, period, BIOMASS_CO2E_NOSCOPE_HDRS, model, false, rawDecimalFormat);
+        fillModel(org, period, BIOMASS_CO2E_NOSCOPE_HDRS, model, false, rawDecimalFormat, maxPeriods);
         return "csv";
     }
     
@@ -337,11 +357,12 @@ public class SduReportController implements SduQuestions {
     @RequestMapping(value = "/{org}/{period}/carbon-footprint.html", method = RequestMethod.GET, produces = "text/html")
     @Transactional
     public String footprintTable(@PathVariable("org") String org,
-            @PathVariable("period") String period, Model model) {
+            @PathVariable("period") String period, @RequestParam(value = "maxPeriods", required = false) Integer maxPeriods,
+            Model model) {
         LOGGER.info(String.format("footprintTable for %1$s %2$s", org, period));
 
-        fillModel(org, period, FOOTPRINT_HDRS, model, false, prettyPrintDecimalFormat);
-        return "table-period-as-row";
+        fillModel(org, period, FOOTPRINT_HDRS, model, true, prettyPrintDecimalFormat, maxPeriods);
+        return "table-period-as-col";
     }
 
     /**
@@ -353,10 +374,11 @@ public class SduReportController implements SduQuestions {
     @RequestMapping(value = "/{org}/{period}/carbon-footprint.csv", method = RequestMethod.GET, produces = "text/csv")
     @Transactional
     public String footprintCsv(@PathVariable("org") String org,
-            @PathVariable("period") String period, Model model) {
+            @PathVariable("period") String period, @RequestParam(value = "maxPeriods", required = false) Integer maxPeriods,
+            Model model) {
         LOGGER.info(String.format("footprintCsv for %1$s %2$s", org, period));
 
-        fillModel(org, period, FOOTPRINT_HDRS, model, false, rawDecimalFormat);
+        fillModel(org, period, FOOTPRINT_HDRS, model, false, rawDecimalFormat, maxPeriods);
         return "csv";
     }
     
@@ -369,10 +391,11 @@ public class SduReportController implements SduQuestions {
     @RequestMapping(value = "/{org}/{period}/carbon-emissions-profile.html", method = RequestMethod.GET, produces = "text/html")
     @Transactional
     public String emissionsProfileTable(@PathVariable("org") String org,
-            @PathVariable("period") String period, Model model) {
+            @PathVariable("period") String period, @RequestParam(value = "maxPeriods", required = false) Integer maxPeriods,
+            Model model) {
         LOGGER.info(String.format("emissionsProfileTable for %1$s %2$s", org, period));
 
-        fillModel(org, period, PROFILE_HDRS, model, true, prettyPrintDecimalFormat);
+        fillModel(org, period, PROFILE_HDRS, model, true, prettyPrintDecimalFormat, maxPeriods);
         return "table-period-as-col";
     }
 
@@ -385,10 +408,11 @@ public class SduReportController implements SduQuestions {
     @RequestMapping(value = "/{org}/{period}/carbon-emissions-profile.csv", method = RequestMethod.GET, produces = "text/csv")
     @Transactional
     public String emissionsProfileCsv(@PathVariable("org") String org,
-            @PathVariable("period") String period, Model model) {
+            @PathVariable("period") String period, @RequestParam(value = "maxPeriods", required = false) Integer maxPeriods,
+            Model model) {
         LOGGER.info(String.format("emissionsProfileCsv for %1$s %2$s", org, period));
 
-        fillModel(org, period, PROFILE_HDRS, model, false, rawDecimalFormat);
+        fillModel(org, period, PROFILE_HDRS, model, false, rawDecimalFormat, maxPeriods);
         return "csv";
     }
     
@@ -401,11 +425,12 @@ public class SduReportController implements SduQuestions {
     @RequestMapping(value = "/{org}/{period}/carbon-by-expenditure.html", method = RequestMethod.GET, produces = "text/html")
     @Transactional
     public String carbonByExpenditureTable(@PathVariable("org") String org,
-            @PathVariable("period") String period, Model model) {
+            @PathVariable("period") String period, @RequestParam(value = "maxPeriods", required = false) Integer maxPeriods,
+            Model model) {
         LOGGER.info(String.format("carbonByExpenditureTable for %1$s %2$s", org, period));
 
-        fillModel(org, period, SPEND_HDRS, model, false, prettyPrintDecimalFormat);
-        return "table-period-as-row";
+        fillModel(org, period, SPEND_HDRS, model, true, prettyPrintDecimalFormat, maxPeriods);
+        return "table-period-as-col";
     }
 
     /**
@@ -417,10 +442,11 @@ public class SduReportController implements SduQuestions {
     @RequestMapping(value = "/{org}/{period}/carbon-by-expenditure.csv", method = RequestMethod.GET, produces = "text/csv")
     @Transactional
     public String carbonByExpenditureCsv(@PathVariable("org") String org,
-            @PathVariable("period") String period, Model model) {
+            @PathVariable("period") String period, @RequestParam(value = "maxPeriods", required = false) Integer maxPeriods,
+            Model model) {
         LOGGER.info(String.format("carbonByExpenditureCsv for %1$s %2$s", org, period));
 
-        fillModel(org, period, SPEND_HDRS, model, false, rawDecimalFormat);
+        fillModel(org, period, SPEND_HDRS, model, false, rawDecimalFormat, maxPeriods);
         return "csv";
     }
     
@@ -434,10 +460,11 @@ public class SduReportController implements SduQuestions {
     @RequestMapping(value = "/{org}/{period}/scope-summary.html", method = RequestMethod.GET, produces = "text/html")
     @Transactional
     public String scopeSummaryTable(@PathVariable("org") String org,
-            @PathVariable("period") String period, Model model) {
+            @PathVariable("period") String period, @RequestParam(value = "maxPeriods", required = false) Integer maxPeriods,
+            Model model) {
         LOGGER.info(String.format("scopeSummaryTable for %1$s %2$s", org, period));
 
-        fillModel(org, period, SUMMARY_SCOPE_HDRS, model, true, prettyPrintDecimalFormat);
+        fillModel(org, period, SUMMARY_SCOPE_HDRS, model, true, prettyPrintDecimalFormat, maxPeriods);
         return "table-period-as-col";
     }
     
@@ -449,10 +476,11 @@ public class SduReportController implements SduQuestions {
     @RequestMapping(value = "/{org}/{period}/scope-1.html", method = RequestMethod.GET, produces = "text/html")
     @Transactional
     public String scope1Table(@PathVariable("org") String org,
-            @PathVariable("period") String period, Model model) {
+            @PathVariable("period") String period, @RequestParam(value = "maxPeriods", required = false) Integer maxPeriods,
+            Model model) {
         LOGGER.info(String.format("scope1Table for %1$s %2$s", org, period));
 
-        fillModel(org, period, SCOPE_1_HDRS, model, true, prettyPrintDecimalFormat);
+        fillModel(org, period, SCOPE_1_HDRS, model, true, prettyPrintDecimalFormat, maxPeriods);
         return "table-period-as-col";
     }
     
@@ -464,10 +492,11 @@ public class SduReportController implements SduQuestions {
     @RequestMapping(value = "/{org}/{period}/scope-2.html", method = RequestMethod.GET, produces = "text/html")
     @Transactional
     public String scope2Table(@PathVariable("org") String org,
-            @PathVariable("period") String period, Model model) {
+            @PathVariable("period") String period, @RequestParam(value = "maxPeriods", required = false) Integer maxPeriods,
+            Model model) {
         LOGGER.info(String.format("scope2Table for %1$s %2$s", org, period));
 
-        fillModel(org, period, SCOPE_2_HDRS, model, true, prettyPrintDecimalFormat);
+        fillModel(org, period, SCOPE_2_HDRS, model, true, prettyPrintDecimalFormat, maxPeriods);
         return "table-period-as-col";
     }
     
@@ -479,10 +508,11 @@ public class SduReportController implements SduQuestions {
     @RequestMapping(value = "/{org}/{period}/scope-3.html", method = RequestMethod.GET, produces = "text/html")
     @Transactional
     public String scope3Table(@PathVariable("org") String org,
-            @PathVariable("period") String period, Model model) {
+            @PathVariable("period") String period, @RequestParam(value = "maxPeriods", required = false) Integer maxPeriods,
+            Model model) {
         LOGGER.info(String.format("scope3Table for %1$s %2$s", org, period));
 
-        fillModel(org, period, SCOPE_3_HDRS, model, true, prettyPrintDecimalFormat);
+        fillModel(org, period, SCOPE_3_HDRS, model, true, prettyPrintDecimalFormat, maxPeriods);
         return "table-period-as-col";
     }
     
@@ -494,10 +524,11 @@ public class SduReportController implements SduQuestions {
     @RequestMapping(value = "/{org}/{period}/sdu-carbon-profile.html", method = RequestMethod.GET, produces = "text/html")
     @Transactional
     public String sduCarbonProfileTable(@PathVariable("org") String org,
-            @PathVariable("period") String period, Model model) {
+            @PathVariable("period") String period, @RequestParam(value = "maxPeriods", required = false) Integer maxPeriods,
+            Model model) {
         LOGGER.info(String.format("sduCarbonProfileTable for %1$s %2$s", org, period));
 
-        fillModel(org, period, SDU_CARBON_PROFILE_HDRS, model, true, prettyPrintDecimalFormat);
+        fillModel(org, period, SDU_CARBON_PROFILE_HDRS, model, true, prettyPrintDecimalFormat, maxPeriods);
         return "table-period-as-col";
     }
     
@@ -509,10 +540,11 @@ public class SduReportController implements SduQuestions {
     @RequestMapping(value = "/{org}/{period}/eclass-carbon-profile.html", method = RequestMethod.GET, produces = "text/html")
     @Transactional
     public String eclassCarbonProfileTable(@PathVariable("org") String org,
-            @PathVariable("period") String period, Model model) {
+            @PathVariable("period") String period, @RequestParam(value = "maxPeriods", required = false) Integer maxPeriods,
+            Model model) {
         LOGGER.info(String.format("eclassCarbonProfileTable for %1$s %2$s", org, period));
 
-        fillModel(org, period, ECLASS_PROFILE_HDRS, model, true, prettyPrintDecimalFormat);
+        fillModel(org, period, ECLASS_PROFILE_HDRS, model, true, prettyPrintDecimalFormat, maxPeriods);
         return "table-period-as-col";
     }
 
@@ -524,10 +556,11 @@ public class SduReportController implements SduQuestions {
     @RequestMapping(value = "/{org}/{period}/carbon-trajectory.html", method = RequestMethod.GET, produces = "text/html")
     @Transactional
     public String carbonTrajectoryTable(@PathVariable("org") String org,
-            @PathVariable("period") String period, Model model) {
+            @PathVariable("period") String period, @RequestParam(value = "maxPeriods", required = false) Integer maxPeriods,
+            Model model) {
         LOGGER.info(String.format("carbonTrajectoryTable for %1$s %2$s", org, period));
 
-        fillModel(org, period, SDU_TREND_HDRS, model, true, prettyPrintDecimalFormat);
+        fillModel(org, period, SDU_TREND_HDRS, model, true, prettyPrintDecimalFormat, maxPeriods);
         return "table-period-as-col";
     }
     
@@ -540,19 +573,21 @@ public class SduReportController implements SduQuestions {
     @RequestMapping(value = "/{org}/{period}/carbon-trajectory.csv", method = RequestMethod.GET, produces = "text/csv")
     @Transactional
     public String carbonTrajectoryCsv(@PathVariable("org") String org,
-            @PathVariable("period") String period, Model model) {
+            @PathVariable("period") String period, @RequestParam(value = "maxPeriods", required = false) Integer maxPeriods,
+            Model model) {
         LOGGER.info(String.format("carbonTrajectoryCsv for %1$s %2$s", org, period));
 
-        fillModel(org, period, SDU_TREND_HDRS, model, false, rawDecimalFormat);
+        fillModel(org, period, SDU_TREND_HDRS, model, false, rawDecimalFormat, maxPeriods);
         return "csv";
     }
     
-    private void fillModel(String org, String period, Q[] headers, Model model, boolean periodAsCol, DecimalFormat decimalFormat) {
+    private void fillModel(String org, String period, Q[] headers, Model model,
+            boolean periodAsCol, DecimalFormat decimalFormat, Integer maxPeriods) {
         String[] headerNames = new String[headers.length];
         for (int i = 0 ; i < headers.length ; i++) {
             headerNames[i] = headers[i].name();
         }
-        
+
         List<Answer> answers = answerRepo.findByOrgAndQuestion(org,
             headerNames);
         LOGGER.info(
@@ -560,13 +595,15 @@ public class SduReportController implements SduQuestions {
                         answers.size(), org));
 
         TabularDataSet table = tdsHelper.tabulate(headerNames, answers, decimalFormat);
+        if (maxPeriods == null) {
+            model.addAttribute("periods", PeriodUtil.fillBackwards(period,
+                    table.rows().length));
+        } else {
+            model.addAttribute("periods", PeriodUtil.fillBackwards(period,
+                    table.rows().length < maxPeriods ? table.rows().length : maxPeriods));
+        }
         if (periodAsCol) {
             table = table.transpose();
-            model.addAttribute("periods",
-                    PeriodUtil.fillBackwards(period, table.rows().length/headers.length));
-        } else {
-            model.addAttribute("periods",
-                    PeriodUtil.fillBackwards(period, table.rows().length));
         }
         model.addAttribute("table", table);
         model.addAttribute("messages",
