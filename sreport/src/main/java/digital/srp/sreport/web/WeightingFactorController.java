@@ -2,6 +2,7 @@ package digital.srp.sreport.web;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
@@ -65,32 +66,33 @@ public class WeightingFactorController {
                         "Skip import of existing factor: %1$s for: %2$s",
                         factor.orgType(), factor.applicablePeriod()));
             } else {
-                wfactorRepo.save(factor);
+                factor.createdBy("Inst");
+                createInternal(factor);
             }
         }
     }
     
     /**
-     * Return just the specified cfactor.
+     * Return just the specified weighting factor.
      * 
-     * @return The specified cfactor.
+     * @return The specified weighting factor.
      */
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
     @JsonView(WeightingFactorViews.Detailed.class)
     @Transactional
     public @ResponseBody WeightingFactor findById(
-            @PathVariable("id") Long cfactorId) {
-        LOGGER.info(String.format("findById %1$s", cfactorId));
+            @PathVariable("id") Long factorId) {
+        LOGGER.info(String.format("findById %1$s", factorId));
 
-        WeightingFactor cfactor = wfactorRepo.findOne(cfactorId);
+        WeightingFactor factor = wfactorRepo.findOne(factorId);
 
-        return addLinks(cfactor);
+        return addLinks(factor);
     }
 
     /**
-     * Return just the specified cfactor.
+     * Return just the specified weighting factor.
      * 
-     * @return The specified cfactor.
+     * @return The specified weighting factor.
      */
     @RequestMapping(value = "/findByName/{name}", method = RequestMethod.GET)
     @JsonView(WeightingFactorViews.Detailed.class)
@@ -99,9 +101,9 @@ public class WeightingFactorController {
             @PathVariable("name") String name) {
         LOGGER.info(String.format("findByName %1$s", name));
 
-        WeightingFactor cfactor = wfactorRepo.findByOrgType(name);
+        WeightingFactor factor = wfactorRepo.findByOrgType(name);
 
-        return cfactor;
+        return factor;
     }
     
     /**
@@ -114,7 +116,7 @@ public class WeightingFactorController {
     public @ResponseBody List<WeightingFactor> list(
             @RequestParam(value = "page", required = false) Integer page,
             @RequestParam(value = "limit", required = false) Integer limit) {
-        LOGGER.info(String.format("List carbon factors"));
+        LOGGER.info(String.format("List weighting factors"));
 
         List<WeightingFactor> list;
         if (limit == null) {
@@ -129,7 +131,7 @@ public class WeightingFactorController {
     }
     
     /**
-     * Create a new cfactor.
+     * Create a new weighting factor.
      * 
      * @return
      */
@@ -137,22 +139,23 @@ public class WeightingFactorController {
     @ResponseStatus(value = HttpStatus.CREATED)
     @RequestMapping(value = "/", method = RequestMethod.POST)
     public @ResponseBody ResponseEntity<?> create(
-            @RequestBody WeightingFactor cfactor) {
+            @RequestBody WeightingFactor factor) {
 
-        createInternal(cfactor);
+        createInternal(factor);
 
         UriComponentsBuilder builder = MvcUriComponentsBuilder
                 .fromController(getClass());
         HashMap<String, String> vars = new HashMap<String, String>();
-        vars.put("id", cfactor.id().toString());
+        vars.put("id", factor.id().toString());
 
         HttpHeaders headers = new HttpHeaders();
         headers.setLocation(builder.path("/{id}").buildAndExpand(vars).toUri());
         return new ResponseEntity(headers, HttpStatus.CREATED);
     }
 
-    protected void createInternal(WeightingFactor cfactor) {
-        cfactor = wfactorRepo.save(cfactor);
+    protected void createInternal(WeightingFactor factor) {
+        factor.created(new Date());
+        factor = wfactorRepo.save(factor);
     }
 
     /**

@@ -2,6 +2,7 @@ package digital.srp.sreport.web;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
@@ -65,7 +66,8 @@ public class CarbonFactorController {
                         "Skip import of existing factor: %1$s for: %2$s",
                         factor.name(), factor.applicablePeriod()));
             } else {
-                cfactorRepo.save(factor);
+                factor.createdBy("Installer");
+                createInternal(factor);
             }
         }
     }
@@ -152,11 +154,12 @@ public class CarbonFactorController {
     }
 
     protected void createInternal(CarbonFactor cfactor) {
+        cfactor.created(new Date());
         cfactor = cfactorRepo.save(cfactor);
     }
 
     /**
-     * Update an existing cfactor.
+     * Update an existing Carbon factor.
      */
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
     @RequestMapping(value = "/{id}", method = RequestMethod.PUT, consumes = { "application/json" })
