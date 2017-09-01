@@ -1,12 +1,16 @@
 <div class="profile pull-right">
-  <form name="logoutForm" action="{{context}}/logout" method="POST">
-    <span class="tenant">{{#tenant}}{{tenant.id}}{{else}}srp{{/}}</span>
-    <span id="tenantId" class="replaceable super-admin tenant" contenteditable="true" onblur="ractive.switchToTenant($('#tenantId').text())" name="tenantId" style=""value="{{tenant == null ? 'Click to set' : tenant.id}}"></span>
-    <a href="{{context}}/me.html" title="To set your profile picture, please visit gravatar.com">
+  <form name="logoutForm" action="/logout" method="POST">
+    {{#if matchRole('super_admin') && profile.allowedTenantsAsList.length>0}}
+      <select class="super-admin tenant" id="curTenant" onchange="ractive.switchToTenant($('#curTenant').val())">
+        {{#profile.allowedTenantsAsList}}
+          <option value="{{.}}" {{#if . == tenant.id}}selected{{/if}}>{{.}}</option>
+        {{/}}
+      </select>
+    {{/if}}
+    <a href="/srp/me.html" title="To set your profile picture, please visit gravatar.com">
       <span class="profile-img">{{username}}</span>
     </a>
-    <a class="clickable logout glyphicon glyphicon-btn glyphicon-log-out" aria-hidden="true" on-click="logout()"></a>
-    <a class="clickable glyphicon glyphicon-btn glyphicon-question-sign" aria-hidden="true" data-toggle="modal" data-target="#helpModal"></a>
-    <input type="hidden" id="_csrf" name="_csrf" value="{{csrfToken}}" />
+    <a class="logout glyphicon glyphicon-btn glyphicon-log-out" aria-hidden="true" on-click="logout()"></a>
+    <a class="glyphicon glyphicon-btn glyphicon-question-sign" aria-hidden="true" on-click="showHelp()"></a>
   </form>
 </div>
