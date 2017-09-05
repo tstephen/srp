@@ -64,8 +64,12 @@ public class Sdu1617 {
                         Q.BOARD_LEAD_FOR_SUSTAINABILITY,
                         Q.BOARD_SUSTAINABILITY_AS_RISK,
                         Q.ADAPTATION_PLAN_INC,
-                        Q.CCGS_SERVED,
-                        Q.PROVIDERS_COMMISSIONED
+                        Q.CCG1_SERVED, Q.CCG2_SERVED, Q.CCG3_SERVED,
+                        Q.CCG4_SERVED, Q.CCG5_SERVED, Q.CCG6_SERVED,
+                        Q.PROVIDER1_COMMISSIONED, Q.PROVIDER2_COMMISSIONED,
+                        Q.PROVIDER3_COMMISSIONED, Q.PROVIDER4_COMMISSIONED,
+                        Q.PROVIDER5_COMMISSIONED, Q.PROVIDER6_COMMISSIONED,
+                        Q.PROVIDER7_COMMISSIONED, Q.PROVIDER8_COMMISSIONED
                 );
         
         SurveyCategory catFinancial = new SurveyCategory()
