@@ -3,7 +3,9 @@ package digital.srp.sreport.internal;
 public class StringUtils {
 
     public static String toConst(String string) {
-         String c = string.toUpperCase().replaceAll("[ /-]", "_").replaceAll("[:;%&()]", "").replaceAll("___", "_");
+        String c = string.toUpperCase().replaceAll("[ /-]", "_")
+                .replaceAll("[:;%&()]", "").replaceAll("___", "_")
+                .replaceAll("__", "_");
          if (Character.isDigit(c.charAt(0))) {
              return "_"+c;
          } else {

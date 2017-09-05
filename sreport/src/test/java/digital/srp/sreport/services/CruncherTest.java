@@ -130,6 +130,49 @@ public class CruncherTest {
     private /* static final */String[] OTHER_PROCUREMENT_CO2E = { "0", "0", "0",
             "0", "0", "0", "0", "0", "0", "0" };
 
+    private /* static final */String[] PROVISIONS_CO2E = { "970", "970", "970",
+            "0", "0", "0", "0", "0", "0", "0" };
+    private /* static final */String[] STAFF_CLOTHING_CO2E = { "580", "580",
+            "580", "0", "0", "0", "0", "0", "0", "0" };
+    private /* static final */String[] PATIENTS_CLOTHING_AND_FOOTWEAR_CO2E = {
+            "870", "870", "870", "0", "0", "0", "0", "0", "0", "0" };
+    private /* static final */String[] PHARMA_BLOOD_PROD_AND_MED_GASES_CO2E = {
+            "1,720", "1,720", "1,720", "0", "0", "0", "0", "0", "0", "0" };
+    private /* static final */String[] DRESSINGS_CO2E = { "7,700", "7,700",
+            "7,700", "0", "0", "0", "0", "0", "0", "0" };
+    private /* static final */String[] MEDICAL_AND_SURGICAL_EQUIPT_CO2E = {
+            "1,800", "1,800", "1,800", "0", "0", "0", "0", "0", "0", "0" };
+    private /* static final */String[] PATIENTS_APPLIANCES_CO2E = { "10,800",
+            "10,800", "10,800", "0", "0", "0", "0", "0", "0", "0" };
+    private /* static final */String[] CHEMICALS_AND_REAGENTS_CO2E = { "6,080",
+            "6,080", "6,080", "0", "0", "0", "0", "0", "0", "0" };
+    private /* static final */String[] DENTAL_AND_OPTICAL_EQUIPT_CO2E = {
+            "2,700", "2,700", "2,700", "0", "0", "0", "0", "0", "0", "0" };
+    private /* static final */String[] IMAGING_AND_RADIOTHERAPY_EQUIPT_AND_SVCS_CO2E = {
+            "3,000", "3,000", "3,000", "0", "0", "0", "0", "0", "0", "0" };
+    private /* static final */String[] LABORATORY_EQUIPMENT_AND_SERVICES_CO2E = {
+            "3,300", "3,300", "3,300", "0", "0", "0", "0", "0", "0", "0" };
+    private /* static final */String[] HOTEL_EQUIPT_MATERIALS_AND_SVCS_CO2E = {
+            "5,880", "5,880", "5,880", "0", "0", "0", "0", "0", "0", "0" };
+    private /* static final */String[] BLDG_AND_ENG_PROD_AND_SVCS_CO2E = {
+            "6,370", "6,370", "6,370", "0", "0", "0", "0", "0", "0", "0" };
+    private /* static final */String[] PURCHASED_HEALTHCARE_CO2E = { "4,760",
+            "4,760", "4,760", "0", "0", "0", "0", "0", "0", "0" };
+    private /* static final */String[] GARDENING_AND_FARMING_CO2E = { "40,200",
+            "40,200", "40,200", "0", "0", "0", "0", "0", "0", "0" };
+    private /* static final */String[] FURNITURE_FITTINGS_CO2E = { "7,680",
+            "7,680", "7,680", "0", "0", "0", "0", "0", "0", "0" };
+    private /* static final */String[] HARDWARE_CROCKERY_CO2E = { "9,860",
+            "9,860", "9,860", "0", "0", "0", "0", "0", "0", "0" };
+    private /* static final */String[] BEDDING_LINEN_AND_TEXTILES_CO2E = {
+            "5,760", "5,760", "5,760", "0", "0", "0", "0", "0", "0" };
+    private /* static final */String[] OFFICE_EQUIPT_TELCO_COMPUTERS_AND_STATIONERY_CO2E = {
+            "10,100", "10,100", "10,100", "0", "0", "0", "0", "0", "0", "0", "0" };
+    private /* static final */String[] REC_EQUIPT_AND_SOUVENIRS_CO2E = {
+            "5,600", "5,600", "5,600", "0", "0", "0", "0", "0", "0", "0" };
+    private /* static final */String[] CONSULTING_SVCS_AND_EXPENSES_CO2E = {
+            "6,510", "6,510", "6,510", "0", "0", "0", "0", "0", "0", "0" };
+
     private static ObjectMapper objectMapper;
 
     private static List<CarbonFactor> cfactors;
@@ -289,6 +332,164 @@ public class CruncherTest {
             assertEquals(String.format("Incorrect value of %2$s for period %1$s", period, Q.CITIZEN_CO2E),
                     CITIZEN_CO2E[i],
                     rtn.answer(Q.CITIZEN_CO2E, period).response3sf());
+        }
+    }
+
+    /**
+     * Tests the E-Class method of CO2e calculations.
+     */
+    @Test
+    public void testCrunchRJ1() {
+        SurveyReturn rj1 = readSurveyReturn("RJ1");
+        SurveyReturn rtn = cruncher.calculate(rj1);
+
+        assertNotNull(rtn);
+        List<String> periods = PeriodUtil.fillBackwards(rtn.applicablePeriod(),
+                4);
+        for (int i = 0; i < periods.size(); i++) {
+            String period = periods.get(i);
+            // Performance and Policy only relevant to current year
+            if (i == 0) {
+                assertEquals(
+                        String.format("Incorrect value of %2$s for period %1$s",
+                                period, Q.ORG_CODE),
+                        "RJ1", rtn.answer(Q.ORG_CODE, period).response());
+                // ECLASS_USER must be true to get procurement estimates based
+                // on the E-Class method
+                String eClassUser = rtn.answer(Q.ECLASS_USER, period)
+                        .response();
+                assertTrue(
+                        String.format("Incorrect value of %2$s for period %1$s",
+                                period, Q.ECLASS_USER),
+                        Boolean.parseBoolean(eClassUser)
+                                || "0-eClass".equals(eClassUser));
+            }
+
+            assertEquals(
+                    String.format("Incorrect value of %2$s for period %1$s",
+                            period, Q.PROVISIONS_CO2E),
+                    PROVISIONS_CO2E[i],
+                    rtn.answer(Q.PROVISIONS_CO2E, period).response3sf());
+            assertEquals(
+                    String.format("Incorrect value of %2$s for period %1$s",
+                            period, Q.STAFF_CLOTHING_CO2E),
+                    STAFF_CLOTHING_CO2E[i],
+                    rtn.answer(Q.STAFF_CLOTHING_CO2E, period).response3sf());
+            assertEquals(
+                    String.format("Incorrect value of %2$s for period %1$s",
+                            period, Q.PATIENTS_CLOTHING_AND_FOOTWEAR_CO2E),
+                    PATIENTS_CLOTHING_AND_FOOTWEAR_CO2E[i],
+                    rtn.answer(Q.PATIENTS_CLOTHING_AND_FOOTWEAR_CO2E, period)
+                            .response3sf());
+            assertEquals(
+                    String.format("Incorrect value of %2$s for period %1$s",
+                            period, Q.PHARMA_BLOOD_PROD_AND_MED_GASES_CO2E),
+                    PHARMA_BLOOD_PROD_AND_MED_GASES_CO2E[i],
+                    rtn.answer(Q.PHARMA_BLOOD_PROD_AND_MED_GASES_CO2E, period)
+                            .response3sf());
+            assertEquals(
+                    String.format("Incorrect value of %2$s for period %1$s",
+                            period, Q.DRESSINGS_CO2E),
+                    DRESSINGS_CO2E[i],
+                    rtn.answer(Q.DRESSINGS_CO2E, period).response3sf());
+            assertEquals(
+                    String.format("Incorrect value of %2$s for period %1$s",
+                            period, Q.MEDICAL_AND_SURGICAL_EQUIPT_CO2E),
+                    MEDICAL_AND_SURGICAL_EQUIPT_CO2E[i],
+                    rtn.answer(Q.MEDICAL_AND_SURGICAL_EQUIPT_CO2E, period)
+                            .response3sf());
+            assertEquals(
+                    String.format("Incorrect value of %2$s for period %1$s",
+                            period, Q.PATIENTS_APPLIANCES_CO2E),
+                    PATIENTS_APPLIANCES_CO2E[i],
+                    rtn.answer(Q.PATIENTS_APPLIANCES_CO2E, period)
+                            .response3sf());
+            assertEquals(
+                    String.format("Incorrect value of %2$s for period %1$s",
+                            period, Q.CHEMICALS_AND_REAGENTS_CO2E),
+                    CHEMICALS_AND_REAGENTS_CO2E[i],
+                    rtn.answer(Q.CHEMICALS_AND_REAGENTS_CO2E, period)
+                            .response3sf());
+            assertEquals(
+                    String.format("Incorrect value of %2$s for period %1$s",
+                            period, Q.DENTAL_AND_OPTICAL_EQUIPT_CO2E),
+                    DENTAL_AND_OPTICAL_EQUIPT_CO2E[i],
+                    rtn.answer(Q.DENTAL_AND_OPTICAL_EQUIPT_CO2E, period)
+                            .response3sf());
+            assertEquals(
+                    String.format("Incorrect value of %2$s for period %1$s",
+                            period,
+                            Q.IMAGING_AND_RADIOTHERAPY_EQUIPT_AND_SVCS_CO2E),
+                    IMAGING_AND_RADIOTHERAPY_EQUIPT_AND_SVCS_CO2E[i],
+                    rtn.answer(Q.IMAGING_AND_RADIOTHERAPY_EQUIPT_AND_SVCS_CO2E,
+                            period).response3sf());
+            assertEquals(
+                    String.format("Incorrect value of %2$s for period %1$s",
+                            period, Q.LAB_EQUIPT_AND_SVCS_CO2E),
+                    LABORATORY_EQUIPMENT_AND_SERVICES_CO2E[i],
+                    rtn.answer(Q.LAB_EQUIPT_AND_SVCS_CO2E, period)
+                            .response3sf());
+            assertEquals(
+                    String.format("Incorrect value of %2$s for period %1$s",
+                            period, Q.HOTEL_EQUIPT_MATERIALS_AND_SVCS_CO2E),
+                    HOTEL_EQUIPT_MATERIALS_AND_SVCS_CO2E[i],
+                    rtn.answer(Q.HOTEL_EQUIPT_MATERIALS_AND_SVCS_CO2E, period)
+                            .response3sf());
+            assertEquals(
+                    String.format("Incorrect value of %2$s for period %1$s",
+                            period, Q.BLDG_AND_ENG_PROD_AND_SVCS_CO2E),
+                    BLDG_AND_ENG_PROD_AND_SVCS_CO2E[i],
+                    rtn.answer(Q.BLDG_AND_ENG_PROD_AND_SVCS_CO2E, period)
+                            .response3sf());
+            assertEquals(
+                    String.format("Incorrect value of %2$s for period %1$s",
+                            period, Q.PURCHASED_HEALTHCARE_CO2E),
+                    PURCHASED_HEALTHCARE_CO2E[i],
+                    rtn.answer(Q.PURCHASED_HEALTHCARE_CO2E, period)
+                            .response3sf());
+            assertEquals(
+                    String.format("Incorrect value of %2$s for period %1$s",
+                            period, Q.GARDENING_AND_FARMING_CO2E),
+                    GARDENING_AND_FARMING_CO2E[i],
+                    rtn.answer(Q.GARDENING_AND_FARMING_CO2E, period)
+                            .response3sf());
+            assertEquals(
+                    String.format("Incorrect value of %2$s for period %1$s",
+                            period, Q.FURNITURE_FITTINGS_CO2E),
+                    FURNITURE_FITTINGS_CO2E[i],
+                    rtn.answer(Q.FURNITURE_FITTINGS_CO2E, period)
+                            .response3sf());
+            assertEquals(
+                    String.format("Incorrect value of %2$s for period %1$s",
+                            period, Q.HARDWARE_CROCKERY_CO2E),
+                    HARDWARE_CROCKERY_CO2E[i],
+                    rtn.answer(Q.HARDWARE_CROCKERY_CO2E, period).response3sf());
+            assertEquals(
+                    String.format("Incorrect value of %2$s for period %1$s",
+                            period, Q.BEDDING_LINEN_AND_TEXTILES_CO2E),
+                    BEDDING_LINEN_AND_TEXTILES_CO2E[i],
+                    rtn.answer(Q.BEDDING_LINEN_AND_TEXTILES_CO2E, period)
+                            .response3sf());
+            assertEquals(
+                    String.format("Incorrect value of %2$s for period %1$s",
+                            period,
+                            Q.OFFICE_EQUIPT_TELCO_COMPUTERS_AND_STATIONERY_CO2E),
+                    OFFICE_EQUIPT_TELCO_COMPUTERS_AND_STATIONERY_CO2E[i],
+                    rtn.answer(
+                            Q.OFFICE_EQUIPT_TELCO_COMPUTERS_AND_STATIONERY_CO2E,
+                            period).response3sf());
+            assertEquals(
+                    String.format("Incorrect value of %2$s for period %1$s",
+                            period, Q.REC_EQUIPT_AND_SOUVENIRS_CO2E),
+                    REC_EQUIPT_AND_SOUVENIRS_CO2E[i],
+                    rtn.answer(Q.REC_EQUIPT_AND_SOUVENIRS_CO2E, period)
+                            .response3sf());
+            assertEquals(
+                    String.format("Incorrect value of %2$s for period %1$s",
+                            period, Q.CONSULTING_SVCS_AND_EXPENSES_CO2E),
+                    CONSULTING_SVCS_AND_EXPENSES_CO2E[i],
+                    rtn.answer(Q.CONSULTING_SVCS_AND_EXPENSES_CO2E, period)
+                            .response3sf());
         }
     }
 

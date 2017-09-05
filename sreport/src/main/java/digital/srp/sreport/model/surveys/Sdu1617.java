@@ -188,14 +188,29 @@ public class Sdu1617 {
                         Q.TRAVEL_SPEND,
                         Q.COMMISSIONING_SPEND
                 );
-//        SurveyCategory catCalcs = new SurveyCategory().name("Calculations");
-        
+        SurveyCategory catEClassProfile = new SurveyCategory()
+                .name("E-Class Profile")
+                .questionEnums(
+                        Q.PROVISIONS, Q.STAFF_CLOTHING,
+                        Q.PATIENTS_CLOTHING_AND_FOOTWEAR,
+                        Q.PHARMA_BLOOD_PROD_AND_MED_GASES, Q.DRESSINGS,
+                        Q.MEDICAL_AND_SURGICAL_EQUIPT, Q.PATIENTS_APPLIANCES,
+                        Q.CHEMICALS_AND_REAGENTS, Q.DENTAL_AND_OPTICAL_EQUIPT,
+                        Q.IMAGING_AND_RADIOTHERAPY_EQUIPT_AND_SVCS,
+                        Q.LAB_EQUIPT_AND_SVCS, Q.HOTEL_EQUIPT_MATERIALS_AND_SVCS,
+                        Q.BLDG_AND_ENG_PROD_AND_SVCS, Q.PURCHASED_HEALTHCARE,
+                        Q.GARDENING_AND_FARMING, Q.FURNITURE_FITTINGS,
+                        Q.HARDWARE_CROCKERY, Q.BEDDING_LINEN_AND_TEXTILES,
+                        Q.OFFICE_EQUIPT_TELCO_COMPUTERS_AND_STATIONERY,
+                        Q.REC_EQUIPT_AND_SOUVENIRS,
+                        Q.CONSULTING_SVCS_AND_EXPENSES
+                );
         Survey survey = new Survey().name(ID).status("Draft")
                 .applicablePeriod("2016-17")
                 .categories(catOrg, catPolicy, catPerf,
                         catFinancial, catEnergy, catWaste,
                         catWater, catBizTravel, catOtherTravel, catGases,
-                        catAdditional, catSpendProfile);
+                        catAdditional, catSpendProfile, catEClassProfile);
         return survey;
     }
 }

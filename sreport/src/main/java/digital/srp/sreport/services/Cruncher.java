@@ -69,8 +69,9 @@ public class Cruncher implements digital.srp.sreport.model.surveys.SduQuestions 
             // TODO Outside scopes -Breakdown - not included in carbon emissions
             // totals
             try {
-                if (Boolean.parseBoolean(
-                        rtn.answer(Q.ECLASS_USER, period).response())) {
+                String eClassUser = rtn.answer(Q.ECLASS_USER, period).response();
+                if (Boolean.parseBoolean(eClassUser)
+                        || "0-eClass".equals(eClassUser)) {
                     calcCarbonProfileEClassMethod(period, rtn);
                 } else {
                     calcCarbonProfileSduMethod(period, rtn);
@@ -455,7 +456,90 @@ public class Cruncher implements digital.srp.sreport.model.surveys.SduQuestions 
 
 
     private void calcCarbonProfileEClassMethod(String period, SurveyReturn rtn) {
-//    TODO
+        // Logic here is that *1000 for thousands of pounds to pounds the
+        // /1000 to convert factor from kg to tonnes, i.e. cancel each other out
+        CarbonFactor cFactor = cFactor(CarbonFactors.PROVISIONS, period);
+        crunchCO2e(period, rtn, Q.PROVISIONS, cFactor.value(),
+                Q.PROVISIONS_CO2E);
+        cFactor = cFactor(CarbonFactors.STAFF_CLOTHING, period);
+        crunchCO2e(period, rtn, Q.STAFF_CLOTHING, cFactor.value(),
+                Q.STAFF_CLOTHING_CO2E);
+        cFactor = cFactor(CarbonFactors.PATIENTS_CLOTHING_FOOTWEAR, period);
+        crunchCO2e(period, rtn, Q.PATIENTS_CLOTHING_AND_FOOTWEAR,
+                cFactor.value(), Q.PATIENTS_CLOTHING_AND_FOOTWEAR_CO2E);
+        cFactor = cFactor(
+                CarbonFactors.PHARMACEUTICALS_BLOOD_PRODUCTS_MEDICAL_GASES,
+                period);
+        crunchCO2e(period, rtn, Q.PHARMA_BLOOD_PROD_AND_MED_GASES,
+                cFactor.value(), Q.PHARMA_BLOOD_PROD_AND_MED_GASES_CO2E);
+        cFactor = cFactor(CarbonFactors.DRESSINGS, period);
+        crunchCO2e(period, rtn, Q.DRESSINGS, cFactor.value(), Q.DRESSINGS_CO2E);
+        cFactor = cFactor(CarbonFactors.MEDICAL_SURGICAL_EQUIPMENT, period);
+        crunchCO2e(period, rtn, Q.MEDICAL_AND_SURGICAL_EQUIPT, cFactor.value(),
+                Q.MEDICAL_AND_SURGICAL_EQUIPT_CO2E);
+        cFactor = cFactor(CarbonFactors.PATIENTS_APPLIANCES, period);
+        crunchCO2e(period, rtn, Q.PATIENTS_APPLIANCES, cFactor.value(),
+                Q.PATIENTS_APPLIANCES_CO2E);
+        cFactor = cFactor(CarbonFactors.CHEMICALS_REAGENTS, period);
+        crunchCO2e(period, rtn, Q.CHEMICALS_AND_REAGENTS, cFactor.value(),
+                Q.CHEMICALS_AND_REAGENTS_CO2E);
+        cFactor = cFactor(CarbonFactors.DENTAL_OPTICAL_EQUIPMENT, period);
+        crunchCO2e(period, rtn, Q.DENTAL_AND_OPTICAL_EQUIPT, cFactor.value(),
+                Q.DENTAL_AND_OPTICAL_EQUIPT_CO2E);
+        cFactor = cFactor(
+                CarbonFactors.DIAGNOSTIC_IMAGING_RADIOTHERAPY_EQUIPMENT_SERVICES,
+                period);
+        crunchCO2e(period, rtn, Q.IMAGING_AND_RADIOTHERAPY_EQUIPT_AND_SVCS,
+                cFactor.value(),
+                Q.IMAGING_AND_RADIOTHERAPY_EQUIPT_AND_SVCS_CO2E);
+        cFactor = cFactor(CarbonFactors.LABORATORY_EQUIPMENT_SERVICES, period);
+        crunchCO2e(period, rtn, Q.LAB_EQUIPT_AND_SVCS, cFactor.value(),
+                Q.LAB_EQUIPT_AND_SVCS_CO2E);
+        // cFactor = cFactor(CarbonFactors.FUEL_LIGHT_POWER_WATER, period);
+        // crunchCO2e(period, rtn, Q.FUEL_LIGHT_POWER_WATER,
+        // cFactor.value(), Q.FUEL_LIGHT_POWER_WATER_CO2E);
+        cFactor = cFactor(
+                CarbonFactors.HOTEL_SERVICES_EQUIPMENT_MATERIALS_SERVICES,
+                period);
+        crunchCO2e(period, rtn, Q.HOTEL_EQUIPT_MATERIALS_AND_SVCS,
+                cFactor.value(), Q.HOTEL_EQUIPT_MATERIALS_AND_SVCS_CO2E);
+        cFactor = cFactor(CarbonFactors.BUILDING_ENGINEERING_PRODUCTS_SERVICES,
+                period);
+        crunchCO2e(period, rtn, Q.BLDG_AND_ENG_PROD_AND_SVCS, cFactor.value(),
+                Q.BLDG_AND_ENG_PROD_AND_SVCS_CO2E);
+        cFactor = cFactor(CarbonFactors.PURCHASED_HEALTHCARE, period);
+        crunchCO2e(period, rtn, Q.PURCHASED_HEALTHCARE, cFactor.value(),
+                Q.PURCHASED_HEALTHCARE_CO2E);
+        cFactor = cFactor(CarbonFactors.GARDENING_FARMING, period);
+        crunchCO2e(period, rtn, Q.GARDENING_AND_FARMING, cFactor.value(),
+                Q.GARDENING_AND_FARMING_CO2E);
+        cFactor = cFactor(CarbonFactors.FURNITURE_FITTINGS, period);
+        crunchCO2e(period, rtn, Q.FURNITURE_FITTINGS, cFactor.value(),
+                Q.FURNITURE_FITTINGS_CO2E);
+        cFactor = cFactor(CarbonFactors.HARDWARE_CROCKERY, period);
+        crunchCO2e(period, rtn, Q.HARDWARE_CROCKERY, cFactor.value(),
+                Q.HARDWARE_CROCKERY_CO2E);
+        cFactor = cFactor(CarbonFactors.BEDDING_LINEN_TEXTILES, period);
+        crunchCO2e(period, rtn, Q.BEDDING_LINEN_AND_TEXTILES, cFactor.value(),
+                Q.BEDDING_LINEN_AND_TEXTILES_CO2E);
+        cFactor = cFactor(
+                CarbonFactors.OFFICE_EQUIPMENT_TELECOMMS_COMPUTERS_STATIONERY,
+                period);
+        crunchCO2e(period, rtn, Q.OFFICE_EQUIPT_TELCO_COMPUTERS_AND_STATIONERY,
+                cFactor.value(),
+                Q.OFFICE_EQUIPT_TELCO_COMPUTERS_AND_STATIONERY_CO2E);
+        // cFactor = cFactor(CarbonFactors.TRANSPORTATION, period);
+        // crunchCO2e(period, rtn, Q.TRANSPORTATION, cFactor.value(),
+        // Q.TRANSPORTATION_CO2E);
+        cFactor = cFactor(CarbonFactors.RECREATIONAL_EQUIPMENT_SOUVENIRS,
+                period);
+        crunchCO2e(period, rtn, Q.REC_EQUIPT_AND_SOUVENIRS, cFactor.value(),
+                Q.REC_EQUIPT_AND_SOUVENIRS_CO2E);
+        cFactor = cFactor(
+                CarbonFactors.STAFF_PATIENT_CONSULTING_SERVICES_EXPENSES,
+                period);
+        crunchCO2e(period, rtn, Q.CONSULTING_SVCS_AND_EXPENSES, cFactor.value(),
+                Q.CONSULTING_SVCS_AND_EXPENSES_CO2E);
     }
 
     private void calcTrendOverTime(String period, SurveyReturn rtn) {
