@@ -39,6 +39,7 @@ import link.omny.acctmgmt.AcctMgmtConfig;
 import link.omny.acctmgmt.model.SystemConfig;
 import link.omny.catalog.CatalogConfig;
 import link.omny.custmgmt.CustMgmtConfig;
+import link.omny.supportservices.SupportServicesConfig;
 
 // See https://github.com/spring-projects/spring-boot/issues/6529 for alternative if JMX needed
 //@EnableAutoConfiguration(exclude = { EndpointMBeanExportAutoConfiguration.class })
@@ -47,7 +48,8 @@ import link.omny.custmgmt.CustMgmtConfig;
         AuthConfig.class, OneDecisionConfig.class, OneDecisionDomainConfig.class,
         AcctMgmtConfig.class, BpmConfiguration.class, 
         CatalogConfig.class, CustMgmtConfig.class,
-        MaccConfig.class, SReportConfiguration.class, SrpConfig.class })
+        MaccConfig.class, SReportConfiguration.class, SrpConfig.class,
+        SupportServicesConfig.class })
 public class Application extends WebMvcConfigurerAdapter {
 
     protected static final Logger LOGGER = LoggerFactory
