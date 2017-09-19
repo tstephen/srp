@@ -2,6 +2,7 @@ package digital.srp.server.web;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -165,8 +166,8 @@ public class MgmtController {
                 for (Answer answer: surveyReturn.answers()) {
                     LOGGER.debug("Looking for answer for org: {}, period: {} and question: {}", 
                             surveyReturn.org(), answer.applicablePeriod(), answer.question().name());
-                    Answer existingAnswer = existingReturn.answer(answer.question().q(), answer.applicablePeriod());
-                    if ((existingAnswer == null || existingAnswer.response().equals("0"))
+                    Optional<Answer> existingAnswer = existingReturn.answer(answer.question().q(), answer.applicablePeriod());
+                    if (!existingAnswer.isPresent()
                             && answerRepo.findByOrgPeriodAndQuestion(surveyReturn.org(), answer.applicablePeriod(), answer.question().name()) == null) {
                         answer.question(findQ(answer));
                         answer.addSurveyReturn(existingReturn);

@@ -6,7 +6,8 @@ import static org.junit.Assert.fail;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -47,7 +48,7 @@ public class EricSurveyAndResponseTest {
         
         assertQuestionJsonFileOk(survey);
         
-        ArrayList<Answer> answers = new ArrayList<Answer>();
+        Set<Answer> answers = new HashSet<Answer>();
         for (int i = 0; i < survey.categories().size(); i++) {
             System.out.println(String.format(
                     "  supplying answers for category: %1$s. %2$s", i,

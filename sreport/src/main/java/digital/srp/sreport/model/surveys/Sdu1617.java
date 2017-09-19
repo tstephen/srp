@@ -214,7 +214,7 @@ public class Sdu1617 {
                 .categories(catOrg, catPolicy, catPerf,
                         catFinancial, catEnergy, catWaste,
                         catWater, catBizTravel, catOtherTravel, catGases,
-                        catAdditional, catSpendProfile, catEClassProfile);
+                        catAdditional, catEClassProfile, catSpendProfile);
         return survey;
     }
 }

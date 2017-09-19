@@ -35,7 +35,7 @@ public class CruncherTest {
     private /* static final */String[] PROCUREMENT_CO2E = { "17,500", "19,200",
             "20,900", "21,500", "0", "0", "0", "0", "0", "0" };
 
-    private /* static final */String[] CORE_CO2E = { "8,720", "9,650", "13,900",
+    private /* static final */String[] CORE_CO2E = { "8,650", "9,570", "13,800",
             "17,000", "0", "0", "0", "0", "0", "0" };
 
     private /* static final */String[] COMMISSIONING_CO2E = { "1,250", "1,370",
@@ -89,14 +89,14 @@ public class CruncherTest {
     private /* static final */String[] WATER_CO2E = { "22", "24", "26", "28",
             "0", "0", "0", "0", "0", "0" };
 
-    private /* static final */String[] SCOPE_2 = { "563", "666", "653", "743",
+    private /* static final */String[] SCOPE_2 = { "486", "593", "559", "681",
             "0", "0", "0", "0", "0", "0" };
 
     private /* static final */String[] NET_ELEC_CO2E = { "339", "398", "394",
             "435", "0", "0", "0", "0", "0", "0" };
 
-    private /* static final */String[] NET_THERMAL_ENERGY_CO2E = { "224", "268",
-            "259", "308", "0", "0", "0", "0", "0", "0" };
+    private /* static final */String[] NET_THERMAL_ENERGY_CO2E = { "146", "195",
+            "165", "246", "0", "0", "0", "0", "0", "0" };
 
     private /* static final */String[] SCOPE_1 = { "7,910", "8,710", "13,000",
             "16,000", "0", "0", "0", "0", "0", "0" };
@@ -173,6 +173,19 @@ public class CruncherTest {
     private /* static final */String[] CONSULTING_SVCS_AND_EXPENSES_CO2E = {
             "6,510", "6,510", "6,510", "0", "0", "0", "0", "0", "0", "0" };
 
+    private /* static final */String[] TOTAL_ENERGY_CO2E = {
+            "2,270", "2,520", "2,690", "3,110", "0", "0", "0", "0", "0", "0" };
+    private /* static final */String[] TOTAL_PROCUREMENT_CO2E = {
+            "23,400", "25,700", "31,500", "34,700", "0", "0", "0", "0", "0", "0" };
+    private /* static final */String[] TOTAL_CO2E = {
+            "27,400", "30,100", "36,200", "39,900", "0", "0", "0", "0", "0", "0" };
+    private /* static final */String[] TOTAL_CO2E_BY_POP = {
+            "0.024", "0.027", "0.032", "0.035", "0", "0", "0", "0", "0", "0" };
+    private /* static final */String[] TOTAL_CO2E_BY_FLOOR = {
+            "0.439", "0.482", "0.581", "0.64", "0", "0", "0", "0", "0", "0" };
+    private /* static final */String[] TOTAL_CO2E_BY_WTE = {
+            "7.27", "8", "9.63", "10.6", "0", "0", "0", "0", "0", "0" };
+
     private static ObjectMapper objectMapper;
 
     private static List<CarbonFactor> cfactors;
@@ -206,132 +219,153 @@ public class CruncherTest {
             // Performance and Policy only relevant to current year
             if (i == 0) {
                 assertEquals(String.format("Incorrect value of %2$s for period %1$s", period, Q.ORG_CODE),
-                        "RDR", rtn.answer(Q.ORG_CODE, period).response());
+                        "RDR", rtn.answer(Q.ORG_CODE, period).orElseThrow(() -> new IllegalStateException()).response());
             }
 
             // SCOPE 1: DIRECT
             assertEquals(String.format("Incorrect value of %2$s for period %1$s", period, Q.OWNED_BUILDINGS_GAS),
                     OWNED_BUILDINGS_GAS[i],
-                    rtn.answer(Q.OWNED_BUILDINGS_GAS, period).response3sf());
+                    rtn.answer(Q.OWNED_BUILDINGS_GAS, period).orElseThrow(() -> new IllegalStateException()).response3sf());
             assertEquals(String.format("Incorrect value of %2$s for period %1$s", period, Q.OWNED_VEHICLES),
                     OWNED_VEHICLES[i],
-                    rtn.answer(Q.OWNED_VEHICLES, period).response3sf());
+                    rtn.answer(Q.OWNED_VEHICLES, period).orElseThrow(() -> new IllegalStateException()).response3sf());
 
             // ANAESTHETIC GASES
             assertEquals(String.format("Incorrect value of %2$s for period %1$s", period, Q.DESFLURANE_CO2E),
                     DESFLURANE_CO2E[i],
-                    rtn.answer(Q.DESFLURANE_CO2E, period).response3sf());
+                    rtn.answer(Q.DESFLURANE_CO2E, period).orElseThrow(() -> new IllegalStateException()).response3sf());
             assertEquals(String.format("Incorrect value of %2$s for period %1$s", period, Q.ISOFLURANE_CO2E),
                     ISOFLURANE_CO2E[i],
-                    rtn.answer(Q.ISOFLURANE_CO2E, period).response3sf());
+                    rtn.answer(Q.ISOFLURANE_CO2E, period).orElseThrow(() -> new IllegalStateException()).response3sf());
             assertEquals(String.format("Incorrect value of %2$s for period %1$s", period, Q.SEVOFLURANE_CO2E),
                     SEVOFLURANE_CO2E[i],
-                    rtn.answer(Q.SEVOFLURANE_CO2E, period).response3sf());
+                    rtn.answer(Q.SEVOFLURANE_CO2E, period).orElseThrow(() -> new IllegalStateException()).response3sf());
             assertEquals(String.format("Incorrect value of %2$s for period %1$s", period, Q.NITROUS_OXIDE_CO2E),
                     NITROUS_OXIDE_CO2E[i],
-                    rtn.answer(Q.NITROUS_OXIDE_CO2E, period).response3sf());
+                    rtn.answer(Q.NITROUS_OXIDE_CO2E, period).orElseThrow(() -> new IllegalStateException()).response3sf());
             assertEquals(String.format("Incorrect value of %2$s for period %1$s", period, Q.PORTABLE_NITROUS_OXIDE_MIX_CO2E),
                     PORTABLE_NITROUS_OXIDE_MIX_CO2E[i],
                     rtn.answer(Q.PORTABLE_NITROUS_OXIDE_MIX_CO2E, period)
-                            .response3sf());
+                            .orElseThrow(() -> new IllegalStateException()).response3sf());
             assertEquals(String.format("Incorrect value of %2$s for period %1$s", period, Q.PORTABLE_NITROUS_OXIDE_MIX_MATERNITY_CO2E),
                     PORTABLE_NITROUS_OXIDE_MIX_MATERNITY_CO2E[i],
                     rtn.answer(Q.PORTABLE_NITROUS_OXIDE_MIX_MATERNITY_CO2E,
-                            period).response3sf());
+                            period).orElseThrow(() -> new IllegalStateException()).response3sf());
             // Total the 6 above
             assertEquals(String.format("Incorrect value of %2$s for period %1$s", period, Q.ANAESTHETIC_GASES_CO2E),
                     ANAESTHETIC_GASES_CO2E[i],
-                    rtn.answer(Q.ANAESTHETIC_GASES_CO2E, period).response3sf());
+                    rtn.answer(Q.ANAESTHETIC_GASES_CO2E, period).orElseThrow(() -> new IllegalStateException()).response3sf());
 
             assertEquals(String.format("Incorrect value of %2$s for period %1$s", period, Q.SCOPE_1),
-                    SCOPE_1[i], rtn.answer(Q.SCOPE_1, period).response3sf());
+                    SCOPE_1[i], rtn.answer(Q.SCOPE_1, period).orElseThrow(() -> new IllegalStateException()).response3sf());
             // END SCOPE 1
 
             // // SCOPE 2: INDIRECT
             assertEquals(String.format("Incorrect value of %2$s for period %1$s", period, Q.NET_THERMAL_ENERGY_CO2E),
                     NET_THERMAL_ENERGY_CO2E[i],
                     rtn.answer(Q.NET_THERMAL_ENERGY_CO2E, period)
-                            .response3sf());
+                            .orElseThrow(() -> new IllegalStateException()).response3sf());
             assertEquals(String.format("Incorrect value of %2$s for period %1$s", period, Q.NET_ELEC_CO2E),
                     NET_ELEC_CO2E[i],
-                    rtn.answer(Q.NET_ELEC_CO2E, period).response3sf());
+                    rtn.answer(Q.NET_ELEC_CO2E, period).orElseThrow(() -> new IllegalStateException()).response3sf());
             assertEquals(String.format("Incorrect value of %2$s for period %1$s", period, Q.SCOPE_2),
-                    SCOPE_2[i], rtn.answer(Q.SCOPE_2, period).response3sf());
+                    SCOPE_2[i], rtn.answer(Q.SCOPE_2, period).orElseThrow(() -> new IllegalStateException()).response3sf());
 
             // SCOPE 3: INDIRECT (SUPPLY CHAIN)
             assertEquals(String.format("Incorrect value of %2$s for period %1$s", period, Q.WATER_CO2E),
                     WATER_CO2E[i],
-                    rtn.answer(Q.WATER_CO2E, period).response3sf());
+                    rtn.answer(Q.WATER_CO2E, period).orElseThrow(() -> new IllegalStateException()).response3sf());
             assertEquals(String.format("Incorrect value of %2$s for period %1$s", period, Q.WATER_TREATMENT_CO2E),
                     WATER_TREATMENT_CO2E[i],
-                    rtn.answer(Q.WATER_TREATMENT_CO2E, period).response3sf());
+                    rtn.answer(Q.WATER_TREATMENT_CO2E, period).orElseThrow(() -> new IllegalStateException()).response3sf());
             assertEquals(String.format("Incorrect value of %2$s for period %1$s", period, Q.SCOPE_3_WATER),
                     SCOPE_3_WATER[i],
-                    rtn.answer(Q.SCOPE_3_WATER, period).response3sf());
+                    rtn.answer(Q.SCOPE_3_WATER, period).orElseThrow(() -> new IllegalStateException()).response3sf());
             // RDR 15-16 example has 29 but questions don't match, this is a
             // subset
             assertEquals(String.format("Incorrect value of %2$s for period %1$s", period, Q.SCOPE_3_WASTE),
                     SCOPE_3_WASTE[i],
-                    rtn.answer(Q.SCOPE_3_WASTE, period).response3sf());
+                    rtn.answer(Q.SCOPE_3_WASTE, period).orElseThrow(() -> new IllegalStateException()).response3sf());
 
             // ECLASS_USER must be false or missing to get SDU procurement
             // estimates
-            assertTrue(!Boolean.parseBoolean(
-                    rtn.answer(Q.ECLASS_USER, period).response()));
+            assertTrue(!cruncher.isEClassUser(rtn));
             // These numbers don't match the RDR 15-16 spreadsheet, but close.
             // Rounding? Or slightly updated factors?
             assertEquals(String.format("Incorrect value of %2$s for period %1$s", period, Q.WASTE_AND_WATER_CO2E),
                     WASTE_AND_WATER_CO2E[i],
-                    rtn.answer(Q.WASTE_AND_WATER_CO2E, period).response3sf());
+                    rtn.answer(Q.WASTE_AND_WATER_CO2E, period).orElseThrow(() -> new IllegalStateException()).response3sf());
             assertEquals(String.format("Incorrect value of %2$s for period %1$s", period, Q.BIZ_SVCS_CO2E),
                     BIZ_SVCS_CO2E[i],
-                    rtn.answer(Q.BIZ_SVCS_CO2E, period).response3sf());
+                    rtn.answer(Q.BIZ_SVCS_CO2E, period).orElseThrow(() -> new IllegalStateException()).response3sf());
             assertEquals(String.format("Incorrect value of %2$s for period %1$s", period, Q.CONSTRUCTION_CO2E),
                     CONSTRUCTION_CO2E[i],
-                    rtn.answer(Q.CONSTRUCTION_CO2E, period).response3sf());
+                    rtn.answer(Q.CONSTRUCTION_CO2E, period).orElseThrow(() -> new IllegalStateException()).response3sf());
             assertEquals(String.format("Incorrect value of %2$s for period %1$s", period, Q.CATERING_CO2E),
                     CATERING_CO2E[i],
-                    rtn.answer(Q.CATERING_CO2E, period).response3sf());
+                    rtn.answer(Q.CATERING_CO2E, period).orElseThrow(() -> new IllegalStateException()).response3sf());
             assertEquals(String.format("Incorrect value of %2$s for period %1$s", period, Q.FREIGHT_CO2E),
                     FREIGHT_CO2E[i],
-                    rtn.answer(Q.FREIGHT_CO2E, period).response3sf());
+                    rtn.answer(Q.FREIGHT_CO2E, period).orElseThrow(() -> new IllegalStateException()).response3sf());
             assertEquals(String.format("Incorrect value of %2$s for period %1$s", period, Q.ICT_CO2E),
-                    ICT_CO2E[i], rtn.answer(Q.ICT_CO2E, period).response3sf());
+                    ICT_CO2E[i], rtn.answer(Q.ICT_CO2E, period).orElseThrow(() -> new IllegalStateException()).response3sf());
             assertEquals(String.format("Incorrect value of %2$s for period %1$s", period, Q.CHEM_AND_GAS_CO2E),
                     CHEM_AND_GAS_CO2E[i],
-                    rtn.answer(Q.CHEM_AND_GAS_CO2E, period).response3sf());
+                    rtn.answer(Q.CHEM_AND_GAS_CO2E, period).orElseThrow(() -> new IllegalStateException()).response3sf());
             assertEquals(String.format("Incorrect value of %2$s for period %1$s", period, Q.MED_INSTR_CO2E),
                     MED_INSTR_CO2E[i],
-                    rtn.answer(Q.MED_INSTR_CO2E, period).response3sf());
+                    rtn.answer(Q.MED_INSTR_CO2E, period).orElseThrow(() -> new IllegalStateException()).response3sf());
             assertEquals(String.format("Incorrect value of %2$s for period %1$s", period, Q.OTHER_MANUFACTURED_CO2E),
                     OTHER_MANUFACTURED_CO2E[i],
                     rtn.answer(Q.OTHER_MANUFACTURED_CO2E, period)
-                            .response3sf());
+                            .orElseThrow(() -> new IllegalStateException()).response3sf());
             assertEquals(String.format("Incorrect value of %2$s for period %1$s", period, Q.OTHER_PROCUREMENT_CO2E),
                     OTHER_PROCUREMENT_CO2E[i],
-                    rtn.answer(Q.OTHER_PROCUREMENT_CO2E, period).response3sf());
+                    rtn.answer(Q.OTHER_PROCUREMENT_CO2E, period).orElseThrow(() -> new IllegalStateException()).response3sf());
             assertEquals(String.format("Incorrect value of %2$s for period %1$s", period, Q.PAPER_CO2E),
                     PAPER_CO2E[i],
-                    rtn.answer(Q.PAPER_CO2E, period).response3sf());
+                    rtn.answer(Q.PAPER_CO2E, period).orElseThrow(() -> new IllegalStateException()).response3sf());
             assertEquals(String.format("Incorrect value of %2$s for period %1$s", period, Q.PHARMA_CO2E),
                     PHARMA_CO2E[i],
-                    rtn.answer(Q.PHARMA_CO2E, period).response3sf());
+                    rtn.answer(Q.PHARMA_CO2E, period).orElseThrow(() -> new IllegalStateException()).response3sf());
             assertEquals(String.format("Incorrect value of %2$s for period %1$s", period, Q.TRAVEL_CO2E),
                     TRAVEL_CO2E[i],
-                    rtn.answer(Q.TRAVEL_CO2E, period).response3sf());
+                    rtn.answer(Q.TRAVEL_CO2E, period).orElseThrow(() -> new IllegalStateException()).response3sf());
             assertEquals(String.format("Incorrect value of %2$s for period %1$s", period, Q.COMMISSIONING_CO2E),
                     COMMISSIONING_CO2E[i],
-                    rtn.answer(Q.COMMISSIONING_CO2E, period).response3sf());
+                    rtn.answer(Q.COMMISSIONING_CO2E, period).orElseThrow(() -> new IllegalStateException()).response3sf());
 
             assertEquals(String.format("Incorrect value of %2$s for period %1$s", period, Q.CORE_CO2E),
                     CORE_CO2E[i],
-                    rtn.answer(Q.CORE_CO2E, period).response3sf());
+                    rtn.answer(Q.CORE_CO2E, period).orElseThrow(() -> new IllegalStateException()).response3sf());
             assertEquals(String.format("Incorrect value of %2$s for period %1$s", period, Q.PROCUREMENT_CO2E),
                     PROCUREMENT_CO2E[i],
-                    rtn.answer(Q.PROCUREMENT_CO2E, period).response3sf());
+                    rtn.answer(Q.PROCUREMENT_CO2E, period).orElseThrow(() -> new IllegalStateException()).response3sf());
             assertEquals(String.format("Incorrect value of %2$s for period %1$s", period, Q.CITIZEN_CO2E),
                     CITIZEN_CO2E[i],
-                    rtn.answer(Q.CITIZEN_CO2E, period).response3sf());
+                    rtn.answer(Q.CITIZEN_CO2E, period).orElseThrow(() -> new IllegalStateException()).response3sf());
+
+            // BENCHMARKING
+            assertEquals(String.format("Incorrect value of %2$s for period %1$s", period, Q.TOTAL_ENERGY_CO2E),
+                    TOTAL_ENERGY_CO2E[i],
+                    rtn.answer(Q.TOTAL_ENERGY_CO2E, period).orElseThrow(() -> new IllegalStateException()).response3sf());
+            assertEquals(String.format("Incorrect value of %2$s for period %1$s", period, Q.TOTAL_PROCUREMENT_CO2E),
+                    TOTAL_PROCUREMENT_CO2E[i],
+                    rtn.answer(Q.TOTAL_PROCUREMENT_CO2E, period).orElseThrow(() -> new IllegalStateException()).response3sf());
+            assertEquals(String.format("Incorrect value of %2$s for period %1$s", period, Q.TOTAL_CO2E),
+                    TOTAL_CO2E[i],
+                    rtn.answer(Q.TOTAL_CO2E, period).orElseThrow(() -> new IllegalStateException()).response3sf());
+
+            assertEquals(String.format("Incorrect value of %2$s for period %1$s", period, Q.TOTAL_CO2E_BY_POP),
+                    TOTAL_CO2E_BY_POP[i],
+                    rtn.answer(Q.TOTAL_CO2E_BY_POP, period).orElseThrow(() -> new IllegalStateException()).response3sf());
+            assertEquals(String.format("Incorrect value of %2$s for period %1$s", period, Q.TOTAL_CO2E_BY_FLOOR),
+                    TOTAL_CO2E_BY_FLOOR[i],
+                    rtn.answer(Q.TOTAL_CO2E_BY_FLOOR, period).orElseThrow(() -> new IllegalStateException()).response3sf());
+            assertEquals(String.format("Incorrect value of %2$s for period %1$s", period, Q.TOTAL_CO2E_BY_WTE),
+                    TOTAL_CO2E_BY_WTE[i],
+                    rtn.answer(Q.TOTAL_CO2E_BY_WTE, period).orElseThrow(() -> new IllegalStateException()).response3sf());
+            assertTrue(!rtn.answer(Q.TOTAL_CO2E_BY_PATIENT_CONTACT, period).isPresent());
         }
     }
 
@@ -345,19 +379,20 @@ public class CruncherTest {
 
         assertNotNull(rtn);
         List<String> periods = PeriodUtil.fillBackwards(rtn.applicablePeriod(),
-                4);
+                cruncher.getYearsToCrunch());
         for (int i = 0; i < periods.size(); i++) {
             String period = periods.get(i);
+            System.out.println("  ASSERTING RESULTS FOR "  + period);
             // Performance and Policy only relevant to current year
             if (i == 0) {
                 assertEquals(
                         String.format("Incorrect value of %2$s for period %1$s",
                                 period, Q.ORG_CODE),
-                        "RJ1", rtn.answer(Q.ORG_CODE, period).response());
+                        "RJ1", rtn.answer(Q.ORG_CODE, period).orElseThrow(() -> new IllegalStateException()).response());
                 // ECLASS_USER must be true to get procurement estimates based
                 // on the E-Class method
                 String eClassUser = rtn.answer(Q.ECLASS_USER, period)
-                        .response();
+                        .orElseThrow(() -> new IllegalStateException()).response();
                 assertTrue(
                         String.format("Incorrect value of %2$s for period %1$s",
                                 period, Q.ECLASS_USER),
@@ -369,107 +404,107 @@ public class CruncherTest {
                     String.format("Incorrect value of %2$s for period %1$s",
                             period, Q.PROVISIONS_CO2E),
                     PROVISIONS_CO2E[i],
-                    rtn.answer(Q.PROVISIONS_CO2E, period).response3sf());
+                    rtn.answer(Q.PROVISIONS_CO2E, period).orElseThrow(() -> new IllegalStateException()).response3sf());
             assertEquals(
                     String.format("Incorrect value of %2$s for period %1$s",
                             period, Q.STAFF_CLOTHING_CO2E),
                     STAFF_CLOTHING_CO2E[i],
-                    rtn.answer(Q.STAFF_CLOTHING_CO2E, period).response3sf());
+                    rtn.answer(Q.STAFF_CLOTHING_CO2E, period).orElseThrow(() -> new IllegalStateException()).response3sf());
             assertEquals(
                     String.format("Incorrect value of %2$s for period %1$s",
                             period, Q.PATIENTS_CLOTHING_AND_FOOTWEAR_CO2E),
                     PATIENTS_CLOTHING_AND_FOOTWEAR_CO2E[i],
                     rtn.answer(Q.PATIENTS_CLOTHING_AND_FOOTWEAR_CO2E, period)
-                            .response3sf());
+                            .orElseThrow(() -> new IllegalStateException()).response3sf());
             assertEquals(
                     String.format("Incorrect value of %2$s for period %1$s",
                             period, Q.PHARMA_BLOOD_PROD_AND_MED_GASES_CO2E),
                     PHARMA_BLOOD_PROD_AND_MED_GASES_CO2E[i],
                     rtn.answer(Q.PHARMA_BLOOD_PROD_AND_MED_GASES_CO2E, period)
-                            .response3sf());
+                            .orElseThrow(() -> new IllegalStateException()).response3sf());
             assertEquals(
                     String.format("Incorrect value of %2$s for period %1$s",
                             period, Q.DRESSINGS_CO2E),
                     DRESSINGS_CO2E[i],
-                    rtn.answer(Q.DRESSINGS_CO2E, period).response3sf());
+                    rtn.answer(Q.DRESSINGS_CO2E, period).orElseThrow(() -> new IllegalStateException()).response3sf());
             assertEquals(
                     String.format("Incorrect value of %2$s for period %1$s",
                             period, Q.MEDICAL_AND_SURGICAL_EQUIPT_CO2E),
                     MEDICAL_AND_SURGICAL_EQUIPT_CO2E[i],
                     rtn.answer(Q.MEDICAL_AND_SURGICAL_EQUIPT_CO2E, period)
-                            .response3sf());
+                            .orElseThrow(() -> new IllegalStateException()).response3sf());
             assertEquals(
                     String.format("Incorrect value of %2$s for period %1$s",
                             period, Q.PATIENTS_APPLIANCES_CO2E),
                     PATIENTS_APPLIANCES_CO2E[i],
                     rtn.answer(Q.PATIENTS_APPLIANCES_CO2E, period)
-                            .response3sf());
+                            .orElseThrow(() -> new IllegalStateException()).response3sf());
             assertEquals(
                     String.format("Incorrect value of %2$s for period %1$s",
                             period, Q.CHEMICALS_AND_REAGENTS_CO2E),
                     CHEMICALS_AND_REAGENTS_CO2E[i],
                     rtn.answer(Q.CHEMICALS_AND_REAGENTS_CO2E, period)
-                            .response3sf());
+                            .orElseThrow(() -> new IllegalStateException()).response3sf());
             assertEquals(
                     String.format("Incorrect value of %2$s for period %1$s",
                             period, Q.DENTAL_AND_OPTICAL_EQUIPT_CO2E),
                     DENTAL_AND_OPTICAL_EQUIPT_CO2E[i],
                     rtn.answer(Q.DENTAL_AND_OPTICAL_EQUIPT_CO2E, period)
-                            .response3sf());
+                            .orElseThrow(() -> new IllegalStateException()).response3sf());
             assertEquals(
                     String.format("Incorrect value of %2$s for period %1$s",
                             period,
                             Q.IMAGING_AND_RADIOTHERAPY_EQUIPT_AND_SVCS_CO2E),
                     IMAGING_AND_RADIOTHERAPY_EQUIPT_AND_SVCS_CO2E[i],
                     rtn.answer(Q.IMAGING_AND_RADIOTHERAPY_EQUIPT_AND_SVCS_CO2E,
-                            period).response3sf());
+                            period).orElseThrow(() -> new IllegalStateException()).response3sf());
             assertEquals(
                     String.format("Incorrect value of %2$s for period %1$s",
                             period, Q.LAB_EQUIPT_AND_SVCS_CO2E),
                     LABORATORY_EQUIPMENT_AND_SERVICES_CO2E[i],
                     rtn.answer(Q.LAB_EQUIPT_AND_SVCS_CO2E, period)
-                            .response3sf());
+                            .orElseThrow(() -> new IllegalStateException()).response3sf());
             assertEquals(
                     String.format("Incorrect value of %2$s for period %1$s",
                             period, Q.HOTEL_EQUIPT_MATERIALS_AND_SVCS_CO2E),
                     HOTEL_EQUIPT_MATERIALS_AND_SVCS_CO2E[i],
                     rtn.answer(Q.HOTEL_EQUIPT_MATERIALS_AND_SVCS_CO2E, period)
-                            .response3sf());
+                            .orElseThrow(() -> new IllegalStateException()).response3sf());
             assertEquals(
                     String.format("Incorrect value of %2$s for period %1$s",
                             period, Q.BLDG_AND_ENG_PROD_AND_SVCS_CO2E),
                     BLDG_AND_ENG_PROD_AND_SVCS_CO2E[i],
                     rtn.answer(Q.BLDG_AND_ENG_PROD_AND_SVCS_CO2E, period)
-                            .response3sf());
+                            .orElseThrow(() -> new IllegalStateException()).response3sf());
             assertEquals(
                     String.format("Incorrect value of %2$s for period %1$s",
                             period, Q.PURCHASED_HEALTHCARE_CO2E),
                     PURCHASED_HEALTHCARE_CO2E[i],
                     rtn.answer(Q.PURCHASED_HEALTHCARE_CO2E, period)
-                            .response3sf());
+                            .orElseThrow(() -> new IllegalStateException()).response3sf());
             assertEquals(
                     String.format("Incorrect value of %2$s for period %1$s",
                             period, Q.GARDENING_AND_FARMING_CO2E),
                     GARDENING_AND_FARMING_CO2E[i],
                     rtn.answer(Q.GARDENING_AND_FARMING_CO2E, period)
-                            .response3sf());
+                            .orElseThrow(() -> new IllegalStateException()).response3sf());
             assertEquals(
                     String.format("Incorrect value of %2$s for period %1$s",
                             period, Q.FURNITURE_FITTINGS_CO2E),
                     FURNITURE_FITTINGS_CO2E[i],
                     rtn.answer(Q.FURNITURE_FITTINGS_CO2E, period)
-                            .response3sf());
+                            .orElseThrow(() -> new IllegalStateException()).response3sf());
             assertEquals(
                     String.format("Incorrect value of %2$s for period %1$s",
                             period, Q.HARDWARE_CROCKERY_CO2E),
                     HARDWARE_CROCKERY_CO2E[i],
-                    rtn.answer(Q.HARDWARE_CROCKERY_CO2E, period).response3sf());
+                    rtn.answer(Q.HARDWARE_CROCKERY_CO2E, period).orElseThrow(() -> new IllegalStateException()).response3sf());
             assertEquals(
                     String.format("Incorrect value of %2$s for period %1$s",
                             period, Q.BEDDING_LINEN_AND_TEXTILES_CO2E),
                     BEDDING_LINEN_AND_TEXTILES_CO2E[i],
                     rtn.answer(Q.BEDDING_LINEN_AND_TEXTILES_CO2E, period)
-                            .response3sf());
+                            .orElseThrow(() -> new IllegalStateException()).response3sf());
             assertEquals(
                     String.format("Incorrect value of %2$s for period %1$s",
                             period,
@@ -477,19 +512,19 @@ public class CruncherTest {
                     OFFICE_EQUIPT_TELCO_COMPUTERS_AND_STATIONERY_CO2E[i],
                     rtn.answer(
                             Q.OFFICE_EQUIPT_TELCO_COMPUTERS_AND_STATIONERY_CO2E,
-                            period).response3sf());
+                            period).orElseThrow(() -> new IllegalStateException()).response3sf());
             assertEquals(
                     String.format("Incorrect value of %2$s for period %1$s",
                             period, Q.REC_EQUIPT_AND_SOUVENIRS_CO2E),
                     REC_EQUIPT_AND_SOUVENIRS_CO2E[i],
                     rtn.answer(Q.REC_EQUIPT_AND_SOUVENIRS_CO2E, period)
-                            .response3sf());
+                            .orElseThrow(() -> new IllegalStateException()).response3sf());
             assertEquals(
                     String.format("Incorrect value of %2$s for period %1$s",
                             period, Q.CONSULTING_SVCS_AND_EXPENSES_CO2E),
                     CONSULTING_SVCS_AND_EXPENSES_CO2E[i],
                     rtn.answer(Q.CONSULTING_SVCS_AND_EXPENSES_CO2E, period)
-                            .response3sf());
+                            .orElseThrow(() -> new IllegalStateException()).response3sf());
         }
     }
 

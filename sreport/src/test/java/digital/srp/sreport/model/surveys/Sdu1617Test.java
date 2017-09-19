@@ -27,7 +27,7 @@ public class Sdu1617Test {
     
     @Test
     public void test() throws IOException {
-        Survey survey = new Sdu1617().getSurvey();
+        Survey survey = Sdu1617.getSurvey();
         
         Writer out = null; 
         try {

@@ -1,9 +1,12 @@
 package digital.srp.sreport.model;
 
+import java.math.BigDecimal;
 import java.security.Principal;
-import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -50,7 +53,7 @@ import lombok.experimental.Accessors;
 
 /**
  * Root object making up a single organisation's submission for a single period.
- * 
+ *
  * @author Tim Stephenson
  */
 @Accessors(fluent=true, chain = true)
@@ -59,13 +62,13 @@ import lombok.experimental.Accessors;
 @EqualsAndHashCode(exclude = { "id", "survey", "revision", "created", "createdBy", "lastUpdated", "updatedBy" })
 @NoArgsConstructor
 @Entity
-/* For whatever reason AuditingEntityListener is not adding auditor, hence own listener as well */ 
+/* For whatever reason AuditingEntityListener is not adding auditor, hence own listener as well */
 @EntityListeners( { AuditingEntityListener.class, EntityAuditorListener.class})
 @Table(name= "SR_RETURN")
 public class SurveyReturn implements AuditorAware<String> {
     private static final Logger LOGGER = LoggerFactory
             .getLogger(SurveyReturn.class);
-    
+
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @JsonProperty
@@ -79,7 +82,7 @@ public class SurveyReturn implements AuditorAware<String> {
     @JsonView({ AnswerViews.Detailed.class, SurveyReturnViews.Summary.class })
     @Column(name = "name")
     private String name;
-    
+
     /**
      * Commonly this will be a unique organisation identifier maintained in
      * another system, though it could simply be a friendly name too.
@@ -90,17 +93,17 @@ public class SurveyReturn implements AuditorAware<String> {
     @JsonView({ AnswerViews.Detailed.class, SurveyReturnViews.Summary.class })
     @Column(name = "org")
     private String org;
-    
+
     @NotNull
     @Size(max = 50)
     @JsonProperty
     @JsonView(SurveyReturnViews.Summary.class)
     @Column(name = "status")
     private String status = StatusType.Draft.name();
-    
-    /** 
-     * Period this set of responses apply to. 
-     * 
+
+    /**
+     * Period this set of responses apply to.
+     *
      * <p>For example: calendar or financial year, quarter etc.
      */
     @NotNull
@@ -109,9 +112,9 @@ public class SurveyReturn implements AuditorAware<String> {
     @JsonView(SurveyReturnViews.Summary.class)
     @Column(name = "applicable_period")
     private String applicablePeriod;
-    
+
     /**
-     * Typically there will be one revision of a survey submitted but this 
+     * Typically there will be one revision of a survey submitted but this
      * allows for a re-statement if needed.
      */
     @JsonProperty
@@ -119,39 +122,39 @@ public class SurveyReturn implements AuditorAware<String> {
     @Column(name = "revision")
     private Short revision = 1;
 
-    
+
     @Temporal(TemporalType.TIMESTAMP)
     @JsonProperty
     @JsonView(SurveyReturnViews.Summary.class)
     @Column(name = "submitted_date")
     private Date submittedDate;
 
-    /** 
+    /**
      * Username of submitter.
      */
     @JsonProperty
     @JsonView(SurveyReturnViews.Summary.class)
     @Column(name = "submitted_by")
     private String submittedBy;
-    
+
     @Transient
     @XmlElement(name = "link", namespace = Link.ATOM_NAMESPACE)
     @JsonProperty("links")
     @JsonView(SurveyReturnViews.Summary.class)
     private List<Link> links;
-    
+
     @JsonProperty
     @JsonView(SurveyReturnViews.Summary.class)
     @Column(name = "created", nullable = false, updatable = false)
     @CreatedDate
     private Date created;
- 
+
     @JsonProperty
     @JsonView(SurveyReturnViews.Summary.class)
     @Column(name = "created_by")
     @CreatedBy
     private String createdBy;
- 
+
     @JsonProperty
     @JsonView(SurveyReturnViews.Summary.class)
     @Column(name = "last_updated")
@@ -168,12 +171,12 @@ public class SurveyReturn implements AuditorAware<String> {
     @JsonView({ AnswerViews.Detailed.class, SurveyReturnViews.Summary.class })
     @ManyToOne(fetch = FetchType.EAGER)
     private Survey survey;
-    
+
     @JsonProperty
     @JsonView(SurveyReturnViews.Detailed.class)
 //    @Transient
     @ManyToMany(cascade=CascadeType.ALL, fetch = FetchType.EAGER, mappedBy = "surveyReturns")
-    private List<Answer> answers;
+    private Set<Answer> answers;
 
     public SurveyReturn(String name, String org, String status,
             String applicablePeriod, Short revision) {
@@ -185,18 +188,38 @@ public class SurveyReturn implements AuditorAware<String> {
         this.revision = revision;
     }
 
-    public List<Answer> answers() {
-        if (answers == null) { 
-            answers = new ArrayList<Answer>();
+    public Set<Answer> answers() {
+        if (answers == null) {
+            answers = new HashSet<Answer>();
         }
         return answers;
     }
-    
-    public Answer answer(Q q, String period) {
+
+    public Set<Answer> derivedAnswers() {
+        HashSet<Answer> derivedAnswers = new HashSet<Answer>();
+        for (Answer answer : answers()) {
+            if (answer.derived() && answer.response() != null ) {
+                derivedAnswers.add(answer);
+            }
+        }
+        return derivedAnswers;
+    }
+
+    public Set<Answer> underivedAnswers() {
+        HashSet<Answer> underivedAnswers = new HashSet<Answer>();
+        for (Answer answer : answers()) {
+            if (!answer.derived() && answer.response() != null ) {
+                underivedAnswers.add(answer);
+            }
+        }
+        return underivedAnswers;
+    }
+
+    public Optional<Answer> answer(Q q, String period) {
         return answer(q.name(), period);
     }
-    
-    protected Answer answer(String qName, String period) {
+
+    protected Optional<Answer> answer(String qName, String period) {
         Answer a = null;
         int count = 0;
         for (Answer answer : answers) {
@@ -205,18 +228,33 @@ public class SurveyReturn implements AuditorAware<String> {
                 a = answer;
             }
         }
-        if (a != null) {
-            if (count != 1){
-                LOGGER.error("Multiple answers to {} found for {} in {}", org, qName, period);
-            }
-            return a;
+        if (count > 1){
+            LOGGER.error("Multiple answers to {} found for {} in {}", org, qName, period);
         }
-        LOGGER.info("Assuming zero for {}", qName);
-        return new Answer().question(new Question()
-                .name(qName))
-                .applicablePeriod(period)
-                .response("0")
-                .addSurveyReturn(this);
+        return Optional.ofNullable(a);
+    }
+
+    public Answer createEmptyAnswer(Question existingQ) {
+        return new Answer()
+                .addSurveyReturn(this)
+                .question(existingQ)
+                .applicablePeriod(this.applicablePeriod)
+                .status(StatusType.Draft.name());
+    }
+
+    public Answer initAnswer(SurveyReturn rtn, Question existingQ) {
+        Answer answer = rtn.createEmptyAnswer(existingQ);
+        rtn.answers().add(answer);
+        return answer;
+    }
+
+    public BigDecimal answerResponseAsBigDecimal(Q q, String period) {
+        Optional<Answer> answer = answer(q, period);
+        if (answer.isPresent()) {
+            return new BigDecimal(answer.get().response());
+        } else {
+            return BigDecimal.ZERO;
+        }
     }
 
     @Override

@@ -3,7 +3,9 @@ package digital.srp.sreport.web;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.transaction.Transactional;
 
@@ -158,7 +160,7 @@ public class SurveyReturnController {
     protected SurveyReturn createBlankReturn(String surveyName, String org, String period) {
         LOGGER.info(String.format("createBlankReturn of %1$s for %2$s", surveyName, org));
         Survey requested = surveyRepo.findByName(surveyName);
-        List<Answer> emptyAnswers = new ArrayList<Answer>();
+        Set<Answer> emptyAnswers = new HashSet<Answer>();
 
         SurveyReturn rtn = new SurveyReturn()
                 .name(String.format("%1$s-%2$s", requested.name(),org))
@@ -191,55 +193,13 @@ public class SurveyReturnController {
         SurveyReturn rtn = returns.get(returns.size()-1);
         LOGGER.info("Found {} returns for {},{} returning revision {}", returns.size(), surveyName, org, rtn.revision());
 
-        Answer answer = rtn.answer(Q.ORG_CODE, rtn.applicablePeriod());
-        if (answer.response().equals("0")) {
-            rtn.answers().add(answer.question(qRepo.findByName(Q.ORG_CODE.name())).response(rtn.org()));
-        }
+        rtn.answer(Q.ORG_CODE, rtn.applicablePeriod())
+                .orElse(rtn.createEmptyAnswer(qRepo.findByName(Q.ORG_CODE.name())))
+                .response(org);
         rtn = saveCalculations(cruncher.calculate(rtn));
         
         return addLinks(rtn);
     }
-
-//    @RequestMapping(value = "/findCurrentBySurveyNameAndOrg/{surveyName}", method = RequestMethod.GET)
-//    @JsonView(SurveyReturnViews.Detailed.class)
-////    @Transactional
-//    public @ResponseBody List<SurveyReturn> findCurrentBySurveyName(
-//            @PathVariable("surveyName") String surveyName) {
-//        LOGGER.info(String.format("findCurrentBySurveyName %1$s", surveyName));
-//
-//        List<SurveyReturn> returns = returnRepo.findBySurveyName(surveyName);
-//        LOGGER.info("Found {} returns for {}", returns.size(), surveyName);
-//
-//        for (SurveyReturn rtn : returns) {
-//            Answer answer = rtn.answer(Q.ORG_CODE, rtn.applicablePeriod());
-//            if (answer.response().equals("0")) {
-//                rtn.answers().add(answer.question(qRepo.findByName(Q.ORG_CODE.name())).response(rtn.org()));
-//            }
-//            rtn = saveCalculations(cruncher.calculate(rtn));
-//            
-//            addLinks(rtn);
-//        }
-//        return returns;
-//    }
-
-//    @RequestMapping(value = "/findCurrentBySurveyOrgAndPeriod/{surveyName}/{org}/{period}", method = RequestMethod.GET)
-//    @JsonView(SurveyReturnViews.Detailed.class)
-////    @Transactional
-//    public @ResponseBody SurveyReturn findCurrentBySurveyOrgAndPeriod(
-//            @PathVariable("surveyName") String surveyName,
-//            @PathVariable("org") String org,
-//            @PathVariable("period") String period) {
-//        LOGGER.info(String.format("findCurrentBySurveyOrgAndPeriod %1$s", surveyName));
-//
-//        List<SurveyReturn> returns = findBySurveyOrgAndPeriod(surveyName, org, period);
-//        returns.sort((r1,r2) -> r1.revision().compareTo(r2.revision()));
-//        SurveyReturn rtn = returns.get(returns.size()-1);
-//        LOGGER.info("Found {} returns for {},{} returning revision {}", returns.size(), surveyName, org, rtn.revision());
-//
-//        rtn = saveCalculations(cruncher.calculate(rtn));
-//        
-//        return addLinks(rtn);
-//    }
 
     @RequestMapping(value = "/importEric/{surveyName}/{org}", method = RequestMethod.GET)
     @JsonView(SurveyReturnViews.Detailed.class)
@@ -257,35 +217,6 @@ public class SurveyReturnController {
 
     @Transactional//(Transactional.TxType.REQUIRES_NEW)
     private SurveyReturn saveCalculations(SurveyReturn rtn) {
-//        EntityManager em = entityManagerFactory.createEntityManager();
-//        return em.merge(rtn);
-//        SurveyCategory calcs = em.merge(new SurveyCategory().name("Calculations").survey(rtn.survey()));
-//        ArrayList<SurveyAnswer> savedAnswers = new ArrayList<SurveyAnswer>();
-//        for (SurveyAnswer answer : rtn.answers()) {
-//            answer.question(em.merge(answer.question().category(calcs)));
-//            savedAnswers.add(em.merge(answer));
-//            if (answer.id() == null) {
-//                SurveyAnswer existingAnswer = answerRepo.findByOrgPeriodAndQuestion(rtn.org(), rtn.applicablePeriod(), answer.question().name());
-//                if (existingAnswer == null) {
-//                    answerRepo.save(answer);
-//                } else {
-//                    existingAnswer.response(answer.response());
-//                    if (existingAnswer.question().id() == null) {
-////                    answer.question(qRepo.save(answer.question()));
-////                    org.hibernate.TransientPropertyValueException: object references an unsaved transient instance - save the transient instance before flushing : digital.srp.sreport.model.SurveyAnswer.question -> digital.srp.sreport.model.SurveyQuestion
-//    
-//                        SurveyQuestion q = qRepo.findByName(existingAnswer.question().name());
-//                        if (q == null) {
-//                            q = qRepo.save(q);
-//                        }
-//                        existingAnswer.question(q);
-//                    }
-//                    answerRepo.save(existingAnswer);
-//                    answer = existingAnswer;
-//                }
-//             }
-//        }
-        
         return returnRepo.save(rtn);
     }
 
@@ -379,7 +310,8 @@ public class SurveyReturnController {
             SurveyReturn existing) {
         int changeCount = 0;
         for (Answer answer : updatedReturn.answers()) {
-            Answer existingAnswer = existing.answer(answer.question().q(), answer.applicablePeriod());
+            Answer existingAnswer = existing.answer(answer.question().q(), answer.applicablePeriod())
+                    .orElse(existing.createEmptyAnswer(answer.question()));
             if (existingAnswer.question().id() == null) {
                 Question q;
                 try {

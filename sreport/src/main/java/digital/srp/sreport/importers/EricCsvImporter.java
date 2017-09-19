@@ -4,7 +4,9 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
@@ -50,7 +52,7 @@ public class EricCsvImporter {
 
         for (CSVRecord record : records) {
             if (record.getRecordNumber() > 2) { // skip headers
-                List<Answer> surveyAnswers = new ArrayList<Answer>();
+                Set<Answer> surveyAnswers = new HashSet<Answer>();
                 String org = record.get(0);
                 for (int i = 0; i < record.size(); i++) {
                     surveyAnswers.add(new Answer()

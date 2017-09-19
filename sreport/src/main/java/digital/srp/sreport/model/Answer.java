@@ -111,6 +111,13 @@ public class Answer implements AuditorAware<String> {
     @Column(name = "revision")
     private Short revision = 1;
 
+    /**
+     * True is we have calculated this answer on behalf of the user.
+     */
+    @JsonProperty
+    @JsonView({ AnswerViews.Detailed.class })
+    @Column(name = "derived")
+    private boolean derived = false;
 
     @Temporal(TemporalType.TIMESTAMP)
     @JsonProperty
@@ -176,6 +183,10 @@ public class Answer implements AuditorAware<String> {
 
     public String response() {
         return typeConversion(response);
+    }
+
+    public BigDecimal responseAsBigDecimal() {
+        return response == null ? BigDecimal.ZERO : new BigDecimal(response);
     }
 
     public Answer response(String response) {

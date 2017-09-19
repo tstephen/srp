@@ -29,7 +29,7 @@ import digital.srp.sreport.services.TabularDataSetHelper;
 
 /**
  * REST web service for accessing various reports.
- * 
+ *
  * @author Tim Stephenson
  */
 @Controller
@@ -60,7 +60,7 @@ public class SduReportController implements SduQuestions {
     /**
      * A table of organisation data for the specified organisation and
      * period.
-     * 
+     *
      * @return HTML table.
      */
     @RequestMapping(value = "/{org}/{period}/org.html", method = RequestMethod.GET, produces = "text/html")
@@ -78,7 +78,7 @@ public class SduReportController implements SduQuestions {
     /**
      * A table of energy use (kWh) for the specified organisation and
      * period.
-     * 
+     *
      * @return HTML table.
      */
     @RequestMapping(value = "/{org}/{period}/energy.html", method = RequestMethod.GET, produces = "text/html")
@@ -96,7 +96,7 @@ public class SduReportController implements SduQuestions {
     /**
      * A table of energy use (kWh) for the specified organisation and
      * period.
-     * 
+     *
      * @return CSV with header row.
      */
     @RequestMapping(value = "/{org}/{period}/energy.csv", method = RequestMethod.GET, produces = "text/csv")
@@ -113,7 +113,7 @@ public class SduReportController implements SduQuestions {
     /**
      * A table of energy use (CO2e) for the specified organisation and
      * period.
-     * 
+     *
      * @return HTML table.
      */
     @RequestMapping(value = "/{org}/{period}/energy-co2e.html", method = RequestMethod.GET, produces = "text/html")
@@ -131,7 +131,7 @@ public class SduReportController implements SduQuestions {
     /**
      * A table of energy use (CO2e) for the specified organisation and
      * period.
-     * 
+     *
      * @return CSV with header row.
      */
     @RequestMapping(value = "/{org}/{period}/energy-co2e.csv", method = RequestMethod.GET, produces = "text/csv")
@@ -147,7 +147,7 @@ public class SduReportController implements SduQuestions {
 
     /**
      * A table of travel data for the specified organisation and period.
-     * 
+     *
      * @return HTML table.
      */
     @RequestMapping(value = "/{org}/{period}/travel.html", method = RequestMethod.GET, produces = "text/html")
@@ -162,9 +162,9 @@ public class SduReportController implements SduQuestions {
     }
 
     /**
-     * A table of travel data emissions (CO2e) for the specified 
+     * A table of travel data emissions (CO2e) for the specified
      * organisation and period.
-     * 
+     *
      * @return CSV with header row.
      */
     @RequestMapping(value = "/{org}/{period}/travel-co2e.html", method = RequestMethod.GET, produces = "text/html")
@@ -181,7 +181,7 @@ public class SduReportController implements SduQuestions {
     /**
      * A table of waste (tonnes) for the specified organisation and
      * period.
-     * 
+     *
      * @return HTML table.
      */
     @RequestMapping(value = "/{org}/{period}/waste.html", method = RequestMethod.GET, produces = "text/html")
@@ -194,11 +194,11 @@ public class SduReportController implements SduQuestions {
         fillModel(org, period, WASTE_HDRS, model, true, prettyPrintDecimalFormat, maxPeriods);
         return "table-period-as-col";
     }
-    
+
     /**
      * A table of waste (CO2e) for the specified organisation and
      * period.
-     * 
+     *
      * @return HTML table.
      */
     @RequestMapping(value = "/{org}/{period}/waste-co2e.html", method = RequestMethod.GET, produces = "text/html")
@@ -211,11 +211,11 @@ public class SduReportController implements SduQuestions {
         fillModel(org, period, WASTE_CO2E_HDRS, model, true, prettyPrintDecimalFormat, maxPeriods);
         return "table-period-as-col";
     }
-    
+
     /**
      * A table of waste (CO2e) for the specified organisation and
      * period.
-     * 
+     *
      * @return CSV with header row.
      */
     @RequestMapping(value = "/{org}/{period}/waste-co2e.csv", method = RequestMethod.GET, produces = "text/csv")
@@ -228,11 +228,11 @@ public class SduReportController implements SduQuestions {
         fillModel(org, period, WASTE_CO2E_HDRS, model, false, rawDecimalFormat, maxPeriods);
         return "csv";
     }
-    
+
     /**
      * A table of water use for the specified organisation and
      * period.
-     * 
+     *
      * @return HTML table.
      */
     @RequestMapping(value = "/{org}/{period}/water.html", method = RequestMethod.GET, produces = "text/html")
@@ -245,11 +245,11 @@ public class SduReportController implements SduQuestions {
         fillModel(org, period, WATER_HDRS, model, true, prettyPrintDecimalFormat, maxPeriods);
         return "table-period-as-col";
     }
-    
+
     /**
      * A table of water emissions (CO2e) for the specified organisation and
      * period.
-     * 
+     *
      * @return HTML table.
      */
     @RequestMapping(value = "/{org}/{period}/water-co2e.html", method = RequestMethod.GET, produces = "text/html")
@@ -262,11 +262,11 @@ public class SduReportController implements SduQuestions {
         fillModel(org, period, WATER_CO2E_HDRS, model, true, prettyPrintDecimalFormat, maxPeriods);
         return "table-period-as-col";
     }
-    
+
     /**
      * A table of water emissions (CO2e) for the specified organisation and
      * period.
-     * 
+     *
      * @return CSV with header row.
      */
     @RequestMapping(value = "/{org}/{period}/water-co2e.csv", method = RequestMethod.GET, produces = "text/csv")
@@ -279,11 +279,11 @@ public class SduReportController implements SduQuestions {
         fillModel(org, period, WATER_CO2E_HDRS, model, false, rawDecimalFormat, maxPeriods);
         return "csv";
     }
-    
+
     /**
      * A table of biomass well to tank emissions (CO2e) for the specified organisation and
      * period.
-     * 
+     *
      * @return HTML table.
      */
     @RequestMapping(value = "/{org}/{period}/biomass-co2e-wtt.html", method = RequestMethod.GET, produces = "text/html")
@@ -296,11 +296,11 @@ public class SduReportController implements SduQuestions {
         fillModel(org, period, BIOMASS_CO2E_WTT_HDRS, model, true, prettyPrintDecimalFormat, maxPeriods);
         return "table-period-as-col";
     }
-    
+
     /**
      * A table of biomass well to tank emissions (CO2e) for the specified organisation and
      * period.
-     * 
+     *
      * @return CSV with header row.
      */
     @RequestMapping(value = "/{org}/{period}/biomass-co2e-wtt.csv", method = RequestMethod.GET, produces = "text/csv")
@@ -313,11 +313,11 @@ public class SduReportController implements SduQuestions {
         fillModel(org, period, BIOMASS_CO2E_WTT_HDRS, model, false, rawDecimalFormat, maxPeriods);
         return "csv";
     }
-    
+
     /**
      * A table of biomass out of scope emissions (CO2e) use for the specified organisation and
      * period.
-     * 
+     *
      * @return HTML table.
      */
     @RequestMapping(value = "/{org}/{period}/biomass-co2e-noscope.html", method = RequestMethod.GET, produces = "text/html")
@@ -330,11 +330,11 @@ public class SduReportController implements SduQuestions {
         fillModel(org, period, BIOMASS_CO2E_NOSCOPE_HDRS, model, true, prettyPrintDecimalFormat, maxPeriods);
         return "table-period-as-col";
     }
-    
+
     /**
      * A table of biomass out of scope emissions (CO2e) for the specified organisation and
      * period.
-     * 
+     *
      * @return CSV with header row.
      */
     @RequestMapping(value = "/{org}/{period}/biomass-co2e-noscope.csv", method = RequestMethod.GET, produces = "text/csv")
@@ -347,11 +347,11 @@ public class SduReportController implements SduQuestions {
         fillModel(org, period, BIOMASS_CO2E_NOSCOPE_HDRS, model, false, rawDecimalFormat, maxPeriods);
         return "csv";
     }
-    
+
     /**
      * A table of categorised carbon emissions for the specified
      * organisation and period.
-     * 
+     *
      * @return HTML table.
      */
     @RequestMapping(value = "/{org}/{period}/carbon-footprint.html", method = RequestMethod.GET, produces = "text/html")
@@ -368,7 +368,7 @@ public class SduReportController implements SduQuestions {
     /**
      * A table of categorised carbon emissions for the specified
      * organisation and period.
-     * 
+     *
      * @return CSV with header row.
      */
     @RequestMapping(value = "/{org}/{period}/carbon-footprint.csv", method = RequestMethod.GET, produces = "text/csv")
@@ -381,11 +381,11 @@ public class SduReportController implements SduQuestions {
         fillModel(org, period, FOOTPRINT_HDRS, model, false, rawDecimalFormat, maxPeriods);
         return "csv";
     }
-    
+
     /**
      * A table of categorised carbon emissions for the specified
      * organisation and period.
-     * 
+     *
      * @return HTML table.
      */
     @RequestMapping(value = "/{org}/{period}/carbon-emissions-profile.html", method = RequestMethod.GET, produces = "text/html")
@@ -402,7 +402,7 @@ public class SduReportController implements SduQuestions {
     /**
      * A table of categorised carbon emissions for the specified
      * organisation and period.
-     * 
+     *
      * @return CSV with header row.
      */
     @RequestMapping(value = "/{org}/{period}/carbon-emissions-profile.csv", method = RequestMethod.GET, produces = "text/csv")
@@ -415,11 +415,11 @@ public class SduReportController implements SduQuestions {
         fillModel(org, period, PROFILE_HDRS, model, false, rawDecimalFormat, maxPeriods);
         return "csv";
     }
-    
+
     /**
      * A table of categorised carbon emissions in ratio to expenditure
      * for the specified organisation and period.
-     * 
+     *
      * @return HTML table.
      */
     @RequestMapping(value = "/{org}/{period}/carbon-by-expenditure.html", method = RequestMethod.GET, produces = "text/html")
@@ -436,7 +436,7 @@ public class SduReportController implements SduQuestions {
     /**
      * A table of categorised carbon emissions in ratio to expenditure
      * for the specified organisation and period.
-     * 
+     *
      * @return CSV with header row.
      */
     @RequestMapping(value = "/{org}/{period}/carbon-by-expenditure.csv", method = RequestMethod.GET, produces = "text/csv")
@@ -449,12 +449,12 @@ public class SduReportController implements SduQuestions {
         fillModel(org, period, SPEND_HDRS, model, false, rawDecimalFormat, maxPeriods);
         return "csv";
     }
-    
+
     /***** TREASURY OUPUTS ****/
-    
+
     /**
      * A summary table of emissions by scope.
-     * 
+     *
      * @return HTML table.
      */
     @RequestMapping(value = "/{org}/{period}/scope-summary.html", method = RequestMethod.GET, produces = "text/html")
@@ -467,10 +467,10 @@ public class SduReportController implements SduQuestions {
         fillModel(org, period, SUMMARY_SCOPE_HDRS, model, true, prettyPrintDecimalFormat, maxPeriods);
         return "table-period-as-col";
     }
-    
+
     /**
      * A summary table of emissions by scope.
-     * 
+     *
      * @return HTML table.
      */
     @RequestMapping(value = "/{org}/{period}/scope-1.html", method = RequestMethod.GET, produces = "text/html")
@@ -483,10 +483,10 @@ public class SduReportController implements SduQuestions {
         fillModel(org, period, SCOPE_1_HDRS, model, true, prettyPrintDecimalFormat, maxPeriods);
         return "table-period-as-col";
     }
-    
+
     /**
      * A summary table of emissions by scope.
-     * 
+     *
      * @return HTML table.
      */
     @RequestMapping(value = "/{org}/{period}/scope-2.html", method = RequestMethod.GET, produces = "text/html")
@@ -499,10 +499,10 @@ public class SduReportController implements SduQuestions {
         fillModel(org, period, SCOPE_2_HDRS, model, true, prettyPrintDecimalFormat, maxPeriods);
         return "table-period-as-col";
     }
-    
+
     /**
      * A summary table of emissions by scope.
-     * 
+     *
      * @return HTML table.
      */
     @RequestMapping(value = "/{org}/{period}/scope-3.html", method = RequestMethod.GET, produces = "text/html")
@@ -515,10 +515,10 @@ public class SduReportController implements SduQuestions {
         fillModel(org, period, SCOPE_3_HDRS, model, true, prettyPrintDecimalFormat, maxPeriods);
         return "table-period-as-col";
     }
-    
+
     /**
      * A summary table of emissions by scope.
-     * 
+     *
      * @return HTML table.
      */
     @RequestMapping(value = "/{org}/{period}/sdu-carbon-profile.html", method = RequestMethod.GET, produces = "text/html")
@@ -531,10 +531,10 @@ public class SduReportController implements SduQuestions {
         fillModel(org, period, SDU_CARBON_PROFILE_HDRS, model, true, prettyPrintDecimalFormat, maxPeriods);
         return "table-period-as-col";
     }
-    
+
     /**
      * A summary table of emissions by E-Class.
-     * 
+     *
      * @return HTML table.
      */
     @RequestMapping(value = "/{org}/{period}/eclass-carbon-profile.html", method = RequestMethod.GET, produces = "text/html")
@@ -550,7 +550,7 @@ public class SduReportController implements SduQuestions {
 
     /**
      * A trajectory table of emissions by SDU groupings.
-     * 
+     *
      * @return HTML table.
      */
     @RequestMapping(value = "/{org}/{period}/carbon-trajectory.html", method = RequestMethod.GET, produces = "text/html")
@@ -563,11 +563,11 @@ public class SduReportController implements SduQuestions {
         fillModel(org, period, SDU_TREND_HDRS, model, true, prettyPrintDecimalFormat, maxPeriods);
         return "table-period-as-col";
     }
-    
+
     /**
-     * A table of categorised carbon emissions compared to target for the 
+     * A table of categorised carbon emissions compared to target for the
      * specified organisation and period.
-     * 
+     *
      * @return CSV with header row.
      */
     @RequestMapping(value = "/{org}/{period}/carbon-trajectory.csv", method = RequestMethod.GET, produces = "text/csv")
@@ -580,7 +580,119 @@ public class SduReportController implements SduQuestions {
         fillModel(org, period, SDU_TREND_HDRS, model, false, rawDecimalFormat, maxPeriods);
         return "csv";
     }
-    
+
+    /**
+     * Total Carbon footprint.
+     *
+     * @return HTML table.
+     */
+    @RequestMapping(value = "/{org}/{period}/co2e.html", method = RequestMethod.GET, produces = "text/html")
+    @Transactional
+    public String co2eTable(@PathVariable("org") String org,
+            @PathVariable("period") String period, @RequestParam(value = "maxPeriods", required = false) Integer maxPeriods,
+            Model model) {
+        LOGGER.info(String.format("co2eTable for %1$s %2$s", org, period));
+
+        fillModel(org, period, BENCHMARK_HDRS, model, true, prettyPrintDecimalFormat, maxPeriods);
+        return "table-period-as-col";
+    }
+
+    /**
+     * Total Carbon footprint by population.
+     *
+     * @return HTML table.
+     */
+    @RequestMapping(value = "/{org}/{period}/co2e-by-population.html", method = RequestMethod.GET, produces = "text/html")
+    @Transactional
+    public String co2eByPopulationTable(@PathVariable("org") String org,
+            @PathVariable("period") String period, @RequestParam(value = "maxPeriods", required = false) Integer maxPeriods,
+            Model model) {
+        LOGGER.info(String.format("co2eByPopulationTable for %1$s %2$s", org, period));
+
+        fillModel(org, period, BENCHMARK_BY_POPULATION_HDRS, model, true, prettyPrintDecimalFormat, maxPeriods);
+        return "table-period-as-col";
+    }
+
+    /**
+     * Total Carbon footprint by gross internal area.
+     *
+     * @return HTML table.
+     */
+    @RequestMapping(value = "/{org}/{period}/co2e-by-floor-area.html", method = RequestMethod.GET, produces = "text/html")
+    @Transactional
+    public String co2eByFloorAreaTable(@PathVariable("org") String org,
+            @PathVariable("period") String period, @RequestParam(value = "maxPeriods", required = false) Integer maxPeriods,
+            Model model) {
+        LOGGER.info(String.format("co2eByFloorAreaTable for %1$s %2$s", org, period));
+
+        fillModel(org, period, BENCHMARK_BY_FLOOR_AREA_HDRS, model, true, prettyPrintDecimalFormat, maxPeriods);
+        return "table-period-as-col";
+    }
+
+    /**
+     * Total Carbon footprint by number of staff.
+     *
+     * @return HTML table.
+     */
+    @RequestMapping(value = "/{org}/{period}/co2e-by-wte.html", method = RequestMethod.GET, produces = "text/html")
+    @Transactional
+    public String co2eByWteTable(@PathVariable("org") String org,
+            @PathVariable("period") String period, @RequestParam(value = "maxPeriods", required = false) Integer maxPeriods,
+            Model model) {
+        LOGGER.info(String.format("co2eByWteTable for %1$s %2$s", org, period));
+
+        fillModel(org, period, BENCHMARK_BY_WTE_HDRS, model, true, prettyPrintDecimalFormat, maxPeriods);
+        return "table-period-as-col";
+    }
+
+    /**
+     * Total Carbon footprint by number of occupied beds.
+     *
+     * @return HTML table.
+     */
+    @RequestMapping(value = "/{org}/{period}/co2e-by-beds.html", method = RequestMethod.GET, produces = "text/html")
+    @Transactional
+    public String co2eByBedsTable(@PathVariable("org") String org,
+            @PathVariable("period") String period, @RequestParam(value = "maxPeriods", required = false) Integer maxPeriods,
+            Model model) {
+        LOGGER.info(String.format("co2eByBedsTable for %1$s %2$s", org, period));
+
+        fillModel(org, period, BENCHMARK_BY_BEDS_HDRS, model, true, prettyPrintDecimalFormat, maxPeriods);
+        return "table-period-as-col";
+    }
+
+    /**
+     * Total Carbon footprint by patient contacts.
+     *
+     * @return HTML table.
+     */
+    @RequestMapping(value = "/{org}/{period}/co2e-by-patient-contacts.html", method = RequestMethod.GET, produces = "text/html")
+    @Transactional
+    public String co2eByPatientContactsTable(@PathVariable("org") String org,
+            @PathVariable("period") String period, @RequestParam(value = "maxPeriods", required = false) Integer maxPeriods,
+            Model model) {
+        LOGGER.info(String.format("co2eByPatientContactsTable for %1$s %2$s", org, period));
+
+        fillModel(org, period, BENCHMARK_BY_PATIENT_CONTACTS_HDRS, model, true, prettyPrintDecimalFormat, maxPeriods);
+        return "table-period-as-col";
+    }
+
+    /**
+     * Total Carbon footprint by operating expenditure.
+     *
+     * @return HTML table.
+     */
+    @RequestMapping(value = "/{org}/{period}/co2e-by-opex.html", method = RequestMethod.GET, produces = "text/html")
+    @Transactional
+    public String co2eByOpExTable(@PathVariable("org") String org,
+            @PathVariable("period") String period, @RequestParam(value = "maxPeriods", required = false) Integer maxPeriods,
+            Model model) {
+        LOGGER.info(String.format("co2eByOpExTable for %1$s %2$s", org, period));
+
+        fillModel(org, period, BENCHMARK_BY_OPEX_HDRS, model, true, prettyPrintDecimalFormat, maxPeriods);
+        return "table-period-as-col";
+    }
+
     private void fillModel(String org, String period, Q[] headers, Model model,
             boolean periodAsCol, DecimalFormat decimalFormat, Integer maxPeriods) {
         String[] headerNames = new String[headers.length];
