@@ -20,13 +20,13 @@ public interface AnswerRepository extends CrudRepository<Answer, Long> {
     @Query("SELECT a FROM Answer a LEFT JOIN a.surveyReturns r "
             + "WHERE a.revision = (SELECT MAX(o.revision) FROM Answer o LEFT JOIN o.surveyReturns r WHERE o.question.name IN :qNames) "
             + "AND a.question.name IN :qNames "
-            + "ORDER BY r.applicablePeriod DESC")
+            + "ORDER BY a.applicablePeriod DESC")
     List<Answer> findByQuestion(@Param("qNames") String... qNames);
 
     @Query("SELECT a FROM Answer a LEFT JOIN a.surveyReturns r "
             + "WHERE a.revision = (SELECT MAX(o.revision) FROM Answer o LEFT JOIN o.surveyReturns r WHERE o.question.name IN :qNames AND r.org = :org) "
             + "AND a.question.name IN :qNames AND r.org = :org "
-            + "ORDER BY r.applicablePeriod DESC")
+            + "ORDER BY a.applicablePeriod DESC")
     List<Answer> findByOrgAndQuestion(@Param("org") String org, @Param("qNames") String... qNames);
 
     @Query("SELECT a FROM Answer a LEFT JOIN a.surveyReturns r "

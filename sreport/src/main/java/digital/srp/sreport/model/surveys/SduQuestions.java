@@ -59,7 +59,7 @@ public interface SduQuestions {
     Q[] ORG_HDRS = new Q[] { Q.FLOOR_AREA, Q.NO_STAFF };
 
     Q[] SUMMARY_SCOPE_HDRS = new Q[] {
-            Q.SCOPE_ALL, Q.SCOPE_1, Q.SCOPE_2, Q.SCOPE_3
+            Q.SCOPE_1, Q.SCOPE_2, Q.SCOPE_3
     };
 
     Q[] SCOPE_1_HDRS = new Q[] {
@@ -109,7 +109,6 @@ public interface SduQuestions {
     };
 
     Q[] BENCHMARK_HDRS = new Q[] {
-            Q.TOTAL_CO2E,
             Q.TOTAL_ENERGY_CO2E,
             Q.SCOPE_3_TRAVEL,
             Q.TOTAL_PROCUREMENT_CO2E,

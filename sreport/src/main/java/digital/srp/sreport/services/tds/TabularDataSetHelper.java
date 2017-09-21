@@ -1,9 +1,9 @@
-package digital.srp.sreport.services;
+package digital.srp.sreport.services.tds;
 
-import java.math.BigDecimal;
 import java.text.Format;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,29 +19,39 @@ public class TabularDataSetHelper {
             .getLogger(TabularDataSetHelper.class);
     
     public TabularDataSet tabulate(String[] headers, List<Answer> answers, 
-            Format formatter) {
-        List<String> hList = Arrays.asList(headers);
-        int colCount = headers.length;
+            Format formatter, Optional<Aggregator> aggregator) {
+        List<String> hList;
+        if (aggregator.isPresent()) {
+            hList = aggregator.get().addAggregatedHeaders(headers);
+        } else {
+            hList = Arrays.asList(headers);
+        }
+        int colCount = hList.size();
         int rowCount = answers.size()/colCount;
         if (answers.size() % colCount != 0) {
             rowCount++;
         }
         TabularDataSet tds = new TabularDataSet(rowCount, colCount)
-                .headers(headers);
+                .headers(hList.toArray(new String[colCount]));
         for (int i = 0; i < answers.size(); i++) {
             Answer answer = answers.get(i);
             int col = hList.indexOf(answer.question().name());
             int row = i/headers.length;
             try {
-                tds.set(row, col, formatter.format(new BigDecimal(answer.response())));
+                tds.set(row, col, formatter.format(answer.responseAsBigDecimal()));
             } catch (NullPointerException e) {
-                tds.set(row, col, " n/a ");
+                tds.set(row, col, "0");
             } catch (IllegalArgumentException e) {
                 LOGGER.warn("Cannot format {} using {}", answer.response(), formatter.getClass().getName());
                 tds.set(row, col, answer.response());
+            } catch (java.lang.ArrayIndexOutOfBoundsException e) {
+                LOGGER.warn("Attempt to set row {}, col {} to {}", row, col, answer.response());
             }
         }
         
+        if (aggregator.isPresent()) {
+            aggregator.get().addAggregateData(answers, formatter, colCount, rowCount, tds);
+        }
         return tds;
     }
 }

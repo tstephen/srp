@@ -17,14 +17,14 @@
   </thead>
   <tbody>
     <#list table.rows() as row>
-        <tr>
-        <th>${messages.getString(table.headers()[row?index])}</th>
+      <tr>
+        <th>${messages.getString(table.headers()[row?index])!table.headers()[row?index]}</th>
           <#list row as col>
             <#if col?index < periods?size>
-              <td class="number">${col!"n/a"}</td>
+              <td class="number">${col!"0"}</td>
             </#if>
           </#list>
-        </tr>
+      </tr>
     </#list>
   </tbody>
 </table>

@@ -46,7 +46,6 @@ import digital.srp.sreport.model.views.SurveyReturnViews;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lombok.ToString;
 import lombok.experimental.Accessors;
 
 
@@ -57,7 +56,6 @@ import lombok.experimental.Accessors;
  */
 @Accessors(fluent=true)
 @Data
-@ToString(exclude = { "id", "surveyReturns" })
 @EqualsAndHashCode(exclude = { "id", "surveyReturns" })
 @NoArgsConstructor
 @Entity
@@ -328,6 +326,15 @@ public class Answer implements AuditorAware<String> {
 
     public void setLinks(List<Link> links) {
         this.links = links;
+    }
+
+    @Override
+    public String toString() {
+        return String.format(
+                "Answer [id=%s, response=%s, question=%s, status=%s, applicablePeriod=%s, revision=%s, derived=%s, submittedDate=%s, submittedBy=%s, created=%s, createdBy=%s, lastUpdated=%s, updatedBy=%s]",
+                id, response, question.name(), status, applicablePeriod, revision,
+                derived, submittedDate, submittedBy, created, createdBy,
+                lastUpdated, updatedBy);
     }
 
 }

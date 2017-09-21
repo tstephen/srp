@@ -10,6 +10,7 @@ import lombok.experimental.Accessors;
 @Accessors(fluent=true)
 @Data
 public class TabularDataSet {
+    private boolean dataAsRows = true;
 
     @JsonProperty
     private String[] headers;
@@ -46,6 +47,8 @@ public class TabularDataSet {
             }
         }
         this.rows = transposed;
+        this.dataAsRows = !dataAsRows;
         return this;
     }
+
 }
