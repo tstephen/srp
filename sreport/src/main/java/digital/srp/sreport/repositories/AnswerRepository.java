@@ -2,7 +2,10 @@ package digital.srp.sreport.repositories;
 
 import java.util.List;
 
+import javax.transaction.Transactional;
+
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
@@ -49,4 +52,10 @@ public interface AnswerRepository extends CrudRepository<Answer, Long> {
             + "WHERE a.revision = (SELECT MAX(o.revision) FROM Answer o LEFT JOIN o.surveyReturns r WHERE o.question.name IN :qNames AND r.org = :org AND o.applicablePeriod = :period)"
             + "AND a.applicablePeriod = :period")
     List<Answer> findPageByPeriod(Pageable pageable, @Param("period") String period);
+
+    @Query("DELETE FROM Answer a WHERE a.id in :ids and a.derived = true")
+    @Modifying(clearAutomatically = true)
+    @Transactional
+    void deleteAnswers(@Param("ids") Long[] ids);
+
 }

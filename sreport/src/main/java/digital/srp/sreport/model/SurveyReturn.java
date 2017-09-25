@@ -228,13 +228,13 @@ public class SurveyReturn implements AuditorAware<String> {
                 a = answer;
             }
         }
-        if (count > 1){
+        if (count > 1) {
             LOGGER.error("Multiple answers to {} found for {} in {}", org, qName, period);
         }
         return Optional.ofNullable(a);
     }
 
-    public Answer createEmptyAnswer(Question existingQ) {
+    public Answer createEmptyAnswer(Question existingQ, String period) {
         return new Answer()
                 .addSurveyReturn(this)
                 .question(existingQ)
@@ -242,8 +242,8 @@ public class SurveyReturn implements AuditorAware<String> {
                 .status(StatusType.Draft.name());
     }
 
-    public Answer initAnswer(SurveyReturn rtn, Question existingQ) {
-        Answer answer = rtn.createEmptyAnswer(existingQ);
+    public Answer initAnswer(SurveyReturn rtn, Question existingQ, String period) {
+        Answer answer = rtn.createEmptyAnswer(existingQ, null);
         rtn.answers().add(answer);
         return answer;
     }
@@ -385,6 +385,14 @@ public class SurveyReturn implements AuditorAware<String> {
 
     public void setUpdatedBy(String updatedBy) {
         this.updatedBy = updatedBy;
+    }
+
+    public Set<Answer> getAnswers() {
+        return answers;
+    }
+
+    public void setAnswers(Set<Answer> answers) {
+        this.answers = answers;
     }
 
 }

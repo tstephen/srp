@@ -32,7 +32,6 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import com.fasterxml.jackson.annotation.JsonView;
 
-import digital.srp.sreport.internal.NullAwareBeanUtils;
 import digital.srp.sreport.model.Answer;
 import digital.srp.sreport.model.Q;
 import digital.srp.sreport.model.Question;
@@ -193,9 +192,9 @@ public class SurveyReturnController {
         SurveyReturn rtn = returns.get(returns.size()-1);
         LOGGER.info("Found {} returns for {},{} returning revision {}", returns.size(), surveyName, org, rtn.revision());
 
-        rtn.answer(Q.ORG_CODE, rtn.applicablePeriod())
-                .orElse(rtn.createEmptyAnswer(qRepo.findByName(Q.ORG_CODE.name())))
-                .response(org);
+//        rtn.answer(Q.ORG_CODE, rtn.applicablePeriod())
+//                .orElse(rtn.initAnswer(rtn, qRepo.findByName(Q.ORG_CODE.name()), rtn.applicablePeriod()))
+//                .response(org);
         rtn = saveCalculations(cruncher.calculate(rtn));
         
         return addLinks(rtn);
@@ -299,11 +298,14 @@ public class SurveyReturnController {
                     returnId, existing.name()));
         }
         int changeCount = createOrMergeAnswers(updatedReturn, existing);
-        NullAwareBeanUtils.copyNonNullProperties(updatedReturn, existing);
+//        NullAwareBeanUtils.copyNonNullProperties(updatedReturn, existing);
         if (changeCount > 0) {
             existing.setLastUpdated(new Date());
         }
+//        SurveyReturn savedReturn = 
         returnRepo.save(existing);
+//        addLinks(Collections.singletonList(savedReturn));
+//        return savedReturn;
     }
 
     private int createOrMergeAnswers(SurveyReturn updatedReturn,
@@ -311,7 +313,10 @@ public class SurveyReturnController {
         int changeCount = 0;
         for (Answer answer : updatedReturn.answers()) {
             Answer existingAnswer = existing.answer(answer.question().q(), answer.applicablePeriod())
-                    .orElse(existing.createEmptyAnswer(answer.question()));
+                    .orElse(existing.createEmptyAnswer(answer.question(), answer.applicablePeriod()));
+            if (answer.question().q() == Q.ORG_NAME) {
+                System.out.println("Pay attention");
+            }
             if (existingAnswer.question().id() == null) {
                 Question q;
                 try {
@@ -326,7 +331,10 @@ public class SurveyReturnController {
             } else if (answer.response() != null && !answer.response().equals(existingAnswer.response())) {
                 // note that Hibernate / Spring Data will skip any update if not actually needed
                 changeCount++;
-                existingAnswer.response(answer.response());
+                answerRepo.save(existingAnswer.response(answer.response()).addSurveyReturn(existing));
+            } else {
+                ;
+                //LOGGER.debug("No change to {}", answer.question().name());
             }
         }
         return changeCount;

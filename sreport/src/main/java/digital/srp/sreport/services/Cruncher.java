@@ -28,6 +28,7 @@ import digital.srp.sreport.model.WeightingFactors;
 import digital.srp.sreport.repositories.AnswerRepository;
 import digital.srp.sreport.repositories.QuestionRepository;
 import digital.srp.sreport.repositories.SurveyCategoryRepository;
+import digital.srp.sreport.repositories.SurveyReturnRepository;
 
 @Component
 public class Cruncher implements digital.srp.sreport.model.surveys.SduQuestions {
@@ -48,6 +49,9 @@ public class Cruncher implements digital.srp.sreport.model.surveys.SduQuestions 
 
     @Autowired
     protected AnswerRepository answerRepo;
+
+    @Autowired
+    protected SurveyReturnRepository returnRepo;
 
     // TODO parameterise
     protected int yearsToCrunch = 4;
@@ -74,6 +78,7 @@ public class Cruncher implements digital.srp.sreport.model.surveys.SduQuestions 
         if (isUpToDate(rtn)) {
             LOGGER.info("Skipping calculations for {} in {}", rtn.org(), rtn.applicablePeriod());
         } else {
+            deleteDerivedForOrg(rtn.org());
             LOGGER.info("Calculating for {} in {}", rtn.org(), rtn.applicablePeriod());
             List<String> periods = PeriodUtil.fillBackwards(rtn.applicablePeriod(), yearsToCrunch);
             for (String period : periods) {
@@ -106,30 +111,50 @@ public class Cruncher implements digital.srp.sreport.model.surveys.SduQuestions 
         return rtn;
     }
 
-    private boolean isUpToDate(SurveyReturn rtn) {
-        Date lastManualUpdate = rtn.underivedAnswers().stream().max(new Comparator<Answer>() {
-            @Override
-            public int compare(Answer a1, Answer a2) {
-                if (a1.lastUpdated() == null) return -1;
-                if (a2.lastUpdated() == null) return 1;
-                return a1.lastUpdated().compareTo(a2.lastUpdated());
-            }
-        }).get().lastUpdated();
-        LOGGER.debug("lastManualUpdate: {}", lastManualUpdate);
-        Set<Answer> derivedAnswers = rtn.derivedAnswers();
-        if (derivedAnswers.size() == 0) {
-            return false;
+    private void deleteDerivedForOrg(String org) {
+        List<SurveyReturn> returns = returnRepo.findByOrg(org);
+        Long[] ids = new Long[returns.size()];
+        for (int i = 0; i < returns.size(); i++) {
+            SurveyReturn rtn = returns.get(i);
+            ids[0] = rtn.id();
         }
-        Date lastCalculated = derivedAnswers.stream().min(new Comparator<Answer>() {
-            @Override
-            public int compare(Answer a1, Answer a2) {
-                if (a1.lastUpdated() == null) return 0;
-                if (a2.lastUpdated() == null) return 0;
-                return a1.lastUpdated().compareTo(a2.lastUpdated());
+        answerRepo.deleteAnswers(ids);
+    }
+
+
+    private boolean isUpToDate(SurveyReturn rtn) {
+        try {
+            Set<Answer> underivedAnswers = rtn.underivedAnswers();
+            if (underivedAnswers.size() == 0) {
+                return true;
             }
-        }).get().lastUpdated();
-        LOGGER.debug("Min: {}", lastCalculated);
-        return lastCalculated.after(lastManualUpdate);
+            Date lastManualUpdate = underivedAnswers.stream().max(new Comparator<Answer>() {
+                @Override
+                public int compare(Answer a1, Answer a2) {
+                    if (a1.lastUpdated() == null) return -1;
+                    if (a2.lastUpdated() == null) return 1;
+                    return a1.lastUpdated().compareTo(a2.lastUpdated());
+                }
+            }).get().lastUpdated();
+            LOGGER.debug("lastManualUpdate: {}", lastManualUpdate);
+            Set<Answer> derivedAnswers = rtn.derivedAnswers();
+            if (derivedAnswers.size() == 0) {
+                return false;
+            }
+            Optional<Answer> answer = derivedAnswers.stream().min(new Comparator<Answer>() {
+                @Override
+                public int compare(Answer a1, Answer a2) {
+                    if (a1.lastUpdated() == null) return 0;
+                    if (a2.lastUpdated() == null) return 0;
+                    return a1.lastUpdated().compareTo(a2.lastUpdated());
+                }
+            });
+            return answer.isPresent() && (
+                    answer.get().created().after(lastManualUpdate)
+                    || answer.get().lastUpdated().after(lastManualUpdate));
+        } catch (Exception e) {
+            return false; // safety net
+        }
     }
 
     boolean isEClassUser(SurveyReturn rtn) {
@@ -335,8 +360,7 @@ public class Cruncher implements digital.srp.sreport.model.surveys.SduQuestions 
             return addCalculatedAnswer(period, rtn, q);
         } else {
             LOGGER.warn("Creating new answer '{}' for '{}' in '{}' in cruncher, should only happen in unit tests", q.name(), rtn.org(), period);
-            return rtn.initAnswer(rtn, new Question().q(q))
-                  .applicablePeriod(period)
+            return rtn.initAnswer(rtn, new Question().q(q), period)
                   .response("0")
                   .derived(true);
         }
@@ -351,7 +375,7 @@ public class Cruncher implements digital.srp.sreport.model.surveys.SduQuestions 
                 if (existingQ == null) {
                     existingQ = qRepo.save(new Question().q(q));
                 }
-                answer = rtn.initAnswer(rtn, existingQ)
+                answer = rtn.initAnswer(rtn, existingQ, null)
                         .applicablePeriod(period)
                         .derived(true);
             }

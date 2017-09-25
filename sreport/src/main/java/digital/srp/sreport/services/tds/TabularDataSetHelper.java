@@ -27,7 +27,7 @@ public class TabularDataSetHelper {
             hList = Arrays.asList(headers);
         }
         int colCount = hList.size();
-        int rowCount = answers.size()/colCount;
+        int rowCount = answers.size()/headers.length;
         if (answers.size() % colCount != 0) {
             rowCount++;
         }
