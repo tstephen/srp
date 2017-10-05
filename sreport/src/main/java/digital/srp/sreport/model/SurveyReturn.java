@@ -215,7 +215,7 @@ public class SurveyReturn implements AuditorAware<String> {
         return underivedAnswers;
     }
 
-    public Optional<Answer> answer(Q q, String period) {
+    public Optional<Answer> answer(String period, Q q) {
         return answer(q.name(), period);
     }
 
@@ -234,22 +234,23 @@ public class SurveyReturn implements AuditorAware<String> {
         return Optional.ofNullable(a);
     }
 
-    public Answer createEmptyAnswer(Question existingQ, String period) {
+    public Answer createEmptyAnswer(String period, Question existingQ) {
         return new Answer()
                 .addSurveyReturn(this)
+                .derived(true)
+                .applicablePeriod(period)
                 .question(existingQ)
-                .applicablePeriod(this.applicablePeriod)
                 .status(StatusType.Draft.name());
     }
 
-    public Answer initAnswer(SurveyReturn rtn, Question existingQ, String period) {
-        Answer answer = rtn.createEmptyAnswer(existingQ, null);
+    public synchronized Answer initAnswer(SurveyReturn rtn, String period, Question existingQ) {
+        Answer answer = rtn.createEmptyAnswer(period, existingQ);
         rtn.answers().add(answer);
         return answer;
     }
 
-    public BigDecimal answerResponseAsBigDecimal(Q q, String period) {
-        Optional<Answer> answer = answer(q, period);
+    public BigDecimal answerResponseAsBigDecimal(String period, Q q) {
+        Optional<Answer> answer = answer(period, q);
         if (answer.isPresent()) {
             return new BigDecimal(answer.get().response());
         } else {

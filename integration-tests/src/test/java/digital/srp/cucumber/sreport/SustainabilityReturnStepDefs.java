@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 import org.springframework.http.HttpStatus;
@@ -138,13 +139,13 @@ public class SustainabilityReturnStepDefs extends IntegrationTestSupport impleme
         for (String period : periods) {
             assertNotNull(
                     String.format("No answer for %1$s in %2$s", q1, period),
-                    rtn.answer(Q.valueOf(q1), period));
+                    rtn.answer(period, Q.valueOf(q1)));
             assertNotNull(
                     String.format("No answer for %1$s in %2$s", q2, period),
-                    rtn.answer(Q.valueOf(q2), period));
+                    rtn.answer(period, Q.valueOf(q2)));
             assertNotNull(
                     String.format("No answer for %1$s in %2$s", q3, period),
-                    rtn.answer(Q.valueOf(q3), period));
+                    rtn.answer(period, Q.valueOf(q3)));
         }
         assertTrue(periods.size() >= yearCount);
     }
@@ -185,7 +186,7 @@ public class SustainabilityReturnStepDefs extends IntegrationTestSupport impleme
         assertNotNull(rtn);
         assertEquals(startYear+"-"+endYear, rtn.applicablePeriod());
         assertEquals(org, rtn.org());
-        assertEquals(org, rtn.answer(Q.ORG_CODE, rtn.applicablePeriod()).response());
+        assertEquals(org, rtn.answer(rtn.applicablePeriod(), Q.ORG_CODE).get().response());
     }
     
 
@@ -194,7 +195,7 @@ public class SustainabilityReturnStepDefs extends IntegrationTestSupport impleme
         Set<String> years = new HashSet<String>();
         ArrayList<Q> missingAnswers = new ArrayList<Q>();
         for (Q q : Sdu1617.getSurvey().questionCodes()) {
-            if (rtn.answer(q, rtn.applicablePeriod())==null) {
+            if (rtn.answer(rtn.applicablePeriod(), q)==null) {
                 missingAnswers.add(q);
             }
         }
@@ -217,9 +218,9 @@ public class SustainabilityReturnStepDefs extends IntegrationTestSupport impleme
 
     @When("^the (\\w+) return is updated with (\\w+), (\\w+) and (\\w+) and uploaded$")
     public void the_return_is_updated_with_x_y_and_z_and_submitted(String org, String q1, String q2, String q3) throws Throwable {
-        rtn.answer(Q.valueOf(q1), Sdu1617.PERIOD).response(getTestDataNumber().toString());
-        rtn.answer(Q.valueOf(q2), Sdu1617.PERIOD).response(getTestDataNumber().toString());
-        rtn.answer(Q.valueOf(q3), Sdu1617.PERIOD).response(getTestDataNumber().toString());
+        rtn.answer(Sdu1617.PERIOD, Q.valueOf(q1)).get().response(getTestDataNumber().toString());
+        rtn.answer(Sdu1617.PERIOD, Q.valueOf(q2)).get().response(getTestDataNumber().toString());
+        rtn.answer(Sdu1617.PERIOD, Q.valueOf(q3)).get().response(getTestDataNumber().toString());
         executePut("/returns/"+rtn.id(), rtn);
     }
 
@@ -267,9 +268,9 @@ public class SustainabilityReturnStepDefs extends IntegrationTestSupport impleme
         List<String> periods = PeriodUtil.fillBackwards(rtn.applicablePeriod(), minNoOfYears);
         for (String p : periods) {
             for (Q q : headers) {
-                Answer answer = rtn.answer(q, p);
-                assertNotNull(String.format("Missing %1$s for %2$s", q.name(), p), answer);
-                assertNotNull(answer.response());
+                Optional<Answer> answer = rtn.answer(p, q);
+                assertTrue(String.format("Missing %1$s for %2$s", q.name(), p), answer.isPresent());
+                assertNotNull(answer.get().response());
             }
         }
     }
@@ -295,7 +296,7 @@ public class SustainabilityReturnStepDefs extends IntegrationTestSupport impleme
         rtn = (SurveyReturn) latestResponse.parseObject(SurveyReturn.class);
         assertEquals(qStartYear+"-"+qEndYear, rtn.applicablePeriod());
         assertEquals(org, rtn.org());
-        assertEquals(org, rtn.answer(Q.ORG_CODE, rtn.applicablePeriod()).response());
+        assertEquals(org, rtn.answer(rtn.applicablePeriod(), Q.ORG_CODE).get().response());
     }
 
     @Given("^the SDU (\\d+)-(\\d+) return of (\\w+) is complete$")

@@ -1,5 +1,6 @@
 package digital.srp.sreport.services.tds;
 
+import java.math.BigDecimal;
 import java.text.Format;
 import java.util.Arrays;
 import java.util.List;
@@ -28,7 +29,7 @@ public class TabularDataSetHelper {
         }
         int colCount = hList.size();
         int rowCount = answers.size()/headers.length;
-        if (answers.size() % colCount != 0) {
+        if (answers.size() % headers.length != 0) {
             rowCount++;
         }
         TabularDataSet tds = new TabularDataSet(rowCount, colCount)
@@ -38,7 +39,7 @@ public class TabularDataSetHelper {
             int col = hList.indexOf(answer.question().name());
             int row = i/headers.length;
             try {
-                tds.set(row, col, formatter.format(answer.responseAsBigDecimal()));
+                tds.set(row, col, formatter.format((BigDecimal) answer.responseAsBigDecimal()));
             } catch (NullPointerException e) {
                 tds.set(row, col, "0");
             } catch (IllegalArgumentException e) {

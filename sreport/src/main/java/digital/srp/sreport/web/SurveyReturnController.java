@@ -32,6 +32,8 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import com.fasterxml.jackson.annotation.JsonView;
 
+import digital.srp.sreport.api.Calculator;
+import digital.srp.sreport.internal.NullAwareBeanUtils;
 import digital.srp.sreport.model.Answer;
 import digital.srp.sreport.model.Q;
 import digital.srp.sreport.model.Question;
@@ -43,7 +45,6 @@ import digital.srp.sreport.repositories.AnswerRepository;
 import digital.srp.sreport.repositories.QuestionRepository;
 import digital.srp.sreport.repositories.SurveyRepository;
 import digital.srp.sreport.repositories.SurveyReturnRepository;
-import digital.srp.sreport.services.Cruncher;
 
 /**
  * REST web service for accessing returned returns.
@@ -61,7 +62,7 @@ public class SurveyReturnController {
     protected String baseUrl;
     
     @Autowired
-    protected Cruncher cruncher;
+    protected Calculator cruncher;
     
     @Autowired
     protected SurveyRepository surveyRepo; 
@@ -192,11 +193,6 @@ public class SurveyReturnController {
         SurveyReturn rtn = returns.get(returns.size()-1);
         LOGGER.info("Found {} returns for {},{} returning revision {}", returns.size(), surveyName, org, rtn.revision());
 
-//        rtn.answer(Q.ORG_CODE, rtn.applicablePeriod())
-//                .orElse(rtn.initAnswer(rtn, qRepo.findByName(Q.ORG_CODE.name()), rtn.applicablePeriod()))
-//                .response(org);
-        rtn = saveCalculations(cruncher.calculate(rtn));
-        
         return addLinks(rtn);
     }
 
@@ -212,11 +208,6 @@ public class SurveyReturnController {
             returnRepo.importAnswers(rtn.id(), rtn.org(), survey.name());
         }
         return findCurrentBySurveyNameAndOrg(surveyName, org);
-    }
-
-    @Transactional//(Transactional.TxType.REQUIRES_NEW)
-    private SurveyReturn saveCalculations(SurveyReturn rtn) {
-        return returnRepo.save(rtn);
     }
 
     /**
@@ -298,7 +289,7 @@ public class SurveyReturnController {
                     returnId, existing.name()));
         }
         int changeCount = createOrMergeAnswers(updatedReturn, existing);
-//        NullAwareBeanUtils.copyNonNullProperties(updatedReturn, existing);
+        NullAwareBeanUtils.copyNonNullProperties(updatedReturn, existing, "answers");
         if (changeCount > 0) {
             existing.setLastUpdated(new Date());
         }
@@ -312,11 +303,8 @@ public class SurveyReturnController {
             SurveyReturn existing) {
         int changeCount = 0;
         for (Answer answer : updatedReturn.answers()) {
-            Answer existingAnswer = existing.answer(answer.question().q(), answer.applicablePeriod())
-                    .orElse(existing.createEmptyAnswer(answer.question(), answer.applicablePeriod()));
-            if (answer.question().q() == Q.ORG_NAME) {
-                System.out.println("Pay attention");
-            }
+            Answer existingAnswer = existing.answer(answer.applicablePeriod(), answer.question().q())
+                    .orElse(existing.createEmptyAnswer(answer.applicablePeriod(), answer.question()));
             if (existingAnswer.question().id() == null) {
                 Question q;
                 try {
@@ -332,9 +320,6 @@ public class SurveyReturnController {
                 // note that Hibernate / Spring Data will skip any update if not actually needed
                 changeCount++;
                 answerRepo.save(existingAnswer.response(answer.response()).addSurveyReturn(existing));
-            } else {
-                ;
-                //LOGGER.debug("No change to {}", answer.question().name());
             }
         }
         return changeCount;
@@ -424,21 +409,6 @@ public class SurveyReturnController {
         }
     }
 
-    /**
-     * Run all calculations based on the return inputs.
-     */
-    @RequestMapping(value = "/{returnId}/calculate", method = RequestMethod.POST, consumes = "application/json")
-    public @ResponseBody void calculate(
-            @PathVariable("returnId") Long returnId) {
-        LOGGER.info(String.format("Running calculations for %1$s", returnId));
-
-        SurveyReturn rtn = returnRepo.findOne(returnId);
-        
-        rtn = cruncher.calculate(rtn);
-
-        returnRepo.save(rtn);
-    }
-    
     /**
      * Delete an existing return.
      */

@@ -21,15 +21,15 @@ public class WeightingFactorCsvImporter {
 
     private static final Logger LOGGER = LoggerFactory
             .getLogger(WeightingFactorCsvImporter.class);
-    
+
     public static final String DATA = "/data/WeightingFactors.csv";
     public static final String[] HEADERS = { "category",
-            "acute_c", "ambulance_c", "care_c", "ccg_c", "community_c",
-            "mental_health_learning_disability_c", "social_enterprise_c", 
-            "acute_m", "ambulance_m", "care_m", "ccg_m", "community_m",
-            "mental_health_learning_disability_m", "social_enterprise_m",
-            "acute_p", "ambulance_p", "care_p", "ccg_p", "community_p",
-            "mental_health_learning_disability_p", "social_enterprise_p"};
+            "acute_c", "ambulance_c", "care_c", "clinical_commissioning_group_c",
+            "community_c", "mental_health_learning_disability_c", "social_enterprise_c",
+            "acute_m", "ambulance_m", "care_m", "clinical_commissioning_group_m",
+            "community_m", "mental_health_learning_disability_m", "social_enterprise_m",
+            "acute_p", "ambulance_p", "care_p", "clinical_commissioning_group_p",
+            "community_p", "mental_health_learning_disability_p", "social_enterprise_p"};
 
     public static final int NO_ORG_TYPES = 7;
 
@@ -40,7 +40,7 @@ public class WeightingFactorCsvImporter {
             return readWeightingFactors(isr, HEADERS);
         }
     }
-    
+
     public List<WeightingFactor> readWeightingFactors(Reader in, String[] headers)
             throws IOException {
         final CSVParser parser = new CSVParser(in,
@@ -71,14 +71,14 @@ public class WeightingFactorCsvImporter {
 
         return wfactors;
     }
-    
+
     private WeightingFactor newWeightingFactor(CSVRecord record, int idx) {
         String value = record.get(idx);
-        if (value.startsWith(".")) { 
+        if (value.startsWith(".")) {
             value = "0" + value;
         }
         LOGGER.debug("value: {}", value);
-        
+
         String category = record.get(0);
         switch(category) {
         case "Energy":
@@ -98,6 +98,9 @@ public class WeightingFactorCsvImporter {
             break;
         case "Business services":
             category = WeightingFactors.BIZ_SVCS.name();
+            break;
+        case "Capital spend":
+            category = WeightingFactors.CAPITAL.name();
             break;
         case "Construction":
             category = WeightingFactors.CONSTRUCTION.name();
@@ -162,7 +165,7 @@ public class WeightingFactorCsvImporter {
                 .carbonValue(new BigDecimal(record.get(idx).trim()).setScale(0, RoundingMode.HALF_UP))
                 .moneyValue(new BigDecimal(record.get(idx+NO_ORG_TYPES).trim()).multiply(new BigDecimal("1000")).setScale(0, RoundingMode.HALF_UP))
                 .proportionOfTotal(new BigDecimal(record.get(idx+(NO_ORG_TYPES*2)).trim()).setScale(3, RoundingMode.HALF_UP));
-        
+
         return factor;
     }
 

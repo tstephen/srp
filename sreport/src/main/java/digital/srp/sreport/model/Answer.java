@@ -166,7 +166,7 @@ public class Answer implements AuditorAware<String> {
     private List<Link> links;
 
     public String response3sf() {
-        return SignificantFiguresFormat.format(new BigDecimal(response));
+        return SignificantFiguresFormat.format(responseAsBigDecimal());
     }
 
     public Answer question(Question q) {

@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.data.rest.webmvc.config.RepositoryRestMvcConfiguration;
 
+import digital.srp.sreport.api.Calculator;
 import digital.srp.sreport.repositories.CarbonFactorRepository;
 import digital.srp.sreport.repositories.WeightingFactorRepository;
 import digital.srp.sreport.services.Cruncher;
@@ -27,7 +28,7 @@ public class SReportConfiguration extends RepositoryRestMvcConfiguration {
     protected WeightingFactorRepository wFactorRepo;
     
     @Bean
-    public Cruncher cruncher() {
+    public Calculator cruncher() {
         return new Cruncher(cFactorRepo.findAll(), wFactorRepo.findAll());
     }
 

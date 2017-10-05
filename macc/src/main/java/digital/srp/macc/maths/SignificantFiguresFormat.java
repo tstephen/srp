@@ -18,16 +18,20 @@ package digital.srp.macc.maths;
 import java.math.BigDecimal;
 import java.math.MathContext;
 import java.math.RoundingMode;
+import java.text.FieldPosition;
+import java.text.Format;
 import java.text.NumberFormat;
+import java.text.ParsePosition;
 import java.util.Locale;
 
-public class SignificantFiguresFormat {
+public class SignificantFiguresFormat extends Format {
+
+    private static final long serialVersionUID = -1964292745833277765L;
 
     private static final int NO_SIGNIFICANT_FIGURES = 3;
     
     private static final NumberFormat NUMBER_FORMAT = NumberFormat
             .getInstance(Locale.UK);
-
 
     public static String format(BigDecimal bd) {
         if (bd == null) {
@@ -54,4 +58,24 @@ public class SignificantFiguresFormat {
         }
     }
 
+    @Override
+    public StringBuffer format(Object obj, StringBuffer toAppendTo,
+            FieldPosition pos) {
+        if (obj instanceof BigDecimal) {
+            return toAppendTo.append(format((BigDecimal) obj));
+        } else if (obj instanceof Long) {
+            return toAppendTo.append(format(new BigDecimal((Long) obj)));
+        } else if (obj instanceof Double) {
+            return toAppendTo.append(format(new BigDecimal((Double) obj)));
+        } else if (obj instanceof String){
+            return toAppendTo.append(format(new BigDecimal((String) obj)));
+        } else {
+            throw new NumberFormatException();
+        }
+    }
+
+    @Override
+    public Object parseObject(String source, ParsePosition pos) {
+        return new BigDecimal(source);
+    }
 }

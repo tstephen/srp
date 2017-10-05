@@ -20,7 +20,7 @@ public interface SduQuestions {
             Q. OIL_CO2E, Q.GAS_CO2E
     };
 
-    Q[] FOOTPRINT_HDRS = new Q[] { Q.ENERGY_CO2E_PCT,
+    Q[] FOOTPRINT_PCT_HDRS = new Q[] { Q.ENERGY_CO2E_PCT,
             Q.COMMISSIONING_CO2E_PCT,
             Q.PROCUREMENT_CO2E_PCT,
             Q.TRAVEL_CO2E_PCT
@@ -48,12 +48,14 @@ public interface SduQuestions {
 
     Q[] ENERGY_CO2E_HDRS = new Q[] {
             Q.ELEC_CO2E, Q.GAS_CO2E, Q.OIL_CO2E,Q.COAL_CO2E,
-            Q.STEAM_CO2E,Q.HOT_WATER_CO2E, Q.ELEC_RENEWABLE_CO2E
+            Q.STEAM_CO2E,Q.HOT_WATER_CO2E, Q.ELEC_RENEWABLE_CO2E,
+            Q.EXPORTED_THERMAL_ENERGY_CO2E
     };
 
     Q[] ENERGY_HDRS = new Q[] {
             Q.ELEC_USED, Q.GAS_USED,Q. OIL_USED,
-            Q.COAL_USED, Q.STEAM_USED,Q. HOT_WATER_USED, Q.ELEC_RENEWABLE
+            Q.COAL_USED, Q.STEAM_USED, Q. HOT_WATER_USED, Q.ELEC_RENEWABLE,
+            Q.EXPORTED_THERMAL_ENERGY
     };
 
     Q[] ORG_HDRS = new Q[] { Q.FLOOR_AREA, Q.NO_STAFF };
@@ -62,13 +64,27 @@ public interface SduQuestions {
             Q.SCOPE_1, Q.SCOPE_2, Q.SCOPE_3
     };
 
+    Q[] ANAESTHETIC_GASES_CO2E_HDRS = new Q[] {
+            Q.DESFLURANE_CO2E, Q.ISOFLURANE_CO2E, Q.SEVOFLURANE_CO2E,
+            Q.NITROUS_OXIDE_CO2E, Q.PORTABLE_NITROUS_OXIDE_MIX_CO2E,
+            Q.PORTABLE_NITROUS_OXIDE_MIX_MATERNITY_CO2E
+    };
+
     Q[] SCOPE_1_HDRS = new Q[] {
             Q.OWNED_BUILDINGS, Q.LEASED_ASSETS_ENERGY_USE,
             Q.OWNED_VEHICLES, Q.ANAESTHETIC_GASES_CO2E };
 
     Q[] SCOPE_2_HDRS = new Q[] { Q.NET_THERMAL_ENERGY_CO2E, Q.NET_ELEC_CO2E };
 
-    Q[] SCOPE_3_HDRS = new Q[] { Q.SCOPE_3_TRAVEL, Q.SCOPE_3_WATER, Q.SCOPE_3_WASTE, Q.CAPITAL_CO2E, Q.SCOPE_3_BIOMASS };
+    Q[] SCOPE_3_HDRS = new Q[] { Q.PROCUREMENT_CO2E, Q.COMMISSIONING_CO2E, Q.SCOPE_3_TRAVEL, Q.SCOPE_3_WASTE, Q.SCOPE_3_WATER, Q.SCOPE_3_ENERGY_WTT };
+
+    Q[] SCOPE_3_TRAVEL_HDRS = new Q[] {
+        Q.OWNED_FLEET_TRAVEL_CO2E, Q.BIZ_MILEAGE_ROAD_CO2E,
+        Q.BIZ_MILEAGE_RAIL_CO2E, Q.BIZ_MILEAGE_AIR_CO2E,
+        Q.FUEL_WTT,
+        Q.PATIENT_AND_VISITOR_MILEAGE_CO2E,
+        Q.STAFF_COMMUTE_MILES_CO2E
+    };
 
     Q[] BIOMASS_CO2E_WTT_HDRS = new Q[] {
             Q.WOOD_LOGS_WTT_CO2E, Q.WOOD_CHIPS_WTT_CO2E, Q.WOOD_PELLETS_WTT_CO2E
@@ -102,6 +118,27 @@ public interface SduQuestions {
             Q.CONSULTING_SVCS_AND_EXPENSES_CO2E
     };
 
+    Q[] CORE_CO2E_HDRS = new Q[] {
+            /* All energy */
+            Q.OWNED_BUILDINGS_GAS, Q.OWNED_BUILDINGS_OIL,
+            Q.OWNED_BUILDINGS_COAL, Q.NET_ELEC_CO2E, Q.NET_THERMAL_ENERGY_CO2E,
+            Q.SCOPE_3_BIOMASS, Q.WOOD_LOGS_WTT_CO2E, Q.WOOD_CHIPS_WTT_CO2E,
+            Q.WOOD_PELLETS_WTT_CO2E,
+            /* water and waste */
+            Q.WASTE_AND_WATER_CO2E, Q.ANAESTHETIC_GASES_CO2E,
+            /*
+             * all travel excepting individual citizens (patients, visitors and
+             * staff)
+             */
+            Q.BIZ_MILEAGE_CO2E, Q.BIZ_MILEAGE_ROAD_CO2E,
+            Q.BIZ_MILEAGE_RAIL_CO2E, Q.BIZ_MILEAGE_AIR_CO2E,
+            Q.OWNED_FLEET_TRAVEL_CO2E };
+
+    Q[] CITIZEN_CO2E_HDRS = new Q[]{
+            Q.STAFF_COMMUTE_MILES_CO2E,
+            Q.PATIENT_AND_VISITOR_MILEAGE_CO2E
+    };
+
     Q[] SDU_TREND_HDRS = new Q[] {
             Q.CORE_CO2E,
             Q.PROCUREMENT_CO2E,
@@ -116,7 +153,6 @@ public interface SduQuestions {
     };
 
     Q[] BENCHMARK_BY_POPULATION_HDRS = new Q[] {
-            Q.TOTAL_CO2E_BY_POP,
             Q.TOTAL_ENERGY_CO2E_BY_POP,
             Q.TOTAL_TRAVEL_CO2E_BY_POP,
             Q.TOTAL_PROCUREMENT_CO2E_BY_POP,
@@ -124,7 +160,6 @@ public interface SduQuestions {
     };
 
     Q[] BENCHMARK_BY_FLOOR_AREA_HDRS = new Q[] {
-            Q.TOTAL_CO2E_BY_FLOOR,
             Q.TOTAL_ENERGY_CO2E_BY_FLOOR,
             Q.TOTAL_TRAVEL_CO2E_BY_FLOOR,
             Q.TOTAL_PROCUREMENT_CO2E_BY_FLOOR,
@@ -132,7 +167,6 @@ public interface SduQuestions {
     };
 
     Q[] BENCHMARK_BY_WTE_HDRS = new Q[] {
-            Q.TOTAL_CO2E_BY_WTE,
             Q.TOTAL_ENERGY_CO2E_BY_WTE,
             Q.TOTAL_TRAVEL_CO2E_BY_WTE,
             Q.TOTAL_PROCUREMENT_CO2E_BY_WTE,
@@ -140,7 +174,6 @@ public interface SduQuestions {
     };
 
     Q[] BENCHMARK_BY_BEDS_HDRS = new Q[] {
-            Q.TOTAL_CO2E_BY_BEDS,
             Q.TOTAL_ENERGY_CO2E_BY_BEDS,
             Q.TOTAL_TRAVEL_CO2E_BY_BEDS,
             Q.TOTAL_PROCUREMENT_CO2E_BY_BEDS,
@@ -148,7 +181,6 @@ public interface SduQuestions {
     };
 
     Q[] BENCHMARK_BY_PATIENT_CONTACTS_HDRS = new Q[] {
-            Q.TOTAL_CO2E_BY_PATIENT_CONTACT,
             Q.TOTAL_ENERGY_CO2E_BY_PATIENT_CONTACT,
             Q.TOTAL_TRAVEL_CO2E_BY_PATIENT_CONTACT,
             Q.TOTAL_PROCUREMENT_CO2E_BY_PATIENT_CONTACT,
@@ -156,10 +188,11 @@ public interface SduQuestions {
     };
 
     Q[] BENCHMARK_BY_OPEX_HDRS = new Q[] {
-            Q.TOTAL_CO2E_BY_OPEX,
             Q.TOTAL_ENERGY_CO2E_BY_OPEX,
             Q.TOTAL_TRAVEL_CO2E_BY_OPEX,
             Q.TOTAL_PROCUREMENT_CO2E_BY_OPEX,
             Q.TOTAL_COMMISSIONING_CO2E_BY_OPEX
     };
+
+    public String ANALYSE_BY_E_CLASS = "0-E-Class";
 }

@@ -1,4 +1,4 @@
-category,acute_c,ambulance_c,care_c,ccg_c,community_c,mental_health_learning_disability_c,social_enterprise_c,acute_m,ambulance_m,care_m,ccg_m,community_m,mental_health_learning_disability_m,social_enterprise_m,acute_p,ambulance_p,care_p,ccg_p,community_p,mental_health_learning_disability_p,social_enterprise_p
+category,acute_c,ambulance_c,care_c,clinical_commissioning_group_c,community_c,mental_health_learning_disability_c,social_enterprise_c,acute_m,ambulance_m,care_m,clinical_commissioning_group_m,community_m,mental_health_learning_disability_m,social_enterprise_m,acute_p,ambulance_p,care_p,clinical_commissioning_group_p,community_p,mental_health_learning_disability_p,social_enterprise_p
 Category,GHG,GHG2,GHG4,GHG4,GHG4,GHG6,GHG4,£000,£000,£000,£000,£000,£000,£000,%,%,%,%,%,%,%
 Energy,3241567572,55718329,364162542,32772036,79875509,486294106,79875509,0,0,0,0,0,0,0,0.000,0.000,0.000,0.000,0.000,0.000,0.000
 Gas,1406443144,17673176,52832354,0,34921048,194868439,34921048,0,0,0,0,0,0,0,0.000,0.000,0.000,0.000,0.000,0.000,0.000
@@ -24,3 +24,4 @@ Visitor Travel,194350657,0,314152127,0,741953,115160582,741953,0,0,0,0,0,0,0,0.0
 Staff Travel,219025828,11287553,49146094,10896919,17244005,56722986,17244005,0,0,0,0,0,0,0,0.000,0.000,0.000,0.000,0.000,0.000,0.000
 Business Travel and fleet,215395491,66492931,245177566,157398882,36342071,156701008,36342071,260120,54660,494655,129388,29875,128814,29875,0.012,0.081,0.018,0.002,0.032,0.046,0.032
 Commissioned health and social care services,205350644,7451992,815450497,16515749025,19116250,79676977,19116250,1088894,39515,1716470,75214241,101366,422496,101366,0.050,0.058,0.063,0.900,0.108,0.150,0.108
+Capital spend,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0.297,0.548,0.084,0.208,0.303,0.279,0.303

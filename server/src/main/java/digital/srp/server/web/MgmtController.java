@@ -166,9 +166,9 @@ public class MgmtController {
                 for (Answer answer: surveyReturn.answers()) {
                     LOGGER.debug("Looking for answer for org: {}, period: {} and question: {}", 
                             surveyReturn.org(), answer.applicablePeriod(), answer.question().name());
-                    Optional<Answer> existingAnswer = existingReturn.answer(answer.question().q(), answer.applicablePeriod());
+                    Optional<Answer> existingAnswer = existingReturn.answer(answer.applicablePeriod(), answer.question().q());
                     if (!existingAnswer.isPresent()
-                            && answerRepo.findByOrgPeriodAndQuestion(surveyReturn.org(), answer.applicablePeriod(), answer.question().name()) == null) {
+                            && answerRepo.findByOrgPeriodAndQuestion(surveyReturn.org(), answer.applicablePeriod(), answer.question().name()).size() == 0) {
                         answer.question(findQ(answer));
                         answer.addSurveyReturn(existingReturn);
                         answer = answerRepo.save(answer);

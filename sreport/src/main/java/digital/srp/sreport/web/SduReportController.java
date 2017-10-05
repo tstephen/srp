@@ -1,6 +1,7 @@
 package digital.srp.sreport.web;
 
 import java.text.DecimalFormat;
+import java.text.Format;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import digital.srp.macc.maths.SignificantFiguresFormat;
 import digital.srp.sreport.internal.PeriodUtil;
 import digital.srp.sreport.model.Answer;
 import digital.srp.sreport.model.Q;
@@ -61,7 +63,7 @@ public class SduReportController implements SduQuestions {
     private TabularDataSetHelper tdsHelper;
 
     private DecimalFormat rawDecimalFormat = new DecimalFormat("#");
-    private DecimalFormat prettyPrintDecimalFormat = new DecimalFormat("#,###");
+    private Format prettyPrintDecimalFormat = new SignificantFiguresFormat();
 
     private Aggregator totaller = new Totaller();
 
@@ -182,7 +184,7 @@ public class SduReportController implements SduQuestions {
             Model model) {
         LOGGER.info(String.format("travelCO2eTable for %1$s %2$s", org, period));
 
-        fillModel(org, period, TRAVEL_HDRS, model, true, prettyPrintDecimalFormat, maxPeriods, true, Optional.of(totaller));
+        fillModel(org, period, SCOPE_3_TRAVEL_HDRS, model, true, prettyPrintDecimalFormat, maxPeriods, true, Optional.of(totaller));
         return "table-period-as-col";
     }
 
@@ -369,7 +371,9 @@ public class SduReportController implements SduQuestions {
             Model model) {
         LOGGER.info(String.format("footprintTable for %1$s %2$s", org, period));
 
-        fillModel(org, period, FOOTPRINT_HDRS, model, true, prettyPrintDecimalFormat, maxPeriods, true, Optional.of(totaller));
+        // If only fetching one period make sure it is not lost off right edge
+        boolean ascending = maxPeriods.equals(1) ? false : true;
+        fillModel(org, period, FOOTPRINT_PCT_HDRS, model, true, prettyPrintDecimalFormat, maxPeriods, ascending, Optional.of(totaller));
         return "table-period-as-col";
     }
 
@@ -382,12 +386,33 @@ public class SduReportController implements SduQuestions {
     @RequestMapping(value = "/{org}/{period}/carbon-footprint.csv", method = RequestMethod.GET, produces = "text/csv")
     @Transactional
     public String footprintCsv(@PathVariable("org") String org,
-            @PathVariable("period") String period, @RequestParam(value = "maxPeriods", required = false, defaultValue = DEFAULT_MAX_PERIODS) Integer maxPeriods,
-            Model model) {
+            @PathVariable("period") String period, Model model) {
         LOGGER.info(String.format("footprintCsv for %1$s %2$s", org, period));
 
-        fillModel(org, period, FOOTPRINT_HDRS, model, false, rawDecimalFormat, maxPeriods, true, Optional.empty());
-        return "csv";
+        String[] headerNames = new String[FOOTPRINT_PCT_HDRS.length];
+        for (int i = 0 ; i < FOOTPRINT_PCT_HDRS.length ; i++) {
+            headerNames[i] = FOOTPRINT_PCT_HDRS[i].name();
+        }
+        model.addAttribute("periods", headerNames);
+        
+        List<Answer> answers = answerRepo.findByOrgPeriodAndQuestion(org, period, headerNames);
+        LOGGER.info(
+                String.format("Found %1$s answers about organisation for %2$s",
+                        answers.size(), org));
+        if (LOGGER.isDebugEnabled()) {
+            for (Answer answer : answers) {
+                LOGGER.debug(answer.toString());
+            }
+        }
+        
+        TabularDataSet table = tdsHelper.tabulate(headerNames, answers, rawDecimalFormat, Optional.empty());
+//            Collections.reverse(periods);
+            table = table.transpose();
+        
+        model.addAttribute("table", table);
+        model.addAttribute("messages",
+                ResourceBundle.getBundle("digital.srp.sreport.Messages"));
+        return "csv-period-as-col";
     }
 
     /**
@@ -699,7 +724,8 @@ public class SduReportController implements SduQuestions {
             Model model) {
         LOGGER.info(String.format("co2eByWteTable for %1$s %2$s", org, period));
 
-        fillModel(org, period, BENCHMARK_BY_WTE_HDRS, model, true, prettyPrintDecimalFormat, maxPeriods, true, Optional.of(totaller));
+        fillModel(org, period, BENCHMARK_BY_WTE_HDRS, model, true, 
+                prettyPrintDecimalFormat, maxPeriods, true, Optional.of(totaller));
         return "table-period-as-col";
     }
 
@@ -816,14 +842,19 @@ public class SduReportController implements SduQuestions {
     }
 
     private void fillModel(String org, String period, Q[] headers, Model model,
-            boolean periodAsCol, DecimalFormat decimalFormat, Integer maxPeriods, 
+            boolean periodAsCol, Format decimalFormat, Integer maxPeriods, 
             boolean ascending, Optional<Aggregator> aggregator) {
         String[] headerNames = new String[headers.length];
         for (int i = 0 ; i < headers.length ; i++) {
             headerNames[i] = headers[i].name();
         }
 
-        List<Answer> answers = answerRepo.findByOrgAndQuestion(org, headerNames);
+        List<Answer> answers;
+        if (ascending) {
+            answers = answerRepo.findByOrgAndQuestionAsc(org, headerNames);
+        } else {
+            answers = answerRepo.findByOrgAndQuestion(org, headerNames);
+        }
         LOGGER.info(
                 String.format("Found %1$s answers about organisation for %2$s",
                         answers.size(), org));
@@ -833,9 +864,6 @@ public class SduReportController implements SduQuestions {
             }
         }
 
-        if (ascending) {
-            Collections.reverse(answers);
-        }        
         TabularDataSet table = tdsHelper.tabulate(headerNames, answers, decimalFormat, aggregator);
         List<String> periods = PeriodUtil.fillBackwards(period,
                 table.rows().length < maxPeriods ? table.rows().length : maxPeriods);
