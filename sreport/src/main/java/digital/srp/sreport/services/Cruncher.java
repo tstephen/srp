@@ -52,6 +52,8 @@ public class Cruncher implements digital.srp.sreport.model.surveys.SduQuestions,
         LOGGER.info("Calculating for {} in {}", rtn.org(), rtn.applicablePeriod());
         List<String> periods = PeriodUtil.fillBackwards(rtn.applicablePeriod(), yearsToCalc);
         for (String period : periods) {
+            calcEnergyConsumption(period, rtn);
+
             calcScope1(period, rtn);
             calcScope2(period, rtn);
             calcScope3(period, rtn);
@@ -80,6 +82,17 @@ public class Cruncher implements digital.srp.sreport.model.surveys.SduQuestions,
         rtn.setLastUpdated(new Date());
         LOGGER.warn("Calculations took {}ms", (System.currentTimeMillis() - start));
         return rtn;
+    }
+
+    private void calcEnergyConsumption(String period, SurveyReturn rtn) {
+        sumAnswers(period, rtn, Q.TOTAL_ENERGY, SduQuestions.ENERGY_HDRS);
+        BigDecimal noStaff = getAnswerForPeriodWithFallback(period, rtn, Q.NO_STAFF).responseAsBigDecimal();
+        try {
+            getAnswer(period, rtn, Q.TOTAL_ENERGY_BY_WTE).response(
+                    getAnswer(period, rtn, Q.TOTAL_ENERGY).responseAsBigDecimal().divide(noStaff, RoundingMode.HALF_UP));
+        } catch (ArithmeticException e) {
+            LOGGER.warn("Insufficient data to calculate energy by WTE");
+        }
     }
 
     protected void ensureInitialised(SurveyReturn rtn, int yearsToCalc, AnswerFactory answerFactory) {
@@ -296,6 +309,12 @@ public class Cruncher implements digital.srp.sreport.model.surveys.SduQuestions,
                     .multiply(cFactor.value())
                     .divide(new BigDecimal("1000"), 0, RoundingMode.HALF_UP);
             getAnswer(period,rtn, Q.WATER_CO2E).response(waterUseCo2e);
+            try {
+                BigDecimal noStaff = getAnswerForPeriodWithFallback(period, rtn, Q.NO_STAFF).responseAsBigDecimal();
+                getAnswer(period,rtn, Q.WATER_VOL_BY_WTE).response(rtn.answerResponseAsBigDecimal(period, Q.WATER_VOL).divide(noStaff));
+            } catch (ArithmeticException e) {
+                LOGGER.warn("Insufficient data to calculate water use by WTE for {} in {}", rtn.org(), period);
+            }
 
             // Treasury row 58: Water Treatment
             cFactor = cFactor(CarbonFactors.WATER_TREATMENT, period);
@@ -807,8 +826,8 @@ public class Cruncher implements digital.srp.sreport.model.surveys.SduQuestions,
                 thirdPtyRenewableUsed = BigDecimal.ZERO;
             }
             BigDecimal elecFactor = oneThousandth(cFactor(CarbonFactors.ELECTRICITY_UK, period));
-            BigDecimal elecUsed = nonRenewableElecUsed.add(greenTariffUsed).add(thirdPtyRenewableUsed).multiply(elecFactor);
-            getAnswer(period,rtn, Q.ELEC_CO2E).response(elecUsed.toPlainString());
+            BigDecimal elecUsedCo2e = nonRenewableElecUsed.add(greenTariffUsed).add(thirdPtyRenewableUsed).multiply(elecFactor);
+            getAnswer(period,rtn, Q.ELEC_CO2E).response(elecUsedCo2e.toPlainString());
 
             BigDecimal elecExported;
             try {
@@ -819,7 +838,7 @@ public class Cruncher implements digital.srp.sreport.model.surveys.SduQuestions,
                 elecExported = BigDecimal.ZERO;
             }
 
-            getAnswer(period,rtn, Q.NET_ELEC_CO2E).response(elecUsed.subtract(elecExported).toPlainString());
+            getAnswer(period,rtn, Q.NET_ELEC_CO2E).response(elecUsedCo2e.subtract(elecExported).toPlainString());
         } catch (IllegalStateException | NullPointerException e) {
             LOGGER.warn("Insufficient data to calculate CO2e from electricity");
         }
@@ -901,7 +920,7 @@ public class Cruncher implements digital.srp.sreport.model.surveys.SduQuestions,
             if (getAnswer(period, rtn, srcQ).response() == null) {
                 LOGGER.info("No directly entered spend {}, estimate from non pay spend", srcQ);
                 calcVal = nonPaySpend.multiply(wFactor.proportionOfTotal())
-                        .multiply(wFactor.intensityValue());    
+                        .multiply(wFactor.intensityValue());
             } else {
                 calcVal = getAnswer(period, rtn, srcQ).responseAsBigDecimal();
             }

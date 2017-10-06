@@ -33,6 +33,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import com.fasterxml.jackson.annotation.JsonView;
 
 import digital.srp.sreport.api.Calculator;
+import digital.srp.sreport.api.exceptions.ObjectNotFoundException;
 import digital.srp.sreport.internal.NullAwareBeanUtils;
 import digital.srp.sreport.model.Answer;
 import digital.srp.sreport.model.Q;
@@ -48,7 +49,7 @@ import digital.srp.sreport.repositories.SurveyReturnRepository;
 
 /**
  * REST web service for accessing returned returns.
- * 
+ *
  * @author Tim Stephenson
  */
 @Controller
@@ -57,28 +58,28 @@ public class SurveyReturnController {
 
     private static final Logger LOGGER = LoggerFactory
             .getLogger(SurveyReturnController.class);
-    
+
     @Value("${spring.data.rest.baseUri}")
     protected String baseUrl;
-    
+
     @Autowired
     protected Calculator cruncher;
-    
+
     @Autowired
-    protected SurveyRepository surveyRepo; 
-    
+    protected SurveyRepository surveyRepo;
+
     @Autowired
     protected SurveyReturnRepository returnRepo;
 
     @Autowired
     protected QuestionRepository qRepo;
-    
+
     @Autowired
     protected AnswerRepository answerRepo;
-    
+
     /**
      * Return a single survey return with the specified id.
-     * 
+     *
      * @return the specified survey.
      */
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
@@ -93,10 +94,10 @@ public class SurveyReturnController {
 
         return addLinks(rtn);
     }
-    
+
     /**
      * Returns matching the specified survey and organisation.
-     * 
+     *
      * @return returns. May be more than one because occasionally returns are restated. .
      */
     @RequestMapping(value = "/findBySurveyName/{surveyName}", method = RequestMethod.GET)
@@ -110,10 +111,10 @@ public class SurveyReturnController {
 
         return addLinks(returns);
     }
-    
+
     /**
      * Returns matching the specified survey and organisation.
-     * 
+     *
      * @return returns. May be more than one because occasionally returns are restated.
      */
     @RequestMapping(value = "/findBySurveyNameAndOrg/{surveyName}/{org}", method = RequestMethod.GET)
@@ -124,34 +125,12 @@ public class SurveyReturnController {
         LOGGER.info(String.format("findBySurveyAndOrg %1$s/%2$s", surveyName, org));
 
         List<SurveyReturn> returns = returnRepo.findBySurveyAndOrg(surveyName, org);
-        if (returns.size()==0) { 
+        if (returns.size()==0) {
             returns.add(createBlankReturn(surveyName, org, applicablePeriod(surveyName)));
         }
 
         return addLinks(returns);
     }
-
-    /**
-     * Returns matching the specified survey, organisation and period.
-     * 
-     * @return returns. May be more than one because occasionally returns are restated.
-     */
-//    @RequestMapping(value = "/findBySurveyOrgAndPeriod/{surveyName}/{org}/{period}", method = RequestMethod.GET)
-//    @JsonView(SurveyReturnViews.Detailed.class)
-//    @Transactional
-//    public @ResponseBody List<SurveyReturn> findBySurveyOrgAndPeriod(
-//            @PathVariable("surveyName") String surveyName,
-//            @PathVariable("org") String org,
-//            @PathVariable("period") String period) {
-//        LOGGER.info(String.format("findBySurveyOrgAndPeriod %1$s/%2$s/%3$s", surveyName, org, period));
-//
-//        List<SurveyReturn> returns = returnRepo.findBySurveyOrgAndPeriod(surveyName, org);
-//        if (returns.size()==0) { 
-//            returns.add(createBlankReturn(surveyName, org, period));
-//        }
-//
-//        return addLinks(returns);
-//    }
 
     protected String applicablePeriod(String surveyName) {
         return surveyName.substring(surveyName.indexOf('-')+1);
@@ -177,7 +156,7 @@ public class SurveyReturnController {
             }
             emptyAnswers.add(answer);
         }
-        
+
         return addLinks(rtn);
     }
 
@@ -188,12 +167,24 @@ public class SurveyReturnController {
             @PathVariable("org") String org) {
         LOGGER.info(String.format("findCurrentBySurveyNameAndOrg %1$s, %2$s", surveyName, org));
 
+        if (org.length() > 3) {
+            org = lookupOrgCode(org);
+        }
+
         List<SurveyReturn> returns = findBySurveyAndOrg(surveyName, org);
         returns.sort((r1,r2) -> r1.revision().compareTo(r2.revision()));
         SurveyReturn rtn = returns.get(returns.size()-1);
         LOGGER.info("Found {} returns for {},{} returning revision {}", returns.size(), surveyName, org, rtn.revision());
 
         return addLinks(rtn);
+    }
+
+    private String lookupOrgCode(String orgName) {
+        Answer answer = answerRepo.findByOrgName(orgName);
+        if (answer == null) {
+            throw new ObjectNotFoundException(SurveyReturn.class, orgName);
+        }
+        return answer.surveyReturns().iterator().next().org();
     }
 
     @RequestMapping(value = "/importEric/{surveyName}/{org}", method = RequestMethod.GET)
@@ -212,7 +203,7 @@ public class SurveyReturnController {
 
     /**
      * Return a list of survey returns, optionally paged.
-     * 
+     *
      * @return survey returns.
      */
     @RequestMapping(value = "/", method = RequestMethod.GET)
@@ -236,7 +227,7 @@ public class SurveyReturnController {
 
     /**
      * Return a list of survey returns for a single organisation.
-     * 
+     *
      * @return survey returns.
      */
     @RequestMapping(value = "/findByOrg/{org}", method = RequestMethod.GET)
@@ -250,10 +241,10 @@ public class SurveyReturnController {
 
         return addLinks(list);
     }
-    
+
     /**
      * Create a new survey response.
-     * 
+     *
      * @return
      */
     @SuppressWarnings({ "rawtypes", "unchecked" })
@@ -285,7 +276,7 @@ public class SurveyReturnController {
         SurveyReturn existing = returnRepo.findOne(returnId);
         if (!StatusType.Draft.name().equals(existing.status())) {
             throw new IllegalStateException(String.format(
-                    "The return %1$d:%2$s has been submitted, you may no longer update. If you've recognised a mistake please re-state the return.", 
+                    "The return %1$d:%2$s has been submitted, you may no longer update. If you've recognised a mistake please re-state the return.",
                     returnId, existing.name()));
         }
         int changeCount = createOrMergeAnswers(updatedReturn, existing);
@@ -293,10 +284,7 @@ public class SurveyReturnController {
         if (changeCount > 0) {
             existing.setLastUpdated(new Date());
         }
-//        SurveyReturn savedReturn = 
         returnRepo.save(existing);
-//        addLinks(Collections.singletonList(savedReturn));
-//        return savedReturn;
     }
 
     private int createOrMergeAnswers(SurveyReturn updatedReturn,
@@ -324,7 +312,7 @@ public class SurveyReturnController {
         }
         return changeCount;
     }
-    
+
     /**
      * Re-stating a return preserves the existing one and saves the updates as a new revision.
      */
@@ -340,7 +328,7 @@ public class SurveyReturnController {
             a.status(StatusType.Superceded.name());
         }
         returnRepo.save(existing);
-        
+
         SurveyReturn restatedRtn = new SurveyReturn()
                 .name(updatedRtn.name())
                 .org(updatedRtn.org())
@@ -348,10 +336,6 @@ public class SurveyReturnController {
                 .applicablePeriod(updatedRtn.applicablePeriod())
                 .revision(new Integer(updatedRtn.revision()+1).shortValue())
                 .survey(existing.survey());
-//        SurveyReturn restatedRtn = new SurveyReturn(updatedRtn.name(), 
-//                updatedRtn.org(), StatusType.Draft.name(), updatedRtn.applicablePeriod(),
-//                new Integer(updatedRtn.revision()+1).shortValue())
-//                .survey(existing.survey());
         for (Answer a : updatedRtn.answers()) {
             restatedRtn.answers().add(new Answer()
                     .applicablePeriod(a.applicablePeriod())
@@ -426,11 +410,11 @@ public class SurveyReturnController {
         }
         return returns;
     }
-    
+
     private SurveyReturn addLinks(SurveyReturn rtn) {
         List<Link> links = new ArrayList<Link>();
         links.add(new Link(baseUrl+getClass().getAnnotation(RequestMapping.class).value()[0] + "/" + rtn.id()));
-        
+
         return rtn.links(links);
     }
 }

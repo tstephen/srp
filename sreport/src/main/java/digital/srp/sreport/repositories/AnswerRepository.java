@@ -43,6 +43,13 @@ public interface AnswerRepository extends CrudRepository<Answer, Long> {
             + "ORDER BY a.applicablePeriod DESC")
     List<Answer> findByOrg(@Param("org") String org);
 
+
+    @Query("SELECT a FROM Answer a JOIN a.surveyReturns r JOIN a.question q "
+            + "WHERE a.response = :orgName "
+            + "AND q.name = 'ORG_NAME' "
+            + "ORDER BY a.applicablePeriod DESC")
+    Answer findByOrgName(@Param("orgName") String orgName);
+
     @Query("SELECT a FROM Answer a LEFT JOIN a.surveyReturns r "
             + "WHERE a.revision = (SELECT MAX(o.revision) FROM Answer o LEFT JOIN o.surveyReturns r WHERE o.question.name IN :qNames AND r.org = :org AND o.applicablePeriod = :period)"
             + "AND a.question.name IN :qNames AND r.org = :org AND a.applicablePeriod = :period")
@@ -68,4 +75,5 @@ public interface AnswerRepository extends CrudRepository<Answer, Long> {
     @Modifying(clearAutomatically = true)
     @Transactional
     void deleteDerivedAnswers(@Param("ids") Long[] ids);
+
 }

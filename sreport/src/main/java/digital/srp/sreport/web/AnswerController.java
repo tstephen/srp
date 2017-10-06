@@ -32,7 +32,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import com.fasterxml.jackson.annotation.JsonView;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import digital.srp.sreport.ResultSetTooLargeException;
+import digital.srp.sreport.api.exceptions.ResultSetTooLargeException;
 import digital.srp.sreport.model.Answer;
 import digital.srp.sreport.model.Criterion;
 import digital.srp.sreport.model.Q;

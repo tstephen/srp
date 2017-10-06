@@ -1,4 +1,4 @@
-package digital.srp.sreport;
+package digital.srp.sreport.api.exceptions;
 
 import java.util.List;
 

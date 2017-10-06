@@ -260,6 +260,9 @@ public class Sdu1617 {
         list.addAll(Arrays.asList(SduQuestions.BENCHMARK_BY_PATIENT_CONTACTS_HDRS));
         list.add(Q.NON_PAY_SPEND);
         list.addAll(Arrays.asList(SduQuestions.BENCHMARK_BY_OPEX_HDRS));
+        list.add(Q.TOTAL_ENERGY);
+        list.add(Q.TOTAL_ENERGY_BY_WTE);
+        list.add(Q.WATER_VOL_BY_WTE);
         return list.toArray(new Q[list.size()]);
     }
 }

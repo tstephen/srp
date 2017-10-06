@@ -8,7 +8,8 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
-import digital.srp.sreport.ResultSetTooLargeException;
+import digital.srp.sreport.api.exceptions.ObjectNotFoundException;
+import digital.srp.sreport.api.exceptions.ResultSetTooLargeException;
 
 @ControllerAdvice
 public class SrpExceptionHandler {
@@ -19,6 +20,14 @@ public class SrpExceptionHandler {
     @ExceptionHandler(ResultSetTooLargeException.class)
     public @ResponseBody String handleLargeResultSetException(
             ResultSetTooLargeException e) {
+        LOGGER.error(e.getMessage(), e);
+        return e.getMessage();
+    }
+
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    @ExceptionHandler(ObjectNotFoundException.class)
+    public @ResponseBody String handleObjectNotFoundException(
+            ObjectNotFoundException e) {
         LOGGER.error(e.getMessage(), e);
         return e.getMessage();
     }
