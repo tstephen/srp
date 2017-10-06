@@ -240,8 +240,7 @@ public class SduReportController implements SduQuestions {
     }
 
     /**
-     * A table of water use for the specified organisation and
-     * period.
+     * A table of water use for the specified organisation and period.
      *
      * @return HTML table.
      */
@@ -252,7 +251,7 @@ public class SduReportController implements SduQuestions {
             Model model) {
         LOGGER.info(String.format("waterTable for %1$s %2$s", org, period));
 
-        fillModel(org, period, WATER_HDRS, model, true, prettyPrintDecimalFormat, maxPeriods, true, Optional.of(totaller));
+        fillModel(org, period, WATER_HDRS, model, true, prettyPrintDecimalFormat, maxPeriods, true, Optional.empty());
         return "table-period-as-col";
     }
 
