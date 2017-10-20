@@ -1,6 +1,5 @@
 package digital.srp.sreport.web;
 
-import java.security.Principal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -21,8 +20,6 @@ import org.springframework.hateoas.Link;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -38,6 +35,7 @@ import com.fasterxml.jackson.annotation.JsonView;
 
 import digital.srp.sreport.api.Calculator;
 import digital.srp.sreport.api.exceptions.ObjectNotFoundException;
+import digital.srp.sreport.internal.AuthUtils;
 import digital.srp.sreport.internal.NullAwareBeanUtils;
 import digital.srp.sreport.model.Answer;
 import digital.srp.sreport.model.Q;
@@ -388,8 +386,8 @@ public class SurveyReturnController {
     }
 
     protected void submit(SurveyReturn survey, String submitter) {
-        survey.updatedBy(submitter == null ? getUserId() : submitter);
-        survey.submittedBy(submitter == null ? getUserId() : submitter);
+        survey.updatedBy(submitter == null ? AuthUtils.getUserId() : submitter);
+        survey.submittedBy(submitter == null ? AuthUtils.getUserId() : submitter);
         survey.submittedDate(new Date());
         survey.status(StatusType.Submitted.name());
         for (Answer a : survey.answers()) {
@@ -419,27 +417,6 @@ public class SurveyReturnController {
             @PathVariable("id") Long returnId) {
         returnRepo.delete(returnId);
     }
-
-    public String getUserId() {
-        Authentication authentication = SecurityContextHolder
-                .getContext().getAuthentication();
-        if (authentication.getPrincipal() instanceof Principal) {
-            String tmp = ((Principal) authentication.getPrincipal())
-                    .getName();
-            if (!tmp.contains("@")) { // i.e. not an email addr
-                LOGGER.warn("Username '{}' is not an email address, ignoring, this may result in errors if the process author expected a username.", tmp);
-            }
-            return tmp;
-        } else if (authentication.getPrincipal() instanceof String) {
-            return (String) authentication.getPrincipal();
-        } else {
-            String msg = String.format("Authenticated but principal of unknown type {}",
-            authentication.getPrincipal().getClass().getName());
-            LOGGER.error(msg);
-            throw new IllegalStateException(msg);
-        }
-    }
-
 
     private List<SurveyReturn> addLinks(List<SurveyReturn> returns) {
         for (SurveyReturn rtn : returns) {

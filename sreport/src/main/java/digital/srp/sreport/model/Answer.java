@@ -1,7 +1,6 @@
 package digital.srp.sreport.model;
 
 import java.math.BigDecimal;
-import java.security.Principal;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -33,13 +32,12 @@ import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.domain.AuditorAware;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import org.springframework.hateoas.Link;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonView;
 
 import digital.srp.macc.maths.SignificantFiguresFormat;
+import digital.srp.sreport.internal.AuthUtils;
 import digital.srp.sreport.model.views.AnswerViews;
 import digital.srp.sreport.model.views.QuestionViews;
 import digital.srp.sreport.model.views.SurveyReturnViews;
@@ -223,13 +221,7 @@ public class Answer implements AuditorAware<String> {
 
     @Override
     public String getCurrentAuditor() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
-        if (authentication == null || !authentication.isAuthenticated()) {
-          return null;
-        }
-
-        return ((Principal) authentication.getPrincipal()).getName();
+        return AuthUtils.getUserId();
     }
 
     public Long getId() {
