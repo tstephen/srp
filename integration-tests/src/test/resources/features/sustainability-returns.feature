@@ -57,11 +57,11 @@ Feature: Sustainability Returns
      When historic ERIC data is imported for RDR 2016-17
      Then 4 years answers exist for ELEC_USED, GAS_USED and WATER_VOL
 
-#  Scenario: Submit return
-#    Given the user is logged in
-#      And the SDU 2016-17 return of RDR is complete
-#     When the user submits the return
-#     Then the RDR return for 2016-17 is available with status 'Submitted' and audit data is set
-#      And it is no longer available for edit
-#     When the user restates the return
-#     Then the RDR return for 2016-17 is available with status 'Draft' and audit data is set
+  Scenario: Submit return
+    Given the user is logged in
+      And the SDU 2016-17 return of RDR is complete
+     When the user submits the return
+     Then the RDR return for 2016-17 is available with status 'Submitted' and audit data is set
+      And it is no longer available for edit
+     When the user restates the return
+     Then the RDR return for 2016-17 is available with status 'Draft' and audit data is set

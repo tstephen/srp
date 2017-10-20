@@ -248,8 +248,8 @@ public class SustainabilityReturnStepDefs extends IntegrationTestSupport impleme
                 // TODO Calculations always appear to be draft, that may need to be fixed
                 assertThat(answer.status(), anyOf(equalTo(StatusType.Draft.name()), equalTo(StatusType.Published.name()), equalTo(StatusType.Submitted.name())));
                 break;
-            case Superceded:
-                assertEquals(StatusType.Superceded.name(), answer.status());
+            case Superseded:
+                assertEquals(StatusType.Superseded.name(), answer.status());
                 break;
             default:
                 // fail?
@@ -305,13 +305,13 @@ public class SustainabilityReturnStepDefs extends IntegrationTestSupport impleme
         latestResponse.statusCodeIs(HttpStatus.OK);
         rtn = (SurveyReturn) latestResponse.parseObject(SurveyReturn.class);
         
-        assertTrue(rtn.isComplete());
+        assertEquals(0, rtn.completeness().size());
         assertEquals(StatusType.Draft.name(), rtn.status());
     }
     
     @When("^the user submits the return$")
     public void the_user_submits_the_return() throws Throwable {
-        executePost("/returns/"+rtn.id()+"/status", "Submitted");
+        executePost("/returns/"+rtn.id()+"/status/Submitted", "");
         latestResponse.statusCodeIs(HttpStatus.OK);
     }
 

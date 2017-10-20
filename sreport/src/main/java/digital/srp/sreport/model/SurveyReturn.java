@@ -41,6 +41,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonView;
 
+import digital.srp.sreport.api.MandatoryCurrentPeriodAnswersProvided;
+import digital.srp.sreport.api.MinimumPeriodsProvided;
 import digital.srp.sreport.internal.EntityAuditorListener;
 import digital.srp.sreport.model.views.AnswerViews;
 import digital.srp.sreport.model.views.SurveyReturnViews;
@@ -65,6 +67,8 @@ import lombok.experimental.Accessors;
 /* For whatever reason AuditingEntityListener is not adding auditor, hence own listener as well */
 @EntityListeners( { AuditingEntityListener.class, EntityAuditorListener.class})
 @Table(name= "SR_RETURN")
+@MinimumPeriodsProvided(noPeriods = 4)
+@MandatoryCurrentPeriodAnswersProvided(requiredAnswers = {Q.ORG_CODE, Q.ORG_NAME, Q.ORG_TYPE, Q.SDMP_CRMP, Q.HEALTHY_TRANSPORT_PLAN, Q.PROMOTE_HEALTHY_TRAVEL})
 public class SurveyReturn implements AuditorAware<String> {
     private static final Logger LOGGER = LoggerFactory
             .getLogger(SurveyReturn.class);
@@ -178,6 +182,11 @@ public class SurveyReturn implements AuditorAware<String> {
     @ManyToMany(cascade=CascadeType.ALL, fetch = FetchType.EAGER, mappedBy = "surveyReturns")
     private Set<Answer> answers;
 
+    @JsonProperty
+    @JsonView(SurveyReturnViews.Summary.class)
+    @Transient
+    private Set<String> completeness;
+
     public SurveyReturn(String name, String org, String status,
             String applicablePeriod, Short revision) {
         this();
@@ -267,21 +276,6 @@ public class SurveyReturn implements AuditorAware<String> {
         }
 
         return ((Principal) authentication.getPrincipal()).getName();
-    }
-
-    /**
-     * @return true if all questions in Organisation, Policy and Performance categries have non-empty answers.
-     */
-    @JsonProperty
-    public boolean isComplete() {
-        boolean complete = true;
-        for (Answer answer : answers) {
-            if (answer.question().required() && answer.response() == null) {
-                complete = false;
-                break;
-            }
-        }
-        return complete;
     }
 
     public Long getId() {

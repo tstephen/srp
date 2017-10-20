@@ -5,6 +5,5 @@ import digital.srp.sreport.services.AnswerFactory;
 
 public interface Calculator {
 
-    SurveyReturn calculate(SurveyReturn rtn, int yearsToCalc, AnswerFactory answerFactory);
-
+    SurveyReturn calculate(final SurveyReturn rtn, final int yearsToCalc, final AnswerFactory answerFactory);
 }

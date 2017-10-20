@@ -174,6 +174,8 @@ public class Survey {
         } catch (NullPointerException e) {
             LOGGER.warn("Have no categories in survey {} ({})", name(), id());
         }
+        LOGGER.info("Survey {} contains a total of {} questions in {} categories",
+                name, questions.size(), categories.size());
         return questions;
     }
 

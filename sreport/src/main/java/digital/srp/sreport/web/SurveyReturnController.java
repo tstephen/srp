@@ -1,5 +1,6 @@
 package digital.srp.sreport.web;
 
+import java.security.Principal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -7,6 +8,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
 
 import org.slf4j.Logger;
@@ -19,6 +21,8 @@ import org.springframework.hateoas.Link;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -46,6 +50,7 @@ import digital.srp.sreport.repositories.AnswerRepository;
 import digital.srp.sreport.repositories.QuestionRepository;
 import digital.srp.sreport.repositories.SurveyRepository;
 import digital.srp.sreport.repositories.SurveyReturnRepository;
+import digital.srp.sreport.services.DefaultCompletenessValidator;
 
 /**
  * REST web service for accessing returned returns.
@@ -59,7 +64,7 @@ public class SurveyReturnController {
     private static final Logger LOGGER = LoggerFactory
             .getLogger(SurveyReturnController.class);
 
-    @Value("${spring.data.rest.baseUri}")
+    @Value("${spring.data.rest.base-path}")
     protected String baseUrl;
 
     @Autowired
@@ -76,6 +81,9 @@ public class SurveyReturnController {
 
     @Autowired
     protected AnswerRepository answerRepo;
+
+    @Autowired
+    protected DefaultCompletenessValidator validator = new DefaultCompletenessValidator() ;
 
     /**
      * Return a single survey return with the specified id.
@@ -176,15 +184,16 @@ public class SurveyReturnController {
         SurveyReturn rtn = returns.get(returns.size()-1);
         LOGGER.info("Found {} returns for {},{} returning revision {}", returns.size(), surveyName, org, rtn.revision());
 
+        validator.validate(rtn);
         return addLinks(rtn);
     }
 
     private String lookupOrgCode(String orgName) {
-        Answer answer = answerRepo.findByOrgName(orgName);
-        if (answer == null) {
+        List<Answer> answer = answerRepo.findByOrgName(orgName);
+        if (answer.size() == 0) {
             throw new ObjectNotFoundException(SurveyReturn.class, orgName);
         }
-        return answer.surveyReturns().iterator().next().org();
+        return answer.get(0).surveyReturns().iterator().next().org();
     }
 
     @RequestMapping(value = "/importEric/{surveyName}/{org}", method = RequestMethod.GET)
@@ -284,6 +293,8 @@ public class SurveyReturnController {
         if (changeCount > 0) {
             existing.setLastUpdated(new Date());
         }
+        DefaultCompletenessValidator validator = new DefaultCompletenessValidator() ;
+        validator.validate(existing);
         returnRepo.save(existing);
     }
 
@@ -317,26 +328,25 @@ public class SurveyReturnController {
      * Re-stating a return preserves the existing one and saves the updates as a new revision.
      */
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
-    @RequestMapping(value = "/{id}/restate", method = RequestMethod.PUT, consumes = { "application/json" })
+    @RequestMapping(value = "/{id}/restate", method = RequestMethod.POST, consumes = { "application/json" })
     @Transactional
     public @ResponseBody void restate(
-            @PathVariable("id") Long returnId,
-            @RequestBody SurveyReturn updatedRtn) {
+            @PathVariable("id") Long returnId) {
         SurveyReturn existing = returnRepo.findOne(returnId);
-        existing.status(StatusType.Superceded.name());
+        existing.status(StatusType.Superseded.name());
         for (Answer a : existing.answers()) {
-            a.status(StatusType.Superceded.name());
+            a.status(StatusType.Superseded.name());
         }
         returnRepo.save(existing);
 
         SurveyReturn restatedRtn = new SurveyReturn()
-                .name(updatedRtn.name())
-                .org(updatedRtn.org())
+                .name(existing.name())
+                .org(existing.org())
                 .status(StatusType.Draft.name())
-                .applicablePeriod(updatedRtn.applicablePeriod())
-                .revision(new Integer(updatedRtn.revision()+1).shortValue())
+                .applicablePeriod(existing.applicablePeriod())
+                .revision(new Integer(existing.revision()+1).shortValue())
                 .survey(existing.survey());
-        for (Answer a : updatedRtn.answers()) {
+        for (Answer a : existing.answers()) {
             restatedRtn.answers().add(new Answer()
                     .applicablePeriod(a.applicablePeriod())
                     .revision(new Integer(a.revision()+1).shortValue())
@@ -350,11 +360,14 @@ public class SurveyReturnController {
 
     /**
      * Change the status the return has reached.
+     * @return
      */
-    @RequestMapping(value = "/{returnId}/status", method = RequestMethod.POST, consumes = "application/json")
-    public @ResponseBody void setStatus(
+    @RequestMapping(value = "/{returnId}/status/{status}", method = RequestMethod.POST, consumes = "application/json")
+    @JsonView(SurveyReturnViews.Detailed.class)
+    public @ResponseBody SurveyReturn setStatus(
             @PathVariable("returnId") Long returnId,
-            @RequestBody String status) {
+            HttpServletRequest req,
+            @PathVariable("status") String status) {
         LOGGER.info(String.format("Setting survey %1$s to status %2$s",
                 returnId, status));
 
@@ -364,24 +377,27 @@ public class SurveyReturnController {
             publish(survey);
             break;
         case Submitted:
-            submit(survey);
+            submit(survey, req.getHeader("X-RunAs"));
             break;
         default:
             String msg = String.format("Setting return %1$d to %2$s is not allowed", returnId, status);
             throw new IllegalArgumentException(msg );
         }
 
-        returnRepo.save(survey);
+        return returnRepo.save(survey);
     }
 
-    protected void submit(SurveyReturn survey) {
+    protected void submit(SurveyReturn survey, String submitter) {
+        survey.updatedBy(submitter == null ? getUserId() : submitter);
+        survey.submittedBy(submitter == null ? getUserId() : submitter);
+        survey.submittedDate(new Date());
         survey.status(StatusType.Submitted.name());
         for (Answer a : survey.answers()) {
             // Cannot overwrite published answers without calling restate
-            if (!a.status().equals(StatusType.Published.name())) {
+            if (!a.status().equals(StatusType.Published.name()) && !a.status().equals(StatusType.Superseded.name())) {
                 a.setStatus(StatusType.Submitted.name());
             } else {
-                LOGGER.warn("Cannot set status of answer {} to {} because it's been published", a.id(), a.status());
+                LOGGER.warn("Cannot set status of answer {} to {} because it's been published or superseded", a.id(), a.status());
             }
         }
     }
@@ -403,6 +419,27 @@ public class SurveyReturnController {
             @PathVariable("id") Long returnId) {
         returnRepo.delete(returnId);
     }
+
+    public String getUserId() {
+        Authentication authentication = SecurityContextHolder
+                .getContext().getAuthentication();
+        if (authentication.getPrincipal() instanceof Principal) {
+            String tmp = ((Principal) authentication.getPrincipal())
+                    .getName();
+            if (!tmp.contains("@")) { // i.e. not an email addr
+                LOGGER.warn("Username '{}' is not an email address, ignoring, this may result in errors if the process author expected a username.", tmp);
+            }
+            return tmp;
+        } else if (authentication.getPrincipal() instanceof String) {
+            return (String) authentication.getPrincipal();
+        } else {
+            String msg = String.format("Authenticated but principal of unknown type {}",
+            authentication.getPrincipal().getClass().getName());
+            LOGGER.error(msg);
+            throw new IllegalStateException(msg);
+        }
+    }
+
 
     private List<SurveyReturn> addLinks(List<SurveyReturn> returns) {
         for (SurveyReturn rtn : returns) {

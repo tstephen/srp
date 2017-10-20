@@ -58,7 +58,7 @@ public class Question {
     
     @NotNull
     @JsonProperty
-    @JsonView( { AnswerViews.Summary.class, QuestionViews.Summary.class, SurveyViews.Detailed.class, SurveyReturnViews.Detailed.class} )
+    @JsonView( { AnswerViews.Summary.class, QuestionViews.Summary.class, SurveyViews.Detailed.class, SurveyReturnViews.Detailed.class } )
     @Column(name = "name")
     protected String name;
     
@@ -69,7 +69,7 @@ public class Question {
 
     @NotNull
     @JsonProperty
-    @JsonView({ QuestionViews.Summary.class, SurveyViews.Detailed.class })
+    @JsonView({ AnswerViews.Summary.class, QuestionViews.Summary.class, SurveyViews.Detailed.class, SurveyReturnViews.Detailed.class })
     @Column(name = "required")
     protected boolean required;
     

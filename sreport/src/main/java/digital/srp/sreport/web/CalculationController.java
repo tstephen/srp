@@ -2,7 +2,7 @@ package digital.srp.sreport.web;
 
 import java.util.List;
 
-import javax.transaction.Transactional;
+import javax.validation.ConstraintViolationException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,30 +49,35 @@ public class CalculationController {
 
     /**
      * Run all calculations based on the return inputs.
+     * @return return including latest calculations.
      */
     @RequestMapping(value = "/{returnId}", method = RequestMethod.POST)
-    @Transactional
-    public @ResponseBody void calculate(
+    public @ResponseBody SurveyReturn calculate(
             @PathVariable("returnId") Long returnId) {
         LOGGER.info(String.format("Running calculations for %1$s", returnId));
 
         SurveyReturn rtn = returnRepo.findOne(returnId);
         calculate(rtn, 4);
+
+        return rtn;
     }
 
     /**
      * Run all calculations based on the return inputs.
+     * @return return including latest calculations.
      */
     @RequestMapping(value = "/{surveyName}/{org}", method = RequestMethod.POST)
-    @Transactional
-    public @ResponseBody void calculate(
+    public @ResponseBody SurveyReturn calculate(
             @PathVariable("surveyName") String surveyName,
             @PathVariable("org") String org) {
         LOGGER.info(String.format("Running calculations for %1$s %2$s", surveyName, org));
 
         List<SurveyReturn> returns = returnRepo.findBySurveyAndOrg(surveyName, org);
         returns.sort((r1,r2) -> r1.revision().compareTo(r2.revision()));
-        calculate(returns.get(returns.size()-1), 4);
+        SurveyReturn rtn = returns.get(returns.size()-1);
+        calculate(rtn, 4);
+
+        return rtn;
     }
 
     private void calculate(SurveyReturn rtn, int yearsToCalc) {
@@ -88,14 +93,28 @@ public class CalculationController {
 //      }
 //      answerRepo.deleteDerivedAnswers(ids);
 //        returnRepo.save(rtn);
-          if (false /*isUpToDate(rtn)*/) {
-              LOGGER.info("Skipping calculations for {} in {}", rtn.org(), rtn.applicablePeriod());
-          } else {
-//              deleteDerivedForOrg(rtn);
-              rtn = cruncher.calculate(rtn, 4, answerFactory);
-          }
+        if (false /*isUpToDate(rtn)*/) {
+            LOGGER.info("Skipping calculations for {} in {}", rtn.org(), rtn.applicablePeriod());
+        } else {
+//          deleteDerivedForOrg(rtn);
+            rtn = cruncher.calculate(rtn, 4, answerFactory);
+        }
+        try {
+            returnRepo.save(rtn);
+        } catch (RuntimeException e) {
+            unwrapException(e);
+        }
+    }
 
-          returnRepo.save(rtn);
+    protected void unwrapException(Throwable e) {
+        LOGGER.error(e.getMessage()+":" + e.getCause()==null ? "" : e.getCause().getMessage());
+        if (e.getCause() instanceof ConstraintViolationException) {
+            throw (ConstraintViolationException) e.getCause();
+        } else if (e.getCause() == null) {
+            throw new  RuntimeException(e);
+        } else {
+            unwrapException(e.getCause());
+        }
     }
 
 //    private void deleteDerivedForOrg(SurveyReturn rtn) {

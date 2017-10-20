@@ -1,13 +1,19 @@
 package digital.srp.sreport.model;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
 
+import org.junit.BeforeClass;
 import org.junit.Test;
 
+import digital.srp.sreport.api.CompletenessValidator;
+import digital.srp.sreport.internal.ClasspathSurveyReturnHelper;
 import digital.srp.sreport.model.returns.EricQuestions;
+import digital.srp.sreport.services.DefaultCompletenessValidator;
 
 public class SurveyReturnTest implements EricQuestions{
 
@@ -15,6 +21,14 @@ public class SurveyReturnTest implements EricQuestions{
     private static final String TEST_DATA_NAME = "RUH";
     private static final String TEST_DATA_PERIOD = "2016-17";
 
+    private static ClasspathSurveyReturnHelper helper;
+    private static CompletenessValidator validator;
+
+    @BeforeClass
+    public static void setUpClass() throws IOException {
+        helper = new ClasspathSurveyReturnHelper();
+        validator = new DefaultCompletenessValidator();
+    }
 
     @Test
     public void testAnswerUniqueForOrgPeriodAndQuestion() {
@@ -86,6 +100,22 @@ public class SurveyReturnTest implements EricQuestions{
                         new Answer().id(1l).question(q1).response("response")
                 )).revision(new Short("2"));
         assertEquals(return1, return2);
+    }
+
+    @Test
+    public void testComplete() {
+        SurveyReturn rdr = helper.readSurveyReturn("RDR");
+        validator.validate(rdr);
+        assertEquals(0, rdr.completeness().size());
+    }
+
+    @Test
+    public void testIncomplete() {
+        SurveyReturn rj1 = helper.readSurveyReturn("RJ1");
+        validator.validate(rj1);
+        System.out.println("Completeness: "+rj1.completeness());
+        assertEquals(1, rj1.completeness().size());
+        assertTrue(rj1.completeness().contains("Insufficient periods specified"));
     }
 
 }

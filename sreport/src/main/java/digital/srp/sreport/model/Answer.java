@@ -113,7 +113,7 @@ public class Answer implements AuditorAware<String> {
      * True is we have calculated this answer on behalf of the user.
      */
     @JsonProperty
-    @JsonView({ AnswerViews.Detailed.class })
+    @JsonView({ AnswerViews.Detailed.class, SurveyReturnViews.Detailed.class })
     @Column(name = "derived")
     private boolean derived = false;
 

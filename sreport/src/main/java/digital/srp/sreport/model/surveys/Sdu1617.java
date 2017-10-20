@@ -263,6 +263,7 @@ public class Sdu1617 {
         list.add(Q.TOTAL_ENERGY);
         list.add(Q.TOTAL_ENERGY_BY_WTE);
         list.add(Q.WATER_VOL_BY_WTE);
+        list.add(Q.NO_STAFF);
         return list.toArray(new Q[list.size()]);
     }
 }

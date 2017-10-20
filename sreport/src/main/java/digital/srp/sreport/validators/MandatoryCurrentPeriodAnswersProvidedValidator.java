@@ -1,0 +1,60 @@
+package digital.srp.sreport.validators;
+
+import java.util.HashSet;
+import java.util.Set;
+
+import javax.validation.ConstraintValidator;
+import javax.validation.ConstraintValidatorContext;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import digital.srp.sreport.api.MandatoryCurrentPeriodAnswersProvided;
+import digital.srp.sreport.model.Answer;
+import digital.srp.sreport.model.Q;
+import digital.srp.sreport.model.SurveyReturn;
+
+public class MandatoryCurrentPeriodAnswersProvidedValidator implements
+        ConstraintValidator<MandatoryCurrentPeriodAnswersProvided, SurveyReturn> {
+    private static final Logger LOGGER = LoggerFactory
+            .getLogger(MandatoryCurrentPeriodAnswersProvidedValidator.class);
+
+    private Q[] requiredAnswers;
+
+    @Override
+    public void initialize(MandatoryCurrentPeriodAnswersProvided annotation) {
+        this.requiredAnswers = annotation.requiredAnswers();
+    }
+
+    @Override
+    public boolean isValid(final SurveyReturn bean,
+            final ConstraintValidatorContext ctx) {
+        Set<Q> qs = new HashSet<Q>();
+        for (Answer a : bean.answers()) {
+            if (a.applicablePeriod().equals(bean.applicablePeriod())) {
+                qs.add(a.question().q());
+            }
+        }
+        LOGGER.debug("Return contains {} questions in the current period", qs.size());
+        Set<Q> missingAnswers = new HashSet<Q>();
+        for (Q q : requiredAnswers) {
+            if (!qs.contains(q)) {
+                missingAnswers.add(q);
+            }
+        }
+        if (LOGGER.isInfoEnabled() && missingAnswers.size() > 0) {
+            LOGGER.info("Return missing these mandatory questions in the current period: {}", missingAnswers);
+            ctx.disableDefaultConstraintViolation();
+            ctx.buildConstraintViolationWithTemplate(
+                            ctx.getDefaultConstraintMessageTemplate())
+                    
+                    .addPropertyNode(missingAnswers.toString())
+                    .addBeanNode()
+                    .addConstraintViolation();
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+}

@@ -48,7 +48,7 @@ public interface AnswerRepository extends CrudRepository<Answer, Long> {
             + "WHERE a.response = :orgName "
             + "AND q.name = 'ORG_NAME' "
             + "ORDER BY a.applicablePeriod DESC")
-    Answer findByOrgName(@Param("orgName") String orgName);
+    List<Answer> findByOrgName(@Param("orgName") String orgName);
 
     @Query("SELECT a FROM Answer a LEFT JOIN a.surveyReturns r "
             + "WHERE a.revision = (SELECT MAX(o.revision) FROM Answer o LEFT JOIN o.surveyReturns r WHERE o.question.name IN :qNames AND r.org = :org AND o.applicablePeriod = :period)"

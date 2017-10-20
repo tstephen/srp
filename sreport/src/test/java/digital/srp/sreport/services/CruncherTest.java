@@ -3,20 +3,17 @@ package digital.srp.sreport.services;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.math.BigDecimal;
 import java.util.List;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import digital.srp.sreport.importers.CarbonFactorCsvImporter;
 import digital.srp.sreport.importers.WeightingFactorCsvImporter;
+import digital.srp.sreport.internal.ClasspathSurveyReturnHelper;
 import digital.srp.sreport.internal.PeriodUtil;
 import digital.srp.sreport.model.Answer;
 import digital.srp.sreport.model.CarbonFactor;
@@ -129,8 +126,6 @@ public class CruncherTest {
     private  static final String[] OWNED_BUILDINGS_GAS = { "1,930", "2,120",
             "2,290", "2,680", "0", "0", "0", "0", "0", "0" };
 
-    private  static final String DATA_FILE = "/returns/%1$s.json";
-
     private  static final String[] OTHER_PROCUREMENT_CO2E = { "0", "0", "0",
             "0", "0", "0", "0", "0", "0", "0" };
 
@@ -200,10 +195,10 @@ public class CruncherTest {
             "99.9", "99.9", "99.9", "99.9", "0", "0", "0", "0", "0", "0" };
     private static final String[] TRAVEL_CO2E_PCT = {
             "0", "0", "0", "0", "0", "0", "0", "0", "0", "0" };
-    
+
     private static AnswerFactory answerFactory;
 
-    private static ObjectMapper objectMapper;
+    private static ClasspathSurveyReturnHelper helper;
 
     private static List<CarbonFactor> cfactors;
     private static List<WeightingFactor> wfactors;
@@ -211,11 +206,12 @@ public class CruncherTest {
 
     @BeforeClass
     public static void setUpClass() throws IOException {
-        objectMapper = new ObjectMapper();
         cfactors = new CarbonFactorCsvImporter().readCarbonFactors();
         wfactors = new WeightingFactorCsvImporter().readWeightingFactors();
         cruncher = new Cruncher(cfactors, wfactors);
         answerFactory = new MemoryAnswerFactory();
+
+        helper = new ClasspathSurveyReturnHelper();
     }
 
     @Test
@@ -226,7 +222,7 @@ public class CruncherTest {
 
     @Test
     public void testCrunchRDR() {
-        SurveyReturn rdr = readSurveyReturn("RDR");
+        SurveyReturn rdr = helper.readSurveyReturn("RDR");
         SurveyReturn rtn = cruncher.calculate(rdr, YEARS_TO_CALC, answerFactory);
 
         assertNotNull(rtn);
@@ -413,7 +409,7 @@ public class CruncherTest {
      */
     @Test
     public void testCrunchRJ1() {
-        SurveyReturn rj1 = readSurveyReturn("RJ1");
+        SurveyReturn rj1 = helper.readSurveyReturn("RJ1");
         SurveyReturn rtn = cruncher.calculate(rj1, YEARS_TO_CALC, answerFactory);
 
         assertNotNull(rtn);
@@ -567,18 +563,4 @@ public class CruncherTest {
         }
     }
 
-    private SurveyReturn readSurveyReturn(String org) {
-        String dataFile = String.format(DATA_FILE, org.toLowerCase());
-        try (InputStream is = getClass().getResourceAsStream(dataFile)) {
-            assertNotNull(
-                    String.format("Unable to find test data at %1$s", dataFile),
-                    is);
-
-            return objectMapper.readValue(is, SurveyReturn.class);
-        } catch (IOException e) {
-            e.printStackTrace();
-            fail();
-        }
-        return null;
-    }
 }
