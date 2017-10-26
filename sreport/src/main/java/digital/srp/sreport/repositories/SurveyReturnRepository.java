@@ -18,26 +18,34 @@ import digital.srp.sreport.model.SurveyReturn;
 @RepositoryRestResource(exported = false)
 public interface SurveyReturnRepository extends CrudRepository<SurveyReturn, Long> {
 
-    @Query("SELECT o FROM SurveyReturn o WHERE o.status != 'Superseded' ORDER BY o.name ASC")
+    @Query("SELECT o FROM SurveyReturn o WHERE o.status != 'Superseded' "
+            + "ORDER BY o.name ASC")
     List<SurveyReturn> findAll();
 
-    @Query("SELECT o FROM SurveyReturn o WHERE o.status != 'Superseded' ORDER BY o.name ASC")
+    @Query("SELECT o FROM SurveyReturn o WHERE o.status != 'Superseded' "
+            + "ORDER BY o.name ASC")
     List<SurveyReturn> findPage(Pageable pageable);
     
-    @Query("SELECT o FROM SurveyReturn o WHERE o.status != 'Superseded' AND o.org = :org ORDER BY o.name ASC")
+    @Query("SELECT o FROM SurveyReturn o WHERE o.status != 'Superseded' "
+            + "AND o.org = :org ORDER BY o.name ASC")
     List<SurveyReturn> findByOrg(@Param("org") String org);
 
-    @Query("SELECT o FROM SurveyReturn o WHERE o.status != 'Superseded' AND o.survey.id = :surveyId ORDER BY o.applicablePeriod DESC, o.name ASC")
+    @Query("SELECT o FROM SurveyReturn o WHERE o.status != 'Superseded' "
+            + "AND o.survey.id = :surveyId ORDER BY o.applicablePeriod DESC, o.name ASC")
     List<SurveyReturn> findBySurvey(@Param("surveyId") Long surveyId);
 
-    @Query("SELECT o FROM SurveyReturn o WHERE o.status != 'Superseded' AND o.survey.name = :surveyName ORDER BY o.applicablePeriod DESC, o.name ASC")
+    @Query("SELECT o FROM SurveyReturn o WHERE o.status != 'Superseded' "
+            + "AND o.survey.name = :surveyName ORDER BY o.applicablePeriod DESC, o.name ASC")
     List<SurveyReturn> findBySurveyName(@Param("surveyName") String surveyName);
 
-    @Query("SELECT o FROM SurveyReturn o WHERE o.status != 'Superseded' AND o.survey.name = :surveyName AND o.org = :org ORDER BY o.applicablePeriod DESC, o.name ASC")
+    @Query("SELECT o FROM SurveyReturn o WHERE o.status != 'Superseded' "
+            + "AND o.survey.name = :surveyName AND o.org = :org "
+            + "ORDER BY o.applicablePeriod DESC, o.name ASC")
     List<SurveyReturn> findBySurveyAndOrg(@Param("surveyName") String surveyName, 
             @Param("org") String org);
     
-    @Query("SELECT o FROM SurveyReturn o WHERE o.status != 'Superseded' ORDER BY o.applicablePeriod DESC, o.name ASC")
+    @Query("SELECT o FROM SurveyReturn o WHERE o.status != 'Superseded' "
+            + "ORDER BY o.applicablePeriod DESC, o.name ASC")
     List<SurveyReturn> findPageBySurvey(@Param("surveyId") Long surveyId, Pageable pageable);
     
     @Override

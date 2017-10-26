@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
@@ -81,7 +82,7 @@ public class SurveyReturnController {
     protected AnswerRepository answerRepo;
 
     @Autowired
-    protected DefaultCompletenessValidator validator = new DefaultCompletenessValidator() ;
+    protected DefaultCompletenessValidator validator = new DefaultCompletenessValidator();
 
     /**
      * Return a single survey return with the specified id.
@@ -290,6 +291,43 @@ public class SurveyReturnController {
         NullAwareBeanUtils.copyNonNullProperties(updatedReturn, existing, "answers");
         if (changeCount > 0) {
             existing.setLastUpdated(new Date());
+        }
+        DefaultCompletenessValidator validator = new DefaultCompletenessValidator() ;
+        validator.validate(existing);
+        returnRepo.save(existing);
+    }
+
+    /**
+     * Update an existing return with a single answer.
+     *
+     * <p>This is primarily intended for qualitative, textual information
+     * for the current period, therefore does not require period to be specified.
+     */
+    @ResponseStatus(value = HttpStatus.NO_CONTENT)
+    @RequestMapping(value = "/{id}/answers/{q}", method = RequestMethod.POST, consumes = "application/json")
+    public @ResponseBody void updateAnswer(
+            @PathVariable("id") Long returnId,
+            @PathVariable("q") String q,
+            @RequestBody String updatedAns) {
+        SurveyReturn existing = returnRepo.findOne(returnId);
+        if (existing == null) {
+            throw new ObjectNotFoundException(SurveyReturn.class, returnId);
+        } else if (!StatusType.Draft.name().equals(existing.status())) {
+            throw new IllegalStateException(String.format(
+                    "The return %1$d:%2$s has been submitted, you may no longer update. If you've recognised a mistake please re-state the return.",
+                    returnId, existing.name()));
+        }
+        Optional<Answer> answer = existing.answer(existing.applicablePeriod(), Q.valueOf(q));
+        if (answer.isPresent()) {
+            answer.get().response(updatedAns).derived(false);
+        } else {
+            Question existingQ = qRepo.findByName(q);
+            if (existingQ == null) {
+                throw new ObjectNotFoundException(Question.class, q);
+            } else {
+                existing.initAnswer(existing, existing.applicablePeriod(), existingQ)
+                        .response(updatedAns).derived(false);
+            }
         }
         DefaultCompletenessValidator validator = new DefaultCompletenessValidator() ;
         validator.validate(existing);

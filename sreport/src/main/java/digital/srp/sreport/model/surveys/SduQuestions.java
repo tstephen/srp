@@ -196,5 +196,16 @@ public interface SduQuestions {
             Q.TOTAL_COMMISSIONING_CO2E_BY_OPEX
     };
 
+    Q[] QUALITATIVE_QS = new Q[] {
+            Q.ADAPTATION_PERF,
+            Q.ENERGY_PERF,
+            Q.TRAJECTORY_PERF,
+            Q.TRAVEL_PERF,
+            Q.WASTE_PERF,
+            Q.WASTE_CTXT,
+            Q.WATER_PERF,
+            Q.WATER_CTXT
+    };
+
     public String ANALYSE_BY_E_CLASS = "0-E-Class";
 }

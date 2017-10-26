@@ -212,12 +212,15 @@ public class Sdu1617 {
                         Q.REC_EQUIPT_AND_SOUVENIRS,
                         Q.CONSULTING_SVCS_AND_EXPENSES
                 );
+        SurveyCategory catQual = new SurveyCategory()
+                .name("Qualitative questions")
+                .questionEnums(SduQuestions.QUALITATIVE_QS);
         Survey survey = new Survey().name(ID).status("Draft")
                 .applicablePeriod("2016-17")
                 .categories(catOrg, catPolicy, catPerf,
                         catFinancial, catEnergy, catWaste,
                         catWater, catBizTravel, catOtherTravel, catGases,
-                        catAdditional, catEClassProfile, catSpendProfile);
+                        catAdditional, catEClassProfile, catSpendProfile, catQual);
         return survey;
     }
 
@@ -264,6 +267,7 @@ public class Sdu1617 {
         list.add(Q.TOTAL_ENERGY_BY_WTE);
         list.add(Q.WATER_VOL_BY_WTE);
         list.add(Q.NO_STAFF);
+        list.addAll(Arrays.asList(SduQuestions.QUALITATIVE_QS));
         return list.toArray(new Q[list.size()]);
     }
 }
