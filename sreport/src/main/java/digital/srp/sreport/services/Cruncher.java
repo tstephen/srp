@@ -25,6 +25,8 @@ import digital.srp.sreport.model.surveys.SduQuestions;
 
 @Component
 public class Cruncher implements digital.srp.sreport.model.surveys.SduQuestions, Calculator {
+    private static final BigDecimal ONE_THOUSAND = new BigDecimal("1000");
+
     private static final Logger LOGGER = LoggerFactory
             .getLogger(Cruncher.class);
 
@@ -147,40 +149,56 @@ public class Cruncher implements digital.srp.sreport.model.surveys.SduQuestions,
         try {
             BigDecimal population = getAnswerForPeriodWithFallback(period, rtn, Q.POPULATION).responseAsBigDecimal();
             getAnswer(period, rtn, Q.TOTAL_CO2E_BY_POP).derived(true).response(
-                    totalCo2e.divide(population, RoundingMode.HALF_UP));
+                    totalCo2e // change tonnes to kgs
+                            .multiply(ONE_THOUSAND)
+                            .divide(population, RoundingMode.HALF_UP));
             getAnswer(period, rtn, Q.TOTAL_ENERGY_CO2E_BY_POP)
                     .derived(true)
-                    .response(totalEnergyCo2e.divide(population, RoundingMode.HALF_UP));
+                    .response(totalEnergyCo2e // change tonnes to kgs
+                            .multiply(ONE_THOUSAND)
+                            .divide(population, RoundingMode.HALF_UP));
             getAnswer(period, rtn, Q.TOTAL_TRAVEL_CO2E_BY_POP)
                     .derived(true)
-                    .response(totalTravelCo2e.divide(population, RoundingMode.HALF_UP));
+                    .response(totalTravelCo2e // change tonnes to kgs
+                            .multiply(ONE_THOUSAND)
+                            .divide(population, RoundingMode.HALF_UP));
             getAnswer(period, rtn, Q.TOTAL_PROCUREMENT_CO2E_BY_POP)
                     .derived(true)
-                    .response(totalProcurementCo2e.divide(population,
-                            RoundingMode.HALF_UP));
+                    .response(totalProcurementCo2e // change tonnes to kgs
+                            .multiply(ONE_THOUSAND)
+                            .divide(population, RoundingMode.HALF_UP));
             getAnswer(period, rtn, Q.TOTAL_COMMISSIONING_CO2E_BY_POP)
                     .derived(true)
-                    .response(totalCommissioningCo2e.divide(population,
-                            RoundingMode.HALF_UP));
+                    .response(totalCommissioningCo2e // change tonnes to kgs
+                            .multiply(ONE_THOUSAND)
+                            .divide(population, RoundingMode.HALF_UP));
         } catch (ArithmeticException | IllegalStateException e) {
             LOGGER.warn("unable to calculate CO2E by population as it is not specified");
         }
         try {
             BigDecimal floorArea = getAnswerForPeriodWithFallback(period, rtn, Q.FLOOR_AREA).responseAsBigDecimal();
-            getAnswer(period, rtn, Q.TOTAL_CO2E_BY_FLOOR).derived(true).response(
-                    totalCo2e.divide(floorArea, RoundingMode.HALF_UP));
-            getAnswer(period, rtn, Q.TOTAL_ENERGY_CO2E_BY_FLOOR).derived(true).response(
-                    totalEnergyCo2e.divide(floorArea, RoundingMode.HALF_UP));
-            getAnswer(period, rtn, Q.TOTAL_TRAVEL_CO2E_BY_FLOOR).derived(true).response(
-                    totalTravelCo2e.divide(floorArea, RoundingMode.HALF_UP));
+            getAnswer(period, rtn, Q.TOTAL_CO2E_BY_FLOOR).derived(true)
+                    .response(totalCo2e // change tonnes to kgs
+                            .multiply(ONE_THOUSAND)
+                            .divide(floorArea, RoundingMode.HALF_UP));
+            getAnswer(period, rtn, Q.TOTAL_ENERGY_CO2E_BY_FLOOR).derived(true)
+                    .response(totalEnergyCo2e // change tonnes to kgs
+                            .multiply(ONE_THOUSAND)
+                            .divide(floorArea, RoundingMode.HALF_UP));
+            getAnswer(period, rtn, Q.TOTAL_TRAVEL_CO2E_BY_FLOOR).derived(true)
+                    .response(totalTravelCo2e // change tonnes to kgs
+                            .multiply(ONE_THOUSAND)
+                            .divide(floorArea, RoundingMode.HALF_UP));
             getAnswer(period, rtn, Q.TOTAL_PROCUREMENT_CO2E_BY_FLOOR)
                     .derived(true)
-                    .response(totalProcurementCo2e.divide(floorArea,
-                            RoundingMode.HALF_UP));
+                    .response(totalProcurementCo2e // change tonnes to kgs
+                            .multiply(ONE_THOUSAND)
+                            .divide(floorArea, RoundingMode.HALF_UP));
             getAnswer(period, rtn, Q.TOTAL_COMMISSIONING_CO2E_BY_FLOOR)
                     .derived(true)
-                    .response(totalCommissioningCo2e.divide(floorArea,
-                            RoundingMode.HALF_UP));
+                    .response(totalCommissioningCo2e // change tonnes to kgs
+                            .multiply(ONE_THOUSAND)
+                            .divide(floorArea, RoundingMode.HALF_UP));
         } catch (ArithmeticException | IllegalStateException e) {
             LOGGER.warn("unable to calculate CO2E by floor area as it is not specified");
         }
@@ -230,18 +248,24 @@ public class Cruncher implements digital.srp.sreport.model.surveys.SduQuestions,
             BigDecimal patientContacts = getAnswerForPeriodWithFallback(period, rtn, Q.NO_PATIENT_CONTACTS).responseAsBigDecimal();
             getAnswer(period, rtn, Q.TOTAL_CO2E_BY_PATIENT_CONTACT)
                     .derived(true)
-                    .response(totalCo2e.divide(patientContacts, RoundingMode.HALF_UP));
+                    .response(totalCo2e // change tonnes to kgs
+                            .multiply(ONE_THOUSAND)
+                            .divide(patientContacts, RoundingMode.HALF_UP));
             getAnswer(period, rtn, Q.TOTAL_ENERGY_CO2E_BY_PATIENT_CONTACT)
                     .derived(true)
-                    .response(totalEnergyCo2e.divide(patientContacts, RoundingMode.HALF_UP));
+                    .response(totalEnergyCo2e // change tonnes to kgs
+                            .multiply(ONE_THOUSAND)
+                            .divide(patientContacts, RoundingMode.HALF_UP));
             getAnswer(period, rtn, Q.TOTAL_TRAVEL_CO2E_BY_PATIENT_CONTACT)
                     .derived(true)
-                    .response(totalTravelCo2e.divide(patientContacts,
-                            RoundingMode.HALF_UP));
+                    .response(totalTravelCo2e // change tonnes to kgs
+                            .multiply(ONE_THOUSAND)
+                            .divide(patientContacts, RoundingMode.HALF_UP));
             getAnswer(period, rtn, Q.TOTAL_PROCUREMENT_CO2E_BY_PATIENT_CONTACT)
                     .derived(true)
-                    .response(totalProcurementCo2e.divide(patientContacts,
-                            RoundingMode.HALF_UP));
+                    .response(totalProcurementCo2e // change tonnes to kgs
+                            .multiply(ONE_THOUSAND)
+                            .divide(patientContacts, RoundingMode.HALF_UP));
             getAnswer(period, rtn, Q.TOTAL_COMMISSIONING_CO2E_BY_PATIENT_CONTACT)
                     .derived(true)
                     .response(totalCommissioningCo2e.divide(patientContacts, RoundingMode.HALF_UP));
@@ -252,21 +276,28 @@ public class Cruncher implements digital.srp.sreport.model.surveys.SduQuestions,
             BigDecimal opex = getAnswerForPeriodWithFallback(period, rtn, Q.OP_EX).responseAsBigDecimal();
             getAnswer(period, rtn, Q.TOTAL_CO2E_BY_OPEX)
                     .derived(true)
-                    .response(totalCo2e.divide(opex, RoundingMode.HALF_UP));
+                    .response(totalCo2e // change tonnes to kgs
+                            .multiply(ONE_THOUSAND)
+                            .divide(opex, RoundingMode.HALF_UP));
             getAnswer(period, rtn, Q.TOTAL_ENERGY_CO2E_BY_OPEX)
                     .derived(true)
-                    .response(totalEnergyCo2e.divide(opex, RoundingMode.HALF_UP));
+                    .response(totalEnergyCo2e // change tonnes to kgs
+                            .multiply(ONE_THOUSAND)
+                            .divide(opex, RoundingMode.HALF_UP));
             getAnswer(period, rtn, Q.TOTAL_TRAVEL_CO2E_BY_OPEX)
-                    .response(totalTravelCo2e.divide(opex,
-                            RoundingMode.HALF_UP));
+                    .response(totalTravelCo2e // change tonnes to kgs
+                            .multiply(ONE_THOUSAND)
+                            .divide(opex, RoundingMode.HALF_UP));
             getAnswer(period, rtn, Q.TOTAL_PROCUREMENT_CO2E_BY_OPEX)
                     .derived(true)
-                    .response(totalProcurementCo2e.divide(opex,
-                            RoundingMode.HALF_UP));
+                    .response(totalProcurementCo2e // change tonnes to kgs
+                            .multiply(ONE_THOUSAND)
+                            .divide(opex, RoundingMode.HALF_UP));
             getAnswer(period, rtn, Q.TOTAL_COMMISSIONING_CO2E_BY_OPEX)
                     .derived(true)
-                    .response(
-                            totalCommissioningCo2e.divide(opex, RoundingMode.HALF_UP));
+                    .response(totalCommissioningCo2e // change tonnes to kgs
+                            .multiply(ONE_THOUSAND)
+                            .divide(opex, RoundingMode.HALF_UP));
         } catch (ArithmeticException | IllegalStateException e) {
             LOGGER.warn("unable to calculate CO2E by opex as it is not specified");
         }
@@ -332,7 +363,7 @@ public class Cruncher implements digital.srp.sreport.model.surveys.SduQuestions,
             CarbonFactor cFactor = cFactor(CarbonFactors.WATER_SUPPLY, period);
             BigDecimal waterUseCo2e = rtn.answerResponseAsBigDecimal(period, Q.WATER_VOL)
                     .multiply(cFactor.value())
-                    .divide(new BigDecimal("1000"), 0, RoundingMode.HALF_UP);
+                    .divide(ONE_THOUSAND, 0, RoundingMode.HALF_UP);
             getAnswer(period,rtn, Q.WATER_CO2E).response(waterUseCo2e);
             try {
                 BigDecimal noStaff = getAnswerForPeriodWithFallback(period, rtn, Q.NO_STAFF).responseAsBigDecimal();
@@ -345,7 +376,7 @@ public class Cruncher implements digital.srp.sreport.model.surveys.SduQuestions,
             cFactor = cFactor(CarbonFactors.WATER_TREATMENT, period);
             BigDecimal waterTreatmentCo2e = rtn.answerResponseAsBigDecimal(period, Q.WASTE_WATER)
                     .multiply(cFactor.value())
-                    .divide(new BigDecimal("1000"), 0, RoundingMode.HALF_UP);
+                    .divide(ONE_THOUSAND, 0, RoundingMode.HALF_UP);
             getAnswer(period,rtn, Q.WATER_TREATMENT_CO2E)
                     .derived(true)
                     .response(waterTreatmentCo2e);
@@ -363,7 +394,7 @@ public class Cruncher implements digital.srp.sreport.model.surveys.SduQuestions,
             CarbonFactor cFactor = cFactor(CarbonFactors.CLOSED_LOOP_OR_OPEN_LOOP, period);
             BigDecimal recyclingCo2e = rtn.answerResponseAsBigDecimal(period, Q.RECYCLING_WEIGHT)
                     .multiply(cFactor.value())
-                    .divide(new BigDecimal("1000"), 0, RoundingMode.HALF_UP);
+                    .divide(ONE_THOUSAND, 0, RoundingMode.HALF_UP);
             getAnswer(period,rtn, Q.RECYCLING_CO2E).response(recyclingCo2e);
         } catch (IllegalStateException | NullPointerException e) {
             LOGGER.warn("Insufficient data to calculate CO2e from recycling waste");
@@ -373,7 +404,7 @@ public class Cruncher implements digital.srp.sreport.model.surveys.SduQuestions,
             CarbonFactor cFactor = cFactor(CarbonFactors.HIGH_TEMPERATURE_DISPOSAL_WASTE_WITH_ENERGY_RECOVERY, period);
             BigDecimal recoveryCo2e = rtn.answerResponseAsBigDecimal(period, Q.OTHER_RECOVERY_WEIGHT)
                     .multiply(cFactor.value())
-                    .divide(new BigDecimal("1000"), 0, RoundingMode.HALF_UP);
+                    .divide(ONE_THOUSAND, 0, RoundingMode.HALF_UP);
             getAnswer(period, rtn, Q.OTHER_RECOVERY_CO2E).derived(true).response(recoveryCo2e);
         } catch (IllegalStateException | NullPointerException e) {
             LOGGER.warn("Insufficient data to calculate CO2e from other waste recovery");
@@ -383,7 +414,7 @@ public class Cruncher implements digital.srp.sreport.model.surveys.SduQuestions,
             CarbonFactor cFactor = cFactor(CarbonFactors.HIGH_TEMPERATURE_DISPOSAL_WASTE, period);
             BigDecimal incinerationCo2e = getAnswer(period, rtn, Q.INCINERATION_WEIGHT).responseAsBigDecimal()
                     .multiply(cFactor.value())
-                    .divide(new BigDecimal("1000"), 0, RoundingMode.HALF_UP);
+                    .divide(ONE_THOUSAND, 0, RoundingMode.HALF_UP);
             getAnswer(period,rtn, Q.INCINERATION_CO2E).response(incinerationCo2e);
         } catch (IllegalStateException | NullPointerException e) {
             LOGGER.warn("Insufficient data to calculate CO2e from incinerating waste");
@@ -393,7 +424,7 @@ public class Cruncher implements digital.srp.sreport.model.surveys.SduQuestions,
             CarbonFactor cFactor = cFactor(CarbonFactors.NON_BURN_TREATMENT_DISPOSAL_WASTE, period);
             BigDecimal landfillCo2e = getAnswer(period, rtn, Q.LANDFILL_WEIGHT).responseAsBigDecimal()
                     .multiply(cFactor.value())
-                    .divide(new BigDecimal("1000"), 0, RoundingMode.HALF_UP);
+                    .divide(ONE_THOUSAND, 0, RoundingMode.HALF_UP);
             getAnswer(period,rtn, Q.LANDFILL_CO2E).response(landfillCo2e);
         } catch (IllegalStateException | NullPointerException e) {
             LOGGER.warn("Insufficient data to calculate CO2e from sending waste to landfill");
@@ -424,7 +455,7 @@ public class Cruncher implements digital.srp.sreport.model.surveys.SduQuestions,
             CarbonFactor cFactor = cFactor(CarbonFactors.WOOD_LOGS_WTT, period);
             BigDecimal logsCo2e = getAnswer(period, rtn, Q.WOOD_LOGS_USED).responseAsBigDecimal()
                     .multiply(cFactor.value())
-                    .divide(new BigDecimal("1000"), 0, RoundingMode.HALF_UP);
+                    .divide(ONE_THOUSAND, 0, RoundingMode.HALF_UP);
             getAnswer(period,rtn, Q.WOOD_LOGS_WTT_CO2E).derived(true).response(logsCo2e);
         } catch (IllegalStateException | NullPointerException e) {
             LOGGER.warn("Insufficient data to calculate CO2e from wood logs");
@@ -436,7 +467,7 @@ public class Cruncher implements digital.srp.sreport.model.surveys.SduQuestions,
             CarbonFactor cFactor = cFactor(CarbonFactors.WOOD_CHIPS_WTT, period);
             BigDecimal chipsCo2e = getAnswer(period, rtn, Q.WOOD_CHIPS_USED).responseAsBigDecimal()
                     .multiply(cFactor.value())
-                    .divide(new BigDecimal("1000"), 0, RoundingMode.HALF_UP);
+                    .divide(ONE_THOUSAND, 0, RoundingMode.HALF_UP);
             getAnswer(period,rtn, Q.WOOD_CHIPS_WTT_CO2E).derived(true).response(chipsCo2e);
         } catch (IllegalStateException | NullPointerException e) {
             LOGGER.warn("Insufficient data to calculate CO2e from wood chips");
@@ -448,7 +479,7 @@ public class Cruncher implements digital.srp.sreport.model.surveys.SduQuestions,
             CarbonFactor cFactor = cFactor(CarbonFactors.WOOD_PELLETS_WTT, period);
             BigDecimal pelletsCo2e = getAnswer(period, rtn, Q.WOOD_PELLETS_USED).responseAsBigDecimal()
                     .multiply(cFactor.value())
-                    .divide(new BigDecimal("1000"), 0, RoundingMode.HALF_UP);
+                    .divide(ONE_THOUSAND, 0, RoundingMode.HALF_UP);
             getAnswer(period,rtn, Q.WOOD_PELLETS_WTT_CO2E).derived(true).response(pelletsCo2e);
         } catch (IllegalStateException | NullPointerException e) {
             LOGGER.warn("Insufficient data to calculate CO2e from wood pellets");
@@ -469,7 +500,7 @@ public class Cruncher implements digital.srp.sreport.model.surveys.SduQuestions,
             CarbonFactor cFactor = cFactor(CarbonFactors.WOOD_LOGS_TOTAL, period);
             BigDecimal logsCo2e = getAnswer(period, rtn, Q.WOOD_LOGS_USED).responseAsBigDecimal()
                     .multiply(cFactor.value())
-                    .divide(new BigDecimal("1000"), 0, RoundingMode.HALF_UP);
+                    .divide(ONE_THOUSAND, 0, RoundingMode.HALF_UP);
             getAnswer(period,rtn, Q.WOOD_LOGS_CO2E).derived(true).response(logsCo2e);
         } catch (IllegalStateException | NullPointerException e) {
             LOGGER.warn("Insufficient data to calculate CO2e from wood logs");
@@ -481,7 +512,7 @@ public class Cruncher implements digital.srp.sreport.model.surveys.SduQuestions,
             CarbonFactor cFactor = cFactor(CarbonFactors.WOOD_CHIPS_TOTAL, period);
             BigDecimal chipsCo2e = getAnswer(period, rtn, Q.WOOD_CHIPS_USED).responseAsBigDecimal()
                     .multiply(cFactor.value())
-                    .divide(new BigDecimal("1000"), 0, RoundingMode.HALF_UP);
+                    .divide(ONE_THOUSAND, 0, RoundingMode.HALF_UP);
             getAnswer(period,rtn, Q.WOOD_CHIPS_CO2E).derived(true).response(chipsCo2e);
         } catch (IllegalStateException | NullPointerException e) {
             LOGGER.warn("Insufficient data to calculate CO2e from wood chips");
@@ -493,7 +524,7 @@ public class Cruncher implements digital.srp.sreport.model.surveys.SduQuestions,
             CarbonFactor cFactor = cFactor(CarbonFactors.WOOD_PELLETS_TOTAL, period);
             BigDecimal pelletsCo2e = getAnswer(period, rtn, Q.WOOD_PELLETS_USED).responseAsBigDecimal()
                     .multiply(cFactor.value())
-                    .divide(new BigDecimal("1000"), 0, RoundingMode.HALF_UP);
+                    .divide(ONE_THOUSAND, 0, RoundingMode.HALF_UP);
             getAnswer(period,rtn, Q.WOOD_PELLETS_CO2E).derived(true).response(pelletsCo2e);
         } catch (IllegalStateException | NullPointerException e) {
             LOGGER.warn("Insufficient data to calculate CO2e from wood pellets");
@@ -515,7 +546,7 @@ public class Cruncher implements digital.srp.sreport.model.surveys.SduQuestions,
                     .add(getAnswer(period, rtn, Q.PATIENT_AND_VISITOR_MILEAGE).responseAsBigDecimal())
                     .multiply(cFactor.value())
                     .multiply(m2km)
-                    .divide(new BigDecimal("1000"), 0, RoundingMode.HALF_UP);
+                    .divide(ONE_THOUSAND, 0, RoundingMode.HALF_UP);
             getAnswer(period,rtn, Q.PATIENT_AND_VISITOR_MILEAGE_CO2E).derived(true).response(patientVisitorCo2e);
         } catch (IllegalStateException | NullPointerException e) {
             LOGGER.warn("Insufficient data to calculate CO2e from patient and visitor travel");
@@ -531,7 +562,7 @@ public class Cruncher implements digital.srp.sreport.model.surveys.SduQuestions,
                     .response(totalStaffMiles
                             .multiply(cFactor.value())
                             .multiply(m2km)
-                            .divide(new BigDecimal("1000"), 0, RoundingMode.HALF_UP));
+                            .divide(ONE_THOUSAND, 0, RoundingMode.HALF_UP));
         } catch (IllegalStateException | NullPointerException e) {
             LOGGER.warn("Insufficient data to calculate CO2e from staff commuting");
         }
@@ -543,14 +574,14 @@ public class Cruncher implements digital.srp.sreport.model.surveys.SduQuestions,
                     .response(fleetMileage
                             .multiply(cFactor(CarbonFactors.CAR_WTT_AVERAGE_SIZE, period).value())
                             .multiply(m2km)
-                            .divide(new BigDecimal("1000"), 0, RoundingMode.HALF_UP));
+                            .divide(ONE_THOUSAND, 0, RoundingMode.HALF_UP));
             try {
                 BigDecimal bizTravelRoadCo2e
                         = getAnswer(period, rtn, Q.BIZ_MILEAGE_ROAD).responseAsBigDecimal()
                         .add(fleetMileage)
                         .multiply(cFactor.value())
                         .multiply(m2km)
-                        .divide(new BigDecimal("1000"), 0, RoundingMode.HALF_UP);
+                        .divide(ONE_THOUSAND, 0, RoundingMode.HALF_UP);
                 getAnswer(period,rtn, Q.BIZ_MILEAGE_ROAD_CO2E).response(bizTravelRoadCo2e);
             } catch (IllegalStateException | NullPointerException e) {
                 LOGGER.warn("Insufficient data to calculate CO2e from personal road miles");
@@ -564,7 +595,7 @@ public class Cruncher implements digital.srp.sreport.model.surveys.SduQuestions,
                     = getAnswer(period, rtn, Q.RAIL_MILES).responseAsBigDecimal()
                     .multiply(cFactor.value())
                     .multiply(m2km)
-                    .divide(new BigDecimal("1000"), 0, RoundingMode.HALF_UP);
+                    .divide(ONE_THOUSAND, 0, RoundingMode.HALF_UP);
             getAnswer(period,rtn, Q.BIZ_MILEAGE_RAIL_CO2E).response(bizTravelRailCo2e);
         } catch (IllegalStateException | NullPointerException e) {
             LOGGER.warn("Insufficient data to calculate CO2e from rail travel");
@@ -574,17 +605,17 @@ public class Cruncher implements digital.srp.sreport.model.surveys.SduQuestions,
                     = getAnswer(period, rtn, Q.DOMESTIC_AIR_MILES).responseAsBigDecimal()
                     .multiply(cFactor(CarbonFactors.DOMESTIC_TOTAL, period).value())
                     .multiply(m2km)
-                    .divide(new BigDecimal("1000"), 0, RoundingMode.HALF_UP);
+                    .divide(ONE_THOUSAND, 0, RoundingMode.HALF_UP);
             BigDecimal bizTravelShortHaulAirCo2e
                     = getAnswer(period, rtn, Q.SHORT_HAUL_AIR_MILES).responseAsBigDecimal()
                     .multiply(cFactor(CarbonFactors.SHORT_HAUL_TOTAL, period).value())
                     .multiply(m2km)
-                    .divide(new BigDecimal("1000"), 0, RoundingMode.HALF_UP);
+                    .divide(ONE_THOUSAND, 0, RoundingMode.HALF_UP);
             BigDecimal bizTravelLongHaulAirCo2e
                     = getAnswer(period, rtn, Q.LONG_HAUL_AIR_MILES).responseAsBigDecimal()
                     .multiply(cFactor(CarbonFactors.LONG_HAUL_TOTAL, period).value())
                     .multiply(m2km)
-                    .divide(new BigDecimal("1000"), 0, RoundingMode.HALF_UP);
+                    .divide(ONE_THOUSAND, 0, RoundingMode.HALF_UP);
             getAnswer(period,rtn, Q.BIZ_MILEAGE_AIR_CO2E)
                     .response(bizTravelDomesticAirCo2e.add(bizTravelShortHaulAirCo2e).add(bizTravelLongHaulAirCo2e));
         } catch (IllegalStateException | NullPointerException e) {
@@ -829,7 +860,7 @@ public class Cruncher implements digital.srp.sreport.model.surveys.SduQuestions,
     }
 
     private BigDecimal oneThousandth(CarbonFactor cFactor) {
-        return cFactor.value().divide(new BigDecimal("1000"), cFactor.value().scale(), RoundingMode.HALF_UP);
+        return cFactor.value().divide(ONE_THOUSAND, cFactor.value().scale(), RoundingMode.HALF_UP);
     }
 
     private void crunchElectricityUsed(String period, SurveyReturn rtn) {
