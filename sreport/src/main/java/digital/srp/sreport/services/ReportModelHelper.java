@@ -25,16 +25,17 @@ public class ReportModelHelper {
 
     private final AnswerRepository answerRepo;
 
-    private final TabularDataSetHelper tdsHelper;
+//    private final TabularDataSetHelper tdsHelper;
 
     public ReportModelHelper(final AnswerRepository answerRepo) {
         this.answerRepo = answerRepo;
-        this.tdsHelper = new TabularDataSetHelper();
+//        this.tdsHelper = new TabularDataSetHelper();
     }
 
     public synchronized void fillModel(String org, String period, Q[] headers, final Model model,
             boolean periodAsCol, Format decimalFormat, Integer maxPeriods,
             boolean ascending, Optional<Aggregator> aggregator) {
+        TabularDataSetHelper tdsHelper = new TabularDataSetHelper();
         String[] headerNames = new String[headers.length];
         for (int i = 0 ; i < headers.length ; i++) {
             headerNames[i] = headers[i].name();
@@ -55,13 +56,16 @@ public class ReportModelHelper {
             }
         }
 
-        TabularDataSet table = tdsHelper.tabulate(headerNames, answers, decimalFormat, aggregator);
+        int rowCount = tdsHelper.getRowCount(headerNames, answers);
         List<String> periods = PeriodUtil.fillBackwards(period,
-                table.rows().length < maxPeriods ? table.rows().length : maxPeriods);
+                rowCount < maxPeriods ? rowCount : maxPeriods);
                 model.addAttribute("periods", periods);
         if (ascending) {
             Collections.reverse(periods);
         }
+        TabularDataSet table = tdsHelper.tabulate(headerNames, 
+                periods.toArray(new String[periods.size()]), answers, decimalFormat, aggregator);
+        
         if (periodAsCol) {
             table = table.transpose();
         }

@@ -13,8 +13,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.fasterxml.jackson.annotation.JsonView;
+
 import digital.srp.sreport.api.Calculator;
 import digital.srp.sreport.model.SurveyReturn;
+import digital.srp.sreport.model.views.SurveyReturnViews;
 import digital.srp.sreport.repositories.AnswerRepository;
 import digital.srp.sreport.repositories.QuestionRepository;
 import digital.srp.sreport.repositories.SurveyReturnRepository;
@@ -52,6 +55,7 @@ public class CalculationController {
      * @return return including latest calculations.
      */
     @RequestMapping(value = "/{returnId}", method = RequestMethod.POST)
+    @JsonView(SurveyReturnViews.Detailed.class)
     public @ResponseBody SurveyReturn calculate(
             @PathVariable("returnId") Long returnId) {
         LOGGER.info(String.format("Running calculations for %1$s", returnId));
@@ -67,6 +71,7 @@ public class CalculationController {
      * @return return including latest calculations.
      */
     @RequestMapping(value = "/{surveyName}/{org}", method = RequestMethod.POST)
+    @JsonView(SurveyReturnViews.Detailed.class)
     public @ResponseBody SurveyReturn calculate(
             @PathVariable("surveyName") String surveyName,
             @PathVariable("org") String org) {

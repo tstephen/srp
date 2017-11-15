@@ -12,9 +12,9 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
+import digital.srp.sreport.api.exceptions.SReportException;
 import digital.srp.sreport.importers.EricCsvImporter;
 import digital.srp.sreport.importers.QuestionCsvImporter;
-import digital.srp.sreport.internal.SReportException;
 import digital.srp.sreport.model.Answer;
 import digital.srp.sreport.model.Question;
 import digital.srp.sreport.model.Survey;

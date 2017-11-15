@@ -2,9 +2,7 @@ package digital.srp.sreport.web;
 
 import java.text.DecimalFormat;
 import java.text.Format;
-import java.util.List;
 import java.util.Optional;
-import java.util.ResourceBundle;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,15 +16,12 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import digital.srp.macc.maths.SignificantFiguresFormat;
-import digital.srp.sreport.model.Answer;
-import digital.srp.sreport.model.TabularDataSet;
 import digital.srp.sreport.model.surveys.SduQuestions;
 import digital.srp.sreport.repositories.AnswerRepository;
 import digital.srp.sreport.repositories.SurveyRepository;
 import digital.srp.sreport.repositories.SurveyReturnRepository;
 import digital.srp.sreport.services.ReportModelHelper;
 import digital.srp.sreport.services.tds.Aggregator;
-import digital.srp.sreport.services.tds.TabularDataSetHelper;
 import digital.srp.sreport.services.tds.Totaller;
 
 /**
@@ -54,10 +49,7 @@ public class SduReportController implements SduQuestions {
 
     @Autowired
     protected AnswerRepository answerRepo;
-
-    @Autowired
-    private TabularDataSetHelper tdsHelper;
-
+    
     private DecimalFormat rawDecimalFormat = new DecimalFormat("#");
     private Format prettyPrintDecimalFormat = new SignificantFiguresFormat();
 
@@ -378,49 +370,13 @@ public class SduReportController implements SduQuestions {
      */
     @RequestMapping(value = "/{org}/{period}/carbon-footprint.csv", method = RequestMethod.GET, produces = "text/csv")
     public String footprintCsv(@PathVariable("org") String org,
-            @PathVariable("period") String period, Model model) {
+            @PathVariable("period") String period,
+            @RequestParam(value = "maxPeriods", required = false, defaultValue = DEFAULT_MAX_PERIODS) Integer maxPeriods,
+            Model model) {
         LOGGER.info(String.format("footprintCsv for %1$s %2$s", org, period));
 
-        String[] headerNames = new String[FOOTPRINT_PCT_HDRS.length];
-        for (int i = 0 ; i < FOOTPRINT_PCT_HDRS.length ; i++) {
-            headerNames[i] = FOOTPRINT_PCT_HDRS[i].name();
-        }
-        model.addAttribute("periods", headerNames);
-
-        List<Answer> answers = answerRepo.findByOrgPeriodAndQuestion(org, period, headerNames);
-        LOGGER.info(
-                String.format("Found %1$s answers about organisation for %2$s",
-                        answers.size(), org));
-        if (LOGGER.isDebugEnabled()) {
-            for (Answer answer : answers) {
-                LOGGER.debug(answer.toString());
-            }
-        }
-
-        TabularDataSet table = tdsHelper.tabulate(headerNames, answers, rawDecimalFormat, Optional.empty());
-//            Collections.reverse(periods);
-            table = table.transpose();
-
-        model.addAttribute("table", table);
-        model.addAttribute("messages",
-                ResourceBundle.getBundle("digital.srp.sreport.Messages"));
+        new ReportModelHelper(answerRepo).fillModel(org, period, FOOTPRINT_PCT_HDRS, model, true, prettyPrintDecimalFormat, maxPeriods, true, Optional.of(totaller));
         return "csv-period-as-col";
-    }
-
-    /**
-     * A table of categorised carbon emissions for the specified
-     * organisation and period.
-     *
-     * @return HTML table.
-     */
-    @RequestMapping(value = "/{org}/{period}/carbon-emissions-profile.html", method = RequestMethod.GET, produces = "text/html")
-    public String emissionsProfileTable(@PathVariable("org") String org,
-            @PathVariable("period") String period, @RequestParam(value = "maxPeriods", required = false, defaultValue = DEFAULT_MAX_PERIODS) Integer maxPeriods,
-            Model model) {
-        LOGGER.info(String.format("emissionsProfileTable for %1$s %2$s", org, period));
-
-        new ReportModelHelper(answerRepo).fillModel(org, period, PROFILE_HDRS, model, true, prettyPrintDecimalFormat, maxPeriods, true, Optional.of(totaller));
-        return "table-period-as-col";
     }
 
     /**
@@ -435,7 +391,7 @@ public class SduReportController implements SduQuestions {
             Model model) {
         LOGGER.info(String.format("emissionsProfileCsv for %1$s %2$s", org, period));
 
-        new ReportModelHelper(answerRepo).fillModel(org, period, PROFILE_HDRS, model, false, rawDecimalFormat, maxPeriods, true, Optional.empty());
+        new ReportModelHelper(answerRepo).fillModel(org, period, SDU_PROFILE_CO2E_HDRS, model, false, rawDecimalFormat, maxPeriods, true, Optional.empty());
         return "csv";
     }
 
@@ -539,13 +495,28 @@ public class SduReportController implements SduQuestions {
      *
      * @return HTML table.
      */
+    @RequestMapping(value = "/{org}/{period}/sdu-spend-profile.html", method = RequestMethod.GET, produces = "text/html")
+    public String sduSpendProfileTable(@PathVariable("org") String org,
+            @PathVariable("period") String period, @RequestParam(value = "maxPeriods", required = false, defaultValue = DEFAULT_MAX_PERIODS) Integer maxPeriods,
+            Model model) {
+        LOGGER.info(String.format("sduSpendProfileTable for %1$s %2$s", org, period));
+
+        new ReportModelHelper(answerRepo).fillModel(org, period, SDU_PROFILE_HDRS, model, true, prettyPrintDecimalFormat, maxPeriods, true, Optional.of(totaller));
+        return "table-period-as-col";
+    }
+
+    /**
+     * A summary table of emissions by scope.
+     *
+     * @return HTML table.
+     */
     @RequestMapping(value = "/{org}/{period}/sdu-carbon-profile.html", method = RequestMethod.GET, produces = "text/html")
     public String sduCarbonProfileTable(@PathVariable("org") String org,
             @PathVariable("period") String period, @RequestParam(value = "maxPeriods", required = false, defaultValue = DEFAULT_MAX_PERIODS) Integer maxPeriods,
             Model model) {
         LOGGER.info(String.format("sduCarbonProfileTable for %1$s %2$s", org, period));
 
-        new ReportModelHelper(answerRepo).fillModel(org, period, SDU_CARBON_PROFILE_HDRS, model, true, prettyPrintDecimalFormat, maxPeriods, true, Optional.of(totaller));
+        new ReportModelHelper(answerRepo).fillModel(org, period, SDU_PROFILE_CO2E_HDRS, model, true, prettyPrintDecimalFormat, maxPeriods, true, Optional.of(totaller));
         return "table-period-as-col";
     }
 

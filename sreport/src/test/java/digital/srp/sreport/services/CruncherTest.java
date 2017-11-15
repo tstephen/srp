@@ -1,6 +1,6 @@
 package digital.srp.sreport.services;
 
-import static org.junit.Assert.assertEquals;
+//import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.List;
 
+import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -33,8 +34,8 @@ public class CruncherTest {
     private  static final String[] CITIZEN_CO2E = { "122", "135", "125",
             "157", "0", "0", "0", "0", "0", "0" };
 
-    private  static final String[] PROCUREMENT_CO2E = { "4,840,000", "5,250,000",
-            "5,350,000", "6,050,000", "0", "0", "0", "0", "0", "0" };
+    private  static final String[] PROCUREMENT_CO2E = { "16,200", "17,800",
+            "19,400", "20,000", "0", "0", "0", "0", "0", "0" };
 
     private  static final String[] CORE_CO2E = { "11,200", "12,400", "17,100",
             "20,400", "0", "0", "0", "0", "0", "0" };
@@ -175,26 +176,28 @@ public class CruncherTest {
     private  static final String[] TOTAL_ENERGY_CO2E = {
             "2,270", "2,520", "2,690", "3,110", "0", "0", "0", "0", "0", "0" };
     private  static final String[] TOTAL_PROCUREMENT_CO2E = {
-            "9,680,000", "10,500,000", "10,700,000", "12,100,000", "0", "0", "0", "0", "0", "0" };
+            "22,200", "24,300", "30,000", "33,200", "0", "0", "0", "0", "0", "0" };
     private  static final String[] TOTAL_CO2E = {
-            "9,680,000", "10,500,000", "10,700,000", "12,100,000", "0", "0", "0", "0", "0", "0" };
+            "28,500", "31,400", "37,800", "41,700", "0", "0", "0", "0", "0", "0" };
     private  static final String[] TOTAL_CO2E_BY_POP = {
-            "8.59", "9.3", "9.49", "10.7", "0", "0", "0", "0", "0", "0" };
+            "25.3", "27.9", "33.5", "37", "0", "0", "0", "0", "0", "0" };
     private  static final String[] TOTAL_CO2E_BY_FLOOR = {
-            "155", "168", "171", "194", "0", "0", "0", "0", "0", "0" };
+            "457", "503", "606", "668", "0", "0", "0", "0", "0", "0" };
     private  static final String[] TOTAL_CO2E_BY_WTE = {
-            "2,580", "2,790", "2,840", "3,220", "0", "0", "0", "0", "0", "0" };
+            "7.59", "8.35", "10", "11.1", "0", "0", "0", "0", "0", "0" };
     private  static final String[] TOTAL_CO2E_BY_OPEX = {
-            "47.5", "46.8", "43.8", "45.8", "0", "0", "0", "0", "0", "0" };
+            "140", "140", "155", "158", "0", "0", "0", "0", "0", "0" };
 
-    private static final String[] COMMISSIONING_CO2E_PCT = {
-            "0.013", "0.013", "0.014", "0.013", "0", "0", "0", "0", "0", "0" };
     private static final String[] ENERGY_CO2E_PCT = {
-            "0.023", "0.024", "0.025", "0.026", "0", "0", "0", "0", "0", "0" };
+            "7.94", "8.02", "7.11", "7.47", "0", "0", "0", "0", "0", "0" };
+    private static final String[] COMMISSIONING_CO2E_PCT = {
+            "4.37", "4.36", "3.95", "3.68", "0", "0", "0", "0", "0", "0" };
     private static final String[] PROCUREMENT_CO2E_PCT = {
-            "99.9", "99.9", "99.9", "99.9", "0", "0", "0", "0", "0", "0" };
+            "77.7", "77.5", "79.5", "79.6", "0", "0", "0", "0", "0", "0" };
     private static final String[] TRAVEL_CO2E_PCT = {
-            "0", "0", "0", "0", "0", "0", "0", "0", "0", "0" };
+            "10", "10.1", "9.4", "9.2", "0", "0", "0", "0", "0", "0" };
+
+    private boolean debug = false;
 
     private static AnswerFactory answerFactory;
 
@@ -214,9 +217,17 @@ public class CruncherTest {
         helper = new ClasspathSurveyReturnHelper();
     }
 
+    private void assertEquals(String message, String expected, String actual) {
+        if (debug && !expected.equals(actual)) {
+            System.err.println(String.format("%1$s. Expected %2$s, but got %3$s", message, expected, actual));
+        } else {
+            Assert.assertEquals(message,  expected, actual);
+        }
+    }
+
     @Test
     public void testFindCFactorByName() {
-        assertEquals(new BigDecimal("0.183997"),
+        Assert.assertEquals(new BigDecimal("0.183997"),
                 cruncher.cFactor(CarbonFactors.NATURAL_GAS, "2016-17").value());
     }
 
@@ -397,7 +408,7 @@ public class CruncherTest {
             assertEquals(String.format("Incorrect value of %2$s for period %1$s", period, Q.TRAVEL_CO2E_PCT),
                     TRAVEL_CO2E_PCT[i], travelPctA.response3sf());
 
-            assertEquals(new BigDecimal(100).doubleValue(), energyPctA.responseAsBigDecimal()
+            Assert.assertEquals(new BigDecimal(100).doubleValue(), energyPctA.responseAsBigDecimal()
                             .add(commissioningPctA.responseAsBigDecimal())
                             .add(procurementPctA.responseAsBigDecimal())
                             .add(travelPctA.responseAsBigDecimal()).doubleValue(), 0.1);

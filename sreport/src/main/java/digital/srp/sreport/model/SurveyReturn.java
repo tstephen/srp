@@ -236,7 +236,7 @@ public class SurveyReturn implements AuditorAware<String> {
             }
         }
         if (count > 1) {
-            LOGGER.error("Multiple answers to {} found for {} in {}", org, qName, period);
+            LOGGER.error("Multiple answers to {} found for {} in {}", qName, org, period);
         }
         return Optional.ofNullable(a);
     }

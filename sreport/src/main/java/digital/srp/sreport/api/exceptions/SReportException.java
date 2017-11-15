@@ -1,4 +1,4 @@
-package digital.srp.sreport.internal;
+package digital.srp.sreport.api.exceptions;
 
 public class SReportException extends RuntimeException {
 

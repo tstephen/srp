@@ -76,6 +76,6 @@ public class SignificantFiguresFormat extends Format {
 
     @Override
     public Object parseObject(String source, ParsePosition pos) {
-        return new BigDecimal(source);
+        return NUMBER_FORMAT.parseObject(source, pos);
     }
 }

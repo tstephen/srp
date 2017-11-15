@@ -11,8 +11,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import digital.srp.sreport.api.Calculator;
+import digital.srp.sreport.api.exceptions.SReportObjectNotFoundException;
 import digital.srp.sreport.internal.PeriodUtil;
-import digital.srp.sreport.internal.SReportObjectNotFoundException;
 import digital.srp.sreport.model.Answer;
 import digital.srp.sreport.model.CarbonFactor;
 import digital.srp.sreport.model.CarbonFactors;
@@ -434,10 +434,14 @@ public class Cruncher implements digital.srp.sreport.model.surveys.SduQuestions,
                 Q.RECYCLING_CO2E, Q.OTHER_RECOVERY_CO2E, Q.INCINERATION_CO2E, Q.LANDFILL_CO2E);
     }
 
-    public Answer getAnswerForPeriodWithFallback(String period,
+    private Answer getAnswerForPeriodWithFallback(String period,
             SurveyReturn rtn, Q q) {
         try {
-            return getAnswer(period, rtn, q);
+            Answer answer = getAnswer(period, rtn, q);
+            if (answer.response() == null) { 
+                throw new IllegalStateException();
+            }
+            return answer;
         } catch (IllegalStateException e) {
             LOGGER.warn("Return does not contain response for {} in {}, use current year as estimate", q, period);
             return getAnswer(rtn.applicablePeriod(), rtn, q);
@@ -538,12 +542,11 @@ public class Cruncher implements digital.srp.sreport.model.surveys.SduQuestions,
     private void crunchScope3Travel(String period, SurveyReturn rtn) {
         CarbonFactor cFactor = cFactor(CarbonFactors.CAR_TOTAL, period);
         try {
-            // TODO this is a derived figure, why including alongside the 'raw' ones?
-            rtn.answer(period, Q.BIZ_MILEAGE_CO2E);
-
             // Treasury row 52: Patient and Visitor
-            BigDecimal patientVisitorCo2e = getAnswer(period, rtn, Q.PATIENT_MILEAGE).responseAsBigDecimal()
-                    .add(getAnswer(period, rtn, Q.PATIENT_AND_VISITOR_MILEAGE).responseAsBigDecimal())
+            BigDecimal patientVisitorMileage = getAnswer(period, rtn, Q.PATIENT_MILEAGE).responseAsBigDecimal()
+                    .add(getAnswer(period, rtn, Q.VISITOR_MILEAGE).responseAsBigDecimal());
+            getAnswer(period,rtn, Q.PATIENT_AND_VISITOR_MILEAGE).derived(true).response(patientVisitorMileage.toPlainString());
+            BigDecimal patientVisitorCo2e = patientVisitorMileage
                     .multiply(cFactor.value())
                     .multiply(m2km)
                     .divide(ONE_THOUSAND, 0, RoundingMode.HALF_UP);
@@ -552,7 +555,7 @@ public class Cruncher implements digital.srp.sreport.model.surveys.SduQuestions,
             LOGGER.warn("Insufficient data to calculate CO2e from patient and visitor travel");
         }
         try {
-            BigDecimal totalStaffMiles = getAnswer(period, rtn, Q.TOTAL_EMPLOYEES).responseAsBigDecimal()
+            BigDecimal totalStaffMiles = getAnswerForPeriodWithFallback(period, rtn, Q.NO_STAFF).responseAsBigDecimal()
                     .multiply(getAnswer(period, rtn, Q.STAFF_COMMUTE_MILES_PP).responseAsBigDecimal());
             getAnswer(period,rtn, Q.STAFF_COMMUTE_MILES_TOTAL).derived(true).response(totalStaffMiles);
 
@@ -621,6 +624,7 @@ public class Cruncher implements digital.srp.sreport.model.surveys.SduQuestions,
         } catch (IllegalStateException | NullPointerException e) {
             LOGGER.warn("Insufficient data to calculate CO2e from air travel");
         }
+        sumAnswers(period, rtn, Q.BIZ_MILEAGE, SduQuestions.BIZ_MILEAGE_HDRS);
         try {
             sumAnswers(period, rtn, Q.SCOPE_3_TRAVEL,
                     SduQuestions.SCOPE_3_TRAVEL_HDRS);
@@ -653,8 +657,8 @@ public class Cruncher implements digital.srp.sreport.model.surveys.SduQuestions,
         }
         BigDecimal nonPaySpend = getAnswer(period, rtn, Q.NON_PAY_SPEND).responseAsBigDecimal();
         if (nonPaySpend.equals(BigDecimal.ZERO)) {
-            LOGGER.info(String.format("Need to calc non pay spend from op ex"));
             nonPaySpend = calcNonPaySpendFromOpEx(period, rtn);
+            getAnswer(period, rtn, Q.NON_PAY_SPEND).derived(true).response(nonPaySpend);
         }
 
         WeightingFactor wFactor = wFactor(WeightingFactors.BIZ_SVCS, period, orgType);
@@ -696,6 +700,7 @@ public class Cruncher implements digital.srp.sreport.model.surveys.SduQuestions,
 
     private BigDecimal calcNonPaySpendFromOpEx(String period,
             SurveyReturn rtn) {
+        LOGGER.info(String.format("Need to calc non pay spend from op ex"));
         // Intentionally use rtn period for org type
         Answer orgTypeA = rtn.answer(rtn.applicablePeriod(), Q.ORG_TYPE)
                 .orElseThrow(() -> new IllegalArgumentException(String.format(
@@ -709,7 +714,9 @@ public class Cruncher implements digital.srp.sreport.model.surveys.SduQuestions,
                 WeightingFactors.NON_PAY_OP_EX_PORTION, period,
                 orgTypeA.response());
 
-        return opExA.responseAsBigDecimal().multiply(wFactor.moneyValue());
+        BigDecimal nonPaySpend = opExA.responseAsBigDecimal().multiply(wFactor.proportionOfTotal());
+        LOGGER.info("Calculated non pay spend {} from op ex {}", nonPaySpend, opExA.response());
+        return nonPaySpend;
     }
 
     private boolean isEmpty(String value) {
@@ -976,14 +983,17 @@ public class Cruncher implements digital.srp.sreport.model.surveys.SduQuestions,
         try {
             if (getAnswer(period, rtn, srcQ).response() == null) {
                 LOGGER.info("No directly entered spend {}, estimate from non pay spend", srcQ);
-                calcVal = nonPaySpend.multiply(wFactor.proportionOfTotal())
-                        .multiply(wFactor.intensityValue());
+                calcVal = nonPaySpend.multiply(wFactor.proportionOfTotal());
+                LOGGER.info("Estimated {} from non pay spend as {}", srcQ, calcVal);
+                getAnswer(period, rtn, srcQ).derived(true).response(calcVal.toPlainString());
             } else {
                 calcVal = getAnswer(period, rtn, srcQ).responseAsBigDecimal();
             }
+            calcVal = calcVal.multiply(wFactor.intensityValue());
         } catch (NumberFormatException e) {
             LOGGER.error("Cannot estimate CO2e from spend");
         }
+        LOGGER.info("Calculated {} emissions as {}", trgtQ, calcVal);
         return getAnswer(period, rtn, trgtQ).derived(true).response(calcVal.toPlainString());
     }
 

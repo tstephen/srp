@@ -1,4 +1,4 @@
-package digital.srp.sreport.internal;
+package digital.srp.sreport.api;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
+
+import digital.srp.sreport.api.exceptions.SReportObjectNotFoundException;
 
 @ControllerAdvice
 public class SReportExceptionHandler {

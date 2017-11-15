@@ -163,6 +163,18 @@ public class Answer implements AuditorAware<String> {
     @JsonView({ AnswerViews.Summary.class, QuestionViews.Summary.class })
     private List<Link> links;
 
+    public Answer(long id, String response, Question q, StatusType status, 
+            String applicablePeriod, short revision, boolean derived, 
+            Date submittedDate, String submittedBy, Date created, 
+            String createdBy, Date lastUpdated, String updatedBy) {
+        this();
+        id(id).response(response).question(q).status(status.name())
+                .applicablePeriod(applicablePeriod).revision(revision)
+                .derived(derived).submittedDate(submittedDate)
+                .submittedBy(submittedBy).created(created).createdBy(createdBy)
+                .lastUpdated(lastUpdated).updatedBy(updatedBy);
+    }
+
     public String response3sf() {
         return SignificantFiguresFormat.format(responseAsBigDecimal());
     }

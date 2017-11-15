@@ -2,6 +2,7 @@ package digital.srp.sreport.services.tds;
 
 import java.math.BigDecimal;
 import java.text.Format;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -9,7 +10,6 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import digital.srp.sreport.model.Answer;
 import digital.srp.sreport.model.TabularDataSet;
 
 public class Totaller implements Aggregator {
@@ -26,23 +26,23 @@ public class Totaller implements Aggregator {
     }
 
     @Override
-    public void addAggregateData(List<Answer> answers, Format formatter,
-            int colCount, int rowCount, TabularDataSet tds) {
-        int col = 0;
+    public void addAggregateData(TabularDataSet tds, Format formatter,
+            int colCount, int rowCount) {
         for (int row = 0; row < rowCount; row++) {
-            tds.set(row, colCount-1, formatter.format(sum(answers.subList(col, (col+colCount-1 > answers.size() ? answers.size() : col+colCount-1)))));
-            col = col+colCount-1;
+            BigDecimal sum = new BigDecimal("0.0000");
+            for (int col = 0; col < colCount; col++) {
+                LOGGER.debug("...adding {}", tds.rows()[row][col]);
+                try {
+                    sum = sum.add(new BigDecimal(formatter.parseObject(tds.rows()[row][col]).toString()));
+                } catch (ParseException e) {
+                    LOGGER.warn("... cannot parse number from {}", tds.rows()[row][col]);
+                } catch (NullPointerException e) {
+                    LOGGER.debug("... cannot add null to total");
+                }
+            }
+            LOGGER.debug("total is {}", sum);
+            tds.set(row, colCount-1, formatter.format(sum));
         }
-    }
-
-    private BigDecimal sum(List<Answer> subList) {
-        BigDecimal sum = new BigDecimal("0.0000");
-        for (Answer answer : subList) {
-            LOGGER.debug("...adding {}", answer.response());
-            sum = sum.add(answer.responseAsBigDecimal());
-        }
-        LOGGER.debug("Resulting sum is {}", sum);
-        return sum;
     }
 
 }

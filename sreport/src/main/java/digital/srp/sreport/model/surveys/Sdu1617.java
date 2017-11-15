@@ -147,7 +147,6 @@ public class Sdu1617 {
                 .questionEnums(
                         Q.PATIENT_MILEAGE,
                         Q.VISITOR_MILEAGE,
-                        Q.TOTAL_EMPLOYEES,
                         Q.STAFF_COMMUTE_MILES_PP,
                         Q.STAFF_COMMUTE_MILES_TOTAL,
                         Q.HEALTH_IMPACT_OF_TRAVEL
@@ -180,21 +179,8 @@ public class Sdu1617 {
 
         SurveyCategory catSpendProfile = new SurveyCategory()
                 .name("Spend Profile")
-                .questionEnums(
-                        Q.BIZ_SVCS_SPEND,
-                        Q.CONSTRUCTION_SPEND,
-                        Q.CATERING_SPEND,
-                        Q.FREIGHT_SPEND,
-                        Q.ICT_SPEND,
-                        Q.CHEM_AND_GAS_SPEND,
-                        Q.MED_INSTR_SPEND,
-                        Q.OTHER_MANUFACTURED_SPEND,
-                        Q.OTHER_SPEND,
-                        Q.PAPER_SPEND,
-                        Q.PHARMA_SPEND,
-                        Q.TRAVEL_SPEND,
-                        Q.COMMISSIONING_SPEND
-                );
+                .questionEnums(SduQuestions.SPEND_HDRS);
+
         SurveyCategory catEClassProfile = new SurveyCategory()
                 .name("E-Class Profile")
                 .questionEnums(
@@ -226,8 +212,9 @@ public class Sdu1617 {
 
     public static Q[] getDerivedQs() {
         ArrayList<Q> list = new ArrayList<Q>();
-        list.addAll(Arrays.asList(SduQuestions.PROFILE_HDRS));
+        list.addAll(Arrays.asList(SduQuestions.SDU_PROFILE_HDRS));
         list.addAll(Arrays.asList(SduQuestions.FOOTPRINT_PCT_HDRS));
+        list.add(Q.WASTE_WATER);
         list.addAll(Arrays.asList(SduQuestions.WATER_CO2E_HDRS));
         list.addAll(Arrays.asList(SduQuestions.WASTE_CO2E_HDRS));
         list.addAll(Arrays.asList(SduQuestions.TRAVEL_CO2E_HDRS));
@@ -238,14 +225,17 @@ public class Sdu1617 {
         list.addAll(Arrays.asList(SduQuestions.SCOPE_1_HDRS));
         list.addAll(Arrays.asList(SduQuestions.SCOPE_2_HDRS));
         list.addAll(Arrays.asList(SduQuestions.SCOPE_3_HDRS));
+        list.add(Q.OWNED_BUILDINGS);
         list.add(Q.SCOPE_3_BIOMASS_WTT);
         list.addAll(Arrays.asList(SduQuestions.BIOMASS_CO2E_WTT_HDRS));
         list.addAll(Arrays.asList(SduQuestions.BIOMASS_CO2E_NOSCOPE_HDRS));
-        list.addAll(Arrays.asList(SduQuestions.SDU_CARBON_PROFILE_HDRS));
+        list.addAll(Arrays.asList(SduQuestions.SDU_PROFILE_CO2E_HDRS));
         list.addAll(Arrays.asList(SduQuestions.ECLASS_PROFILE_HDRS));
         list.addAll(Arrays.asList(SduQuestions.CORE_CO2E_HDRS));
-        list.add(Q.STAFF_COMMUTE_MILES_TOTAL);
-        list.add(Q.PATIENT_AND_VISITOR_MILEAGE);
+        list.addAll(Arrays.asList(SduQuestions.ECLASS_PROFILE_HDRS));
+        list.addAll(Arrays.asList(SduQuestions.BIZ_MILEAGE_HDRS));
+        list.add(Q.BIZ_MILEAGE);
+        list.addAll(Arrays.asList(SduQuestions.TRAVEL_HDRS));
         list.addAll(Arrays.asList(SduQuestions.CITIZEN_CO2E_HDRS));
         list.addAll(Arrays.asList(SduQuestions.SDU_TREND_HDRS));
         list.add(Q.TOTAL_CO2E);
@@ -262,6 +252,7 @@ public class Sdu1617 {
         list.addAll(Arrays.asList(SduQuestions.BENCHMARK_BY_BEDS_HDRS));
         list.addAll(Arrays.asList(SduQuestions.BENCHMARK_BY_PATIENT_CONTACTS_HDRS));
         list.add(Q.NON_PAY_SPEND);
+        list.addAll(Arrays.asList(SduQuestions.SPEND_HDRS));
         list.addAll(Arrays.asList(SduQuestions.BENCHMARK_BY_OPEX_HDRS));
         list.add(Q.TOTAL_ENERGY);
         list.add(Q.TOTAL_ENERGY_BY_WTE);

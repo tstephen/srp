@@ -19,26 +19,27 @@ public class TabularDataSetHelper {
     private static final Logger LOGGER = LoggerFactory
             .getLogger(TabularDataSetHelper.class);
     
-    public TabularDataSet tabulate(String[] headers, List<Answer> answers, 
-            Format formatter, Optional<Aggregator> aggregator) {
-        List<String> hList;
+    public synchronized TabularDataSet tabulate(final String[] cHeaders, final String[] rHeaders,
+            final List<Answer> answers, final Format formatter, final Optional<Aggregator> aggregator) {
+        List<String> rhList = Arrays.asList(rHeaders);
+        List<String> chList;
         if (aggregator.isPresent()) {
-            hList = aggregator.get().addAggregatedHeaders(headers);
+            chList = aggregator.get().addAggregatedHeaders(cHeaders);
         } else {
-            hList = Arrays.asList(headers);
+            chList = Arrays.asList(cHeaders);
         }
-        int colCount = hList.size();
-        int rowCount = answers.size()/headers.length;
-        if (answers.size() % headers.length != 0) {
-            rowCount++;
-        }
+        LOGGER.debug("Row headers for table: {}", rhList);
+        LOGGER.debug("Column headers for table: {}", chList);
+        int colCount = chList.size();
+        int rowCount = getRowCount(cHeaders, answers);
         TabularDataSet tds = new TabularDataSet(rowCount, colCount)
-                .headers(hList.toArray(new String[colCount]));
+                .headers(chList.toArray(new String[colCount]));
         for (int i = 0; i < answers.size(); i++) {
             Answer answer = answers.get(i);
-            int col = hList.indexOf(answer.question().name());
-            int row = i/headers.length;
+            int col = chList.indexOf(answer.question().name());
+            int row = rhList.indexOf(answer.applicablePeriod());
             try {
+                LOGGER.debug("Setting {} in {} ({},{}) to {}", answer.question().name(), answer.applicablePeriod(), row, col, answer.response());
                 tds.set(row, col, formatter.format((BigDecimal) answer.responseAsBigDecimal()));
             } catch (NullPointerException e) {
                 tds.set(row, col, "0");
@@ -51,8 +52,17 @@ public class TabularDataSetHelper {
         }
         
         if (aggregator.isPresent()) {
-            aggregator.get().addAggregateData(answers, formatter, colCount, rowCount, tds);
+            aggregator.get().addAggregateData(tds, formatter, colCount, rowCount);
         }
         return tds;
+    }
+
+    public int getRowCount(final String[] cHeaders,
+            final List<Answer> answers) {
+        int rowCount = answers.size()/cHeaders.length;
+        if (answers.size() % cHeaders.length != 0) {
+            rowCount++;
+        }
+        return rowCount;
     }
 }
