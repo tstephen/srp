@@ -1,25 +1,116 @@
-1. Create table from sdu_org.sql
+= Import org data from NHS Digital 
 
-2. import CSV file
+Canonical source: https://digital.nhs.uk/media/352/etr/zip/etr
 
+. Create table from etr.sql
+
+. Minor amends to provided CSV
+
+  - Add id column
+  - Add titles
+  - Remove null columns
+  - format dates yyyy-mm-dd
+  - Save with $ delimiter rather than ,
+
+. Import CSV file
++
+----
+    mysqlimport --ignore-lines=1 --fields-terminated-by=$ --verbose --local -u tstephen -p srp_db sdu_etr.csv 
+----
+
+. Compare what exists already
++
+----
+    mysql> select a.id, a.name, c.name, c.value from OL_ACCOUNT a join OL_ACCOUNT_CUSTOM c on a.id = c.account_id where c.name = 'orgCode';
+    475 rows in set (0.00 sec)
+    mysql> select org_code, name from sdu_etr where org_code not in (select c.value from OL_ACCOUNT a join OL_ACCOUNT_CUSTOM c on a.id = c.account_id where c.name = 'orgCode');
+    R0A      MANCHESTER UNIVERSITY NHS FOUNDATION TRUST        
+    R1L      ESSEX PARTNERSHIP UNIVERSITY NHS FOUNDATION TRUST 
+    RJD      MID STAFFORDSHIRE NHS FOUNDATION TRUST            
+    RQF      VELINDRE NHS TRUST                                
+    RT4      WELSH AMBULANCE SERVICES NHS TRUST                
+    RYT      PUBLIC HEALTH WALES NHS TRUST
+----
+
+. Consolidate longer addresses
++
+----
+mysql> update sdu_etr set addr1 = concat(addr1, ', ', addr2) where addr3 is not null and addr3!='';
+Query OK, 70 rows affected (0.01 sec)
+Rows matched: 70  Changed: 70  Warnings: 0
+
+mysql> update sdu_etr set addr2 = addr3 where addr3 is not null and addr3!='';
+Query OK, 70 rows affected (0.01 sec)
+Rows matched: 70  Changed: 70  Warnings: 0
+----
+
+. Create account records
++
+----
+    INSERT INTO OL_ACCOUNT 
+       (name, account_type, stage, email_confirmed, existing_customer, address1, address2, town, county_or_city, post_code, tenant_id)
+    SELECT name, 'Acute Trust', 'No contact', b'00', b'00', addr1, addr2, addr4, addr5, post_code, 'sdu'
+    FROM sdu_etr
+    where org_code not in (select c.value from OL_ACCOUNT a join OL_ACCOUNT_CUSTOM c on a.id = c.account_id where c.name = 'orgCode');
+----
+    
+. Update account types 
++
+----
+    update OL_ACCOUNT set account_type = 'Ambulance Trust' where name = 'WELSH AMBULANCE SERVICES NHS TRUST';                
+    update OL_ACCOUNT set account_type = 'Public Health' where name = 'PUBLIC HEALTH WALES NHS TRUST';
+----
+
+. Create custom fields
++   
+---- 
+    select id, name from OL_ACCOUNT where name in ('MANCHESTER UNIVERSITY NHS FOUNDATION TRUST','ESSEX PARTNERSHIP UNIVERSITY NHS FOUNDATION TRUST','MID STAFFORDSHIRE NHS FOUNDATION TRUST','VELINDRE NHS TRUST','WELSH AMBULANCE SERVICES NHS TRUST','PUBLIC HEALTH WALES NHS TRUST');
+    
+    INSERT INTO OL_ACCOUNT_CUSTOM (name,value,account_id) values ('orgCode','R0A',532);
+    INSERT INTO OL_ACCOUNT_CUSTOM (name,value,account_id) values ('orgCode','R1L',533);
+    INSERT INTO OL_ACCOUNT_CUSTOM (name,value,account_id) values ('orgCode','RJD',534);
+    INSERT INTO OL_ACCOUNT_CUSTOM (name,value,account_id) values ('orgCode','RQF',535);
+    INSERT INTO OL_ACCOUNT_CUSTOM (name,value,account_id) values ('orgCode','RT4',536);
+    INSERT INTO OL_ACCOUNT_CUSTOM (name,value,account_id) values ('orgCode','RYT',537);
+----
+          MANCHESTER UNIVERSITY NHS FOUNDATION TRUST        
+          ESSEX PARTNERSHIP UNIVERSITY NHS FOUNDATION TRUST 
+          MID STAFFORDSHIRE NHS FOUNDATION TRUST            
+          VELINDRE NHS TRUST                                
+          WELSH AMBULANCE SERVICES NHS TRUST                
+          PUBLIC HEALTH WALES NHS TRUST
+
+= Import SDU org tab
+
+. Create table from sdu_org.sql
+
+. import CSV file
++
+----
     export table=sdu_org
     export collist=c_org_code,name,c_nhs_area,c_phe_centre,c_region,account_type,c_sdmp,c_adaptation,c_on_track_34_pct,c_healthy_tp,c_gcc,c_sr_score,c_sr_pct,c_nrg,c_nrg_fte,c_water,c_water_fte,c_waste,c_waste_change
     mysql -u root -p srp_db --execute="LOAD DATA INFILE '/var/lib/mysql-files/sdu_org.csv' INTO TABLE $table FIELDS TERMINATED BY '$' OPTIONALLY ENCLOSED BY '\"' IGNORE 1 LINES ($collist) ; SHOW WARNINGS" > $table.output
+----
 
-3. CREATE account records
-
+. CREATE account records
++
+----
     INSERT INTO OL_ACCOUNT 
        (name, account_type, stage, email_confirmed, existing_customer, tenant_id)
     SELECT name, account_type, 'No contact', b'00', b'00', 'sdu'
     FROM sdu_org;
-    
-4. UPDATE tmp table with account ids
+----
 
+. UPDATE tmp table with account ids
++
+----
     UPDATE sdu_org o
     SET account_id = ( SELECT min(id) from OL_ACCOUNT a where a.name = o.name )
-    
-5. Create custom fields
-    
+----
+
+. Create custom fields
++
+----    
     INSERT INTO OL_ACCOUNT_CUSTOM (name,value,account_id)
     SELECT 'orgCode',c_org_code,account_id
     FROM   sdu_org;
@@ -87,4 +178,4 @@
     INSERT INTO OL_ACCOUNT_CUSTOM (name,value,account_id)
     SELECT 'wasteChange',c_waste_change,account_id
     FROM   sdu_org;
-
+----
