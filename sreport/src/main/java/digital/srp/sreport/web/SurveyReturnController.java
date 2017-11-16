@@ -204,7 +204,17 @@ public class SurveyReturnController {
         SurveyReturn rtn  = findCurrentBySurveyNameAndOrg(surveyName, org);
         List<Survey> surveys = surveyRepo.findEricSurveys();
         for (Survey survey : surveys) {
-            returnRepo.importAnswers(rtn.id(), rtn.org(), survey.name());
+            List<Answer> answersToImport = answerRepo.findAnswersToImport(rtn.id(), rtn.org(), survey.name());
+            LOGGER.info("Found {} answers to import from {} to {}", answersToImport.size(), survey.name(), rtn.id());
+            for (Answer a : answersToImport) {
+                rtn.answers().add(new Answer()
+                        .applicablePeriod(a.applicablePeriod())
+                        .revision(new Integer(a.revision()+1).shortValue())
+                        .status(StatusType.Draft.name())
+                        .response(a.response())
+                        .question(a.question())
+                        .addSurveyReturn(rtn));
+            }
         }
         return findCurrentBySurveyNameAndOrg(surveyName, org);
     }

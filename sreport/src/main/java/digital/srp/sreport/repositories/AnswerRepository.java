@@ -43,7 +43,6 @@ public interface AnswerRepository extends CrudRepository<Answer, Long> {
             + "ORDER BY a.applicablePeriod DESC")
     List<Answer> findByOrg(@Param("org") String org);
 
-
     @Query("SELECT a FROM Answer a JOIN a.surveyReturns r JOIN a.question q "
             + "WHERE a.response = :orgName "
             + "AND q.name = 'ORG_NAME' "
@@ -54,6 +53,15 @@ public interface AnswerRepository extends CrudRepository<Answer, Long> {
             + "WHERE a.revision = (SELECT MAX(o.revision) FROM Answer o LEFT JOIN o.surveyReturns r WHERE o.question.name IN :qNames AND r.org = :org AND o.applicablePeriod = :period)"
             + "AND a.question.name IN :qNames AND r.org = :org AND a.applicablePeriod = :period")
     List<Answer> findByOrgPeriodAndQuestion(@Param("org") String org, @Param("period") String period, @Param("qNames") String... qNames);
+
+    @Query(value = "SELECT a.* from SR_ANSWER a "
+            + "INNER JOIN SR_RETURN_ANSWER ra ON a.id = ra.answer_id "
+            + "INNER JOIN SR_RETURN r ON ra.survey_return_id = r.id "
+            + "INNER JOIN SR_SURVEY s ON r.survey_id = s.id "
+            + "WHERE r.org = :org "
+            + "AND s.name = :surveyToImport "
+            + "AND a.id NOT IN (SELECT answer_id FROM SR_RETURN_ANSWER WHERE survey_return_id = :targetReturnId)", nativeQuery = true)
+    List<Answer> findAnswersToImport(@Param("targetReturnId") Long targetReturnId, @Param("org") String org, @Param("surveyToImport") String surveyToImport);
 
     @Query("SELECT o FROM Answer o ORDER BY o.lastUpdated DESC")
     List<Answer> findAll();
