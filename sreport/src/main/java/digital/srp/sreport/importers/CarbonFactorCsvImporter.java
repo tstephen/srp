@@ -24,7 +24,7 @@ public class CarbonFactorCsvImporter {
     
     public static final String DATA = "/data/CarbonFactors.csv";
     public static final String[] HEADERS = { 
-            "category","name","unit","scope","2007-08","2008-09","2009-10","2010-11","2011-12","2012-13","2013-14","2014-15","2015-16","2016-17","comments"};
+            "category","name","unit","scope","2007-08","2008-09","2009-10","2010-11","2011-12","2012-13","2013-14","2014-15","2015-16","2016-17","2017-18","comments"};
 
     public List<CarbonFactor> readCarbonFactors()
             throws IOException {
@@ -58,6 +58,7 @@ public class CarbonFactorCsvImporter {
                     cfactors.add(newCarbonFactor(record, "2014-15", 11));
                     cfactors.add(newCarbonFactor(record, "2015-16", 12));
                     cfactors.add(newCarbonFactor(record, "2016-17", 13));
+                    cfactors.add(newCarbonFactor(record, "2017-18", 14));
                 } catch (Exception e) {
                     LOGGER.error(String.format("Problem with record: %1$d: %2$s", record.getRecordNumber(), e.getMessage()));
                     e.printStackTrace();

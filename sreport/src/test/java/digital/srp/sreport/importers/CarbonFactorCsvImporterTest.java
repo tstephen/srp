@@ -21,7 +21,7 @@ public class CarbonFactorCsvImporterTest {
                     .readCarbonFactors();
             System.out.println(
                     String.format(" found %1$d factors", factors.size()));
-            assertEquals(103 * 10, factors.size());
+            assertEquals(114 * 11, factors.size());
 
             // assert expected values of first record
             // Electricity generated,Electricity: UK,kWh,2,0.46673,0.49608,0.49381,0.48531,0.45205,0.46002,0.44548,0.49426,0.46219,0.41205
