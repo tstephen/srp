@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+import javax.persistence.Transient;
 import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
 
@@ -32,6 +33,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonView;
 
 import digital.srp.sreport.api.Calculator;
@@ -43,6 +45,7 @@ import digital.srp.sreport.model.Q;
 import digital.srp.sreport.model.Question;
 import digital.srp.sreport.model.StatusType;
 import digital.srp.sreport.model.Survey;
+import digital.srp.sreport.model.SurveyCategory;
 import digital.srp.sreport.model.SurveyReturn;
 import digital.srp.sreport.model.views.SurveyReturnViews;
 import digital.srp.sreport.repositories.AnswerRepository;
@@ -154,15 +157,18 @@ public class SurveyReturnController {
                 .org(org)
                 .applicablePeriod(requested.applicablePeriod())
                 .answers(emptyAnswers);
-        returnRepo.save(rtn);
-        for (Question q : requested.questions()) {
-            Answer answer = new Answer().question(q).addSurveyReturn(rtn)
-                    .applicablePeriod(requested.applicablePeriod());
-            if (q.q().equals(Q.ORG_CODE)) {
-                answer.response(org);
+        for (SurveyCategory cat : requested.categories()) {
+            for (Q q : cat.questionEnums()) {
+                Question question = qRepo.findByName(q.name());
+                Answer answer = new Answer().question(question ).addSurveyReturn(rtn)
+                        .applicablePeriod(requested.applicablePeriod());
+                if (q.equals(Q.ORG_CODE)) {
+                    answer.response(org);
+                }
+                emptyAnswers.add(answer);
             }
-            emptyAnswers.add(answer);
         }
+        returnRepo.save(rtn);
 
         return addLinks(rtn);
     }

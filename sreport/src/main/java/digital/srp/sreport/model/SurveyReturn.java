@@ -39,7 +39,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonView;
 
 import digital.srp.sreport.api.MandatoryCurrentPeriodAnswersProvided;
-import digital.srp.sreport.api.MinimumPeriodsProvided;
 import digital.srp.sreport.internal.AuthUtils;
 import digital.srp.sreport.internal.EntityAuditorListener;
 import digital.srp.sreport.model.views.AnswerViews;
@@ -65,8 +64,9 @@ import lombok.experimental.Accessors;
 /* For whatever reason AuditingEntityListener is not adding auditor, hence own listener as well */
 @EntityListeners( { AuditingEntityListener.class, EntityAuditorListener.class})
 @Table(name= "SR_RETURN")
-@MinimumPeriodsProvided(noPeriods = 4)
-@MandatoryCurrentPeriodAnswersProvided(requiredAnswers = {Q.ORG_CODE, Q.ORG_NAME, Q.ORG_TYPE, Q.SDMP_CRMP, Q.HEALTHY_TRANSPORT_PLAN, Q.PROMOTE_HEALTHY_TRAVEL})
+// Take care that what is validated here must be provided by createBlankReturn
+//@MinimumPeriodsProvided(noPeriods = 4)
+@MandatoryCurrentPeriodAnswersProvided(requiredAnswers = {Q.ORG_CODE})
 public class SurveyReturn implements AuditorAware<String> {
     private static final Logger LOGGER = LoggerFactory
             .getLogger(SurveyReturn.class);

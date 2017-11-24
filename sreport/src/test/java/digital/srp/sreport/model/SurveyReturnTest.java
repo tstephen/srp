@@ -109,13 +109,4 @@ public class SurveyReturnTest implements EricQuestions{
         assertEquals(0, rdr.completeness().size());
     }
 
-    @Test
-    public void testIncomplete() {
-        SurveyReturn rj1 = helper.readSurveyReturn("RJ1");
-        validator.validate(rj1);
-        System.out.println("Completeness: "+rj1.completeness());
-        assertEquals(1, rj1.completeness().size());
-        assertTrue(rj1.completeness().contains("Insufficient periods specified"));
-    }
-
 }

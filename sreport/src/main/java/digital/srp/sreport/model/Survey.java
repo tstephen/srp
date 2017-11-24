@@ -163,31 +163,6 @@ public class Survey {
         return null;
     }
 
-    @JsonProperty
-    @Transient
-    public List<Question> questions() {
-        ArrayList<Question> questions = new ArrayList<Question>();
-        try {
-            for (SurveyCategory cat : categories) {
-                questions.addAll(cat.questions());
-            }
-        } catch (NullPointerException e) {
-            LOGGER.warn("Have no categories in survey {} ({})", name(), id());
-        }
-        LOGGER.info("Survey {} contains a total of {} questions in {} categories",
-                name, questions.size(), categories.size());
-        return questions;
-    }
-
-    public Question question(String qName) {
-        for (Question q : questions()) {
-            if (qName.equals(q.name())) {
-                return q;
-            }
-        }
-        return null;
-    }
-    
     public SurveyCategory category(String catName) {
         for (SurveyCategory cat : categories()) {
             if (catName.equals(cat.name())) {
