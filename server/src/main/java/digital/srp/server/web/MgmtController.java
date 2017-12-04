@@ -9,8 +9,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import digital.srp.sreport.api.exceptions.SReportException;
 import digital.srp.sreport.importers.EricCsvImporter;
@@ -66,8 +68,14 @@ public class MgmtController {
 
         initQuestions(model);
         initSurveys(model);
-        initReturns(model);
+
+        String[] ericDataSets = { "ERIC-2016-17", "ERIC-2015-16", "ERIC-2014-15", "ERIC-2013-14" };
+        for (String ericDataSet : ericDataSets) {
+            initEricReturns(ericDataSet);
+        }
         
+        model.addAttribute("answers", answerRepo.findAll());
+        model.addAttribute("returns", returnRepo.findAll());
         model.addAttribute("orgs", accountRepo.findAllForTenant("sdu"));
         return "jsonStatus";
     }
@@ -122,34 +130,26 @@ public class MgmtController {
         return "jsonStatus";
     }
 
-//    @RequestMapping(value = "/answers", method = RequestMethod.GET, headers = "Accept=application/json")
-    public String initReturns(Model model) {
-        String[] ericDataSets = { "ERIC-2015-16", "ERIC-2014-15", "ERIC-2013-14" };
+    @RequestMapping(value = "/answers/{ericDataSet}", method = RequestMethod.GET, headers = "Accept=application/json")
+    public @ResponseBody String initEricReturns(@PathVariable("ericDataSet") String ericDataSet) {
+        List<SurveyReturn> existingReturns = returnRepo.findBySurveyName(ericDataSet);
+        LOGGER.debug(" ... {} existing returns", existingReturns.size());
         
-        for (String ericDataSet : ericDataSets) {
-//            LOGGER.debug("Found survey definition {} ({} containing {} questions", survey.name(), survey.id(), survey.questionCodes().size());
-            List<SurveyReturn> existingReturns = returnRepo.findBySurveyName(ericDataSet);
-            LOGGER.debug(" ... {} existing returns", existingReturns.size());
-            
-
-            EricDataSet ericDS = EricDataSetFactory.getInstance(ericDataSet);
-            try {
-                List<SurveyReturn> returns = new EricCsvImporter().readEricReturns(ericDS);
-                LOGGER.info("Found {} {} returns to import...", returns.size(), ericDataSet);
-                Survey survey = surveyRepo.findByName(ericDataSet);
-                if (survey == null) {
-                    survey = new Survey().name(ericDataSet).applicablePeriod(returns.get(0).applicablePeriod());
-                    survey = surveyRepo.save(survey);
-                }
-                importReturns(survey, existingReturns, returns);
-            } catch (Throwable e) {
-                String msg = String.format("Unable to load ERIC data from %1$s", ericDS.getDataFile());
-                LOGGER.error(msg, e);
-                throw new SReportException(msg, e);
+        EricDataSet ericDS = EricDataSetFactory.getInstance(ericDataSet);
+        try {
+            List<SurveyReturn> returns = new EricCsvImporter().readEricReturns(ericDS);
+            LOGGER.info("Found {} {} returns to import...", returns.size(), ericDataSet);
+            Survey survey = surveyRepo.findByName(ericDataSet);
+            if (survey == null) {
+                survey = new Survey().name(ericDataSet).applicablePeriod(returns.get(0).applicablePeriod());
+                survey = surveyRepo.save(survey);
             }
+            importReturns(survey, existingReturns, returns);
+        } catch (Throwable e) {
+            String msg = String.format("Unable to load ERIC data from %1$s", ericDS.getDataFile());
+            LOGGER.error(msg, e);
+            throw new SReportException(msg, e);
         }
-        model.addAttribute("answers", answerRepo.findAll());
-        model.addAttribute("returns", returnRepo.findAll());
         return "jsonStatus";
     }
 
@@ -184,7 +184,9 @@ public class MgmtController {
         LOGGER.info("findQ {}", answer.question().q().name());
         Question q = qRepo.findByName(answer.question().name());
         if (q == null) {
-            System.err.println("You must create all questions before attempting to import returns that use them");
+            String msg = String.format("Missing question %1$s. You must create all questions before attempting to import returns that use them",
+                    answer.question().q().name());
+            throw new IllegalStateException(msg);
         }
         return q;
     }

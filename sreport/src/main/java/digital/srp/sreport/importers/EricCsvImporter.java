@@ -20,8 +20,9 @@ import digital.srp.sreport.model.Question;
 import digital.srp.sreport.model.StatusType;
 import digital.srp.sreport.model.SurveyReturn;
 import digital.srp.sreport.model.returns.EricDataSet;
+import digital.srp.sreport.model.returns.EricQuestions;
 
-public class EricCsvImporter {
+public class EricCsvImporter implements EricQuestions {
 
     private static final Logger LOGGER = LoggerFactory
             .getLogger(EricCsvImporter.class);
@@ -412,7 +413,17 @@ public class EricCsvImporter {
         case "Portering staff (WTE)":
             return Q.NO_PORTERING_STAFF;
         case "PFI Unitary charges (£)":
-            return Q.PFI_CHARGES;     
+            return Q.PFI_CHARGES;
+        case NO_NHS_PROPERTY_SVCS_SITES:
+            return Q.NO_NHS_PROPERTY_SVCS_SITES;
+        case CIP_ACTUAL_VAL:
+            return Q.CIP_ACTUAL_VAL;
+        case CIP_PLANNED_VAL:
+            return Q.CIP_PLANNED_VAL;
+        case OVERHEATING_EVENTS:
+            return Q.OVERHEATING_EVENTS;
+        case PCT_TEMP_MONITORED:
+            return Q.PCT_TEMP_MONITORED;
         }
         throw new IllegalArgumentException(
                 String.format("ERIC data not expected to include %1$s", hdr));

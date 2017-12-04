@@ -1,8 +1,8 @@
 package digital.srp.sreport.model.returns;
 
-public class Eric1516 implements EricDataSet, EricQuestions {
+public class Eric1617 implements EricDataSet, EricQuestions {
     
-    public static final String PERIOD = "2015-16";
+    public static final String PERIOD = "2016-17";
 
     public static final String NAME = "ERIC-"+PERIOD;
     
@@ -27,6 +27,7 @@ public class Eric1516 implements EricDataSet, EricQuestions {
             NO_OUTPATIENT_SITES,
             NO_SUPPORT_SITES,
             NO_OTHER_SITES,
+            NO_NHS_PROPERTY_SVCS_SITES,
             ESTATES_DEV_STRATEGY,
             HEALTHY_TRANSPORT_PLAN,
             BOARD_ADAPTATION_PLAN,
@@ -34,22 +35,23 @@ public class Eric1516 implements EricDataSet, EricQuestions {
             CARBON_REDUCTION_TARGET,
             PFA_ASSESSMENT,
             PFA_ACTION_PLAN,
-            CONTRACTING_OUT_VAL,
-            CONTRACTING_OUT_PCT,
             CAPITAL_NEW_BUILD,
             CAPITAL_IMPROVING_EXISTING,
             CAPITAL_EQUIPMENT,
             PRIVATE_SECTOR,
             BACKLOG_MAINTENANCE_VAL,
-            PFA_ACTION_PLAN_VAL,
-            NON_EMERGENCY_TRANSPORT_VAL,
+            CIP_ACTUAL_VAL,
+            CIP_PLANNED_VAL,
             INCOME_CATERING,
             INCOME_LAUNDRY,
             INCOME_OTHER,
             NO_RIDDOR_INCIDENTS,
             NO_FM_INCIDENTS,
             NO_FM_CLINICAL_INCIDENTS,
-            NO_FIRES, NO_FALSE_ALARMS,
+            OVERHEATING_EVENTS,
+            PCT_TEMP_MONITORED,
+            NO_FIRES, 
+            NO_FALSE_ALARMS,
             NO_DEATHS_FROM_FIRE,
             NO_INJURIES_FROM_FIRE,
             NO_INJURIES_DURING_EVACUATION,

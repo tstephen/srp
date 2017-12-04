@@ -1,3 +1,6 @@
+/* How many answers entered for a given org */
+mysql> select count(1) from SR_RETURN_ANSWER ra join SR_RETURN r on ra.survey_return_id = r.id where r.org = 'RWH' and r.survey_id = 5 /* SDU 2016-17 */;
+
 mysql> insert into SR_ANSWER values(1,'2015-16',0, 'tstephen',null,'201516',1,'Published',null,null,null,4398,521);
 
 /* All answers for an org */

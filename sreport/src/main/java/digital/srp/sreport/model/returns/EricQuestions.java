@@ -45,4 +45,9 @@ public interface EricQuestions {
     String ORG_NAME = "Organisation Name";
     String ORG_CODE = "Organisation Code";
 
+    String CIP_ACTUAL_VAL = "Estates and Facilities savings from Cost Improvement Plans (£)";
+    String CIP_PLANNED_VAL = "Estates and Facilities planned savings from Cost Improvement Plans (£)";
+    String OVERHEATING_EVENTS = "Overheating occurrences triggering a risk assessment (No.)";
+    String PCT_TEMP_MONITORED = "Percentage of clinical space monitored for temperatures (%)"; 
+    String NO_NHS_PROPERTY_SVCS_SITES = "Number of sites leased from NHS Property Services (No.)";
 }

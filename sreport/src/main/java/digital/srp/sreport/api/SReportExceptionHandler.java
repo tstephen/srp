@@ -34,6 +34,14 @@ public class SReportExceptionHandler {
         return sb.toString();
     }
 
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(IllegalStateException.class)
+    public @ResponseBody String handleIllegalStateException(
+            IllegalStateException e) {
+        LOGGER.error(e.getMessage(), e);
+        return String.format("{\"message\":\"%1$s\"}", e.getMessage());
+    }
+
     @ResponseStatus(HttpStatus.NOT_FOUND)
     @ExceptionHandler(SReportObjectNotFoundException.class)
     public @ResponseBody String handleEntityNotFoundException(
