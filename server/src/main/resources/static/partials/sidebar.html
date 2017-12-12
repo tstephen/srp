@@ -14,7 +14,13 @@
       {{/if}}
     {{/}}
     <li class="powered-by-icon">
-      <img src="/srp/2.0.0/images/icon/srp-icon-32x32.png" alt="Sustainable Resource Planning™">
+      {{#if window.location.host == 'srp.digital'}}
+        <img src="/srp/2.0.0/images/icon/srp-icon-32x32.png" alt="Sustainable Resource Planning&trade;">
+      {{else}}
+        <a href="/about.html">
+          <img src="https://api.knowprocess.com/images/icon/brain-gears-16x16.png" alt="Know Process™">
+        </a>
+      {{/if}}
     </li>
   </ul>
 </div>
