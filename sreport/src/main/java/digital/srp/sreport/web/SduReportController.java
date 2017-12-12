@@ -38,7 +38,7 @@ public class SduReportController implements SduQuestions {
 
     private static final String DEFAULT_MAX_PERIODS = "4";
 
-    @Value("${spring.data.rest.base-path}")
+    @Value("${kp.application.base-uri}")
     protected String baseUrl;
 
     @Autowired

@@ -66,7 +66,7 @@ public class SurveyReturnController {
     private static final Logger LOGGER = LoggerFactory
             .getLogger(SurveyReturnController.class);
 
-    @Value("${spring.data.rest.base-path}")
+    @Value("${kp.application.base-uri}")
     protected String baseUrl;
 
     @Autowired
