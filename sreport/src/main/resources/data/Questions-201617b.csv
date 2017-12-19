@@ -104,7 +104,7 @@ WASTE_WATER$Waste water$m3$SDU$Waste water that enters the mains drainage system
 BIZ_MILEAGE_ROAD$Business Mileage - Road / Grey Fleet$miles$SDU$Personal vehicles used for business travel$number$$$$
 FLEET_ROAD_MILES$Business mileage - Owned, pool, leased and managed vehicles$miles$SDU$Vehicles owned by the organisation$number$$$$
 FLEET_COST$Business mileage - Owned, pool, leased and managed vehicles Cost$£$SDU$Vehicles owned by the organisation$number$$$$
-_3RD_PTY_ROAD_MILES$Business Mileage - Non-organisation Owned Fleet/Pool/Third party provided used by the organisation (excluding leased vehicles) Road Travel (Hire etc.)$miles$SDU$Vehicles not owned but used by the organisation$number$$$$
+BIZ_MILEAGE_ROAD_COST$Cost of Non-organisation Owned Fleet/Pool/Third party provided used by the organisation (excluding leased vehicles) Road Travel (Hire etc.)$£$SDU$Vehicles not owned but used by the organisation$number$$$$
 OWNED_LEASED_LOW_CARBON_MILES$Business Mileage - Owned, pool, leased or managed vehicles that are electric or plug in hybrid (on Go Ultra Low approved list)$miles$SDU$GoUltraLow approved list$number$$$$
 OWNED_LEASED_LOW_CARBON_COST$Business Mileage - Owned, pool, leased or managed vehicles that are electric or plug in hybrid (on Go Ultra Low approved list) Cost$£$SDU$GoUltraLow approved list$number$$$$
 RAIL_MILES$Rail/Underground/Tram$£$SDU$Provide the cost figure for expense claims and directly purchased rail/underground/tram journeys$number$$$$
