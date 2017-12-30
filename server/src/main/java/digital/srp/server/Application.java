@@ -15,6 +15,8 @@
  *******************************************************************************/
 package digital.srp.server;
 
+import java.util.List;
+
 import org.apache.catalina.connector.Connector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,13 +27,21 @@ import org.springframework.boot.context.embedded.tomcat.TomcatEmbeddedServletCon
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
+import org.springframework.hateoas.Link;
+import org.springframework.http.converter.HttpMessageConverter;
+import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.knowprocess.auth.AuthConfig;
 import com.knowprocess.bpm.BpmConfiguration;
 
 import digital.srp.macc.MaccConfig;
+import digital.srp.server.model.mixins.DocumentMixIn;
+import digital.srp.server.model.mixins.NoteMixIn;
+import digital.srp.server.model.mixins.SrpLinkMixIn;
 import digital.srp.sreport.internal.SReportConfiguration;
 import io.onedecision.engine.OneDecisionConfig;
 import io.onedecision.engine.domain.OneDecisionDomainConfig;
@@ -39,6 +49,8 @@ import link.omny.acctmgmt.AcctMgmtConfig;
 import link.omny.acctmgmt.model.SystemConfig;
 import link.omny.catalog.CatalogConfig;
 import link.omny.custmgmt.CustMgmtConfig;
+import link.omny.custmgmt.model.Document;
+import link.omny.custmgmt.model.Note;
 import link.omny.supportservices.SupportServicesConfig;
 
 // See https://github.com/spring-projects/spring-boot/issues/6529 for alternative if JMX needed
@@ -108,11 +120,17 @@ public class Application extends WebMvcConfigurerAdapter {
                 "loginPage?error");
     }
 
-//    @Bean
-//    public WebSecurityConfigurerAdapter applicationSecurity() {
-//        return new ActivitiApplicationSecurity();
-//        // return new SrpActivitiApplicationSecurity();
-//    }
+    @Override
+    public void configureMessageConverters(
+            List<HttpMessageConverter<?>> converters) {
+        ObjectMapper objectMapper = Jackson2ObjectMapperBuilder.json()
+                .mixIn(Document.class, DocumentMixIn.class)
+                .mixIn(Link.class, SrpLinkMixIn.class)
+                .mixIn(Note.class, NoteMixIn.class)
+                .build();
+        converters.add(new MappingJackson2HttpMessageConverter(objectMapper));
+        super.configureMessageConverters(converters);
+    }
     
     public static void main(String[] args) {
         SpringApplication.run(Application.class, args);
