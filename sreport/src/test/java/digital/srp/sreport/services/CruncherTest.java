@@ -37,8 +37,8 @@ public class CruncherTest {
     private  static final String[] PROCUREMENT_CO2E = { "16,200", "17,800",
             "19,400", "20,000", "0", "0", "0", "0", "0", "0" };
 
-    private  static final String[] CORE_CO2E = { "11,200", "12,400", "17,100",
-            "20,400", "0", "0", "0", "0", "0", "0" };
+    private  static final String[] CORE_CO2E = { "11,400", "12,700", "17,400",
+            "20,700", "0", "0", "0", "0", "0", "0" };
 
     private  static final String[] COMMISSIONING_CO2E = { "1,250", "1,370",
             "1,490", "1,530", "0", "0", "0", "0", "0", "0" };

@@ -571,14 +571,24 @@ public class Cruncher implements digital.srp.sreport.model.surveys.SduQuestions,
         } catch (IllegalStateException | NullPointerException e) {
             LOGGER.warn("Insufficient data to calculate CO2e from staff commuting");
         }
-        // TODO split fuel and EVs
+        try {
+            BigDecimal fleetMileage = getAnswer(period, rtn, Q.OWNED_LEASED_LOW_CARBON_MILES).responseAsBigDecimal();
+            getAnswer(period, rtn, Q.OWNED_LEASED_LOW_CARBON_CO2E)
+                    .derived(true)
+                    .response(fleetMileage
+                            .multiply(cFactor(CarbonFactors.AVERAGE_BATTERY_AND_PLUGIN_HYBRID_EV_TOTAL, period).value())
+                            .multiply(m2km)
+                            .divide(ONE_THOUSAND, 0, RoundingMode.HALF_UP));
+        } catch (IllegalStateException | NullPointerException e) {
+            LOGGER.warn("Insufficient data to calculate CO2e from low carbon fleet miles");
+        }
         try {
             BigDecimal fleetMileage = getAnswer(period, rtn, Q.FLEET_ROAD_MILES).responseAsBigDecimal();
-         // Treasury row 51: Owned vehicles  Fuel Well to Tank
+            // Treasury row 51: Owned vehicles both direct and Well to Tank
             getAnswer(period, rtn, Q.OWNED_FLEET_TRAVEL_CO2E)
                     .derived(true)
                     .response(fleetMileage
-                            .multiply(cFactor(CarbonFactors.CAR_WTT_AVERAGE_SIZE, period).value())
+                            .multiply(cFactor(CarbonFactors.CAR_TOTAL, period).value())
                             .multiply(m2km)
                             .divide(ONE_THOUSAND, 0, RoundingMode.HALF_UP));
             try {
