@@ -65,8 +65,8 @@
     </dependency>
     <dependency>
       <groupId>link.omny</groupId>
-      <artifactId>omny-link-processes</artifactId>
-      <version>${omny-link.version}</version>
+      <artifactId>crm-processes</artifactId>
+      <version>${crm.version}</version>
     </dependency>
     <dependency>
       <groupId>com.knowprocess.bpm</groupId>

@@ -17,12 +17,12 @@
     <activiti.version>5.18.0.20151117</activiti.version>
     <activiti.bdd.version>5.19.0.20161207</activiti.bdd.version>
     <kp-auth.version>1.1.0-SNAPSHOT</kp-auth.version>
-    <omny-link.version>2.2.0-SNAPSHOT</omny-link.version>
+    <crm.version>3.0.0-SNAPSHOT</crm.version>
     <onedecision.version>1.2.0-RC1</onedecision.version>
     <ractive.version>0.7.3</ractive.version>
     <spring.boot.version>1.4.0.RELEASE</spring.boot.version>
     <srp.version>${project.version}</srp.version>
-    <work-mgmt.version>2.3.0-SNAPSHOT</work-mgmt.version>
+    <work-mgmt.version>3.0.0-SNAPSHOT</work-mgmt.version>
   </properties>
 
   <parent>
