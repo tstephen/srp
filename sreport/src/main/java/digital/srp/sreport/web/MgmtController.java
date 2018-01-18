@@ -1,4 +1,4 @@
-package digital.srp.server.web;
+package digital.srp.sreport.web;
 
 import java.io.IOException;
 import java.util.List;
@@ -30,7 +30,6 @@ import digital.srp.sreport.repositories.QuestionRepository;
 import digital.srp.sreport.repositories.SurveyCategoryRepository;
 import digital.srp.sreport.repositories.SurveyRepository;
 import digital.srp.sreport.repositories.SurveyReturnRepository;
-import link.omny.custmgmt.repositories.AccountRepository;
 
 /**
  * REST web service for managing application data.
@@ -59,9 +58,6 @@ public class MgmtController {
     @Autowired
     protected SurveyReturnRepository returnRepo;
     
-    @Autowired
-    protected AccountRepository accountRepo;
-    
     @RequestMapping(value = "/", method = RequestMethod.GET, headers = "Accept=application/json")
     public String initAndShowStatus(Model model) throws IOException {
         LOGGER.info(String.format("initAndShowStatus"));
@@ -76,7 +72,6 @@ public class MgmtController {
         
         model.addAttribute("answers", answerRepo.findAll());
         model.addAttribute("returns", returnRepo.findAll());
-        model.addAttribute("orgs", accountRepo.findAllForTenant("sdu"));
         return "jsonStatus";
     }
 
