@@ -22,16 +22,6 @@
       <artifactId>activiti-engine</artifactId>
       <version>${activiti.version}</version>
     </dependency>
-    <!-- Not needed? <dependency>
-      <groupId>org.activiti</groupId>
-      <artifactId>activiti-bpmn-layout</artifactId>
-      <version>${activiti.version}</version>
-    </dependency>-->
-    <dependency>
-      <groupId>org.activiti</groupId>
-      <artifactId>activiti-bpmn-model</artifactId>
-      <version>${activiti.version}</version>
-    </dependency>
     <dependency>
       <groupId>com.h2database</groupId>
       <artifactId>h2</artifactId>
@@ -63,6 +53,7 @@
       <version>${activiti.bdd.version}</version>
       <scope>test</scope>
     </dependency>
+    <!-- required by integration tests, look for another way... -->
     <dependency>
       <groupId>link.omny</groupId>
       <artifactId>crm-processes</artifactId>
