@@ -375,6 +375,9 @@ public class SurveyReturn implements AuditorAware<String> {
     }
 
     public Set<Answer> getAnswers() {
+        if (answers == null) {
+            answers = new HashSet<Answer>();
+        }
         return answers;
     }
 

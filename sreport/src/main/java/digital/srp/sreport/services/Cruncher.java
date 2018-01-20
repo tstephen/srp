@@ -86,7 +86,7 @@ public class Cruncher implements digital.srp.sreport.model.surveys.SduQuestions,
         return rtn;
     }
 
-    private void calcEnergyConsumption(String period, SurveyReturn rtn) {
+    protected void calcEnergyConsumption(String period, SurveyReturn rtn) {
         sumAnswers(period, rtn, Q.TOTAL_ENERGY, SduQuestions.ENERGY_HDRS);
         BigDecimal noStaff = getAnswerForPeriodWithFallback(period, rtn, Q.NO_STAFF).responseAsBigDecimal();
         try {
@@ -124,7 +124,7 @@ public class Cruncher implements digital.srp.sreport.model.surveys.SduQuestions,
         }
     }
 
-    private void calcBenchmarking(String period, SurveyReturn rtn) {
+    protected void calcBenchmarking(String period, SurveyReturn rtn) {
         Answer totalEnergyCo2eA = sumAnswers(period, rtn, Q.TOTAL_ENERGY_CO2E, Q.OWNED_BUILDINGS,
                 Q.NET_ELEC_CO2E, Q.SCOPE_3_BIOMASS_WTT);
         BigDecimal totalEnergyCo2e = totalEnergyCo2eA.responseAsBigDecimal();
@@ -335,7 +335,7 @@ public class Cruncher implements digital.srp.sreport.model.surveys.SduQuestions,
         }
     }
 
-    private void calcScope3(String period, SurveyReturn rtn) {
+    protected void calcScope3(String period, SurveyReturn rtn) {
         // TODO move leased assets here 
         crunchScope3Travel(period, rtn);
         crunchScope3Water(period, rtn);
@@ -345,12 +345,12 @@ public class Cruncher implements digital.srp.sreport.model.surveys.SduQuestions,
         crunchScope3EnergyWtt(period, rtn);
     }
 
-    private void crunchScope3EnergyWtt(String period, SurveyReturn rtn) {
+    protected void crunchScope3EnergyWtt(String period, SurveyReturn rtn) {
         // TODO Auto-generated method stub
 
     }
 
-    private void crunchScope3Water(String period, SurveyReturn rtn) {
+    protected void crunchScope3Water(String period, SurveyReturn rtn) {
         try {
             // If necessary estimate waste water as 0% of incoming
             Answer wasteWater = getAnswer(period,rtn, Q.WASTE_WATER);
@@ -389,7 +389,7 @@ public class Cruncher implements digital.srp.sreport.model.surveys.SduQuestions,
         }
     }
 
-    private void crunchScope3Waste(String period, SurveyReturn rtn) {
+    protected void crunchScope3Waste(String period, SurveyReturn rtn) {
         try {
             // Treasury row 62: Waste Recycling
             CarbonFactor cFactor = cFactor(CarbonFactors.CLOSED_LOOP_OR_OPEN_LOOP, period);
@@ -435,7 +435,7 @@ public class Cruncher implements digital.srp.sreport.model.surveys.SduQuestions,
                 Q.RECYCLING_CO2E, Q.OTHER_RECOVERY_CO2E, Q.INCINERATION_CO2E, Q.LANDFILL_CO2E);
     }
 
-    private Answer getAnswerForPeriodWithFallback(String period,
+    protected Answer getAnswerForPeriodWithFallback(String period,
             SurveyReturn rtn, Q q) {
         try {
             Answer answer = getAnswer(period, rtn, q);
@@ -499,7 +499,7 @@ public class Cruncher implements digital.srp.sreport.model.surveys.SduQuestions,
         }
     }
 
-    private void crunchScope3Biomass(String period, SurveyReturn rtn) {
+    protected void crunchScope3Biomass(String period, SurveyReturn rtn) {
         try {
             // Treasury row 72: Wood logs
             CarbonFactor cFactor = cFactor(CarbonFactors.WOOD_LOGS_TOTAL, period);
@@ -540,7 +540,7 @@ public class Cruncher implements digital.srp.sreport.model.surveys.SduQuestions,
                 Q.WOOD_LOGS_CO2E, Q.WOOD_CHIPS_CO2E, Q.WOOD_PELLETS_CO2E);
     }
 
-    private void crunchScope3Travel(String period, SurveyReturn rtn) {
+    protected void crunchScope3Travel(String period, SurveyReturn rtn) {
         // NOTE: XXX_TOTAL means primary and WTT combined due to XXX
         CarbonFactor cFactor = cFactor(CarbonFactors.CAR_TOTAL, period);
         try {
@@ -669,20 +669,20 @@ public class Cruncher implements digital.srp.sreport.model.surveys.SduQuestions,
     }
 
 
-    private void calcScope1(String period, SurveyReturn rtn) {
+    protected void calcScope1(String period, SurveyReturn rtn) {
         crunchOwnedBuildings(period, rtn);
         CarbonFactor cFactor = cFactor(CarbonFactors.CAR_AVERAGE_SIZE, period);
         crunchCO2e(period, rtn, Q.FLEET_ROAD_MILES, oneThousandth(cFactor), Q.OWNED_VEHICLES);
         crunchAnaestheticGases(period, rtn);
     }
 
-    private void calcScope2(String period, SurveyReturn rtn) {
+    protected void calcScope2(String period, SurveyReturn rtn) {
         crunchElectricityUsed(period, rtn);
         crunchHeatSteam(period, rtn);
         // TODO EV Owned Vehicles
     }
 
-    private void calcCarbonProfileSduMethod(String period, SurveyReturn rtn) {
+    protected void calcCarbonProfileSduMethod(String period, SurveyReturn rtn) {
         sumAnswers(period, rtn, Q.WASTE_AND_WATER_CO2E, Q.SCOPE_3_WASTE, Q.SCOPE_3_WATER);
 
         // Intentional use of return period for org type
@@ -734,7 +734,7 @@ public class Cruncher implements digital.srp.sreport.model.surveys.SduQuestions,
                 Q.OTHER_PROCUREMENT_CO2E, Q.PAPER_CO2E, Q.PHARMA_CO2E);
     }
 
-    private BigDecimal calcNonPaySpendFromOpEx(String period,
+    protected BigDecimal calcNonPaySpendFromOpEx(String period,
             SurveyReturn rtn) {
         LOGGER.info(String.format("Need to calc non pay spend from op ex"));
         // Intentionally use rtn period for org type
@@ -759,7 +759,7 @@ public class Cruncher implements digital.srp.sreport.model.surveys.SduQuestions,
         return value == null || "0".equals(value);
     }
 
-    private void calcCarbonProfileEClassMethod(String period, SurveyReturn rtn) {
+    protected void calcCarbonProfileEClassMethod(String period, SurveyReturn rtn) {
         // Logic here is that *1000 for thousands of pounds to pounds the
         // /1000 to convert factor from kg to tonnes, i.e. cancel each other out
         CarbonFactor cFactor = cFactor(CarbonFactors.PROVISIONS, period);
@@ -861,7 +861,9 @@ public class Cruncher implements digital.srp.sreport.model.surveys.SduQuestions,
                 Q.CONSULTING_SVCS_AND_EXPENSES_CO2E);
     }
 
-    private void calcTrendOverTime(String period, SurveyReturn rtn) {
+    protected void calcTrendOverTime(String period, SurveyReturn rtn) {
+        crunchEnergyCostChange(period, rtn);
+
         sumAnswers(period, rtn, Q.CORE_CO2E,
                 /* All energy */
                 Q.OWNED_BUILDINGS_GAS, Q.OWNED_BUILDINGS_OIL, Q.OWNED_BUILDINGS_COAL,
@@ -877,6 +879,18 @@ public class Cruncher implements digital.srp.sreport.model.surveys.SduQuestions,
         sumAnswers(period, rtn, Q.CITIZEN_CO2E,
                 Q.STAFF_COMMUTE_MILES_CO2E, Q.PATIENT_AND_VISITOR_MILEAGE_CO2E);
 
+    }
+
+    protected void crunchEnergyCostChange(String period, SurveyReturn rtn) {
+        try {
+            BigDecimal currentEnergyCost = getAnswer(period, rtn, Q.TOTAL_ENERGY_COST).responseAsBigDecimal();
+            BigDecimal previousEnergyCost = getAnswer(PeriodUtil.previous(period), rtn, Q.TOTAL_ENERGY_COST).responseAsBigDecimal();
+
+            BigDecimal change = currentEnergyCost.divide(previousEnergyCost, 5, RoundingMode.HALF_UP).multiply(ONE_HUNDRED).subtract(ONE_HUNDRED);
+            getAnswer(period, rtn, Q.ENERGY_COST_CHANGE_PCT).response(change);
+        } catch (IllegalStateException | NullPointerException e) {
+            LOGGER.warn("Insufficient data to calculate change of energy costs in {}", period);
+        }
     }
 
     private void crunchHeatSteam(String period, SurveyReturn rtn) {
@@ -906,7 +920,7 @@ public class Cruncher implements digital.srp.sreport.model.surveys.SduQuestions,
         return cFactor.value().divide(ONE_THOUSAND, cFactor.value().scale(), RoundingMode.HALF_UP);
     }
 
-    private void crunchElectricityUsed(String period, SurveyReturn rtn) {
+    protected void crunchElectricityUsed(String period, SurveyReturn rtn) {
         try {
             BigDecimal nonRenewableElecUsed = getAnswer(period, rtn, Q.ELEC_USED).responseAsBigDecimal();
             BigDecimal greenTariffUsed;
@@ -944,7 +958,7 @@ public class Cruncher implements digital.srp.sreport.model.surveys.SduQuestions,
         }
     }
 
-    private void crunchOwnedBuildings(String period, SurveyReturn rtn) {
+    protected void crunchOwnedBuildings(String period, SurveyReturn rtn) {
         CarbonFactor cFactor = cFactor(CarbonFactors.NATURAL_GAS, period);
         crunchCO2e(period, rtn, Q.GAS_USED, oneThousandth(cFactor), Q.OWNED_BUILDINGS_GAS);
 
@@ -956,7 +970,7 @@ public class Cruncher implements digital.srp.sreport.model.surveys.SduQuestions,
         sumAnswers(period, rtn,Q.OWNED_BUILDINGS, Q.OWNED_BUILDINGS_GAS, Q.OWNED_BUILDINGS_OIL, Q.OWNED_BUILDINGS_COAL);
     }
 
-    private void crunchAnaestheticGases(String period, SurveyReturn rtn) {
+    protected void crunchAnaestheticGases(String period, SurveyReturn rtn) {
         CarbonFactor cFactor = cFactor(CarbonFactors.DESFLURANE, period);
         crunchCO2e(period, rtn, Q.DESFLURANE, cFactor.value(), Q.DESFLURANE_CO2E);
         cFactor = cFactor(CarbonFactors.ISOFLURANE, period);

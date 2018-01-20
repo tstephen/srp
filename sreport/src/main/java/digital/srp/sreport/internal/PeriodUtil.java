@@ -28,7 +28,7 @@ public class PeriodUtil {
         return startYear;
     }
 
-    protected static String previous(String period) {
+    public static String previous(String period) {
         return previous(startYear(period));
     }
     
@@ -41,7 +41,7 @@ public class PeriodUtil {
         return next(startYear(period));
     }
     
-    protected static String next(int startYear) {
+    public static String next(int startYear) {
         return String.format("%1$d-%2$s", startYear + 1,
                 String.valueOf(startYear + 2).substring(2));
     }

@@ -255,6 +255,8 @@ public class Sdu1617 {
         list.addAll(Arrays.asList(SduQuestions.SPEND_HDRS));
         list.addAll(Arrays.asList(SduQuestions.BENCHMARK_BY_OPEX_HDRS));
         list.add(Q.TOTAL_ENERGY);
+        list.add(Q.TOTAL_ENERGY_COST);
+        list.add(Q.ENERGY_COST_CHANGE_PCT);
         list.add(Q.TOTAL_ENERGY_BY_WTE);
         list.add(Q.WATER_VOL_BY_WTE);
         list.add(Q.NO_STAFF);
