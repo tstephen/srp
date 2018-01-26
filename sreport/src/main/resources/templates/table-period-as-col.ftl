@@ -2,9 +2,9 @@
 <link href="//srp.digital/srp/2.0.0/css/srp.css" rel="stylesheet">
 <link rel="icon" type="image/png" href="//srp.digital/srp/2.0.0/images/icon/srp-icon-32x32.png" />
 <div class="controls pull-right" style="display:none">
-  <span class="glyphicon glyphicon-btn glyphicon-share"></span>
-  <!--span class="glyphicon glyphicon-btn glyphicon-link"></span-->
-  <!--span class="glyphicon glyphicon-btn glyphicon-copy"></span-->
+  <span class="glyphicon icon-btn kp-icon-new-tab"></span>
+  <!--span class="glyphicon icon-btn kp-icon-link"></span-->
+  <!--span class="glyphicon icon-btn kp-icon-copy"></span-->
 </div>
 <table class="table table-striped">
   <thead>
