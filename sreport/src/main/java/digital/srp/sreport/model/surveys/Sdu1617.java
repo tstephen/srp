@@ -171,7 +171,7 @@ public class Sdu1617 {
                         Q.WOOD_LOGS_USED,
                         Q.WOOD_CHIPS_USED,
                         Q.WOOD_PELLETS_USED,
-                        Q.ELEC_OWNED_RENEWABLE_USED,
+                        Q.ELEC_OWNED_RENEWABLE_USED_SDU,
                         Q.LEASED_ASSETS_ENERGY_USE,
                         Q.GREEN_TARIFF_ADDITIONAL_PCT,
                         Q.THIRD_PARTY_ADDITIONAL_PCT

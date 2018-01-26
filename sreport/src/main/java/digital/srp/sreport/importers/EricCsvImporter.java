@@ -277,7 +277,7 @@ public class EricCsvImporter implements EricQuestions {
         case "Electricity consumed - renewable (kWh)":
             return Q.ELEC_RENEWABLE_USED;
         case "Non-fossil fuel consumed - renewable (kWh)":
-            return Q.ELEC_RENEWABLE_USED;
+            return Q.RENEWABLE_USED;
         case "Fossil energy input to the CHP system/s (kWh)":
         case "Total fossil energy input to the CHP system/s (kWh)":
         case "Fossil energy input to CHP system/s (kWh)":
