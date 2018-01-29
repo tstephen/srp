@@ -544,21 +544,7 @@ public class Cruncher implements digital.srp.sreport.model.surveys.SduQuestions,
         // NOTE: XXX_TOTAL means primary and WTT combined due to XXX
         CarbonFactor cFactor = cFactor(CarbonFactors.CAR_TOTAL, period);
         crunchPatientVisitorMileageCo2e(period, rtn);
-        try {
-            BigDecimal totalStaffMiles = getAnswerForPeriodWithFallback(period, rtn, Q.NO_STAFF).responseAsBigDecimal()
-                    .multiply(getAnswer(period, rtn, Q.STAFF_COMMUTE_MILES_PP).responseAsBigDecimal());
-            getAnswer(period,rtn, Q.STAFF_COMMUTE_MILES_TOTAL).derived(true).response(totalStaffMiles);
-
-            // Treasury row 53: Staff commute
-            getAnswer(period,rtn, Q.STAFF_COMMUTE_MILES_CO2E)
-                    .derived(true)
-                    .response(totalStaffMiles
-                            .multiply(cFactor.value())
-                            .multiply(m2km)
-                            .divide(ONE_THOUSAND, 0, RoundingMode.HALF_UP));
-        } catch (IllegalStateException | NullPointerException e) {
-            LOGGER.warn("Insufficient data to calculate CO2e from staff commuting");
-        }
+        crunchStaffCommuteCo2e(period, rtn);
         try {
             BigDecimal fleetMileage = getAnswer(period, rtn, Q.OWNED_LEASED_LOW_CARBON_MILES).responseAsBigDecimal();
             getAnswer(period, rtn, Q.OWNED_LEASED_LOW_CARBON_CO2E)
@@ -653,6 +639,29 @@ public class Cruncher implements digital.srp.sreport.model.surveys.SduQuestions,
                     SduQuestions.SCOPE_3_TRAVEL_HDRS);
         } catch (IllegalStateException | NullPointerException e) {
             LOGGER.warn("Insufficient data to calculate CO2e from travel");
+        }
+    }
+
+    // Treasury row 53: Staff commute
+    protected void crunchStaffCommuteCo2e(String period, SurveyReturn rtn) {
+        // NOTE: XXX_TOTAL means primary and WTT combined due to XXX
+        CarbonFactor cFactor = cFactor(CarbonFactors.CAR_TOTAL, period);
+        try {
+            BigDecimal totalStaffMiles = getAnswer(period, rtn, Q.STAFF_COMMUTE_MILES_TOTAL).responseAsBigDecimal();
+            if (totalStaffMiles.equals(BigDecimal.ZERO)) {
+                totalStaffMiles = getAnswerForPeriodWithFallback(period, rtn, Q.NO_STAFF).responseAsBigDecimal()
+                        .multiply(getAnswer(period, rtn, Q.STAFF_COMMUTE_MILES_PP).responseAsBigDecimal());
+                getAnswer(period, rtn, Q.STAFF_COMMUTE_MILES_TOTAL).response(totalStaffMiles);
+            }
+
+            getAnswer(period,rtn, Q.STAFF_COMMUTE_MILES_CO2E)
+                    .derived(true)
+                    .response(totalStaffMiles
+                            .multiply(cFactor.value())
+                            .multiply(m2km)
+                            .divide(ONE_THOUSAND, 0, RoundingMode.HALF_UP));
+        } catch (IllegalStateException | NullPointerException e) {
+            LOGGER.warn("Insufficient data to calculate CO2e from staff commuting");
         }
     }
 
