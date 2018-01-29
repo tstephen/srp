@@ -336,7 +336,7 @@ public class Cruncher implements digital.srp.sreport.model.surveys.SduQuestions,
     }
 
     protected void calcScope3(String period, SurveyReturn rtn) {
-        // TODO move leased assets here 
+        // TODO move leased assets here
         crunchScope3Travel(period, rtn);
         crunchScope3Water(period, rtn);
         crunchScope3Waste(period, rtn);
@@ -439,7 +439,7 @@ public class Cruncher implements digital.srp.sreport.model.surveys.SduQuestions,
             SurveyReturn rtn, Q q) {
         try {
             Answer answer = getAnswer(period, rtn, q);
-            if (answer.response() == null) { 
+            if (answer.response() == null) {
                 throw new IllegalStateException();
             }
             return answer;
@@ -543,19 +543,7 @@ public class Cruncher implements digital.srp.sreport.model.surveys.SduQuestions,
     protected void crunchScope3Travel(String period, SurveyReturn rtn) {
         // NOTE: XXX_TOTAL means primary and WTT combined due to XXX
         CarbonFactor cFactor = cFactor(CarbonFactors.CAR_TOTAL, period);
-        try {
-            // Treasury row 52: Patient and Visitor
-            BigDecimal patientVisitorMileage = getAnswer(period, rtn, Q.PATIENT_MILEAGE).responseAsBigDecimal()
-                    .add(getAnswer(period, rtn, Q.VISITOR_MILEAGE).responseAsBigDecimal());
-            getAnswer(period,rtn, Q.PATIENT_AND_VISITOR_MILEAGE).derived(true).response(patientVisitorMileage.toPlainString());
-            BigDecimal patientVisitorCo2e = patientVisitorMileage
-                    .multiply(cFactor.value())
-                    .multiply(m2km)
-                    .divide(ONE_THOUSAND, 0, RoundingMode.HALF_UP);
-            getAnswer(period,rtn, Q.PATIENT_AND_VISITOR_MILEAGE_CO2E).derived(true).response(patientVisitorCo2e);
-        } catch (IllegalStateException | NullPointerException e) {
-            LOGGER.warn("Insufficient data to calculate CO2e from patient and visitor travel");
-        }
+        crunchPatientVisitorMileageCo2e(period, rtn);
         try {
             BigDecimal totalStaffMiles = getAnswerForPeriodWithFallback(period, rtn, Q.NO_STAFF).responseAsBigDecimal()
                     .multiply(getAnswer(period, rtn, Q.STAFF_COMMUTE_MILES_PP).responseAsBigDecimal());
@@ -668,6 +656,28 @@ public class Cruncher implements digital.srp.sreport.model.surveys.SduQuestions,
         }
     }
 
+    protected void crunchPatientVisitorMileageCo2e(String period,
+            SurveyReturn rtn) {
+        CarbonFactor cFactor = cFactor(CarbonFactors.CAR_TOTAL, period);
+        try {
+            // Treasury row 52: Patient and Visitor
+            BigDecimal visitorMileage = getAnswer(period, rtn, Q.VISITOR_MILEAGE).responseAsBigDecimal();
+            if (visitorMileage.equals(BigDecimal.ZERO)) {
+                visitorMileage =  getAnswer(period, rtn, Q.NO_PATIENT_CONTACTS).responseAsBigDecimal().multiply(new BigDecimal("3.7")).multiply(new BigDecimal("9.4"));
+                getAnswer(period, rtn, Q.VISITOR_MILEAGE).response(visitorMileage);
+            }
+            BigDecimal patientVisitorMileage = getAnswer(period, rtn, Q.PATIENT_MILEAGE).responseAsBigDecimal()
+                    .add(getAnswer(period, rtn, Q.VISITOR_MILEAGE).responseAsBigDecimal());
+            getAnswer(period, rtn, Q.PATIENT_AND_VISITOR_MILEAGE).response(patientVisitorMileage);
+            BigDecimal patientVisitorCo2e = patientVisitorMileage
+                    .multiply(cFactor.value())
+                    .multiply(m2km)
+                    .divide(ONE_THOUSAND, 0, RoundingMode.HALF_UP);
+            getAnswer(period,rtn, Q.PATIENT_AND_VISITOR_MILEAGE_CO2E).derived(true).response(patientVisitorCo2e);
+        } catch (IllegalStateException | NullPointerException e) {
+            LOGGER.warn("Insufficient data to calculate CO2e from patient and visitor travel");
+        }
+    }
 
     protected void calcScope1(String period, SurveyReturn rtn) {
         crunchOwnedBuildings(period, rtn);
