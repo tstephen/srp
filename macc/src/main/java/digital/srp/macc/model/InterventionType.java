@@ -587,7 +587,7 @@ public class InterventionType implements CsvSerializable {
                     "Must inject gasCIntensity before calling getTonnesCo2eSavedFromGasInYear");
         }
         return annualGasSaved == null ? Finance.ZERO_BIG_DECIMAL
-                : annualGasSaved.multiply(gasCIntensity.getValue().divide(
+                : annualGasSaved.multiply(gasCIntensity.getValueAsBigDecimal().divide(
                         new BigDecimal(1000), Finance.ROUND_MODE));
     }
 
@@ -626,7 +626,7 @@ public class InterventionType implements CsvSerializable {
     }
 
     public int getTargetYearIndex() {
-        return targetYear.getValue().intValue() - getModellingYear() - 1;
+        return Integer.parseInt(targetYear.getValue()) - getModellingYear() - 1;
     }
 
     public Long getTonnesCo2eSaved() {

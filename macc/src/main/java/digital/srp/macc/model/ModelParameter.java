@@ -26,6 +26,7 @@ import javax.persistence.Id;
 import javax.persistence.Lob;
 import javax.persistence.Table;
 import javax.persistence.Transient;
+import javax.validation.constraints.Size;
 import javax.xml.bind.annotation.XmlElement;
 
 import org.springframework.hateoas.Link;
@@ -70,8 +71,9 @@ public class ModelParameter {
 
     @JsonProperty
     @JsonView({ ModelParameterViews.Summary.class })
+    @Size(max = 50)
     @Column(name = "value")
-    private BigDecimal value;
+    private String value;
 
     @JsonProperty
     @JsonView({ ModelParameterViews.Detailed.class })
@@ -99,7 +101,19 @@ public class ModelParameter {
     public ModelParameter(String name, BigDecimal value) {
         super();
         this.name = name;
-        this.value = value;
+        this.value = value.toPlainString();
+    }
+
+    @JsonProperty
+    @Transient
+    public BigDecimal getValueAsBigDecimal() {
+        return value == null ? null : new BigDecimal(value);
+    }
+
+    @JsonProperty
+    @Transient
+    public void setValueAsBigDecimal(BigDecimal value) {
+        this.value = value == null ? null : value.toPlainString();
     }
 
     @JsonProperty

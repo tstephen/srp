@@ -84,13 +84,19 @@ public class ModelParameterController {
     /**
      * @return The specified parameter.
      */
-    @RequestMapping(value = "/{id}", method = RequestMethod.GET)
+    @RequestMapping(value = "/{idOrName}", method = RequestMethod.GET)
     @JsonView(ModelParameterViews.Detailed.class)
     public @ResponseBody ModelParameter findById(
-            @PathVariable("id") Long parameterId) {
-        LOGGER.info(String.format("findById %1$s", parameterId));
+            @PathVariable("idOrName") String param) {
+        LOGGER.info(String.format("findById %1$s", param));
+        
 
-        ModelParameter parameter = modelParamRepo.findOne(parameterId);
+        ModelParameter parameter;
+        try {
+            parameter = modelParamRepo.findOne(Long.parseLong(param));
+        } catch (NumberFormatException e) {
+            parameter = modelParamRepo.findByName(param);
+        }
 
         return addLinks(parameter);
     }
