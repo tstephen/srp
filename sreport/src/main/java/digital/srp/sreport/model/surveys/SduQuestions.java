@@ -51,9 +51,9 @@ public interface SduQuestions {
     };
 
     Q[] ENERGY_HDRS = new Q[] {
-            Q.ELEC_USED, Q.GAS_USED, Q.OIL_USED,
-            Q.COAL_USED, Q.STEAM_USED, Q. HOT_WATER_USED, Q.ELEC_RENEWABLE,
-            Q.EXPORTED_THERMAL_ENERGY
+            Q.GAS_USED, Q.OIL_USED, Q.COAL_USED,
+            Q.STEAM_USED, Q.HOT_WATER_USED,
+            Q.ELEC_USED, Q.ELEC_TOTAL_RENEWABLE_USED
     };
 
     Q[] ORG_HDRS = new Q[] { Q.FLOOR_AREA, Q.NO_STAFF };

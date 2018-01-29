@@ -218,6 +218,7 @@ public class Sdu1617 {
         list.addAll(Arrays.asList(SduQuestions.WATER_CO2E_HDRS));
         list.addAll(Arrays.asList(SduQuestions.WASTE_CO2E_HDRS));
         list.addAll(Arrays.asList(SduQuestions.TRAVEL_CO2E_HDRS));
+        list.addAll(Arrays.asList(SduQuestions.ENERGY_HDRS));
         list.addAll(Arrays.asList(SduQuestions.ENERGY_CO2E_HDRS));
         list.addAll(Arrays.asList(SduQuestions.SUMMARY_SCOPE_HDRS));
         list.add(Q.SCOPE_ALL);

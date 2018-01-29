@@ -942,38 +942,52 @@ public class Cruncher implements digital.srp.sreport.model.surveys.SduQuestions,
     protected void crunchElectricityUsed(String period, SurveyReturn rtn) {
         try {
             BigDecimal nonRenewableElecUsed = getAnswer(period, rtn, Q.ELEC_USED).responseAsBigDecimal();
+            BigDecimal elecFactor = oneThousandth(cFactor(CarbonFactors.ELECTRICITY_UK, period));
+            getAnswer(period,rtn, Q.ELEC_CO2E).derived(true).response(nonRenewableElecUsed.multiply(elecFactor));
+        } catch (IllegalStateException | NullPointerException e) {
+            LOGGER.warn("Insufficient data to calculate CO2e from grid electricity");
+        }
+
+        BigDecimal elecExportedCo2e;
+        try {
+            elecExportedCo2e = getAnswer(period, rtn, Q.ELEC_EXPORTED).responseAsBigDecimal().multiply(oneThousandth(cFactor(CarbonFactors.GAS_FIRED_CHP, period)));
+            getAnswer(period,rtn, Q.ELEC_EXPORTED_CO2E).derived(true).response(elecExportedCo2e);
+        } catch (IllegalStateException | NullPointerException e) {
+            LOGGER.warn("Insufficient data to calculate CO2e from elec exported");
+            elecExportedCo2e = BigDecimal.ZERO;
+        }
+        getAnswer(period,rtn, Q.NET_ELEC_CO2E).derived(true).response(
+                getAnswer(period,rtn, Q.ELEC_CO2E).responseAsBigDecimal().subtract(elecExportedCo2e));
+
+        BigDecimal renewableElecUsed = sumAnswers(period, rtn,
+                Q.ELEC_TOTAL_RENEWABLE_USED, Q.ELEC_USED_GREEN_TARIFF,
+                Q.ELEC_3RD_PTY_RENEWABLE_USED, Q.ELEC_OWNED_RENEWABLE_USED_SDU)
+                .responseAsBigDecimal();
+        getAnswer(period,rtn, Q.ELEC_TOTAL_RENEWABLE_USED).derived(true).response(renewableElecUsed);
+        try {
             BigDecimal greenTariffUsed;
             try {
                  greenTariffUsed = getAnswer(period, rtn, Q.ELEC_USED_GREEN_TARIFF).responseAsBigDecimal().multiply(
                         new BigDecimal("1.000000").subtract(getAnswer(period, rtn, Q.GREEN_TARIFF_ADDITIONAL_PCT).responseAsBigDecimal()));
+                 getAnswer(period,rtn, Q.ELEC_NON_RENEWABLE_GREEN_TARIFF_CO2E).derived(true).response(greenTariffUsed);
             } catch (IllegalStateException | NullPointerException e) {
-                LOGGER.warn("Insufficient data to calculate CO2e saved from green tariff");
+                LOGGER.warn("Insufficient data to calculate CO2e saved from green tariff elec used");
                  greenTariffUsed = BigDecimal.ZERO;
             }
             BigDecimal thirdPtyRenewableUsed;
             try {
                 thirdPtyRenewableUsed = getAnswer(period, rtn, Q.ELEC_3RD_PTY_RENEWABLE_USED).responseAsBigDecimal().multiply(
                         new BigDecimal("1.000000").subtract(getAnswer(period, rtn, Q.THIRD_PARTY_ADDITIONAL_PCT).responseAsBigDecimal()));
+                getAnswer(period,rtn, Q.ELEC_NON_RENEWABLE_3RD_PARTY_CO2E).derived(true).response(thirdPtyRenewableUsed);
             } catch (IllegalStateException | NullPointerException e) {
                 LOGGER.warn("Insufficient data to calculate CO2e from third party renewable elec used");
                 thirdPtyRenewableUsed = BigDecimal.ZERO;
             }
             BigDecimal elecFactor = oneThousandth(cFactor(CarbonFactors.ELECTRICITY_UK, period));
-            BigDecimal elecUsedCo2e = nonRenewableElecUsed.add(greenTariffUsed).add(thirdPtyRenewableUsed).multiply(elecFactor);
-            getAnswer(period,rtn, Q.ELEC_CO2E).derived(true).response(elecUsedCo2e.toPlainString());
-
-            BigDecimal elecExported;
-            try {
-                elecExported = getAnswer(period, rtn, Q.ELEC_EXPORTED).responseAsBigDecimal().multiply(oneThousandth(cFactor(CarbonFactors.GAS_FIRED_CHP, period)));
-                getAnswer(period,rtn, Q.ELEC_EXPORTED_CO2E).derived(true).response(elecExported.toPlainString());
-            } catch (IllegalStateException | NullPointerException e) {
-                LOGGER.warn("Insufficient data to calculate CO2e from elec exported");
-                elecExported = BigDecimal.ZERO;
-            }
-
-            getAnswer(period,rtn, Q.NET_ELEC_CO2E).derived(true).response(elecUsedCo2e.subtract(elecExported).toPlainString());
+            BigDecimal renewableElecCo2e = greenTariffUsed.add(thirdPtyRenewableUsed).multiply(elecFactor);
+            getAnswer(period,rtn, Q.ELEC_RENEWABLE_CO2E).derived(true).response(renewableElecCo2e);
         } catch (IllegalStateException | NullPointerException e) {
-            LOGGER.warn("Insufficient data to calculate CO2e from electricity");
+            LOGGER.warn("Insufficient data to calculate CO2e from renewable electricity");
         }
     }
 
