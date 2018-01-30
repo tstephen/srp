@@ -1,11 +1,13 @@
 package digital.srp.sreport.model;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Function;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -228,15 +230,21 @@ public class SurveyReturn implements AuditorAware<String> {
 
     protected Optional<Answer> answer(String qName, String period) {
         Answer a = null;
-        int count = 0;
+        List<Answer> matches = new ArrayList<Answer>();
         for (Answer answer : answers) {
             if (qName.equals(answer.question().name()) && period.equals(answer.applicablePeriod())) {
-                count++;
+                matches.add(a);
                 a = answer;
             }
         }
-        if (count > 1) {
+        if (matches.size() > 1) {
             LOGGER.error("Multiple answers to {} found for {} in {}", qName, org, period);
+            LOGGER.error("  review ids: {}", matches.parallelStream().map(new Function<Answer, Long>() {
+                @Override
+                public Long apply(Answer t) {
+                    return t.id();
+                }
+            }).toString());
         }
         return Optional.ofNullable(a);
     }

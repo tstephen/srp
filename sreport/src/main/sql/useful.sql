@@ -9,7 +9,8 @@ select * from SR_ANSWER a
   INNER JOIN SR_RETURN r on ra.survey_return_id = r.id
   where r.org = 'RD1';
 
-select ra.survey_return_id, a.id, a.applicable_period, q.name, a.response from SR_ANSWER a
+select ra.survey_return_id, a.id, a.applicable_period, q.name, a.response 
+from SR_ANSWER a
   INNER JOIN SR_RETURN_ANSWER ra on a.id = ra.answer_id
   INNER JOIN SR_RETURN r on ra.survey_return_id = r.id
   INNER JOIN SR_QUESTION q on a.question_id = q.id
@@ -24,15 +25,34 @@ select count(id), question_id from SR_ANSWER where id in (
   Select answer_id from SR_RETURN_ANSWER where survey_return_id = 480)
 group by question_id having count(id) > 1;
 
-select count(id), question_id from SR_ANSWER where id in (
-  Select answer_id from SR_RETURN_ANSWER)
-group by question_id having count(id) > 1;
+select count(a.id), q.name, a.applicable_period, r.id, r.name
+from SR_ANSWER a
+  INNER JOIN SR_RETURN_ANSWER ra on a.id = ra.answer_id
+  INNER JOIN SR_RETURN r on ra.survey_return_id = r.id
+  INNER JOIN SR_QUESTION q on a.question_id = q.id
+WHERE a.status = 'Draft'
+-- AND r.name = 'SDU-2017-18-ZZ1'
+-- AND a.applicable_period = '2016-17'
+group by q.name, a.applicable_period, r.id, r.name having count(a.id) > 1;
+
+select a.id as a_id, q.name as q_name, a.applicable_period, a.response, r.id as r_id, r.name as r_name, r.applicable_period as r_period
+from SR_ANSWER a
+  INNER JOIN SR_RETURN_ANSWER ra on a.id = ra.answer_id
+  INNER JOIN SR_RETURN r on ra.survey_return_id = r.id
+  INNER JOIN SR_QUESTION q on a.question_id = q.id
+WHERE r.name = 'SDU-2017-18-ZZ1'
+AND a.status = 'Draft'
+AND q.name = 'DESFLURANE';
+
+insert into tmp_id values(133851);
 
 /* remove non-unique answers, most recent first */
 insert into tmp_id select max(id) from SR_ANSWER where id in (
-  Select answer_id from SR_RETURN_ANSWER where survey_return_id = 956)
+  Select answer_id from SR_RETURN_ANSWER where survey_return_id = 1239)
 group by question_id having count(id) > 1;
+
 delete from SR_RETURN_ANSWER where answer_id in (select id from tmp_id);
+delete from SR_ANSWER where id in (select id from tmp_id);
 
 /* import answers from other return */
 INSERT INTO SR_RETURN_ANSWER (survey_return_id, answer_id)
