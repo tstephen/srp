@@ -369,6 +369,10 @@ public class SurveyReturnController {
                 // note that Hibernate / Spring Data will skip any update if not actually needed
                 changeCount++;
                 answerRepo.save(existingAnswer.response(answer.response()).addSurveyReturn(existing));
+            } else if (answer.response() == null && existingAnswer.response() != null) {
+                // note that Hibernate / Spring Data will skip any update if not actually needed
+                changeCount++;
+                answerRepo.save(existingAnswer.response((String) null).addSurveyReturn(existing));
             }
         }
         return changeCount;
