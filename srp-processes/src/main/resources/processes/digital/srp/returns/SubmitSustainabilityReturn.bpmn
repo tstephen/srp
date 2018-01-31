@@ -53,7 +53,7 @@
     <callActivity calledElement="SendAlert" completionQuantity="1" id="alertNewReturn" isForCompensation="false" name="Alert new return submitted" startQuantity="1">
       <extensionElements>
         <activiti:in sourceExpression="SRP: New return for ${org} ${applicablePeriod} is available" target="subject"/>
-        <activiti:in sourceExpression="tim@trakeo.com" target="addressee"/>
+        <activiti:in sourceExpression="tim@srp.digital" target="addressee"/>
         <activiti:in sourceExpression="SRP: &lt;a href=https://srp.digital/srp/accounts.html?q=${org}>Click to view&lt;/a>" target="message"/>
         <activiti:in sourceExpression="${tenantId}" target="tenantId"/>
       </extensionElements>

@@ -1,4 +1,4 @@
-insert into ACT_ID_USER values ('tstephen',1,'Tim','Stephenson','tim@trakeo.com','tstephen',null);
+insert into ACT_ID_USER values ('tstephen',1,'Tim','Stephenson','tim@srp.digital','tstephen',null);
 
 insert into ACT_ID_GROUP values('user',1,'User',null);
 insert into ACT_ID_GROUP values('admin',1,'Admin',null);

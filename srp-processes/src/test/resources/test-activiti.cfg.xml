@@ -57,7 +57,7 @@
     <property name="mailServerUsername" value="" />
     <property name="mailServerPassword" value="" />
     
-    <property name="mailServerDefaultFrom" value="tim@trakeo.com" />
+    <property name="mailServerDefaultFrom" value="tim@srp.digital" />
     --> 
     <!-- history configuration, 'audit' is default -->
     <property name="history" value="full" />    
