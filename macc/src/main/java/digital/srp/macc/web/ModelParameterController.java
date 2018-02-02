@@ -135,7 +135,7 @@ public class ModelParameterController {
             @RequestBody ModelParameter updatedParam) {
         ModelParameter param = modelParamRepo.findOne(paramId);
 
-        BeanUtils.copyProperties(updatedParam, param, "id");
+        BeanUtils.copyProperties(updatedParam, param, "id", "valueAsBigDecimal");
         param.setTenantId(tenantId);
         modelParamRepo.save(param);
     }

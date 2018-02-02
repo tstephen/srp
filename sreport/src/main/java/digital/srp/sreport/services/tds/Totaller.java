@@ -34,7 +34,7 @@ public class Totaller implements Aggregator {
                 LOGGER.debug("...adding {}", tds.rows()[row][col]);
                 try {
                     sum = sum.add(new BigDecimal(formatter.parseObject(tds.rows()[row][col]).toString()));
-                } catch (ParseException e) {
+                } catch (ParseException | NumberFormatException e) {
                     LOGGER.warn("... cannot parse number from {}", tds.rows()[row][col]);
                 } catch (NullPointerException e) {
                     LOGGER.debug("... cannot add null to total");
