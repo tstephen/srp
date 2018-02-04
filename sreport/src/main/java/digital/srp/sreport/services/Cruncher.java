@@ -354,11 +354,11 @@ public class Cruncher implements digital.srp.sreport.model.surveys.SduQuestions,
     protected void crunchScope3Water(String period, SurveyReturn rtn) {
         try {
             // If necessary estimate waste water as 0% of incoming
-            Answer wasteWater = getAnswer(period,rtn, Q.WASTE_WATER);
-            if (wasteWater.response() == null || wasteWater.response().equals(BigDecimal.ZERO.toString())) {
-                wasteWater.response(
-                        rtn.answerResponseAsBigDecimal(period, Q.WATER_VOL)
-                        .multiply(new BigDecimal("0.80")));
+            BigDecimal wasteWater = getAnswer(period,rtn, Q.WASTE_WATER).responseAsBigDecimal();
+            if (wasteWater == null || wasteWater.equals(BigDecimal.ZERO)) {
+                getAnswer(period,rtn, Q.WASTE_WATER)
+                        .derived(true)
+                        .response(rtn.answerResponseAsBigDecimal(period, Q.WATER_VOL).multiply(new BigDecimal("0.80")));
             }
 
             // Treasury row 57: Water Use
@@ -370,7 +370,7 @@ public class Cruncher implements digital.srp.sreport.model.surveys.SduQuestions,
             try {
                 BigDecimal noStaff = getAnswerForPeriodWithFallback(period, rtn, Q.NO_STAFF).responseAsBigDecimal();
                 getAnswer(period,rtn, Q.WATER_VOL_BY_WTE).derived(true).response(rtn.answerResponseAsBigDecimal(period, Q.WATER_VOL).divide(noStaff));
-            } catch (ArithmeticException e) {
+            } catch (IllegalStateException | NullPointerException | ArithmeticException e) {
                 LOGGER.warn("Insufficient data to calculate water use by WTE for {} in {}", rtn.org(), period);
             }
 
