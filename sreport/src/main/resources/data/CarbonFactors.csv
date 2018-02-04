@@ -82,16 +82,19 @@ Battery EV,Average car,km,2,0.0558,0.0558,0.0558,0.0558,0.0558,0.0558,0.0558,0.0
 Battery EV,Average car - WTT,km,3,0.00522,0.00522,0.00522,0.00522,0.00522,0.00522,0.00522,0.00522,0.00522,0.00522,0.00522,,,,,
 Plug in hybrid EV,Average car,km,2,0.07341,0.07341,0.07341,0.07341,0.07341,0.07341,0.07341,0.07341,0.07341,0.07341,0.07341,,,,,
 Plug in hybrid EV,Average car - WTT,km,3,0.00686,0.00686,0.00686,0.00686,0.00686,0.00686,0.00686,0.00686,0.00686,0.00686,0.00686,,,,,
-Average Battery and Plugin Hybrid EV,Average Battery and Plugin Hybrid EV total,km,N/A,0.070645,0.070645,0.070645,0.070645,0.070645,0.070645,0.070645,0.070645,0.070645,0.070645,0.070645,SDU calculated from average battery EV and Plug in Hybrid EV,,,,
-Anaesthetic Gases,Desflurane,litre,1,3.7211,3.7211,3.7211,3.7211,3.7211,3.7211,3.7211,3.7211,3.7211,3.7211,3.7211,SDU carbon work on anaesthetic gases,,,,
-Anaesthetic Gases,Isoflurane,litre,1,0.76296,0.76296,0.76296,0.76296,0.76296,0.76296,0.76296,0.76296,0.76296,0.76296,0.76296,SDU carbon work on anaesthetic gases,,,,103380
-Anaesthetic Gases,Sevoflurane,litre,1,0.19786,0.19786,0.19786,0.19786,0.19786,0.19786,0.19786,0.19786,0.19786,0.19786,0.19786,SDU carbon work on anaesthetic gases,,,,41205
-Anaesthetic Gases,Nitrous oxide,litre,1,0.000559,0.000559,0.000559,0.000559,0.000559,0.000559,0.000559,0.000559,0.000559,0.000559,0.000559,SDU carbon work on anaesthetic gases,,,,-12589.5
-Anaesthetic Gases,Nitrous oxide with oxygen 50/50 split,litre,1,0.000278,0.000278,0.000278,0.000278,0.000278,0.000278,0.000278,0.000278,0.000278,0.000278,0.000278,SDU carbon work on anaesthetic gases,,,,131995.5
-Anaesthetic Gases,Nitrous oxide with oxygen 50/50 split,litre,1,0.000278,0.000278,0.000278,0.000278,0.000278,0.000278,0.000278,0.000278,0.000278,0.000278,0.000278,SDU carbon work on anaesthetic gases,,,,131.9955
-Electrical export (gas fired CHP),Gas-fired CHP,kWh,1,0.22314,0.22314,0.22314,0.22314,0.22314,0.22314,0.22173,0.22286,0.22223,0.22168,0.22188,SDU assumptions = based on 80% CHP gas fired efficiency and a heat and electrical output ratio of 1.5:1,,,,
-Electrical export (gas fired CHP),Gas-fired CHP,kWh,3,0.02306,0.02306,0.02306,0.02306,0.02306,0.02306,0.03386,0.02992,0.02992,0.03011,0.03355,SDU assumptions = based on 80% CHP gas fired efficiency and a heat and electrical output ratio of 1.5:0,,,,
-Electrical export (gas fired CHP),Electrical export (gas fired CHP) total,kWh,N/A,0.2462,0.2462,0.2462,0.2462,0.2462,0.2462,0.25559,0.25277,0.25214,0.25179,0.25544,SDU assumptions = based on 80% CHP gas fired efficiency and a heat and electrical output ratio of 1.5:1,,,,
+Average Battery and Plugin Hybrid EV,Average Battery and Plugin Hybrid EV,km,2,0.064605,0.064605,0.064605,0.064605,0.064605,0.064605,0.064605,0.064605,0.064605,0.064605,0.06461,,,,,
+Average Battery and Plugin Hybrid EV WTT,Average Battery and Plugin Hybrid EV WTT,km,3,0.00604,0.00604,0.00604,0.00604,0.00604,0.00604,0.00604,0.00604,0.00604,0.00604,0.00604,,,,,
+Average Battery and Plugin Hybrid EV total,Average Battery and Plugin Hybrid EV total,km,N/A,0.070645,0.070645,0.070645,0.070645,0.070645,0.070645,0.070645,0.070645,0.070645,0.070645,0.070645,SDU calculated from average battery EV and Plug in Hybrid EV,,,,,,,,,
+Anaesthetic Gases,Desflurane,litre,1,3.7211,3.7211,3.7211,3.7211,3.7211,3.7211,3.7211,3.7211,3.7211,3.7211,3.7211,SDU carbon work on anaesthetic gases,,,,,,,,,
+Anaesthetic Gases,Isoflurane,litre,1,0.76296,0.76296,0.76296,0.76296,0.76296,0.76296,0.76296,0.76296,0.76296,0.76296,0.76296,SDU carbon work on anaesthetic gases,,,,,,,,,103380
+Anaesthetic Gases,Sevoflurane,litre,1,0.19786,0.19786,0.19786,0.19786,0.19786,0.19786,0.19786,0.19786,0.19786,0.19786,0.19786,SDU carbon work on anaesthetic gases,,,,,,,,,41205
+Anaesthetic Gases,Nitrous oxide,litre,1,0.000559,0.000559,0.000559,0.000559,0.000559,0.000559,0.000559,0.000559,0.000559,0.000559,0.000559,SDU carbon work on anaesthetic gases,,"1,739",,,,,,,-12589.5
+Anaesthetic Gases,Nitrous oxide with oxygen 50/50 split,litre,1,0.000278,0.000278,0.000278,0.000278,0.000278,0.000278,0.000278,0.000278,0.000278,0.000278,0.000278,SDU carbon work on anaesthetic gases,,,,,,,,,131995.5
+Anaesthetic Gases,Nitrous oxide with oxygen 50/50 split,litre,1,0.000278,0.000278,0.000278,0.000278,0.000278,0.000278,0.000278,0.000278,0.000278,0.000278,0.000278,SDU carbon work on anaesthetic gases,,"9,478",113.820,,,,,,131.9955
+Electrical export (gas fired CHP),Elec exported (gas fired CHP),kWh,1,0.22314,0.22314,0.22314,0.22314,0.22314,0.22314,0.22173,0.22286,0.22223,0.22168,0.22188,SDU assumptions = based on 80% CHP gas fired efficiency and a heat and electrical output ratio of 1.5:1,,,,,,,,,
+Electrical export (gas fired CHP) WTT,Elect exported (gas fired CHP) WTT,kWh,3,0.02306,0.02306,0.02306,0.02306,0.02306,0.02306,0.03386,0.02992,0.02992,0.03011,0.03355,SDU assumptions = based on 80% CHP gas fired efficiency and a heat and electrical output ratio of 1.5:0,,,,,,,,,
+Electrical export (gas fired CHP) total,Elec exported (gas fired CHP) total,kWh,N/A,0.2462,0.2462,0.2462,0.2462,0.2462,0.2462,0.25559,0.25277,0.25214,0.25179,0.25544,SDU assumptions = based on 80% CHP gas fired efficiency and a heat and electrical output ratio of 1.5:1,,,,,,,,,
+Paper,Paper,tonnes,3,928.6,928.6,928.6,928.6,928.6,928.6,928.6,928.6,928.6,928.6,928.6,,,,,
 Procurement eClass - Category A,Provisions,£,3,0.97,0.97,0.97,0.97,0.97,0.97,0.97,0.97,0.97,0.97,0.97,,,,,
 Procurement eClass - Category B,Staff Clothing,£,3,0.29,0.29,0.29,0.29,0.29,0.29,0.29,0.29,0.29,0.29,0.29,,,,,
 Procurement eClass - Category C,Patients Clothing & Footwear,£,3,0.29,0.29,0.29,0.29,0.29,0.29,0.29,0.29,0.29,0.29,0.29,,,,,

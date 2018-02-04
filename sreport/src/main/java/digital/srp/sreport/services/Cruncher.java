@@ -343,6 +343,7 @@ public class Cruncher implements digital.srp.sreport.model.surveys.SduQuestions,
         crunchScope3BiomassWtt(period, rtn);
         crunchScope3Biomass(period, rtn);
         crunchScope3EnergyWtt(period, rtn);
+        crunchPaperCo2e(period, rtn);
     }
 
     protected void crunchScope3EnergyWtt(String period, SurveyReturn rtn) {
@@ -665,6 +666,18 @@ public class Cruncher implements digital.srp.sreport.model.surveys.SduQuestions,
         }
     }
 
+    protected void crunchPaperCo2e(String period, SurveyReturn rtn) {
+        BigDecimal paperCo2e;
+        try {
+            paperCo2e = getAnswer(period, rtn, Q.PAPER_USED).responseAsBigDecimal()
+                    .multiply(oneThousandth(cFactor(CarbonFactors.PAPER, period)));
+            getAnswer(period,rtn, Q.PAPER_CO2E).derived(true).response(paperCo2e);
+        } catch (IllegalStateException | NullPointerException e) {
+            LOGGER.warn("Insufficient data to calculate CO2e from paper used");
+            paperCo2e = BigDecimal.ZERO;
+        }
+    }
+
     protected void crunchPatientVisitorMileageCo2e(String period,
             SurveyReturn rtn) {
         CarbonFactor cFactor = cFactor(CarbonFactors.CAR_TOTAL, period);
@@ -736,8 +749,20 @@ public class Cruncher implements digital.srp.sreport.model.surveys.SduQuestions,
         crunchWeighting(period, rtn, nonPaySpend, Q.OTHER_MANUFACTURED_SPEND, wFactor, Q.OTHER_MANUFACTURED_CO2E);
         wFactor = wFactor(WeightingFactors.OTHER_PROCURMENT, period, orgType);
         crunchWeighting(period, rtn, nonPaySpend, Q.OTHER_SPEND, wFactor, Q.OTHER_PROCUREMENT_CO2E);
+
+        // #206 paper emissions now calculated from weight consumed per treasury
+        // guidelines
         wFactor = wFactor(WeightingFactors.PAPER, period, orgType);
-        crunchWeighting(period, rtn, nonPaySpend, Q.PAPER_SPEND, wFactor, Q.PAPER_CO2E);
+        BigDecimal calcVal = new BigDecimal("0.00");
+        if (getAnswer(period, rtn, Q.PAPER_SPEND).response() == null) {
+            LOGGER.info("No directly entered spend {}, estimate from non pay spend", Q.PAPER_SPEND);
+            calcVal = nonPaySpend.multiply(wFactor.proportionOfTotal());
+            LOGGER.info("Estimated {} from non pay spend as {}", Q.PAPER_SPEND, calcVal);
+            getAnswer(period, rtn, Q.PAPER_SPEND).derived(true).response(calcVal.toPlainString());
+        } else {
+            calcVal = getAnswer(period, rtn, Q.PAPER_SPEND).responseAsBigDecimal();
+        }
+
         wFactor = wFactor(WeightingFactors.PHARMA, period, orgType);
         crunchWeighting(period, rtn, nonPaySpend, Q.PHARMA_SPEND, wFactor, Q.PHARMA_CO2E);
         wFactor = wFactor(WeightingFactors.BIZ_TRAVEL, period, orgType);
@@ -950,7 +975,8 @@ public class Cruncher implements digital.srp.sreport.model.surveys.SduQuestions,
 
         BigDecimal elecExportedCo2e;
         try {
-            elecExportedCo2e = getAnswer(period, rtn, Q.ELEC_EXPORTED).responseAsBigDecimal().multiply(oneThousandth(cFactor(CarbonFactors.GAS_FIRED_CHP, period)));
+            elecExportedCo2e = getAnswer(period, rtn, Q.ELEC_EXPORTED).responseAsBigDecimal()
+                    .multiply(oneThousandth(cFactor(CarbonFactors.ELEC_EXPORTED_GAS_FIRED_CHP_TOTAL, period)));
             getAnswer(period,rtn, Q.ELEC_EXPORTED_CO2E).derived(true).response(elecExportedCo2e);
         } catch (IllegalStateException | NullPointerException e) {
             LOGGER.warn("Insufficient data to calculate CO2e from elec exported");

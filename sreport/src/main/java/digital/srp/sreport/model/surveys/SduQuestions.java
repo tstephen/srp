@@ -35,6 +35,14 @@ public interface SduQuestions {
             Q.DOMESTIC_AIR_MILES, Q.SHORT_HAUL_AIR_MILES, Q.LONG_HAUL_AIR_MILES
     };
 
+    Q[] PAPER_HDRS = new Q[] {
+            Q.PAPER_SPEND, Q.PAPER_USED
+    };
+
+    Q[] PAPER_CO2E_HDRS = new Q[] {
+            Q.PAPER_CO2E
+    };
+
     Q[] TRAVEL_HDRS = new Q[] { Q.PATIENT_AND_VISITOR_MILEAGE,
             Q.BIZ_MILEAGE, Q.STAFF_COMMUTE_MILES_TOTAL
     };

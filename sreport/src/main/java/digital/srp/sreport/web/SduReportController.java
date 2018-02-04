@@ -49,7 +49,7 @@ public class SduReportController implements SduQuestions {
 
     @Autowired
     protected AnswerRepository answerRepo;
-    
+
     private DecimalFormat rawDecimalFormat = new DecimalFormat("#");
     private Format prettyPrintDecimalFormat = new SignificantFiguresFormat();
 
@@ -135,6 +135,53 @@ public class SduReportController implements SduQuestions {
         LOGGER.info(String.format("energyCO2eCsv for %1$s %2$s", org, period));
 
         new ReportModelHelper(answerRepo).fillModel(org, period, ENERGY_CO2E_HDRS, model, false, rawDecimalFormat, maxPeriods, true, Optional.empty());
+        return "csv";
+    }
+
+    /**
+     * A table of paper data for the specified organisation and period.
+     *
+     * @return HTML table.
+     */
+    @RequestMapping(value = "/{org}/{period}/paper.html", method = RequestMethod.GET, produces = "text/html")
+    public String paperTable(@PathVariable("org") String org,
+            @PathVariable("period") String period, @RequestParam(value = "maxPeriods", required = false, defaultValue = DEFAULT_MAX_PERIODS) Integer maxPeriods,
+            Model model) {
+        LOGGER.info(String.format("paperTable for %1$s %2$s", org, period));
+
+        new ReportModelHelper(answerRepo).fillModel(org, period, PAPER_HDRS, model, true, prettyPrintDecimalFormat, maxPeriods, true, Optional.empty());
+        return "table-period-as-col";
+    }
+
+    /**
+     * A table of paper data emissions (CO2e) for the specified
+     * organisation and period.
+     *
+     * @return HTML table.
+     */
+    @RequestMapping(value = "/{org}/{period}/paper-co2e.html", method = RequestMethod.GET, produces = "text/html")
+    public String paperCO2eTable(@PathVariable("org") String org,
+            @PathVariable("period") String period, @RequestParam(value = "maxPeriods", required = false, defaultValue = DEFAULT_MAX_PERIODS) Integer maxPeriods,
+            Model model) {
+        LOGGER.info(String.format("paperCO2eTable for %1$s %2$s", org, period));
+
+        new ReportModelHelper(answerRepo).fillModel(org, period, PAPER_CO2E_HDRS, model, true, prettyPrintDecimalFormat, maxPeriods, true, Optional.empty());
+        return "table-period-as-col";
+    }
+
+    /**
+     * A table of paper use (CO2e) for the specified organisation and
+     * period.
+     *
+     * @return CSV with header row.
+     */
+    @RequestMapping(value = "/{org}/{period}/paper-co2e.csv", method = RequestMethod.GET, produces = "text/csv")
+    public String paperCO2eCsv(@PathVariable("org") String org,
+            @PathVariable("period") String period, @RequestParam(value = "maxPeriods", required = false, defaultValue = DEFAULT_MAX_PERIODS) Integer maxPeriods,
+            Model model) {
+        LOGGER.info(String.format("paperCO2eCsv for %1$s %2$s", org, period));
+
+        new ReportModelHelper(answerRepo).fillModel(org, period, PAPER_CO2E_HDRS, model, false, rawDecimalFormat, maxPeriods, true, Optional.empty());
         return "csv";
     }
 
