@@ -231,6 +231,8 @@ public class Sdu1617 {
         list.addAll(Arrays.asList(SduQuestions.BIOMASS_CO2E_WTT_HDRS));
         list.addAll(Arrays.asList(SduQuestions.BIOMASS_CO2E_NOSCOPE_HDRS));
         list.addAll(Arrays.asList(SduQuestions.SDU_PROFILE_CO2E_HDRS));
+        // #203 not displayed but still calculated
+        list.add(Q.OTHER_PROCUREMENT_CO2E);
         list.addAll(Arrays.asList(SduQuestions.ECLASS_PROFILE_HDRS));
         list.addAll(Arrays.asList(SduQuestions.CORE_CO2E_HDRS));
         list.addAll(Arrays.asList(SduQuestions.ECLASS_PROFILE_HDRS));
