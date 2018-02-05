@@ -729,10 +729,10 @@ public class Cruncher implements digital.srp.sreport.model.surveys.SduQuestions,
             getAnswer(period, rtn, Q.NON_PAY_SPEND).derived(true).response(nonPaySpend);
         }
 
+        crunchCapitalSpend(period, rtn, orgType, nonPaySpend);
+
         WeightingFactor wFactor = wFactor(WeightingFactors.BIZ_SVCS, period, orgType);
         crunchWeighting(period, rtn, nonPaySpend, Q.BIZ_SVCS_SPEND, wFactor, Q.BIZ_SVCS_CO2E);
-        wFactor = wFactor(WeightingFactors.CAPITAL, period, orgType);
-        crunchWeighting(period, rtn, nonPaySpend, Q.CAPITAL_SPEND, wFactor, Q.CAPITAL_CO2E);
         wFactor = wFactor(WeightingFactors.CONSTRUCTION, period, orgType);
         crunchWeighting(period, rtn, nonPaySpend, Q.CONSTRUCTION_SPEND, wFactor, Q.CONSTRUCTION_CO2E);
         wFactor = wFactor(WeightingFactors.CATERING, period, orgType);
@@ -776,6 +776,34 @@ public class Cruncher implements digital.srp.sreport.model.surveys.SduQuestions,
                 Q.CATERING_CO2E, Q.FREIGHT_CO2E, Q.ICT_CO2E, Q.CHEM_AND_GAS_CO2E,
                 Q.MED_INSTR_CO2E, Q.OTHER_MANUFACTURED_CO2E,
                 Q.OTHER_PROCUREMENT_CO2E, Q.PAPER_CO2E, Q.PHARMA_CO2E);
+    }
+
+    // This is probably a poor approximation.
+    // The rational is that capital does not deal with major construction
+    // projects but 'small works'. Therefore it combines a carbon intensity for
+    // construction in 2013-14 with a weighting of different org types
+    protected void crunchCapitalSpend(String period, SurveyReturn rtn,
+            String orgType, BigDecimal nonPaySpend) {
+        WeightingFactor wFactor = wFactor(WeightingFactors.CAPITAL, period, orgType);
+        BigDecimal calcVal;
+        try {
+            if (getAnswer(period, rtn, Q.CAPITAL_SPEND).response() == null) {
+                LOGGER.info("No directly entered spend {}, estimate from non pay spend", Q.CAPITAL_SPEND);
+                calcVal = nonPaySpend.multiply(wFactor.proportionOfTotal());
+                LOGGER.info("Estimated {} from non pay spend as {}", Q.CAPITAL_SPEND, calcVal);
+                getAnswer(period, rtn, Q.CAPITAL_SPEND).derived(true).response(calcVal.toPlainString());
+            } else {
+                calcVal = getAnswer(period, rtn, Q.CAPITAL_SPEND).responseAsBigDecimal();
+            }
+            // This intentionally uses proportion of total not intensity
+            // because as explained above it is a special combined factor
+            calcVal = calcVal.multiply(wFactor.proportionOfTotal());
+        } catch (NumberFormatException e) {
+            LOGGER.error("Cannot estimate CO2e from capital spend");
+            calcVal = BigDecimal.ZERO;
+        }
+        LOGGER.info("Calculated {} emissions as {}", Q.CAPITAL_CO2E, calcVal);
+        getAnswer(period, rtn, Q.CAPITAL_CO2E).derived(true).response(calcVal.toPlainString());
     }
 
     protected BigDecimal calcNonPaySpendFromOpEx(String period,

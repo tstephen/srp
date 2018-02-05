@@ -108,7 +108,7 @@ public interface SduQuestions {
             Q.ICT_CO2E, Q.CHEM_AND_GAS_CO2E, Q. MED_INSTR_CO2E,
             Q.OTHER_MANUFACTURED_CO2E,
             /* #203 drop as no Carbon factor Q.OTHER_PROCUREMENT_CO2E */
-            Q.PAPER_CO2E, Q.PHARMA_CO2E, Q.TRAVEL_CO2E, Q.SCOPE_3_ENERGY_WTT
+            Q.PAPER_CO2E, Q.PHARMA_CO2E, Q.TRAVEL_CO2E
     };
 
     Q[] BIOMASS_CO2E_WTT_HDRS = new Q[] {
