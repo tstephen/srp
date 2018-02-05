@@ -39,6 +39,20 @@ public interface AnswerRepository extends CrudRepository<Answer, Long> {
     List<Answer> findByOrgAndQuestionAsc(@Param("org") String org, @Param("qNames") String... qNames);
 
     @Query("SELECT a FROM Answer a LEFT JOIN a.surveyReturns r "
+            + "WHERE a.revision = (SELECT MAX(o.revision) FROM Answer o LEFT JOIN o.surveyReturns r WHERE o.applicablePeriod IN :periods AND o.question.name IN :qNames AND r.org = :org) "
+            + "AND a.applicablePeriod IN :periods "
+            + "AND a.question.name IN :qNames AND r.org = :org "
+            + "ORDER BY a.applicablePeriod DESC")
+    List<Answer> findByOrgPeriodAndQuestion(@Param("org") String org, @Param("periods") String[] periods, @Param("qNames") String... qNames);
+
+    @Query("SELECT a FROM Answer a LEFT JOIN a.surveyReturns r "
+            + "WHERE a.revision = (SELECT MAX(o.revision) FROM Answer o LEFT JOIN o.surveyReturns r WHERE o.applicablePeriod IN :periods AND o.question.name IN :qNames AND r.org = :org) "
+            + "AND a.applicablePeriod IN :periods "
+            + "AND a.question.name IN :qNames AND r.org = :org "
+            + "ORDER BY a.applicablePeriod ASC")
+    List<Answer> findByOrgPeriodAndQuestionAsc(@Param("org") String org, @Param("periods") String[] periods, @Param("qNames") String... qNames);
+
+    @Query("SELECT a FROM Answer a LEFT JOIN a.surveyReturns r "
             + "WHERE r.org = :org "
             + "ORDER BY a.applicablePeriod DESC")
     List<Answer> findByOrg(@Param("org") String org);
