@@ -16,7 +16,6 @@ import digital.srp.sreport.importers.CarbonFactorCsvImporter;
 import digital.srp.sreport.importers.WeightingFactorCsvImporter;
 import digital.srp.sreport.internal.ClasspathSurveyReturnHelper;
 import digital.srp.sreport.internal.PeriodUtil;
-import digital.srp.sreport.model.Answer;
 import digital.srp.sreport.model.CarbonFactor;
 import digital.srp.sreport.model.CarbonFactors;
 import digital.srp.sreport.model.Q;
@@ -30,15 +29,6 @@ public class CruncherTest {
 
     private  static final String[] ANAESTHETIC_GASES_CO2E = { "5,840",
             "6,430", "10,500", "13,100", "0", "0", "0", "0", "0", "0" };
-
-    private  static final String[] CITIZEN_CO2E = { "122", "135", "125",
-            "157", "0", "0", "0", "0", "0", "0" };
-
-    private  static final String[] PROCUREMENT_CO2E = { "16,200", "17,800",
-            "19,400", "20,000", "0", "0", "0", "0", "0", "0" };
-
-    private  static final String[] CORE_CO2E = { "11,400", "12,700", "17,400",
-            "20,700", "0", "0", "0", "0", "0", "0" };
 
     private  static final String[] COMMISSIONING_CO2E = { "1,250", "1,370",
             "1,490", "1,530", "0", "0", "0", "0", "0", "0" };
@@ -91,17 +81,17 @@ public class CruncherTest {
     private  static final String[] WATER_CO2E = { "22", "24", "26", "28",
             "0", "0", "0", "0", "0", "0" };
 
-    private  static final String[] SCOPE_2 = { "586", "693", "679", "776",
+    private  static final String[] SCOPE_2 = { "668", "794", "781", "880",
             "0", "0", "0", "0", "0", "0" };
 
-    private  static final String[] NET_ELEC_CO2E = { "339", "398", "394",
-            "435", "0", "0", "0", "0", "0", "0" };
+    private  static final String[] NET_ELEC_CO2E = { "422", "498", "495",
+            "539", "0", "0", "0", "0", "0", "0" };
 
     private  static final String[] NET_THERMAL_ENERGY_CO2E = { "246", "295",
-            "285", "341", "0", "0", "0", "0", "0", "0" };
+            "286", "341", "0", "0", "0", "0", "0", "0" };
 
-    private  static final String[] SCOPE_1 = { "7,910", "8,710", "13,000",
-            "16,000", "0", "0", "0", "0", "0", "0" };
+    private  static final String[] SCOPE_1 = { "8,180", "8,990", "13,300",
+            "16,300", "0", "0", "0", "0", "0", "0" };
 
     private  static final String[] PORTABLE_NITROUS_OXIDE_MIX_MATERNITY_CO2E = {
             "0", "0", "0", "0", "0", "0", "0", "0", "0", "0" };
@@ -121,11 +111,11 @@ public class CruncherTest {
     private  static final String[] DESFLURANE_CO2E = { "3,720", "4,090",
             "7,440", "9,300", "0", "0", "0", "0", "0", "0" };
 
-    private  static final String[] OWNED_VEHICLES = { "142", "157", "171",
-            "188", "0", "0", "0", "0", "0", "0" };
+    private  static final String[] OWNED_VEHICLES = { "142", "158", "172",
+            "187", "0", "0", "0", "0", "0", "0" };
 
-    private  static final String[] OWNED_BUILDINGS_GAS = { "1,930", "2,120",
-            "2,290", "2,680", "0", "0", "0", "0", "0", "0" };
+    private  static final String[] OWNED_BUILDINGS_GAS = { "2,190", "2,410",
+            "2,640", "2,960", "0", "0", "0", "0", "0", "0" };
 
     private  static final String[] OTHER_PROCUREMENT_CO2E = { "0", "0", "0",
             "0", "0", "0", "0", "0", "0", "0" };
@@ -172,30 +162,6 @@ public class CruncherTest {
             "5,600", "5,600", "5,600", "0", "0", "0", "0", "0", "0", "0" };
     private  static final String[] CONSULTING_SVCS_AND_EXPENSES_CO2E = {
             "6,510", "6,510", "6,510", "0", "0", "0", "0", "0", "0", "0" };
-
-    private  static final String[] TOTAL_ENERGY_CO2E = {
-            "2,270", "2,520", "2,690", "3,110", "0", "0", "0", "0", "0", "0" };
-    private  static final String[] TOTAL_PROCUREMENT_CO2E = {
-            "22,200", "24,300", "30,000", "33,200", "0", "0", "0", "0", "0", "0" };
-    private  static final String[] TOTAL_CO2E = {
-            "28,500", "31,400", "37,800", "41,700", "0", "0", "0", "0", "0", "0" };
-    private  static final String[] TOTAL_CO2E_BY_POP = {
-            "25.3", "27.9", "33.5", "37", "0", "0", "0", "0", "0", "0" };
-    private  static final String[] TOTAL_CO2E_BY_FLOOR = {
-            "457", "503", "606", "668", "0", "0", "0", "0", "0", "0" };
-    private  static final String[] TOTAL_CO2E_BY_WTE = {
-            "7.59", "8.35", "10", "11.1", "0", "0", "0", "0", "0", "0" };
-    private  static final String[] TOTAL_CO2E_BY_OPEX = {
-            "140", "140", "155", "158", "0", "0", "0", "0", "0", "0" };
-
-    private static final String[] ENERGY_CO2E_PCT = {
-            "7.94", "8.02", "7.11", "7.47", "0", "0", "0", "0", "0", "0" };
-    private static final String[] COMMISSIONING_CO2E_PCT = {
-            "4.37", "4.36", "3.95", "3.68", "0", "0", "0", "0", "0", "0" };
-    private static final String[] PROCUREMENT_CO2E_PCT = {
-            "77.7", "77.5", "79.5", "79.6", "0", "0", "0", "0", "0", "0" };
-    private static final String[] TRAVEL_CO2E_PCT = {
-            "10", "10.1", "9.4", "9.2", "0", "0", "0", "0", "0", "0" };
 
     private boolean debug = false;
 
@@ -359,59 +325,6 @@ public class CruncherTest {
             assertEquals(String.format("Incorrect value of %2$s for period %1$s", period, Q.COMMISSIONING_CO2E),
                     COMMISSIONING_CO2E[i],
                     rtn.answer(period, Q.COMMISSIONING_CO2E).orElseThrow(() -> new IllegalStateException()).response3sf());
-
-            assertEquals(String.format("Incorrect value of %2$s for period %1$s", period, Q.CORE_CO2E),
-                    CORE_CO2E[i],
-                    rtn.answer(period, Q.CORE_CO2E).orElseThrow(() -> new IllegalStateException()).response3sf());
-            assertEquals(String.format("Incorrect value of %2$s for period %1$s", period, Q.PROCUREMENT_CO2E),
-                    PROCUREMENT_CO2E[i],
-                    rtn.answer(period, Q.PROCUREMENT_CO2E).orElseThrow(() -> new IllegalStateException()).response3sf());
-            assertEquals(String.format("Incorrect value of %2$s for period %1$s", period, Q.CITIZEN_CO2E),
-                    CITIZEN_CO2E[i],
-                    rtn.answer(period, Q.CITIZEN_CO2E).orElseThrow(() -> new IllegalStateException()).response3sf());
-
-            // BENCHMARKING
-            assertEquals(String.format("Incorrect value of %2$s for period %1$s", period, Q.TOTAL_ENERGY_CO2E),
-                    TOTAL_ENERGY_CO2E[i],
-                    rtn.answer(period, Q.TOTAL_ENERGY_CO2E).orElseThrow(() -> new IllegalStateException()).response3sf());
-            assertEquals(String.format("Incorrect value of %2$s for period %1$s", period, Q.TOTAL_PROCUREMENT_CO2E),
-                    TOTAL_PROCUREMENT_CO2E[i],
-                    rtn.answer(period, Q.TOTAL_PROCUREMENT_CO2E).orElseThrow(() -> new IllegalStateException()).response3sf());
-            assertEquals(String.format("Incorrect value of %2$s for period %1$s", period, Q.TOTAL_CO2E),
-                    TOTAL_CO2E[i],
-                    rtn.answer(period, Q.TOTAL_CO2E).orElseThrow(() -> new IllegalStateException()).response3sf());
-
-            assertEquals(String.format("Incorrect value of %2$s for period %1$s", period, Q.TOTAL_CO2E_BY_POP),
-                    TOTAL_CO2E_BY_POP[i],
-                    rtn.answer(period, Q.TOTAL_CO2E_BY_POP).orElseThrow(() -> new IllegalStateException()).response3sf());
-            assertEquals(String.format("Incorrect value of %2$s for period %1$s", period, Q.TOTAL_CO2E_BY_FLOOR),
-                    TOTAL_CO2E_BY_FLOOR[i],
-                    rtn.answer(period, Q.TOTAL_CO2E_BY_FLOOR).orElseThrow(() -> new IllegalStateException()).response3sf());
-            assertEquals(String.format("Incorrect value of %2$s for period %1$s", period, Q.TOTAL_CO2E_BY_WTE),
-                    TOTAL_CO2E_BY_WTE[i],
-                    rtn.answer(period, Q.TOTAL_CO2E_BY_WTE).orElseThrow(() -> new IllegalStateException()).response3sf());
-//            assertTrue(!rtn.answer(period, Q.TOTAL_CO2E_BY_PATIENT_CONTACT).isPresent());
-            assertEquals(String.format("Incorrect value of %2$s for period %1$s", period, Q.TOTAL_CO2E_BY_OPEX),
-                    TOTAL_CO2E_BY_OPEX[i],
-                    rtn.answer(period, Q.TOTAL_CO2E_BY_OPEX).orElseThrow(() -> new IllegalStateException()).response3sf());
-
-            Answer energyPctA = rtn.answer(period, Q.ENERGY_CO2E_PCT).orElseThrow(() -> new IllegalStateException());
-            assertEquals(String.format("Incorrect value of %2$s for period %1$s", period, Q.ENERGY_CO2E_PCT),
-                    ENERGY_CO2E_PCT[i], energyPctA.response3sf());
-            Answer commissioningPctA = rtn.answer(period, Q.COMMISSIONING_CO2E_PCT).orElseThrow(() -> new IllegalStateException());
-            assertEquals(String.format("Incorrect value of %2$s for period %1$s", period, Q.COMMISSIONING_CO2E_PCT),
-                    COMMISSIONING_CO2E_PCT[i], commissioningPctA.response3sf());
-            Answer procurementPctA = rtn.answer(period, Q.PROCUREMENT_CO2E_PCT).orElseThrow(() -> new IllegalStateException());
-            assertEquals(String.format("Incorrect value of %2$s for period %1$s", period, Q.PROCUREMENT_CO2E_PCT),
-                    PROCUREMENT_CO2E_PCT[i], procurementPctA.response3sf());
-            Answer travelPctA = rtn.answer(period, Q.TRAVEL_CO2E_PCT).orElseThrow(() -> new IllegalStateException());
-            assertEquals(String.format("Incorrect value of %2$s for period %1$s", period, Q.TRAVEL_CO2E_PCT),
-                    TRAVEL_CO2E_PCT[i], travelPctA.response3sf());
-
-            Assert.assertEquals(new BigDecimal(100).doubleValue(), energyPctA.responseAsBigDecimal()
-                            .add(commissioningPctA.responseAsBigDecimal())
-                            .add(procurementPctA.responseAsBigDecimal())
-                            .add(travelPctA.responseAsBigDecimal()).doubleValue(), 0.1);
         }
     }
 

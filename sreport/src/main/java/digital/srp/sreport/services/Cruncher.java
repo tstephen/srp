@@ -25,12 +25,12 @@ import digital.srp.sreport.model.surveys.SduQuestions;
 
 @Component
 public class Cruncher implements digital.srp.sreport.model.surveys.SduQuestions, Calculator {
-    private static final BigDecimal ONE_THOUSAND = new BigDecimal("1000");
+    private static final BigDecimal ONE_THOUSAND = new BigDecimal("1000.000000");
 
     private static final Logger LOGGER = LoggerFactory
             .getLogger(Cruncher.class);
 
-    protected static final BigDecimal ONE_HUNDRED = new BigDecimal("100.000");
+    protected static final BigDecimal ONE_HUNDRED = new BigDecimal("100.000000");
 
     protected static final BigDecimal m2km = new BigDecimal("1.60934");
 
@@ -989,13 +989,13 @@ public class Cruncher implements digital.srp.sreport.model.surveys.SduQuestions,
     }
 
     private BigDecimal oneThousandth(CarbonFactor cFactor) {
-        return cFactor.value().divide(ONE_THOUSAND, cFactor.value().scale(), RoundingMode.HALF_UP);
+        return cFactor.value().divide(ONE_THOUSAND, cFactor.value().scale()+3, RoundingMode.HALF_UP);
     }
 
     protected void crunchElectricityUsed(String period, SurveyReturn rtn) {
         try {
             BigDecimal nonRenewableElecUsed = getAnswer(period, rtn, Q.ELEC_USED).responseAsBigDecimal();
-            BigDecimal elecFactor = oneThousandth(cFactor(CarbonFactors.ELECTRICITY_UK, period));
+            BigDecimal elecFactor = oneThousandth(cFactor(CarbonFactors.ELECTRICITY_UK_TOTAL, period));
             getAnswer(period,rtn, Q.ELEC_CO2E).derived(true).response(nonRenewableElecUsed.multiply(elecFactor));
         } catch (IllegalStateException | NullPointerException e) {
             LOGGER.warn("Insufficient data to calculate CO2e from grid electricity");
@@ -1019,26 +1019,27 @@ public class Cruncher implements digital.srp.sreport.model.surveys.SduQuestions,
                 .responseAsBigDecimal();
         getAnswer(period,rtn, Q.ELEC_TOTAL_RENEWABLE_USED).derived(true).response(renewableElecUsed);
         try {
-            BigDecimal greenTariffUsed;
+            BigDecimal greenTariffGridEquivUsed;
             try {
-                 greenTariffUsed = getAnswer(period, rtn, Q.ELEC_USED_GREEN_TARIFF).responseAsBigDecimal().multiply(
-                        new BigDecimal("1.000000").subtract(getAnswer(period, rtn, Q.GREEN_TARIFF_ADDITIONAL_PCT).responseAsBigDecimal()));
-                 getAnswer(period,rtn, Q.ELEC_NON_RENEWABLE_GREEN_TARIFF_CO2E).derived(true).response(greenTariffUsed);
+                 greenTariffGridEquivUsed = getAnswer(period, rtn, Q.ELEC_USED_GREEN_TARIFF).responseAsBigDecimal().multiply(
+                        ONE_HUNDRED.subtract(getAnswer(period, rtn, Q.GREEN_TARIFF_ADDITIONAL_PCT).responseAsBigDecimal()));
+                 getAnswer(period,rtn, Q.ELEC_NON_RENEWABLE_GREEN_TARIFF_CO2E).derived(true).response(greenTariffGridEquivUsed);
             } catch (IllegalStateException | NullPointerException e) {
                 LOGGER.warn("Insufficient data to calculate CO2e saved from green tariff elec used");
-                 greenTariffUsed = BigDecimal.ZERO;
+                 greenTariffGridEquivUsed = BigDecimal.ZERO;
             }
-            BigDecimal thirdPtyRenewableUsed;
+            BigDecimal thirdPtyRenewableGridEquivUsed;
             try {
-                thirdPtyRenewableUsed = getAnswer(period, rtn, Q.ELEC_3RD_PTY_RENEWABLE_USED).responseAsBigDecimal().multiply(
-                        new BigDecimal("1.000000").subtract(getAnswer(period, rtn, Q.THIRD_PARTY_ADDITIONAL_PCT).responseAsBigDecimal()));
-                getAnswer(period,rtn, Q.ELEC_NON_RENEWABLE_3RD_PARTY_CO2E).derived(true).response(thirdPtyRenewableUsed);
+                thirdPtyRenewableGridEquivUsed = getAnswer(period, rtn, Q.ELEC_3RD_PTY_RENEWABLE_USED).responseAsBigDecimal().multiply(
+                        ONE_HUNDRED.subtract(getAnswer(period, rtn, Q.THIRD_PARTY_ADDITIONAL_PCT).responseAsBigDecimal()));
+                getAnswer(period,rtn, Q.ELEC_NON_RENEWABLE_3RD_PARTY_CO2E).derived(true).response(thirdPtyRenewableGridEquivUsed);
             } catch (IllegalStateException | NullPointerException e) {
                 LOGGER.warn("Insufficient data to calculate CO2e from third party renewable elec used");
-                thirdPtyRenewableUsed = BigDecimal.ZERO;
+                thirdPtyRenewableGridEquivUsed = BigDecimal.ZERO;
             }
-            BigDecimal elecFactor = oneThousandth(cFactor(CarbonFactors.ELECTRICITY_UK, period));
-            BigDecimal renewableElecCo2e = greenTariffUsed.add(thirdPtyRenewableUsed).multiply(elecFactor);
+            BigDecimal elecFactor = oneThousandth(cFactor(CarbonFactors.ELECTRICITY_UK_TOTAL, period));
+            BigDecimal renewableElecCo2e = greenTariffGridEquivUsed.add(thirdPtyRenewableGridEquivUsed)
+                    .multiply(elecFactor).divide(ONE_HUNDRED, RoundingMode.HALF_UP);
             getAnswer(period,rtn, Q.ELEC_RENEWABLE_CO2E).derived(true).response(renewableElecCo2e);
         } catch (IllegalStateException | NullPointerException e) {
             LOGGER.warn("Insufficient data to calculate CO2e from renewable electricity");
@@ -1046,13 +1047,13 @@ public class Cruncher implements digital.srp.sreport.model.surveys.SduQuestions,
     }
 
     protected void crunchOwnedBuildings(String period, SurveyReturn rtn) {
-        CarbonFactor cFactor = cFactor(CarbonFactors.NATURAL_GAS, period);
+        CarbonFactor cFactor = cFactor(CarbonFactors.GAS_TOTAL, period);
         crunchCO2e(period, rtn, Q.GAS_USED, oneThousandth(cFactor), Q.OWNED_BUILDINGS_GAS);
 
-        cFactor = cFactor(CarbonFactors.FUEL_OIL, period);
+        cFactor = cFactor(CarbonFactors.FUEL_OIL_TOTAL, period);
         crunchCO2e(period, rtn, Q.OIL_USED, oneThousandth(cFactor), Q.OWNED_BUILDINGS_OIL);
 
-        cFactor = cFactor(CarbonFactors.COAL_INDUSTRIAL, period);
+        cFactor = cFactor(CarbonFactors.COAL_INDUSTRIAL_TOTAL, period);
         crunchCO2e(period, rtn, Q.COAL_USED, oneThousandth(cFactor), Q.OWNED_BUILDINGS_COAL);
         sumAnswers(period, rtn,Q.OWNED_BUILDINGS, Q.OWNED_BUILDINGS_GAS, Q.OWNED_BUILDINGS_OIL, Q.OWNED_BUILDINGS_COAL);
     }
