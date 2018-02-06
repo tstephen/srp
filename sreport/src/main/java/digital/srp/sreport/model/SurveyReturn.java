@@ -7,7 +7,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.function.Function;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -238,13 +237,12 @@ public class SurveyReturn implements AuditorAware<String> {
             }
         }
         if (matches.size() > 1) {
-            LOGGER.error("Multiple answers to {} found for {} in {}", qName, org, period);
-            LOGGER.error("  review ids: {}", matches.parallelStream().map(new Function<Answer, Long>() {
-                @Override
-                public Long apply(Answer t) {
-                    return t.id();
-                }
-            }).toString());
+            StringBuffer sb = new StringBuffer();
+            for (Answer answer : matches) {
+                sb.append(answer == null ? "" : answer.getId()).append(",");
+            }
+            LOGGER.error("Multiple answers to {} found for {} in {}. Review ids: {}",
+                    qName, org, period, sb.toString());
         }
         return Optional.ofNullable(a);
     }
