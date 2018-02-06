@@ -25,6 +25,8 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import javax.xml.bind.annotation.XmlElement;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedBy;
@@ -60,6 +62,9 @@ import lombok.experimental.Accessors;
 @EntityListeners(AuditingEntityListener.class)
 @Table(name= "SR_ANSWER")
 public class Answer implements AuditorAware<String> {
+
+    private static final Logger LOGGER = LoggerFactory
+            .getLogger(Answer.class);
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -194,7 +199,13 @@ public class Answer implements AuditorAware<String> {
     }
 
     public BigDecimal responseAsBigDecimal() {
-        return response == null ? BigDecimal.ZERO : new BigDecimal(response);
+        try {
+            return response == null || response.trim().length() == 0
+                    ? BigDecimal.ZERO : new BigDecimal(response);
+        } catch (NumberFormatException e) {
+            LOGGER.warn("Cannot parse BigDecimal from {} for answer id {}", response, id);
+            return BigDecimal.ZERO;
+        }
     }
 
     public Answer response(String response) {
