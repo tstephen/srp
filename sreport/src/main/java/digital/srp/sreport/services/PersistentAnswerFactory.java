@@ -24,7 +24,7 @@ public class PersistentAnswerFactory implements AnswerFactory {
 
     @Override
     public Answer addAnswer(SurveyReturn rtn, String period, Q q) {
-        LOGGER.info("Creating new answer '{}' for '{}' in '{}'",
+        LOGGER.info("Creating new derived answer '{}' for '{}' in '{}'",
                q.name(), rtn.org(), period);
         try {
 //                Answer answer = answerRepo.findByOrgPeriodAndQuestion(rtn.org(), period, q.name());

@@ -2,12 +2,16 @@ package digital.srp.sreport.services;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
+import javax.transaction.Transactional;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import digital.srp.sreport.api.Calculator;
@@ -22,6 +26,7 @@ import digital.srp.sreport.model.WeightingFactor;
 import digital.srp.sreport.model.WeightingFactors;
 import digital.srp.sreport.model.surveys.Sdu1617;
 import digital.srp.sreport.model.surveys.SduQuestions;
+import digital.srp.sreport.repositories.AnswerRepository;
 
 @Component
 public class Cruncher implements digital.srp.sreport.model.surveys.SduQuestions, Calculator {
@@ -37,6 +42,9 @@ public class Cruncher implements digital.srp.sreport.model.surveys.SduQuestions,
     protected final List<CarbonFactor> cfactors;
 
     protected final List<WeightingFactor> wfactors;
+
+    @Autowired
+    private AnswerRepository answerRepo;
 
     public Cruncher(final List<CarbonFactor> cfactors2,
             final List<WeightingFactor> wfactors2) {
@@ -105,7 +113,6 @@ public class Cruncher implements digital.srp.sreport.model.surveys.SduQuestions,
             for (Q q : Sdu1617.getDerivedQs()) {
                 Optional<Answer> optional = rtn.answer(period, q);
                 if (!optional.isPresent()) {
-                    LOGGER.debug("Creating derived answer for {} in ", q, period);
                     answerFactory.addAnswer(rtn, period, q);
                 }
             }
@@ -450,9 +457,42 @@ public class Cruncher implements digital.srp.sreport.model.surveys.SduQuestions,
         }
     }
 
+    @Transactional
     private Answer getAnswer(String period, SurveyReturn rtn, Q q) {
-        return rtn.answer(period, q).orElseThrow(() -> new IllegalStateException(
-                String.format("Return does not contain the expected response for %1$s in %2$s", q, period)));
+        List<Answer> matches = new ArrayList<Answer>();
+        for (Answer a : rtn.answers()) {
+            if (q.name().equals(a.question().name()) && period.equals(a.applicablePeriod())) {
+                matches.add(a);
+            }
+        }
+        switch (matches.size()) {
+        case 0:
+            throw new IllegalStateException(
+                    String.format("Return does not contain the expected response for %1$s in %2$s", q, period));
+        case 1:
+            return matches.get(0);
+        default:
+            Answer a = matches.get(0);
+            StringBuffer sb = new StringBuffer();
+            for (int i = 1; i < matches.size(); i++) {
+                Answer b = matches.get(i);
+                if (a.response() == b.response()
+                        || (b.response() != null && b.response().equals(a.response()))) {
+                    LOGGER.warn("Removing duplicate answer: {}={} to {} for {} in {}",
+                            b.id(), b.response(), q.name(), rtn.org(), period, sb.toString());
+                    rtn.answers().remove(b);
+                    answerRepo.delete(b.id());
+                } else {
+                    sb.append(b == null ? "" : b.getId()).append(",");
+                }
+            }
+            if (sb.length() > 0) {
+                sb.append(a.id());
+                LOGGER.error("Multiple answers to {} found for {} in {}. Review ids: {}",
+                        q.name(), rtn.org(), period, sb.toString());
+            }
+            return a;
+        }
     }
 
     private void crunchScope3BiomassWtt(String period, SurveyReturn rtn) {

@@ -97,6 +97,13 @@ public class SurveyReturnController {
         LOGGER.info(String.format("findById %1$s", returnId));
 
         SurveyReturn rtn = returnRepo.findOne(returnId);
+        if (rtn == null) {
+            throw new ObjectNotFoundException(SurveyReturn.class, returnId);
+        } else if (!StatusType.Draft.name().equals(rtn.status())) {
+            throw new IllegalStateException(String.format(
+                    "The return %1$d:%2$s has been submitted, you may no longer update. If you've recognised a mistake please re-state the return.",
+                    rtn.id(), rtn.name()));
+        }
         // use logger for force child load
         LOGGER.info(String.format("Found return with id %1$d with status %2$s and containing %3$d answers", rtn.id(), rtn.status(), rtn.answers().size()));
 
@@ -292,7 +299,7 @@ public class SurveyReturnController {
      */
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
     @RequestMapping(value = "/{id}", method = RequestMethod.PUT, consumes = { "application/json" })
-    public @ResponseBody void update(
+    public synchronized @ResponseBody void update(
             @PathVariable("id") Long returnId,
             @RequestBody SurveyReturn updatedReturn) {
         SurveyReturn existing = returnRepo.findOne(returnId);
@@ -314,38 +321,58 @@ public class SurveyReturnController {
     /**
      * Update an existing return with a single answer.
      *
-     * <p>This is primarily intended for qualitative, textual information
-     * for the current period, therefore does not require period to be specified.
+     * <p>The period of the return is assumed.
+     *
+     * @param returnId The return this answer belongs to.
+     * @param q The name of the question this answer belongs to.
+     *
      */
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
     @RequestMapping(value = "/{id}/answers/{q}", method = RequestMethod.POST, consumes = "application/json")
-    public @ResponseBody void updateAnswer(
+    public @ResponseBody void updateCurrentAnswer(
             @PathVariable("id") Long returnId,
             @PathVariable("q") String q,
             @RequestBody String updatedAns) {
-        SurveyReturn existing = returnRepo.findOne(returnId);
-        if (existing == null) {
-            throw new ObjectNotFoundException(SurveyReturn.class, returnId);
-        } else if (!StatusType.Draft.name().equals(existing.status())) {
-            throw new IllegalStateException(String.format(
-                    "The return %1$d:%2$s has been submitted, you may no longer update. If you've recognised a mistake please re-state the return.",
-                    returnId, existing.name()));
-        }
-        Optional<Answer> answer = existing.answer(existing.applicablePeriod(), Q.valueOf(q));
+        SurveyReturn existing = findById(returnId);
+        updateAnswer(existing, q, existing.applicablePeriod(), updatedAns);
+    }
+
+    /**
+     * Update an existing return with a single answer.
+     *
+     * @param returnId The return this answer belongs to.
+     * @param q The name of the question this answer belongs to.
+     * @param period The period of this answer, if omitted the period of the return is assumed.
+     */
+    @ResponseStatus(value = HttpStatus.NO_CONTENT)
+    @RequestMapping(value = "/{id}/answers/{q}/{period}", method = RequestMethod.POST, consumes = "application/json")
+    public @ResponseBody void updateAnswer(
+            @PathVariable("id") Long returnId,
+            @PathVariable("q") String q,
+            @PathVariable("period") String period,
+            @RequestBody String updatedAns) {
+        updateAnswer(findById(returnId), q, period, updatedAns);
+    }
+
+    protected void updateAnswer(SurveyReturn rtn, String q,
+            String period, String updatedAns) {
+        LOGGER.info("Updating answer to {} for {} in {} to {}", q, rtn.org(), period, updatedAns);
+        Optional<Answer> answer = rtn.answer(period, Q.valueOf(q));
         if (answer.isPresent()) {
             answer.get().response(updatedAns).derived(false);
         } else {
+            LOGGER.warn("Creating new answer to {} for {} in {}", q, rtn.org(), period);
             Question existingQ = qRepo.findByName(q);
             if (existingQ == null) {
                 throw new ObjectNotFoundException(Question.class, q);
             } else {
-                existing.initAnswer(existing, existing.applicablePeriod(), existingQ)
+                rtn.initAnswer(rtn, period, existingQ)
                         .response(updatedAns).derived(false);
             }
         }
         DefaultCompletenessValidator validator = new DefaultCompletenessValidator() ;
-        validator.validate(existing);
-        returnRepo.save(existing);
+        validator.validate(rtn);
+        returnRepo.save(rtn);
     }
 
     private int createOrMergeAnswers(SurveyReturn updatedReturn,
