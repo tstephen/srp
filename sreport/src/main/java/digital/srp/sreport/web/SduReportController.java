@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import digital.srp.macc.maths.SignificantFiguresFormat;
+import digital.srp.sreport.internal.PeriodUtil;
 import digital.srp.sreport.model.surveys.SduQuestions;
 import digital.srp.sreport.repositories.AnswerRepository;
 import digital.srp.sreport.repositories.SurveyRepository;
@@ -590,11 +591,13 @@ public class SduReportController implements SduQuestions {
      */
     @RequestMapping(value = "/{org}/{period}/carbon-trajectory.html", method = RequestMethod.GET, produces = "text/html")
     public String carbonTrajectoryTable(@PathVariable("org") String org,
-            @PathVariable("period") String period, @RequestParam(value = "maxPeriods", required = false, defaultValue = DEFAULT_MAX_PERIODS) Integer maxPeriods,
-            Model model) {
+            @PathVariable("period") String period, Model model) {
         LOGGER.info(String.format("carbonTrajectoryTable for %1$s %2$s", org, period));
 
-        new ReportModelHelper(answerRepo).fillModel(org, period, SDU_TREND_HDRS, model, true, prettyPrintDecimalFormat, maxPeriods, true, Optional.of(totaller));
+        new ReportModelHelper(answerRepo).fillModel(org, period, SDU_TREND_HDRS,
+                model, true, prettyPrintDecimalFormat,
+                PeriodUtil.periodsSinceInc(period, "2007-08"), true,
+                Optional.of(totaller));
         return "table-period-as-col";
     }
 
@@ -606,12 +609,13 @@ public class SduReportController implements SduQuestions {
      */
     @RequestMapping(value = "/{org}/{period}/carbon-trajectory.csv", method = RequestMethod.GET, produces = "text/csv")
     public String carbonTrajectoryCsv(@PathVariable("org") String org,
-            @PathVariable("period") String period, @RequestParam(value = "maxPeriods", required = false, defaultValue = DEFAULT_MAX_PERIODS) Integer maxPeriods,
-            Model model) {
+            @PathVariable("period") String period, Model model) {
         LOGGER.info(String.format("carbonTrajectoryCsv for %1$s %2$s", org, period));
 
-        new ReportModelHelper(answerRepo).fillModel(org, period, SDU_TREND_HDRS, model, false, rawDecimalFormat,
-                maxPeriods, true, Optional.empty());
+        new ReportModelHelper(answerRepo).fillModel(org, period, SDU_TREND_HDRS,
+                model, false, rawDecimalFormat,
+                PeriodUtil.periodsSinceInc(period, "2007-08"), true,
+                Optional.empty());
         return "csv";
     }
 

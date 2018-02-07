@@ -24,4 +24,9 @@ public class PeriodUtilTest {
         assertEquals(Arrays.asList(expected), 
                 PeriodUtil.fillBackwards("2016-17", 2));
     }
+
+    @Test
+    public void testPeriodsSince2007Inclusive() {
+        assertEquals(11, PeriodUtil.periodsSinceInc("2017-18", "2007-08"));
+    }
 }

@@ -45,4 +45,8 @@ public class PeriodUtil {
         return String.format("%1$d-%2$s", startYear + 1,
                 String.valueOf(startYear + 2).substring(2));
     }
+
+    public static int periodsSinceInc(String now, String since) {
+        return startYear(now) - startYear(since) + 1;
+    }
 }

@@ -7,15 +7,18 @@ import javax.validation.ConstraintViolationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
 
 import com.fasterxml.jackson.annotation.JsonView;
 
 import digital.srp.sreport.api.Calculator;
+import digital.srp.sreport.internal.PeriodUtil;
 import digital.srp.sreport.model.SurveyReturn;
 import digital.srp.sreport.model.views.SurveyReturnViews;
 import digital.srp.sreport.repositories.AnswerRepository;
@@ -61,7 +64,7 @@ public class CalculationController {
         LOGGER.info(String.format("Running calculations for %1$s", returnId));
 
         SurveyReturn rtn = returnRepo.findOne(returnId);
-        calculate(rtn, 4);
+        calculate(rtn, PeriodUtil.periodsSinceInc(rtn.applicablePeriod(), "2007-08"));
 
         return rtn;
     }
@@ -77,32 +80,24 @@ public class CalculationController {
             @PathVariable("org") String org) {
         LOGGER.info(String.format("Running calculations for %1$s %2$s", surveyName, org));
 
-        List<SurveyReturn> returns = returnRepo.findBySurveyAndOrg(surveyName, org);
-        returns.sort((r1,r2) -> r1.revision().compareTo(r2.revision()));
-        SurveyReturn rtn = returns.get(returns.size()-1);
-        calculate(rtn, 4);
+        SurveyReturn rtn = findLatestReturn(surveyName, org);
+        calculate(rtn, PeriodUtil.periodsSinceInc(rtn.applicablePeriod(), "2007-08"));
 
         return rtn;
     }
 
+    private SurveyReturn findLatestReturn(String surveyName, String org) {
+        List<SurveyReturn> returns = returnRepo.findBySurveyAndOrg(surveyName, org);
+        returns.sort((r1,r2) -> r1.revision().compareTo(r2.revision()));
+        SurveyReturn rtn = returns.get(returns.size()-1);
+        return rtn;
+    }
+
     private void calculate(SurveyReturn rtn, int yearsToCalc) {
-     // remove derived?
-//      List<Answer> answers = answerRepo.findByOrg(rtn.org());
-//      if (answers.size() == 0) {
-//          return;
-//      }
-//      Long[] ids = new Long[answers.size()];
-//      for (int i = 0; i < answers.size(); i++) {
-//          Answer a = answers.get(i);
-//          ids[i] = a.id();
-//      }
-//      answerRepo.deleteDerivedAnswers(ids);
-//        returnRepo.save(rtn);
-        if (false /*isUpToDate(rtn)*/) {
+        if (isUpToDate(rtn)) {
             LOGGER.info("Skipping calculations for {} in {}", rtn.org(), rtn.applicablePeriod());
         } else {
-//          deleteDerivedForOrg(rtn);
-            rtn = cruncher.calculate(rtn, 4, answerFactory);
+            rtn = cruncher.calculate(rtn, yearsToCalc, answerFactory);
         }
         try {
             returnRepo.save(rtn);
@@ -122,16 +117,25 @@ public class CalculationController {
         }
     }
 
-//    private void deleteDerivedForOrg(SurveyReturn rtn) {
-//        for (Answer answer : rtn.answers()) {
-//            if (answer.derived() && answer.response() != null ) {
-//                rtn.answers().remove(answer);
-//            }
-//        }
-//        return;
+//    /**
+//     * Remove all calculations (i.e. those with derived = true).
+//     */
+//    @RequestMapping(value = "/{surveyName}/{org}", method = RequestMethod.DELETE)
+//    @ResponseStatus(HttpStatus.NO_CONTENT)
+//    @JsonView(SurveyReturnViews.Detailed.class)
+//    public @ResponseBody void clean(
+//            @PathVariable("surveyName") String surveyName,
+//            @PathVariable("org") String org) {
+//        LOGGER.info(String.format("Clean calculations for %1$s %2$s", surveyName, org));
+//
+//        SurveyReturn rtn = findLatestReturn(surveyName, org);
+//        List<String> periods = PeriodUtil.fillBackwards(rtn.applicablePeriod(),
+//                PeriodUtil.periodsSinceInc(rtn.applicablePeriod(), "2007-08"));
+//        answerRepo.deleteDerivedAnswers(rtn.getId(), periods.toArray(new String[periods.size()]));
 //    }
 
-//    private boolean isUpToDate(SurveyReturn rtn) {
+        private boolean isUpToDate(SurveyReturn rtn) {
+            return false;
 //        try {
 //            Set<Answer> underivedAnswers = rtn.underivedAnswers();
 //            if (underivedAnswers.size() == 0) {
@@ -164,6 +168,6 @@ public class CalculationController {
 //        } catch (Exception e) {
 //            return false; // safety net
 //        }
-//    }
+    }
 
 }
