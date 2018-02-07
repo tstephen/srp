@@ -20,7 +20,7 @@ public class WeightingFactorCsvImporterTest {
                     .readWeightingFactors();
             System.out.println(
                     String.format(" found %1$d factors", factors.size()));
-            assertEquals(25*WeightingFactorCsvImporter.NO_ORG_TYPES, factors.size());
+            assertEquals(26*WeightingFactorCsvImporter.NO_ORG_TYPES, factors.size());
 
             // assert expected values of 5th record
             // Business services,898385085,36484424,430605458,106399,63999801,153255016,63999801,5913115,240138,7892636,700,421243,1008715,421243

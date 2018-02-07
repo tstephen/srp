@@ -126,6 +126,9 @@ public class WeightingFactorCsvImporter {
         case "Other procurement":
             category = WeightingFactors.OTHER_PROCURMENT.name();
             break;
+        case "Non-pay op ex portion":
+            category = WeightingFactors.NON_PAY_OP_EX_PORTION.name();
+            break;
         case "Paper products":
             category = WeightingFactors.PAPER.name();
             break;
@@ -156,6 +159,8 @@ public class WeightingFactorCsvImporter {
         case "Commissioned health and social care services":
             category = WeightingFactors.COMMISSIONING.name();
             break;
+        default:
+            LOGGER.error("No conversion for category {}", category);
         }
 
         WeightingFactor factor = new WeightingFactor()
