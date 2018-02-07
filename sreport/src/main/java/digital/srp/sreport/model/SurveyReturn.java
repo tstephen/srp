@@ -265,7 +265,12 @@ public class SurveyReturn implements AuditorAware<String> {
     public BigDecimal answerResponseAsBigDecimal(String period, Q q) {
         Optional<Answer> answer = answer(period, q);
         if (answer.isPresent()) {
-            return new BigDecimal(answer.get().response());
+            try {
+                return new BigDecimal(answer.get().response());
+            } catch (NumberFormatException e) {
+                LOGGER.warn("Requesting {}={} as number", q.name(), answer.get().response());
+                return BigDecimal.ZERO;
+            }
         } else {
             return BigDecimal.ZERO;
         }
