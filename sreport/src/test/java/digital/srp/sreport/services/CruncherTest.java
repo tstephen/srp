@@ -313,9 +313,9 @@ public class CruncherTest {
             assertEquals(String.format("Incorrect value of %2$s for period %1$s", period, Q.OTHER_PROCUREMENT_CO2E),
                     OTHER_PROCUREMENT_CO2E[i],
                     rtn.answer(period, Q.OTHER_PROCUREMENT_CO2E).orElseThrow(() -> new IllegalStateException()).response3sf());
-            assertEquals(String.format("Incorrect value of %2$s for period %1$s", period, Q.PAPER_CO2E),
+            assertEquals(String.format("Incorrect value of %2$s for period %1$s", period, Q.PAPER_AND_CARD_CO2E),
                     PAPER_CO2E[i],
-                    rtn.answer(period, Q.PAPER_CO2E).orElseThrow(() -> new IllegalStateException()).response3sf());
+                    rtn.answer(period, Q.PAPER_AND_CARD_CO2E).orElseThrow(() -> new IllegalStateException()).response3sf());
             assertEquals(String.format("Incorrect value of %2$s for period %1$s", period, Q.PHARMA_CO2E),
                     PHARMA_CO2E[i],
                     rtn.answer(period, Q.PHARMA_CO2E).orElseThrow(() -> new IllegalStateException()).response3sf());

@@ -789,20 +789,8 @@ public class Cruncher implements digital.srp.sreport.model.surveys.SduQuestions,
         crunchWeighting(period, rtn, nonPaySpend, Q.OTHER_MANUFACTURED_SPEND, wFactor, Q.OTHER_MANUFACTURED_CO2E);
         wFactor = wFactor(WeightingFactors.OTHER_PROCURMENT, period, orgType);
         crunchWeighting(period, rtn, nonPaySpend, Q.OTHER_SPEND, wFactor, Q.OTHER_PROCUREMENT_CO2E);
-
-        // #206 paper emissions now calculated from weight consumed per treasury
-        // guidelines
         wFactor = wFactor(WeightingFactors.PAPER, period, orgType);
-        BigDecimal calcVal = new BigDecimal("0.00");
-        if (getAnswer(period, rtn, Q.PAPER_SPEND).response() == null) {
-            LOGGER.info("No directly entered spend {}, estimate from non pay spend", Q.PAPER_SPEND);
-            calcVal = nonPaySpend.multiply(wFactor.proportionOfTotal());
-            LOGGER.info("Estimated {} from non pay spend as {}", Q.PAPER_SPEND, calcVal);
-            getAnswer(period, rtn, Q.PAPER_SPEND).derived(true).response(calcVal.toPlainString());
-        } else {
-            calcVal = getAnswer(period, rtn, Q.PAPER_SPEND).responseAsBigDecimal();
-        }
-
+        crunchWeighting(period, rtn, nonPaySpend, Q.PAPER_AND_CARD_SPEND, wFactor, Q.PAPER_AND_CARD_CO2E);
         wFactor = wFactor(WeightingFactors.PHARMA, period, orgType);
         crunchWeighting(period, rtn, nonPaySpend, Q.PHARMA_SPEND, wFactor, Q.PHARMA_CO2E);
         wFactor = wFactor(WeightingFactors.BIZ_TRAVEL, period, orgType);
@@ -815,7 +803,7 @@ public class Cruncher implements digital.srp.sreport.model.surveys.SduQuestions,
                 Q.BIZ_SVCS_CO2E, Q.CAPITAL_CO2E, Q.CONSTRUCTION_CO2E,
                 Q.CATERING_CO2E, Q.FREIGHT_CO2E, Q.ICT_CO2E, Q.CHEM_AND_GAS_CO2E,
                 Q.MED_INSTR_CO2E, Q.OTHER_MANUFACTURED_CO2E,
-                Q.OTHER_PROCUREMENT_CO2E, Q.PAPER_CO2E, Q.PHARMA_CO2E);
+                Q.OTHER_PROCUREMENT_CO2E, Q.PAPER_AND_CARD_CO2E, Q.PHARMA_CO2E);
     }
 
     // This is probably a poor approximation.
