@@ -41,11 +41,13 @@ public class ReportModelHelper {
             headerNames[i] = headers[i].name();
         }
 
+        List<String> periods = PeriodUtil.fillBackwards(period, maxPeriods);
+                model.addAttribute("periods", periods);
         List<Answer> answers;
         if (ascending) {
-            answers = answerRepo.findByOrgAndQuestionAsc(org, headerNames);
+            answers = answerRepo.findByOrgPeriodAndQuestionAsc(org, periods.toArray(new String[periods.size()]), headerNames);
         } else {
-            answers = answerRepo.findByOrgAndQuestion(org, headerNames);
+            answers = answerRepo.findByOrgPeriodAndQuestion(org, periods.toArray(new String[periods.size()]), headerNames);
         }
         LOGGER.info(
                 String.format("Found %1$s answers about organisation for %2$s",
@@ -57,7 +59,9 @@ public class ReportModelHelper {
         }
 
         int rowCount = tdsHelper.getRowCount(headerNames, answers);
-        List<String> periods = PeriodUtil.fillBackwards(period,
+        // TODO should now be impossible to have rowCount < maxPeriods because
+        // we pre-populate I think
+        periods = PeriodUtil.fillBackwards(period,
                 rowCount < maxPeriods ? rowCount : maxPeriods);
                 model.addAttribute("periods", periods);
         if (ascending) {
