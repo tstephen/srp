@@ -1,3 +1,235 @@
+= Import SDU org update (2017 data)
+
+. Create table from sdu_org.sql
+
+. Import CSV file (assumes mysql .my.cnf set up with credentials)
++
+----
+    sudo mysqlimport --ignore-lines=1 --fields-terminated-by=, --fields-optionally-enclosed-by='"' --verbose --local kp_db /var/lib/mysql-files/sdu_org.csv 
+----
+
+. Compare which orgs exist already - hopefully empty set like this
++
+----
+    mysql> select c_org_code, name from sdu_org where c_org_code not in (select c.value from OL_ACCOUNT a join OL_ACCOUNT_CUSTOM c on a.id = c.account_id where c.name = 'orgCode');
+Empty set (0.24 sec)
+----
+
+. Check for any name changes
++
+----
+    mysql> select id, c_org_code, name from sdu_org where account_id is null;
+    +------+------------+---------------------------------------------------------+
+    | id   | c_org_code | name                                                    |
+    +------+------------+---------------------------------------------------------+
+    | 1128 | 01H        | NHS North Cumbria CCG                                   |
+    | 1130 | 01K        | NHS Morecambe Bay CCG                                   |
+    | 1402 | RGN        | NORTH WEST ANGLIA NHS FOUNDATION TRUST                  |
+    | 1415 | RJ2        | LEWISHAM AND GREENWICH NHS TRUST                        |
+    | 1417 | RJ7        | ST GEORGE'S UNIVERSITY HOSPITALS NHS FOUNDATION TRUST   |
+    | 1475 | RRD        | NORTH ESSEX PARTNERSHIP UNIVERSITY NHS FOUNDATION TRUST |
+    | 1478 | RRJ        | THE ROYAL ORTHOPAEDIC HOSPITAL NHS FOUNDATION TRUST     |
+    | 1490 | RTG        | DERBY TEACHING HOSPITALS NHS FOUNDATION TRUST           |
+    | 1496 | RTV        | NORTH WEST BOROUGHS HEALTHCARE NHS FOUNDATION TRUST     |
+    | 1554 | RY2        | BRIDGEWATER COMMUNITY HEALTHCARE NHS FOUNDATION TRUST   |
+    | 1575 | TAD        | BRADFORD DISTRICT CARE FOUNDATION TRUST                 |
+    +------+------------+---------------------------------------------------------+
+    11 rows in set (0.00 sec)
+----
+
+. Check / Update name changes
++
+----
+    SELECT o.name, a.name 
+    FROM sdu_org o, OL_ACCOUNT a, OL_ACCOUNT_CUSTOM ac
+    WHERE a.id = ac.account_id 
+    AND ac.name = 'orgCode'
+    AND ac.value = o.c_org_code
+    AND o.name != a.name;
+      
+    UPDATE OL_ACCOUNT a, OL_ACCOUNT_CUSTOM ac,sdu_org o 
+    set a.name = (
+      SELECT o.name from sdu_org o
+      WHERE ac.name = 'orgCode'
+      AND ac.value = o.c_org_code
+    )
+    WHERE a.id = ac.account_id 
+    AND ac.name = 'orgCode'
+    AND ac.value = o.c_org_code;
+----
+
+. UPDATE tmp table with account ids
++
+----
+    UPDATE sdu_org o
+    SET account_id = ( SELECT min(id) from OL_ACCOUNT a where a.name = o.name );
+----
+
+. Update custom fields
++
+----
+    UPDATE OL_ACCOUNT_CUSTOM ac,sdu_org o 
+    set ac.value = (
+      SELECT o.c_nhs_area from sdu_org o
+      WHERE ac.name = 'nhsEnglandArea'
+      AND ac.account_id = o.account_id
+    )
+    WHERE ac.name = 'nhsEnglandArea'
+    AND ac.account_id = o.account_id;
+    -- 12 rows affected
+        
+    UPDATE OL_ACCOUNT_CUSTOM ac,sdu_org o 
+    set ac.value = (
+      SELECT o.c_phe_centre from sdu_org o
+      WHERE ac.name = 'pheCentre'
+      AND ac.account_id = o.account_id
+    )
+    WHERE ac.name = 'pheCentre'
+    AND ac.account_id = o.account_id;
+    -- 0 rows affected
+    
+    UPDATE OL_ACCOUNT_CUSTOM ac,sdu_org o 
+    set ac.value = (
+      SELECT o.c_region from sdu_org o
+      WHERE ac.name = 'region'
+      AND ac.account_id = o.account_id
+    )
+    WHERE ac.name = 'region'
+    AND ac.account_id = o.account_id;
+    -- 0 rows affected
+    
+    UPDATE OL_ACCOUNT_CUSTOM ac,sdu_org o 
+    set ac.value = (
+      SELECT o.c_sdmp from sdu_org o
+      WHERE ac.name = 'sdmp'
+      AND ac.account_id = o.account_id
+    )
+    WHERE ac.name = 'sdmp'
+    AND ac.account_id = o.account_id;
+    -- 256 rows affected
+        
+    UPDATE OL_ACCOUNT_CUSTOM ac,sdu_org o 
+    set ac.value = (
+      SELECT o.c_adaptation from sdu_org o
+      WHERE ac.name = 'adaptation'
+      AND ac.account_id = o.account_id
+    )
+    WHERE ac.name = 'adaptation'
+    AND ac.account_id = o.account_id;
+    -- 174 rows affected
+    
+    UPDATE OL_ACCOUNT_CUSTOM ac,sdu_org o 
+    set ac.value = (
+      SELECT o.c_on_track_34_pct from sdu_org o
+      WHERE ac.name = 'onTrack34Pct'
+      AND ac.account_id = o.account_id
+    )
+    WHERE ac.name = 'onTrack34Pct'
+    AND ac.account_id = o.account_id;
+    -- 112 rows affected
+    
+    UPDATE OL_ACCOUNT_CUSTOM ac,sdu_org o 
+    set ac.value = (
+      SELECT o.c_healthy_tp from sdu_org o
+      WHERE ac.name = 'healthyTP'
+      AND ac.account_id = o.account_id
+    )
+    WHERE ac.name = 'healthyTP'
+    AND ac.account_id = o.account_id;
+    -- 111 rows affected
+        
+    UPDATE OL_ACCOUNT_CUSTOM ac,sdu_org o 
+    set ac.value = (
+      SELECT o.c_gcc from sdu_org o
+      WHERE ac.name = 'gcc'
+      AND ac.account_id = o.account_id
+    )
+    WHERE ac.name = 'gcc'
+    AND ac.account_id = o.account_id;
+    -- 45 rows affected
+    
+    UPDATE OL_ACCOUNT_CUSTOM ac,sdu_org o 
+    set ac.value = (
+      SELECT o.c_sr_score from sdu_org o
+      WHERE ac.name = 'srScore'
+      AND ac.account_id = o.account_id
+    )
+    WHERE ac.name = 'srScore'
+    AND ac.account_id = o.account_id;
+    -- 231 rows affected
+    
+    UPDATE OL_ACCOUNT_CUSTOM ac,sdu_org o 
+    set ac.value = (
+      SELECT o.c_sr_pct from sdu_org o
+      WHERE ac.name = 'srPct'
+      AND ac.account_id = o.account_id
+    )
+    WHERE ac.name = 'srPct'
+    AND ac.account_id = o.account_id;
+    -- 473 rows affected
+        
+    UPDATE OL_ACCOUNT_CUSTOM ac,sdu_org o 
+    set ac.value = (
+      SELECT o.c_nrg from sdu_org o
+      WHERE ac.name = 'energy'
+      AND ac.account_id = o.account_id
+    )
+    WHERE ac.name = 'energy'
+    AND ac.account_id = o.account_id;
+    -- 163 rows affected
+    
+    UPDATE OL_ACCOUNT_CUSTOM ac,sdu_org o 
+    set ac.value = (
+      SELECT o.c_nrg_fte from sdu_org o
+      WHERE ac.name = 'energyFte'
+      AND ac.account_id = o.account_id
+    )
+    WHERE ac.name = 'energyFte'
+    AND ac.account_id = o.account_id;
+    -- 247 rows affected
+    
+    UPDATE OL_ACCOUNT_CUSTOM ac,sdu_org o 
+    set ac.value = (
+      SELECT o.c_water from sdu_org o
+      WHERE ac.name = 'water'
+      AND ac.account_id = o.account_id
+    )
+    WHERE ac.name = 'water'
+    AND ac.account_id = o.account_id;
+    -- 108 rows affected
+        
+    UPDATE OL_ACCOUNT_CUSTOM ac,sdu_org o 
+    set ac.value = (
+      SELECT o.c_water_fte from sdu_org o
+      WHERE ac.name = 'waterFte'
+      AND ac.account_id = o.account_id
+    )
+    WHERE ac.name = 'waterFte'
+    AND ac.account_id = o.account_id;
+    -- 227 rows affected
+    
+    UPDATE OL_ACCOUNT_CUSTOM ac,sdu_org o 
+    set ac.value = (
+      SELECT o.c_waste from sdu_org o
+      WHERE ac.name = 'waste'
+      AND ac.account_id = o.account_id
+    )
+    WHERE ac.name = 'waste'
+    AND ac.account_id = o.account_id;
+    -- 165 rows affected
+    
+    UPDATE OL_ACCOUNT_CUSTOM ac,sdu_org o 
+    set ac.value = (
+      SELECT o.c_waste_change from sdu_org o
+      WHERE ac.name = 'wasteChange'
+      AND ac.account_id = o.account_id
+    )
+    WHERE ac.name = 'wasteChange'
+    AND ac.account_id = o.account_id;
+    -- 174 rows affected
+        
+----
+
 = Import org data from NHS Digital 
 
 Canonical source: https://digital.nhs.uk/media/352/etr/zip/etr
