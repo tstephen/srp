@@ -41,6 +41,8 @@ public enum Q implements QuestionEnum {
 
     ELEC_TOTAL_RENEWABLE_USED,
 
+    ELEC_NON_RENEWABLE_GREEN_TARIFF,
+    ELEC_NON_RENEWABLE_3RD_PARTY,
     ELEC_NON_RENEWABLE_GREEN_TARIFF_CO2E,
     ELEC_NON_RENEWABLE_3RD_PARTY_CO2E,
     /* Emissions from partially renewable sources such as Green Tariff from grid */

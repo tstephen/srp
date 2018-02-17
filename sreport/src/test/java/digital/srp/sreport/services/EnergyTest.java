@@ -61,6 +61,8 @@ public class EnergyTest {
         rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD).question(Q.ELEC_OWNED_RENEWABLE_USED_SDU).response("8000"));
 
         rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD).question(Q.ELEC_TOTAL_RENEWABLE_USED));
+        rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD).question(Q.ELEC_NON_RENEWABLE_GREEN_TARIFF));
+        rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD).question(Q.ELEC_NON_RENEWABLE_3RD_PARTY));
         rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD).question(Q.ELEC_NON_RENEWABLE_GREEN_TARIFF_CO2E));
         rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD).question(Q.ELEC_NON_RENEWABLE_3RD_PARTY_CO2E));
         rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD).question(Q.ELEC_RENEWABLE_CO2E));
@@ -70,6 +72,8 @@ public class EnergyTest {
 
         svc.crunchElectricityUsed(PERIOD, rtn);
         assertEquals(new BigDecimal("3952"), rtn.answer(PERIOD, Q.ELEC_CO2E).get().responseAsBigDecimal().setScale(0, RoundingMode.HALF_UP));
+        assertEquals(new BigDecimal("247"), rtn.answer(PERIOD, Q.ELEC_NON_RENEWABLE_GREEN_TARIFF_CO2E).get().responseAsBigDecimal().setScale(0, RoundingMode.HALF_UP));
+        assertEquals(new BigDecimal("245"), rtn.answer(PERIOD, Q.ELEC_NON_RENEWABLE_3RD_PARTY_CO2E).get().responseAsBigDecimal().setScale(0, RoundingMode.HALF_UP));
         assertEquals(new BigDecimal("142"), rtn.answer(PERIOD, Q.ELEC_EXPORTED_CO2E).get().responseAsBigDecimal().setScale(0, RoundingMode.HALF_UP));
         assertEquals(new BigDecimal("3810"), rtn.answer(PERIOD, Q.NET_ELEC_CO2E).get().responseAsBigDecimal().setScale(0, RoundingMode.HALF_UP));
         assertEquals(new BigDecimal("2216364"), rtn.answer(PERIOD, Q.ELEC_TOTAL_RENEWABLE_USED).get().responseAsBigDecimal().setScale(0, RoundingMode.HALF_UP));
