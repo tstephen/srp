@@ -39,6 +39,10 @@ public class Cruncher implements digital.srp.sreport.model.surveys.SduQuestions,
 
     protected static final BigDecimal m2km = new BigDecimal("1.60934");
 
+    protected static final BigDecimal BUS_PER_MILE = new BigDecimal("0.1200");
+    protected static final BigDecimal RAIL_PER_MILE = new BigDecimal("0.3000");
+    protected static final BigDecimal TAXI_PER_MILE = new BigDecimal("2.8300");
+
     protected final List<CarbonFactor> cfactors;
 
     protected final List<WeightingFactor> wfactors;
@@ -582,10 +586,20 @@ public class Cruncher implements digital.srp.sreport.model.surveys.SduQuestions,
     }
 
     protected void crunchScope3Travel(String period, SurveyReturn rtn) {
-        // NOTE: XXX_TOTAL means primary and WTT combined due to XXX
-        CarbonFactor cFactor = cFactor(CarbonFactors.CAR_TOTAL, period);
         crunchPatientVisitorMileageCo2e(period, rtn);
         crunchStaffCommuteCo2e(period, rtn);
+        crunchBizTravel(period, rtn);
+        try {
+            sumAnswers(period, rtn, Q.SCOPE_3_TRAVEL,
+                    SduQuestions.SCOPE_3_TRAVEL_HDRS);
+        } catch (IllegalStateException | NullPointerException e) {
+            LOGGER.warn("Insufficient data to calculate CO2e from travel");
+        }
+    }
+
+    protected void crunchBizTravel(String period, SurveyReturn rtn) {
+        // CAR_TOTAL means primary and WTT combined due to CAR
+        CarbonFactor cFactor = cFactor(CarbonFactors.CAR_TOTAL, period);
         try {
             BigDecimal fleetMileage = getAnswer(period, rtn, Q.OWNED_LEASED_LOW_CARBON_MILES).responseAsBigDecimal();
             getAnswer(period, rtn, Q.OWNED_LEASED_LOW_CARBON_CO2E)
@@ -621,6 +635,13 @@ public class Cruncher implements digital.srp.sreport.model.surveys.SduQuestions,
             LOGGER.warn("Insufficient data to calculate CO2e from fleet miles");
         }
         try {
+            if (getAnswer(period, rtn, Q.RAIL_MILES).response() == null
+                    && getAnswer(period, rtn, Q.RAIL_COST).response() != null) {
+                BigDecimal railMiles = getAnswer(period, rtn, Q.RAIL_COST).responseAsBigDecimal()
+                        .divide(RAIL_PER_MILE, RoundingMode.HALF_UP);
+                getAnswer(period, rtn, Q.RAIL_MILES).derived(true).response(railMiles);
+            }
+
             cFactor = cFactor(CarbonFactors.NATIONAL_RAIL_TOTAL, period);
             BigDecimal bizTravelRailCo2e
                     = getAnswer(period, rtn, Q.RAIL_MILES).responseAsBigDecimal()
@@ -653,34 +674,42 @@ public class Cruncher implements digital.srp.sreport.model.surveys.SduQuestions,
             LOGGER.warn("Insufficient data to calculate CO2e from air travel");
         }
         try {
+            if (getAnswer(period, rtn, Q.BUS_MILES).response() == null
+                    && getAnswer(period, rtn, Q.BUS_COST).response() != null) {
+                BigDecimal busMiles = getAnswer(period, rtn, Q.BUS_COST).responseAsBigDecimal()
+                        .divide(BUS_PER_MILE, RoundingMode.HALF_UP);
+                getAnswer(period, rtn, Q.BUS_MILES).derived(true).response(busMiles);
+            }
+
             cFactor = cFactor(CarbonFactors.BUS_TOTAL, period);
-            BigDecimal bizTravelRailCo2e
-                    = getAnswer(period, rtn, Q.RAIL_MILES).responseAsBigDecimal()
+            BigDecimal bizTravelBusCo2e
+                    = getAnswer(period, rtn, Q.BUS_MILES).responseAsBigDecimal()
                     .multiply(cFactor.value())
                     .multiply(m2km)
                     .divide(ONE_THOUSAND, 0, RoundingMode.HALF_UP);
-            getAnswer(period,rtn, Q.BIZ_MILEAGE_BUS_CO2E).response(bizTravelRailCo2e);
+            getAnswer(period,rtn, Q.BIZ_MILEAGE_BUS_CO2E).response(bizTravelBusCo2e);
         } catch (IllegalStateException | NullPointerException e) {
             LOGGER.warn("Insufficient data to calculate CO2e from bus travel");
         }
         try {
+            if (getAnswer(period, rtn, Q.TAXI_MILES).response() == null
+                    && getAnswer(period, rtn, Q.TAXI_COST).response() != null) {
+                BigDecimal taxiMiles = getAnswer(period, rtn, Q.TAXI_COST).responseAsBigDecimal()
+                        .divide(TAXI_PER_MILE, RoundingMode.HALF_UP);
+                getAnswer(period, rtn, Q.TAXI_MILES).derived(true).response(taxiMiles);
+            }
+
             cFactor = cFactor(CarbonFactors.TAXI_TOTAL, period);
-            BigDecimal bizTravelRailCo2e
-                    = getAnswer(period, rtn, Q.RAIL_MILES).responseAsBigDecimal()
+            BigDecimal bizTravelTaxiCo2e
+                    = getAnswer(period, rtn, Q.TAXI_MILES).responseAsBigDecimal()
                     .multiply(cFactor.value())
                     .multiply(m2km)
                     .divide(ONE_THOUSAND, 0, RoundingMode.HALF_UP);
-            getAnswer(period,rtn, Q.BIZ_MILEAGE_TAXI_CO2E).response(bizTravelRailCo2e);
+            getAnswer(period,rtn, Q.BIZ_MILEAGE_TAXI_CO2E).response(bizTravelTaxiCo2e);
         } catch (IllegalStateException | NullPointerException e) {
             LOGGER.warn("Insufficient data to calculate CO2e from taxi travel");
         }
         sumAnswers(period, rtn, Q.BIZ_MILEAGE, SduQuestions.BIZ_MILEAGE_HDRS);
-        try {
-            sumAnswers(period, rtn, Q.SCOPE_3_TRAVEL,
-                    SduQuestions.SCOPE_3_TRAVEL_HDRS);
-        } catch (IllegalStateException | NullPointerException e) {
-            LOGGER.warn("Insufficient data to calculate CO2e from travel");
-        }
     }
 
     // Treasury row 53: Staff commute
