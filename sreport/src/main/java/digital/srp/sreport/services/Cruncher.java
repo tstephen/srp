@@ -407,7 +407,7 @@ public class Cruncher implements digital.srp.sreport.model.surveys.SduQuestions,
             CarbonFactor cFactor = cFactor(CarbonFactors.CLOSED_LOOP_OR_OPEN_LOOP, period);
             BigDecimal recyclingCo2e = rtn.answerResponseAsBigDecimal(period, Q.RECYCLING_WEIGHT)
                     .multiply(cFactor.value())
-                    .divide(ONE_THOUSAND, 0, RoundingMode.HALF_UP);
+                    .divide(ONE_THOUSAND, 2, RoundingMode.HALF_UP);
             getAnswer(period,rtn, Q.RECYCLING_CO2E).response(recyclingCo2e);
         } catch (IllegalStateException | NullPointerException e) {
             LOGGER.warn("Insufficient data to calculate CO2e from recycling waste");
@@ -417,7 +417,7 @@ public class Cruncher implements digital.srp.sreport.model.surveys.SduQuestions,
             CarbonFactor cFactor = cFactor(CarbonFactors.HIGH_TEMPERATURE_DISPOSAL_WASTE_WITH_ENERGY_RECOVERY, period);
             BigDecimal recoveryCo2e = rtn.answerResponseAsBigDecimal(period, Q.OTHER_RECOVERY_WEIGHT)
                     .multiply(cFactor.value())
-                    .divide(ONE_THOUSAND, 0, RoundingMode.HALF_UP);
+                    .divide(ONE_THOUSAND, 2, RoundingMode.HALF_UP);
             getAnswer(period, rtn, Q.OTHER_RECOVERY_CO2E).derived(true).response(recoveryCo2e);
         } catch (IllegalStateException | NullPointerException e) {
             LOGGER.warn("Insufficient data to calculate CO2e from other waste recovery");
@@ -427,17 +427,17 @@ public class Cruncher implements digital.srp.sreport.model.surveys.SduQuestions,
             CarbonFactor cFactor = cFactor(CarbonFactors.HIGH_TEMPERATURE_DISPOSAL_WASTE, period);
             BigDecimal incinerationCo2e = getAnswer(period, rtn, Q.INCINERATION_WEIGHT).responseAsBigDecimal()
                     .multiply(cFactor.value())
-                    .divide(ONE_THOUSAND, 0, RoundingMode.HALF_UP);
+                    .divide(ONE_THOUSAND, 2, RoundingMode.HALF_UP);
             getAnswer(period,rtn, Q.INCINERATION_CO2E).response(incinerationCo2e);
         } catch (IllegalStateException | NullPointerException e) {
             LOGGER.warn("Insufficient data to calculate CO2e from incinerating waste");
         }
         try {
             // Treasury row 65: Landfill disposal waste
-            CarbonFactor cFactor = cFactor(CarbonFactors.NON_BURN_TREATMENT_DISPOSAL_WASTE, period);
+            CarbonFactor cFactor = cFactor(CarbonFactors.LANDFILL_WEIGHTED_AVERAGE, period);
             BigDecimal landfillCo2e = getAnswer(period, rtn, Q.LANDFILL_WEIGHT).responseAsBigDecimal()
                     .multiply(cFactor.value())
-                    .divide(ONE_THOUSAND, 0, RoundingMode.HALF_UP);
+                    .divide(ONE_THOUSAND, 2, RoundingMode.HALF_UP);
             getAnswer(period,rtn, Q.LANDFILL_CO2E).response(landfillCo2e);
         } catch (IllegalStateException | NullPointerException e) {
             LOGGER.warn("Insufficient data to calculate CO2e from sending waste to landfill");

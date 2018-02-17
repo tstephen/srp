@@ -66,10 +66,10 @@ public class CruncherTest {
     private  static final String[] BIZ_SVCS_CO2E = { "4,180", "4,600",
             "5,010", "5,140", "0", "0", "0", "0", "0", "0" };
 
-    private  static final String[] WASTE_AND_WATER_CO2E = { "68", "74",
-            "80", "90", "0", "0", "0", "0", "0", "0" };
+    private  static final String[] WASTE_AND_WATER_CO2E = { "88.3", "96.7",
+            "105", "118", "0", "0", "0", "0", "0", "0" };
 
-    private  static final String[] SCOPE_3_WASTE = { "3", "3", "3", "5",
+    private  static final String[] SCOPE_3_WASTE = { "23.3", "25.7", "28.2", "33.3",
             "0", "0", "0", "0", "0", "0" };
 
     private  static final String[] SCOPE_3_WATER = { "65", "71", "77", "85",
