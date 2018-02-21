@@ -31,7 +31,7 @@ public class TabularDataSetHelper {
         LOGGER.debug("Row headers for table: {}", rhList);
         LOGGER.debug("Column headers for table: {}", chList);
         int colCount = chList.size();
-        int rowCount = getRowCount(cHeaders, answers);
+        int rowCount = rHeaders.length;
         TabularDataSet tds = new TabularDataSet(rowCount, colCount)
                 .headers(chList.toArray(new String[colCount]));
         for (int i = 0; i < answers.size(); i++) {
@@ -55,14 +55,5 @@ public class TabularDataSetHelper {
             aggregator.get().addAggregateData(tds, formatter, colCount, rowCount);
         }
         return tds;
-    }
-
-    public int getRowCount(final String[] cHeaders,
-            final List<Answer> answers) {
-        int rowCount = answers.size()/cHeaders.length;
-        if (answers.size() % cHeaders.length != 0) {
-            rowCount++;
-        }
-        return rowCount;
     }
 }

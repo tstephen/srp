@@ -25,11 +25,8 @@ public class ReportModelHelper {
 
     private final AnswerRepository answerRepo;
 
-//    private final TabularDataSetHelper tdsHelper;
-
     public ReportModelHelper(final AnswerRepository answerRepo) {
         this.answerRepo = answerRepo;
-//        this.tdsHelper = new TabularDataSetHelper();
     }
 
     public synchronized void fillModel(String org, String period, Q[] headers, final Model model,
@@ -58,12 +55,6 @@ public class ReportModelHelper {
             }
         }
 
-        int rowCount = tdsHelper.getRowCount(headerNames, answers);
-        // TODO should now be impossible to have rowCount < maxPeriods because
-        // we pre-populate I think
-        periods = PeriodUtil.fillBackwards(period,
-                rowCount < maxPeriods ? rowCount : maxPeriods);
-                model.addAttribute("periods", periods);
         if (ascending) {
             Collections.reverse(periods);
         }
