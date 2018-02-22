@@ -19,13 +19,11 @@ import digital.srp.sreport.model.SurveyReturn;
 import digital.srp.sreport.model.WeightingFactor;
 
 public class SduProfileTest {
-
+    private static final String OP_EX = "275000";
     private static final String NON_PAY_SPEND = "107740";
 
     private static final String CAPITAL_SPEND = "35350";
     private static final String CAPITAL_CO2E = "10499";
-    private static final String WATER_CO2E = "191.0";
-    private static final String WASTE_CO2E = "314.0";
 
     private static final String PERIOD = "2017-18";
     private static Cruncher svc;
@@ -41,16 +39,43 @@ public class SduProfileTest {
     }
 
     @Test
-    public void testCalcCo2eProfile() {
+    public void testCalcCo2eProfileFromOpex() {
         SurveyReturn rtn = new SurveyReturn().applicablePeriod(PERIOD).org("ZZ1");
         rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD).question(Q.ORG_TYPE).response("Acute Trust"));
-        rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD).question(Q.NON_PAY_SPEND).response(NON_PAY_SPEND));
+        rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD).question(Q.OP_EX).response(OP_EX));
 
-        rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD).question(Q.CAPITAL_SPEND).response(CAPITAL_SPEND));
-        rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD).question(Q.SCOPE_3_WATER).response(WATER_CO2E));
-        rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD).question(Q.SCOPE_3_WASTE).response(WASTE_CO2E));
+        rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD).question(Q.NON_PAY_SPEND));
+        rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD).question(Q.CAPITAL_SPEND));
 
-        rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD).question(Q.BIZ_SVCS_SPEND));
+        initAnswers(rtn);
+
+        svc.calcCarbonProfileSduMethod(PERIOD, rtn);
+
+        assertEquals(new BigDecimal("106975"), rtn.answer(PERIOD, Q.NON_PAY_SPEND).get().responseAsBigDecimal().setScale(0, RoundingMode.HALF_UP));
+        assertEquals(new BigDecimal("31772"), rtn.answer(PERIOD, Q.CAPITAL_SPEND).get().responseAsBigDecimal().setScale(0, RoundingMode.HALF_UP));
+        assertEquals(new BigDecimal("9436"), rtn.answer(PERIOD, Q.CAPITAL_CO2E).get().responseAsBigDecimal().setScale(0, RoundingMode.HALF_UP));
+    }
+
+    @Test
+    public void testCalcCo2eProfileFromOpexTolerateEmptyStrings() {
+        SurveyReturn rtn = new SurveyReturn().applicablePeriod(PERIOD).org("ZZ1");
+        rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD).question(Q.ORG_TYPE).response("Acute Trust"));
+        rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD).question(Q.OP_EX).response(OP_EX));
+
+        rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD).question(Q.NON_PAY_SPEND).response(""));
+        rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD).question(Q.CAPITAL_SPEND).response(""));
+
+        initAnswers(rtn);
+
+        svc.calcCarbonProfileSduMethod(PERIOD, rtn);
+
+        assertEquals(new BigDecimal("106975"), rtn.answer(PERIOD, Q.NON_PAY_SPEND).get().responseAsBigDecimal().setScale(0, RoundingMode.HALF_UP));
+        assertEquals(new BigDecimal("31772"), rtn.answer(PERIOD, Q.CAPITAL_SPEND).get().responseAsBigDecimal().setScale(0, RoundingMode.HALF_UP));
+        assertEquals(new BigDecimal("9436"), rtn.answer(PERIOD, Q.CAPITAL_CO2E).get().responseAsBigDecimal().setScale(0, RoundingMode.HALF_UP));
+    }
+
+    private void initAnswers(SurveyReturn rtn) {
+        rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD).question(Q.BIZ_SVCS_SPEND).response(""));
         rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD).question(Q.CONSTRUCTION_SPEND));
         rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD).question(Q.CATERING_SPEND));
         rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD).question(Q.FREIGHT_SPEND));
@@ -80,6 +105,16 @@ public class SduProfileTest {
         rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD).question(Q.COMMISSIONING_CO2E));
         rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD).question(Q.WASTE_AND_WATER_CO2E));
         rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD).question(Q.PROCUREMENT_CO2E));
+    }
+
+    @Test
+    public void testCalcCo2eProfileFromNonPaySpend() {
+        SurveyReturn rtn = new SurveyReturn().applicablePeriod(PERIOD).org("ZZ1");
+        rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD).question(Q.ORG_TYPE).response("Acute Trust"));
+        rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD).question(Q.NON_PAY_SPEND).response(NON_PAY_SPEND));
+        rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD).question(Q.CAPITAL_SPEND).response(CAPITAL_SPEND));
+
+        initAnswers(rtn);
 
         svc.calcCarbonProfileSduMethod(PERIOD, rtn);
 

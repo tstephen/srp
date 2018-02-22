@@ -844,7 +844,7 @@ public class Cruncher implements digital.srp.sreport.model.surveys.SduQuestions,
         WeightingFactor wFactor = wFactor(WeightingFactors.CAPITAL, period, orgType);
         BigDecimal calcVal;
         try {
-            if (getAnswer(period, rtn, Q.CAPITAL_SPEND).response() == null) {
+            if (BigDecimal.ZERO.equals(getAnswer(period, rtn, Q.CAPITAL_SPEND).responseAsBigDecimal())) {
                 LOGGER.info("No directly entered spend {}, estimate from non pay spend", Q.CAPITAL_SPEND);
                 calcVal = nonPaySpend.multiply(wFactor.proportionOfTotal());
                 LOGGER.info("Estimated {} from non pay spend as {}", Q.CAPITAL_SPEND, calcVal);
