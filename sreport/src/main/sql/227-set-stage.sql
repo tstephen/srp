@@ -29,11 +29,11 @@ DROP PROCEDURE IF EXISTS sp_update_account_stage //
 CREATE PROCEDURE sp_update_account_stage() 
 BEGIN
   DROP TABLE IF EXISTS tmp_org;
-  
+
   CREATE TABLE tmp_org (
     org char(3) NOT NULL
   );
-  
+
   INSERT INTO tmp_org
     SELECT org
     FROM SR_ANSWER a 
@@ -42,8 +42,25 @@ BEGIN
     WHERE a.applicable_period = ( SELECT value from TR_MODEL_PARAM WHERE name = 'REPORTING_PERIOD' )
     GROUP BY r.org
     HAVING count(1) > 1;
-  
+
   UPDATE OL_ACCOUNT a, OL_ACCOUNT_CUSTOM ac SET stage = 'In progress'
+  WHERE a.id = ac.account_id
+  AND a.tenant_id = 'sdu' 
+  AND ac.value IN ( SELECT org from tmp_org );
+
+  DELETE FROM tmp_org;
+
+  INSERT INTO tmp_org
+    SELECT org
+    FROM SR_ANSWER a 
+      JOIN SR_RETURN_ANSWER ra on a.id = ra.answer_id
+      JOIN SR_RETURN r on r.id = ra.survey_return_id
+    WHERE a.applicable_period = ( SELECT value from TR_MODEL_PARAM WHERE name = 'REPORTING_PERIOD' )
+    AND r.status = 'Submitted'
+    GROUP BY r.org
+    HAVING count(1) > 1;
+  
+  UPDATE OL_ACCOUNT a, OL_ACCOUNT_CUSTOM ac SET stage = 'Submitted'
   WHERE a.id = ac.account_id
   AND a.tenant_id = 'sdu' 
   AND ac.value IN ( SELECT org from tmp_org );
