@@ -1214,15 +1214,26 @@ public class Cruncher implements digital.srp.sreport.model.surveys.SduQuestions,
         case "ambulance trust":
             orgType = "Ambulance";
             break;
+        case "care":
+        case "adult social care":
+        case "social care":
+            orgType = "Care";
+            break;
         case "clinical commissioning group":
             orgType = "Clinical commissioning group";
             break;
         case "community":
             orgType = "Community";
             break;
+        case "mental health":
+        case "mental health / learning disability":
+        case "mental health learning disability":
         case "mental health and learning disability":
+            orgType = "Mental health learning disability";
             break;
         case "independent sector":
+            break;
+        case "social enterprise":
             break;
         default:
             LOGGER.warn("Unhandled org type when looking up weighting factor {}: {}", wName, orgType);
