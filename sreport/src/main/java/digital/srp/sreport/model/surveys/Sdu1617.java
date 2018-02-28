@@ -210,17 +210,26 @@ public class Sdu1617 {
         return survey;
     }
 
+    // NOTE some of those below are not actually derived but if not supplied
+    // with at least a default (e.g. ) will cause cruncher to fail
     public static Q[] getDerivedQs() {
         ArrayList<Q> list = new ArrayList<Q>();
         list.addAll(Arrays.asList(SduQuestions.SDU_PROFILE_HDRS));
         list.addAll(Arrays.asList(SduQuestions.FOOTPRINT_PCT_HDRS));
+        list.addAll(Arrays.asList(SduQuestions.FOOTPRINT_2017_PCT_HDRS));
         list.add(Q.WASTE_WATER);
         list.addAll(Arrays.asList(SduQuestions.WATER_CO2E_HDRS));
+        list.add(Q.PAPER_USED);
+        list.addAll(Arrays.asList(SduQuestions.WASTE_HDRS));
         list.addAll(Arrays.asList(SduQuestions.WASTE_CO2E_HDRS));
         list.addAll(Arrays.asList(SduQuestions.TRAVEL_CO2E_HDRS));
         list.addAll(Arrays.asList(SduQuestions.ENERGY_HDRS));
+        list.add(Q.ELEC_USED_GREEN_TARIFF);
+        list.add(Q.ELEC_3RD_PTY_RENEWABLE_USED);
         list.add(Q.ELEC_NON_RENEWABLE_GREEN_TARIFF);
+        list.add(Q.GREEN_TARIFF_ADDITIONAL_PCT);
         list.add(Q.ELEC_NON_RENEWABLE_3RD_PARTY);
+        list.add(Q.THIRD_PARTY_ADDITIONAL_PCT);
         list.addAll(Arrays.asList(SduQuestions.ENERGY_CO2E_HDRS));
         list.add(Q.ELEC_NON_RENEWABLE_GREEN_TARIFF_CO2E);
         list.add(Q.ELEC_NON_RENEWABLE_3RD_PARTY_CO2E);
@@ -240,11 +249,11 @@ public class Sdu1617 {
         list.addAll(Arrays.asList(SduQuestions.ECLASS_PROFILE_HDRS));
         list.addAll(Arrays.asList(SduQuestions.CORE_CO2E_HDRS));
         list.addAll(Arrays.asList(SduQuestions.ECLASS_PROFILE_HDRS));
+        list.addAll(Arrays.asList(SduQuestions.BIZ_MILEAGE_ACTIVE_PUBLIC_HDRS));
         list.addAll(Arrays.asList(SduQuestions.BIZ_MILEAGE_HDRS));
         list.add(Q.BIZ_MILEAGE);
         list.addAll(Arrays.asList(SduQuestions.TRAVEL_HDRS));
         list.addAll(Arrays.asList(SduQuestions.CITIZEN_CO2E_HDRS));
-        list.addAll(Arrays.asList(SduQuestions.SDU_TREND_HDRS));
         list.add(Q.TOTAL_CO2E);
         list.add(Q.TOTAL_CO2E_BY_POP);
         list.add(Q.TOTAL_CO2E_BY_FLOOR);
@@ -253,6 +262,7 @@ public class Sdu1617 {
         list.add(Q.TOTAL_CO2E_BY_PATIENT_CONTACT);
         list.add(Q.TOTAL_CO2E_BY_OPEX);
         list.addAll(Arrays.asList(SduQuestions.BENCHMARK_HDRS));
+        list.addAll(Arrays.asList(SduQuestions.BENCHMARK_2017_HDRS));
         list.addAll(Arrays.asList(SduQuestions.BENCHMARK_BY_POPULATION_HDRS));
         list.addAll(Arrays.asList(SduQuestions.BENCHMARK_BY_FLOOR_AREA_HDRS));
         list.addAll(Arrays.asList(SduQuestions.BENCHMARK_BY_WTE_HDRS));

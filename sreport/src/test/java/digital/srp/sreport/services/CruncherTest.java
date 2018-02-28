@@ -30,12 +30,6 @@ public class CruncherTest {
     private  static final String[] ANAESTHETIC_GASES_CO2E = { "5,840",
             "6,430", "10,500", "13,100", "0", "0", "0", "0", "0", "0" };
 
-    private  static final String[] COMMISSIONING_CO2E = { "1,250", "1,370",
-            "1,490", "1,530", "0", "0", "0", "0", "0", "0" };
-
-    private  static final String[] TRAVEL_CO2E = { "2,370", "2,610",
-            "2,840", "2,920", "0", "0", "0", "0", "0", "0" };
-
     private  static final String[] PHARMA_CO2E = { "94.6", "104", "113",
             "116", "0", "0", "0", "0", "0", "0" };
 
@@ -319,12 +313,6 @@ public class CruncherTest {
             assertEquals(String.format("Incorrect value of %2$s for period %1$s", period, Q.PHARMA_CO2E),
                     PHARMA_CO2E[i],
                     rtn.answer(period, Q.PHARMA_CO2E).orElseThrow(() -> new IllegalStateException()).response3sf());
-            assertEquals(String.format("Incorrect value of %2$s for period %1$s", period, Q.TRAVEL_CO2E),
-                    TRAVEL_CO2E[i],
-                    rtn.answer(period, Q.TRAVEL_CO2E).orElseThrow(() -> new IllegalStateException()).response3sf());
-            assertEquals(String.format("Incorrect value of %2$s for period %1$s", period, Q.COMMISSIONING_CO2E),
-                    COMMISSIONING_CO2E[i],
-                    rtn.answer(period, Q.COMMISSIONING_CO2E).orElseThrow(() -> new IllegalStateException()).response3sf());
         }
     }
 

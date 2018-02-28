@@ -10,6 +10,7 @@
   <thead>
     <tr>
       <th>&nbsp;</th>
+      <th>&nbsp;</th>
       <#list periods as period>
         <th class="number">${period}</th>
       </#list>
@@ -19,11 +20,12 @@
     <#list table.rows() as row>
       <tr>
         <th>${messages.getString(table.headers()[row?index])!table.headers()[row?index]}</th>
-          <#list row as col>
-            <#if col?index < periods?size>
-              <td class="number">${col!"0"}</td>
-            </#if>
-          </#list>
+        <th class="legend ${table.headers()[row?index]?lower_case}">&nbsp;</th>
+        <#list row as col>
+          <#if col?index < periods?size>
+            <td class="number">${col!"0"}</td>
+          </#if>
+        </#list>
       </tr>
     </#list>
   </tbody>

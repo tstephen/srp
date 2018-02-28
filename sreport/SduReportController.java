@@ -2,7 +2,11 @@ package digital.srp.sreport.web;
 
 import java.text.DecimalFormat;
 import java.text.Format;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
+import java.util.ResourceBundle;
+import java.util.TreeSet;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,12 +20,16 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import digital.srp.sreport.internal.PeriodUtil;
+import digital.srp.sreport.model.Answer;
+import digital.srp.sreport.model.Q;
+import digital.srp.sreport.model.SurveyReturn;
+import digital.srp.sreport.model.TabularDataSet;
+import digital.srp.sreport.model.surveys.Sdu1617;
 import digital.srp.sreport.model.surveys.SduQuestions;
 import digital.srp.sreport.repositories.AnswerRepository;
-import digital.srp.sreport.repositories.SurveyRepository;
-import digital.srp.sreport.repositories.SurveyReturnRepository;
 import digital.srp.sreport.services.ReportModelHelper;
 import digital.srp.sreport.services.tds.Aggregator;
+import digital.srp.sreport.services.tds.TabularDataSetHelper;
 import digital.srp.sreport.services.tds.Totaller;
 
 /**
@@ -42,10 +50,7 @@ public class SduReportController implements SduQuestions {
     protected String baseUrl;
 
     @Autowired
-    protected SurveyRepository surveyRepo;
-
-    @Autowired
-    protected SurveyReturnRepository returnRepo;
+    protected SurveyReturnController rtnController;
 
     @Autowired
     protected AnswerRepository answerRepo;
@@ -406,7 +411,7 @@ public class SduReportController implements SduQuestions {
 
         // If only fetching one period make sure it is not lost off right edge
         boolean ascending = maxPeriods.equals(1) ? false : true;
-        new ReportModelHelper(answerRepo).fillModel(org, period, FOOTPRINT_2017_PCT_HDRS, model, true, prettyPrintDecimalFormat, maxPeriods, ascending, Optional.of(totaller));
+        new ReportModelHelper(answerRepo).fillModel(org, period, FOOTPRINT_PCT_HDRS, model, true, prettyPrintDecimalFormat, maxPeriods, ascending, Optional.of(totaller));
         return "table-period-as-col";
     }
 
@@ -423,7 +428,7 @@ public class SduReportController implements SduQuestions {
             Model model) {
         LOGGER.info(String.format("footprintCsv for %1$s %2$s", org, period));
 
-        new ReportModelHelper(answerRepo).fillModel(org, period, FOOTPRINT_2017_PCT_HDRS, model, true, prettyPrintDecimalFormat, maxPeriods, true, Optional.empty());
+        new ReportModelHelper(answerRepo).fillModel(org, period, FOOTPRINT_PCT_HDRS, model, true, prettyPrintDecimalFormat, maxPeriods, true, Optional.empty());
         return "csv-period-as-col";
     }
 
@@ -593,7 +598,7 @@ public class SduReportController implements SduQuestions {
             @PathVariable("period") String period, Model model) {
         LOGGER.info(String.format("carbonTrajectoryTable for %1$s %2$s", org, period));
 
-        new ReportModelHelper(answerRepo).fillModel(org, period, BENCHMARK_2017_HDRS,
+        new ReportModelHelper(answerRepo).fillModel(org, period, SDU_TREND_HDRS,
                 model, true, prettyPrintDecimalFormat,
                 PeriodUtil.periodsSinceInc(period, "2007-08"), true,
                 Optional.of(totaller));
@@ -611,7 +616,7 @@ public class SduReportController implements SduQuestions {
             @PathVariable("period") String period, Model model) {
         LOGGER.info(String.format("carbonTrajectoryCsv for %1$s %2$s", org, period));
 
-        new ReportModelHelper(answerRepo).fillModel(org, period, BENCHMARK_2017_HDRS,
+        new ReportModelHelper(answerRepo).fillModel(org, period, SDU_TREND_HDRS,
                 model, false, rawDecimalFormat,
                 PeriodUtil.periodsSinceInc(period, "2007-08"), true,
                 Optional.empty());
@@ -623,7 +628,7 @@ public class SduReportController implements SduQuestions {
      *
      * @return HTML table.
      */
-    @RequestMapping(value = "/{org}/{period}/co2e-2016.html", method = RequestMethod.GET, produces = "text/html")
+    @RequestMapping(value = "/{org}/{period}/co2e.html", method = RequestMethod.GET, produces = "text/html")
     public String co2eTable(@PathVariable("org") String org,
             @PathVariable("period") String period, @RequestParam(value = "maxPeriods", required = false, defaultValue = DEFAULT_MAX_PERIODS) Integer maxPeriods,
             Model model) {
@@ -638,43 +643,13 @@ public class SduReportController implements SduQuestions {
      *
      * @return CSV with header row.
      */
-    @RequestMapping(value = "/{org}/{period}/co2e-2016.csv", method = RequestMethod.GET, produces = "text/csv")
+    @RequestMapping(value = "/{org}/{period}/co2e.csv", method = RequestMethod.GET, produces = "text/csv")
     public String co2eCsv(@PathVariable("org") String org,
             @PathVariable("period") String period, @RequestParam(value = "maxPeriods", required = false, defaultValue = DEFAULT_MAX_PERIODS) Integer maxPeriods,
             Model model) {
         LOGGER.info(String.format("co2eTable for %1$s %2$s", org, period));
 
         new ReportModelHelper(answerRepo).fillModel(org, period, BENCHMARK_HDRS, model, false, rawDecimalFormat, maxPeriods, true, Optional.empty());
-        return "csv";
-    }
-
-    /**
-     * Total Carbon footprint in categories revised for 2017-18.
-     *
-     * @return HTML table.
-     */
-    @RequestMapping(value = "/{org}/{period}/co2e.html", method = RequestMethod.GET, produces = "text/html")
-    public String co2e2017Table(@PathVariable("org") String org,
-            @PathVariable("period") String period, @RequestParam(value = "maxPeriods", required = false, defaultValue = DEFAULT_MAX_PERIODS) Integer maxPeriods,
-            Model model) {
-        LOGGER.info(String.format("co2eTable for %1$s %2$s", org, period));
-
-        new ReportModelHelper(answerRepo).fillModel(org, period, BENCHMARK_2017_HDRS, model, true, prettyPrintDecimalFormat, maxPeriods, true, Optional.of(totaller));
-        return "table-period-as-col";
-    }
-
-    /**
-     * Total Carbon footprint in categories revised for 2017-18.
-     *
-     * @return CSV with header row.
-     */
-    @RequestMapping(value = "/{org}/{period}/co2e.csv", method = RequestMethod.GET, produces = "text/csv")
-    public String co2e2017Csv(@PathVariable("org") String org,
-            @PathVariable("period") String period, @RequestParam(value = "maxPeriods", required = false, defaultValue = DEFAULT_MAX_PERIODS) Integer maxPeriods,
-            Model model) {
-        LOGGER.info(String.format("co2eTable for %1$s %2$s", org, period));
-
-        new ReportModelHelper(answerRepo).fillModel(org, period, BENCHMARK_2017_HDRS, model, false, rawDecimalFormat, maxPeriods, true, Optional.empty());
         return "csv";
     }
 
@@ -858,5 +833,49 @@ public class SduReportController implements SduQuestions {
         new ReportModelHelper(answerRepo).fillModel(org, period, BENCHMARK_BY_OPEX_HDRS, model, false, rawDecimalFormat, maxPeriods, true, Optional.empty());
         return "csv";
     }
+    
+    /**
+     * @return HTML table of data outstanding for a complete report.
+     */
+    @RequestMapping(value = "/{org}/{period}/outstanding.html", method = RequestMethod.GET, produces = "text/html")
+    public String outstanding(@PathVariable("org") String org,
+            @PathVariable("period") String period,
+            @RequestParam(value = "maxPeriods", required = false, defaultValue = DEFAULT_MAX_PERIODS) Integer maxPeriods,
+            Model model) {
+        LOGGER.info(String.format("outstanding for %1$s %2$s", org, period));
+        
+        SurveyReturn rtn = rtnController.findCurrentBySurveyNameAndOrg("SDU-"+period, org);
+        List<String> periods = PeriodUtil.fillBackwards(rtn.applicablePeriod(),
+                maxPeriods);
+        List<Answer> answers = new ArrayList<Answer>();
+        TreeSet<String> headers = new TreeSet<String>(); // avoid duplicates
+        for (String p : periods) {
+            for (Q q : Sdu1617.getDerivedQs()) {
+                Optional<Answer> optional = rtn.answer(p, q);
+                if (!optional.isPresent()) {
+                    Answer answer = new Answer()
+                            .addSurveyReturn(rtn)
+                            .applicablePeriod(period)
+                            .question(q)
+                            .derived(true);
+                    answers.add(answer);
+                    headers.add(q.code());
+                }
+            }
+        }
+//        Collections.sort(headers);
+        String[] headerNames = headers.toArray(new String[headers.size()]);
 
+        TabularDataSetHelper tdsHelper = new TabularDataSetHelper();
+        TabularDataSet table = tdsHelper.tabulate(headerNames, 
+                periods.toArray(new String[periods.size()]), answers,
+                prettyPrintDecimalFormat, Optional.of(totaller));
+        table = table.transpose();
+
+        model.addAttribute("periods", periods);
+        model.addAttribute("table", table);
+        model.addAttribute("messages",
+                ResourceBundle.getBundle("digital.srp.sreport.Messages"));
+        return "table-period-as-col";
+    }
 }

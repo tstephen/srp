@@ -39,7 +39,7 @@ public class ReportModelHelper {
         }
 
         List<String> periods = PeriodUtil.fillBackwards(period, maxPeriods);
-                model.addAttribute("periods", periods);
+        model.addAttribute("periods", periods);
         List<Answer> answers;
         if (ascending) {
             answers = answerRepo.findByOrgPeriodAndQuestionAsc(org, periods.toArray(new String[periods.size()]), headerNames);
