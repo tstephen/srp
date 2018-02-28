@@ -8,7 +8,7 @@
 
   <groupId>digital.srp</groupId>
   <artifactId>srp-root</artifactId>
-  <version>2.1.0-SNAPSHOT</version>
+  <version>2.0.0</version>
   <packaging>pom</packaging>
   
   <properties>
@@ -16,13 +16,13 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <activiti.version>5.18.0.20151117</activiti.version>
     <activiti.bdd.version>5.19.0.20161207</activiti.bdd.version>
-    <kp-auth.version>1.1.0-SNAPSHOT</kp-auth.version>
-    <crm.version>3.0.0-SNAPSHOT</crm.version>
+    <kp-auth.version>1.1.0</kp-auth.version>
+    <crm.version>2.2.1</crm.version>
     <onedecision.version>1.2.0-RC1</onedecision.version>
     <ractive.version>0.7.3</ractive.version>
     <spring.boot.version>1.4.0.RELEASE</spring.boot.version>
     <srp.version>${project.version}</srp.version>
-    <work-mgmt.version>3.0.0-SNAPSHOT</work-mgmt.version>
+    <work-mgmt.version>2.3.0</work-mgmt.version>
   </properties>
 
   <parent>
@@ -64,19 +64,18 @@
 
   <issueManagement>
     <system>Gitlab</system>
-    <url>http://www.knowprocess.net/tstephen/trakeo-srp/issues</url>
+    <url>https://code.knowprocess.com/puffin/srp/issues</url>
   </issueManagement>
 
   <scm>
-    <url>http://www.knowprocess.net/tstephen/trakeo-srp.git</url>
-    <connection>scm:git:git@www.knowprocess.net/tstephen/trakeo-srp.git</connection>
-    <developerConnection>scm:git:git@www.knowprocess.net/tstephen/trakeo-srp.git</developerConnection>
+    <url>https://code.knowprocess.com/puffin/srp</url>
+    <connection>scm:git:git@code.knowprocess.com/puffin/srp.git</connection>
+    <developerConnection>scm:git:git@code.knowprocess.com/puffin/srp.git</developerConnection>
   </scm>
 
   <modules>
     <module>srp-processes</module>
     <module>macc</module>
-    <!--module>srp</module-->
     <module>server</module>
     <module>sreport</module>
   </modules>

@@ -4,6 +4,10 @@ Sustainable Resource Planning
 Release History
 ---------------
 
+2.0.0 - 28 Feb 18 
+
+  - SDU reporting project
+
 1.1.0 - 27 Jul 16
 
   - SDU Healthy Returns 2020 (macc project)

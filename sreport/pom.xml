@@ -9,7 +9,7 @@
     <parent>
       <groupId>digital.srp</groupId>
       <artifactId>srp-root</artifactId>
-      <version>2.1.0-SNAPSHOT</version>
+      <version>2.0.0</version>
       <relativePath>..</relativePath>
     </parent>
     
@@ -96,6 +96,7 @@
       <dependency>
         <groupId>com.h2database</groupId>
         <artifactId>h2</artifactId>
+        <scope>test</scope>
       </dependency>
       <dependency>
         <groupId>mysql</groupId>
@@ -106,11 +107,6 @@
         <groupId>digital.srp</groupId>
         <artifactId>macc</artifactId>
         <version>${srp.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>com.knowprocess</groupId>
-        <artifactId>auth</artifactId>
-        <version>${kp-auth.version}</version>
       </dependency>
     </dependencies>
     

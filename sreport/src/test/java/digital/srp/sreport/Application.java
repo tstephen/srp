@@ -6,13 +6,11 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
-import com.knowprocess.auth.AuthConfig;
-
 import digital.srp.sreport.internal.SReportConfiguration;
 
 @EnableAutoConfiguration
 @Configuration
-@Import({ AuthConfig.class, SReportConfiguration.class })
+@Import({ SReportConfiguration.class })
 public class Application extends WebMvcConfigurerAdapter {
 
     public static void main(String[] args) {
