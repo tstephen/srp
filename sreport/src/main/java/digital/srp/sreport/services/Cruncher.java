@@ -806,7 +806,8 @@ public class Cruncher implements digital.srp.sreport.model.surveys.SduQuestions,
             throw new IllegalStateException(msg);
         }
         BigDecimal nonPaySpend = getAnswer(period, rtn, Q.NON_PAY_SPEND).responseAsBigDecimal();
-        if (nonPaySpend.equals(BigDecimal.ZERO)) {
+        if (nonPaySpend.equals(BigDecimal.ZERO)
+                || getAnswer(period, rtn, Q.NON_PAY_SPEND).derived()) {
             nonPaySpend = calcNonPaySpendFromOpEx(period, rtn);
             getAnswer(period, rtn, Q.NON_PAY_SPEND).derived(true).response(nonPaySpend);
         }
