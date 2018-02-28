@@ -23,7 +23,7 @@
       <outgoing>_16</outgoing>
       <potentialOwner id="_90_RES_1" name="tenantAdmin">
         <resourceAssignmentExpression>
-          <formalExpression><![CDATA[${tenantId}_admin]]></formalExpression>
+          <formalExpression><![CDATA[support]]></formalExpression>
         </resourceAssignmentExpression>
       </potentialOwner>
       <potentialOwner id="_90_RES_2" name="superAdmin">
@@ -41,18 +41,11 @@
     <sequenceFlow id="_12" sourceRef="_10" targetRef="_3"/>
     <serviceTask activiti:async="true" activiti:type="mail" completionQuantity="1" id="_13" implementation="##WebService" isForCompensation="false" name="Email Support" startQuantity="1">
       <extensionElements>
-        <activiti:field name="to">
-          <activiti:expression>support@trakeo.com</activiti:expression>
-        </activiti:field>
-        <activiti:field name="bcc">
-          <activiti:expression>tim@srp.digital</activiti:expression>
-        </activiti:field>
-        <activiti:field name="subject">
-          <activiti:expression><![CDATA[[Support] Task created]]></activiti:expression>
-        </activiti:field>
+        <activiti:field name="to" expression="tim@knowprocess.com"/>
+        <activiti:field name="subject" expression="[Support] Task created"/>
         <activiti:field name="text">
           <activiti:expression>
-I've created a task that should have been handled by a customer process, please investigate: &lt;http://srp.digital:8443/work.html|Click to open work manager&gt;
+I've created a task that should have been handled by a customer process, please investigate: &lt;https://srp.digital/work.html|Click to open work manager&gt;
 
 SRP bot
           </activiti:expression>

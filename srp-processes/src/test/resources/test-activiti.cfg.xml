@@ -44,8 +44,8 @@
     <property name="mailServerHost" value="localhost" />
     <property name="mailServerPort" value="5025" />
     <property name="mailServerUseTLS" value="false" />    
-    <property name="mailServerDefaultFrom" value="info@trakeo.com" />
-    <property name="mailServerUsername" value="info@trakeo.com" />
+    <property name="mailServerDefaultFrom" value="no-reply@srp.digital" />
+    <property name="mailServerUsername" value="no-reply@srp.digital" />
     <property name="mailServerPassword" value="password" />
    
     
