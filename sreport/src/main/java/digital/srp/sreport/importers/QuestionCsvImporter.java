@@ -27,16 +27,18 @@ public class QuestionCsvImporter {
     private static final String HINT = "hint";
 
     private static final String TYPE = "type";
-    
+
     private static final String PLACEHOLDER = "placeholder";
 
     private static final String REQD = "required";
 
     private static final String VALIDATION = "validation";
-    
+
     public static final String[] HEADERS = { NAME, LABEL, UNIT, SOURCE, HINT, TYPE, PLACEHOLDER, REQD, VALIDATION };
 
     public static final String DATA = "/data/Questions-201617b.csv";
+
+    public static final String TENANT_ID = "sdu";
 
     private static final Logger LOGGER = LoggerFactory
             .getLogger(QuestionCsvImporter.class);
@@ -69,6 +71,7 @@ public class QuestionCsvImporter {
                         .required(Boolean.valueOf(record.get(REQD).trim()))
                         .placeholder(record.get(PLACEHOLDER).trim())
                         .validation(record.get(VALIDATION).trim())
+                        .tenantId(TENANT_ID)
                 );
             }
         }

@@ -18,6 +18,8 @@ public class PersistentAnswerFactory implements AnswerFactory {
 
     @Autowired
     protected QuestionRepository qRepo;
+
+    private static final String TENANT_ID = "sdu";
     
     private static final Logger LOGGER = LoggerFactory
             .getLogger(PersistentAnswerFactory.class);
@@ -27,17 +29,15 @@ public class PersistentAnswerFactory implements AnswerFactory {
         LOGGER.info("Creating new derived answer '{}' for '{}' in '{}'",
                q.name(), rtn.org(), period);
         try {
-//                Answer answer = answerRepo.findByOrgPeriodAndQuestion(rtn.org(), period, q.name());
-//                if (answer==null) {
-                Question existingQ = qRepo.findByName(q.name());
-                if (existingQ == null) {
-                    LOGGER.info("Creating new question {} ", q.name());
-                    existingQ = qRepo.save(new Question().q(q));
-                }
-                Answer answer = rtn.initAnswer(rtn, null, existingQ)
-                        .applicablePeriod(period)
-                        .derived(true);
-//                }
+            Question existingQ = qRepo.findByName(q.name());
+            if (existingQ == null) {
+                LOGGER.info("Creating new question {} ", q.name());
+                // TODO tenant needs to be injected, e.g. via rtn.tenantId()
+                existingQ = qRepo.save(new Question().q(q).tenantId(TENANT_ID));
+            }
+            Answer answer = rtn.initAnswer(rtn, null, existingQ)
+                    .applicablePeriod(period)
+                    .derived(true);
             return answer;
         } catch (NonUniqueResultException e) {
             LOGGER.error("looking for answer '%1$s' for '%2$s' in '%3$s'",
