@@ -1,0 +1,24 @@
+<section>
+  <div>
+    <h2>National organisation type carbon and cost benefit curve</h2>
+    <p>This MAC curve contains the national data split according to a number of different organisation types across the NHS and Social Care system. </p>
+    <!--p>There are overlapping interventions shown in the curve, further detailed 
+    analysis would be needed to understand the magnitude of the overlap. Below 
+    follows a list of the interventions affected and the interventions that 
+    overlaps with each.</p>
+    {{{haveOverlaps(interventions)}}}-->
+  </div>
+  <div class="col-md-12">
+    <form class="form-horizontal" id="optionsForm2" style="position:relative;top:10px;padding-bottom:10px;">
+      <fieldset>
+        <legend>Organisation Type</legend>
+        {{#organisationTypes:idx}}
+          <label class="radio-inline" for="orgType{{idx}}">{{name}}</label>
+          {{! TODO onchange works fine in latest chrome, trying onclick as solution for older }}
+          <input class="" type="radio" id="orgType{{idx}}" name="orgType" on-change="filterOrgType:{{name}}" onclick="ractive.set('optOrgType','{{name}}')" {{#idx==0}} checked {{/}} value="{{idx}}">
+        {{/}}
+      </fieldset>
+    </form>
+  </div>
+</section>
+

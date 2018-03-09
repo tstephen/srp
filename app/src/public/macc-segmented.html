@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>SRP</title>
+  <link href="https://api.knowprocess.com/webjars/bootstrap/3.3.5/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://api.knowprocess.com/webjars/bootstrap/3.3.5/css/bootstrap-theme.min.css" rel="stylesheet">
+  <link href="https://api.knowprocess.com/css/jquery.tagit.css" rel="stylesheet" type="text/css">
+
+  <link href="https://api.knowprocess.com/workmgmt/3.0.0/css/base.css" rel="stylesheet">
+  <link href="../vsn/css/srp.css" rel="stylesheet">
+  <link rel="icon" type="image/png" href="../vsn/images/icon/srp-icon-32x32.png"/>
+</head>
+<body>
+
+  <div class="clearfix" id="messages"></div>
+  <div class="container" id="container"></div>
+  <script id='template' type='text/ractive'>
+    {{#partial workings}}
+      <h5>Costs</h5>
+      {{#cashOutflowsUpFront!=0}}<p>£{{cashOutflowsUpFrontNational.sigFigs(3)}} up-front investment nationally * {{uptake}}% uptake * {{shareOfTotal}}% attributed to segment = £{{cashOutflowsUpFront.sigFigs(3)}}</p>{{/}}
+      {{#annualCashOutflowsNationalTargetYear!=0}}<p>£{{annualCashOutflowsNationalTargetYear.sigFigs(3)}} p.a. required nationally * {{uptake}}% uptake * {{shareOfTotal}}% attributed to segment = £{{annualCashOutflowsTargetYear.sigFigs(3)}}</p>{{/}}
+      <h5>Financial savings in target year</h5>
+      <p>£{{annualCashInflowsNationalTargetYear.sigFigs(3)}} potential nationally * {{uptake}}% uptake * {{shareOfTotal}}% attributed to segment = £{{annualCashInflowsTargetYear.sigFigs(3)}}</p>
+      <h5>Carbon savings in target year</h5>
+      {{#tonnesCo2eSavedTargetYear.sigFigs(3)==0}}
+        <p>Due to the nature of the intervention there is no benefit in the target year but significant benefits accrue in subsequent years.</p>
+      {{else}}
+        <p>{{tonnesCo2eSavedNationallyTargetYear.sigFigs(3)}} tCO<sub>2</sub>e potential nationally * {{uptake}}% uptake * {{shareOfTotal}}% attributed to segment = {{(tonnesCo2eSavedTargetYear).sigFigs(3)}} tCO<sub>2</sub>e</p>
+      {{/}}
+      <p>Information on the projected cost and carbon-intensity affecting this intervention may be found <a href="http://srp.digital/future-cost-and-carbon-intensity-projections-by-hm-treasury" target="_blank" title="Future cost and carbon-intensity projections by HM Treasury">here</a></p>
+    {{/partial workings}}
+
+    {{>titleArea}}
+    {{>maccIntroSect}}
+    {{>maccDisplaySect}}
+    {{>maccOptionsSect}}
+    {{>macTableDisplaySect  { active: 'maccSegmented' }}}
+    {{>poweredBy}}
+  </script>
+
+  <script src="//code.jquery.com/jquery-1.11.0.min.js"></script>
+  <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pace/1.0.2/pace.js"></script>
+  <script src='https://cdnjs.cloudflare.com/ajax/libs/ractive/0.7.3/ractive.min.js'></script>
+
+  <script src="https://d3js.org/d3.v3.min.js"></script>
+  <!--script src="/webjars/d3js/3.5.5/d3.min.js"></script-->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/autonumeric/1.9.30/autoNumeric.min.js"></script>
+
+  <script src="../vsn/js/string-functions-0.1.0.js"></script>
+  <script src="../vsn/js/md5.min.js"></script>
+  <script src="../vsn/js/macc.js"></script>
+  <script src="https://api.knowprocess.com/js/env.js"></script>
+  <script src="https://api.knowprocess.com/workmgmt/3.0.0/js/i18n.js"></script>
+
+  <script src="../vsn/js/base.js"></script>
+  <script src="../vsn/js/macc-segmented.js"></script>
+  <script src="https://api.knowprocess.com/webjars/auth/1.1.0/js/auth.js"></script>
+  <!--script src="../vsn/js/embed.js"></script-->
+</body>
+</html>

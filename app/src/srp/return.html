@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html class="no-js">
+<head>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="utf-8">
+  <title>Questionnaire</title>
+  <link rel="stylesheet" type="text/css" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"/>
+  <link rel="stylesheet" type="text/css" href="/questionnaire/0.4.0/css/questionnaire.css"/>
+  <link rel="stylesheet" href="/srp/2.1.0/css/srp.css">
+</head>
+<body>
+
+  <!--[if lt IE 8]>
+  <div class="alert alert-warning">
+    You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.
+  </div>
+  <![endif]-->
+  <div class="container">
+    <div class="clearfix" id="messages"></div>
+    <div class="row" id="containerSect">
+    </div><!-- /.row -->
+  </div><!-- /.container -->
+
+  <div class="save-indicator">
+    <span class="save-indicator-animation glyphicon glyphicon-save"></span>
+  </div>
+
+  <script id="template" type="text/html">
+    {{>loginSect}}
+    {{>questionnaire}}
+  </script>
+
+  <script src="//code.jquery.com/jquery-1.11.0.min.js"></script>
+  <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pace/1.0.2/pace.js"></script>
+  <script src='/questionnaire/js/0.7.3/ractive.min.js'></script>
+
+  <script src="https://api.knowprocess.com/js/md5.min.js"></script>
+  <script src="https://api.knowprocess.com/js/env.js"></script>
+  <script src="/questionnaire/0.4.0/js/questionnaire.js"></script>
+
+  <script src="2.1.0/js/string-functions-0.1.0.js"></script>
+  <script src="https://api.knowprocess.com/workmgmt/3.0.0/js/i18n.js"></script>
+
+  <script src="https://api.knowprocess.com/webjars/auth/1.1.0/js/auth.js"></script>
+  <script src="2.1.0/js/return.js"></script>
+</body>
+</html>

@@ -1,0 +1,70 @@
+<section id="currentSect" style="display:none">
+  <form class="inline-form form" id="currentForm">
+    <h2 class="form-inline">
+      {{#current._links.self}}
+        <span>Edit </span>
+      {{/}}
+      {{^current._links.self}}
+        <span>Create </span>
+      {{/}}
+      <span>Question:</span>
+      <span>{{current.name}}</span>
+      <span class="pull-right">
+        <a class="clickable glyphicon icon-btn kp-icon-remove" aria-hidden="true" on-click="@this.delete(current)" title="Delete this record"></a>
+      </span>
+    </h2>
+
+    <div class="currentBody col-md-6 col-sm-12 col-xs-12">
+      <ul class="form edit-form">
+        <li>
+          <label class="col-md-4 required">Name:</label>
+          <input class="form-control" id="curName" required value="{{current.name}}">
+        </li>
+        <li>
+          <label class="col-md-4 required">Label:</label>
+          <input class="form-control" id="curLabel" required value="{{current.label}}"/>
+          <p class="help-block col-xs-offset-4"></p>
+        </li>
+        <li>
+          <label class="col-md-4">Type:</label>
+          <input class="form-control" id="curType" value="{{current.type}}"/>
+          <p class="help-block col-xs-offset-4"></p>
+        </li>
+        <li>
+          <label class="col-md-4">Placeholder:</label>
+          <input class="form-control" id="curPlaceholder" value="{{current.placeholder}}"/>
+          <p class="help-block col-xs-offset-4"></p>
+        </li>
+        <li>
+          <label class="col-md-4">Hint:</label>
+          <textarea class="form-control" id="curHint" value="{{current.hint}}"></textarea>
+        </li>
+      </ul>
+    </div>
+    <div class="currentBody col-md-6 col-sm-12 col-xs-12">
+      <ul class="form edit-form">
+        <li>
+          <label class="col-md-4">Required:</label>
+          <input class="form-control" id="curRequired" value="{{current.required}}"/>
+          <p class="help-block col-xs-offset-4"></p>
+        </li>
+        <li>
+          <label class="col-md-4">Unit:</label>
+          <input class="form-control" id="curUnit" value="{{current.unit}}"/>
+          <p class="help-block col-xs-offset-4"></p>
+        </li>
+        <li>
+          <label class="col-md-4">Default:</label>
+          <input class="form-control" id="curDefaultValue" value="{{current.defaultValue}}"/>
+          <p class="help-block col-xs-offset-4"></p>
+        </li>
+        <li>
+          <label class="col-md-4">Validation:</label>
+          <input class="form-control" id="curValidation" value="{{current.validation}}"/>
+          <p class="help-block col-xs-offset-4"></p>
+        </li>
+      </ul>
+    </div>
+
+  </form>
+</section>

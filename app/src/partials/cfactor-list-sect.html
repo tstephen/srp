@@ -1,0 +1,47 @@
+<section class="container navbar-sticky">
+  <h2>
+    {{>navbar}}
+    {{>profileArea}}
+  </h2>
+</section>
+<section id="cfactorsSect">
+  <h2 class="navbar-top">
+    {{>navbar}}
+  </h2>
+  <table id="cfactorsTable" class="table table-striped">
+    <thead>
+      <tr>
+        <th></th>
+        <th on-click="sort:category">Category<span class="sortable {{ sorted('name') }} glyphicon icon-btn"></span></th>
+        <th on-click="sort:applicablePeriod">Period<span class="sortable {{ sorted('type') }} glyphicon icon-btn"></span></th>
+        <th on-click="sort:scope">Scope<span class="sortable {{ sorted('scope') }} glyphicon icon-btn"></span></th>
+        <th on-click="sort:source">Source<span class="sortable {{ sorted('source') }} glyphicon icon-btn"></span></th>
+        <th on-click="sort:value">Value<span class="sortable {{ sorted('value') }} glyphicon icon-btn"></span></th>
+        <th class="col-actions">Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+    {{#each sort(cfactors,sortColumn,sortAsc):i}}
+      {{# matchSearch(this) }}
+        <tr data-href="{{links[rel=='self'].href}}" on-click="edit(this)">
+          <td>{{i+1}}</td>
+          <td>{{category}}</td>
+          <td>{{applicablePeriod}}</td>
+          <td>{{scope}}</td>
+          <td>{{#source}}{{source}}{{else}}SDU{{/}}</td>
+          <td>{{value}}</td>
+          <td class="col-actions">
+            <a class="clickable admin glyphicon icon-btn kp-icon-remove" aria-hidden="true" on-click="@this.delete(.)" title="Delete this record"></a>
+            <a class="clickable glyphicon icon-btn kp-icon-pencil" aria-hidden="true" on-click="@this.edit(.)" title="View or edit this intervention"></a>
+          </td>
+        </tr>
+      {{/}}
+    {{/each}}
+    </tbody>
+    <tfoot>
+      {{# searchTerm!=undefined }}
+        <tr><th colspan="11">{{searchMatched == 0 ? 'No' : searchMatched}} matching record{{searchMatched==1 ? '' : 's'}}</th></tr>
+      {{/}}
+    </tfoot>
+  </table>
+</section>

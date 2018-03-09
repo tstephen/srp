@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang='en-GB'>
+<head>
+  <meta http-equiv="x-ua-compatible" content="IE=Edge"/>
+  <!-- as the **very** first line just after head-->
+  <meta charset='utf-8'>
+  <title>Profile</title>
+  <link rel="stylesheet" type="text/css" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"/>
+
+  <link href="https://api.knowprocess.com/workmgmt/3.0.0/css/base.css" rel="stylesheet">
+  <link href="/srp/vsn/css/srp.css" rel="stylesheet">
+  <link rel="icon" type="image/png" href="/srp/vsn/images/icon/srp-icon-32x32.png" />
+  <link href="https://api.knowprocess.com/css/jquery.tagit.css" rel="stylesheet" type="text/css">
+</head>
+<body>
+  <div class="clearfix" id="messages"></div>
+  <div class="container" id="container"></div>
+  <script id='template' type='text/ractive'>
+    {{>profileArea}}
+    {{>titleArea}}
+    {{>loginSect}}
+
+    <section>
+      {{>userCurrentSect { current: profile }}}
+    </section>
+
+    {{>sidebar { active: 'me.html' }}}
+    {{>helpModal}}
+  </script>
+
+  <script src="//code.jquery.com/jquery-1.11.0.min.js"></script>
+  <script src="https://code.jquery.com/ui/1.11.4/jquery-ui.min.js" type="text/javascript" charset="utf-8"></script>
+  <script src="https://api.knowprocess.com/js/tag-it.min.js" type="text/javascript" charset="utf-8"></script>
+  <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pace/1.0.2/pace.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/ractive@0.8.0/ractive.js"></script>
+  <script src="https://d3js.org/d3.v4.min.js"></script>
+
+  <script src="https://api.knowprocess.com/html2canvas/0.5.0-alpha1/js/html2canvas.js"></script>
+  <script src="https://api.knowprocess.com/js/autoNumeric.js"></script>
+  <script src="https://api.knowprocess.com/js/md5.min.js"></script>
+
+  <script src="https://api.knowprocess.com/js/env.js"></script>
+  <script src="https://api.knowprocess.com/workmgmt/3.0.0/js/activity.js"></script>
+  <script src="https://api.knowprocess.com/workmgmt/3.0.0/js/string-functions.js"></script>
+  <script src="https://api.knowprocess.com/workmgmt/3.0.0/js/i18n.js"></script>
+
+  <script src="https://api.knowprocess.com/workmgmt/3.0.0/js/base.js"></script>
+  <script src="https://api.knowprocess.com/workmgmt/3.0.0/js/usermgmt.js"></script>
+  <script src="https://api.knowprocess.com/webjars/auth/1.1.0/js/auth.js"></script>
+  <script src="https://api.knowprocess.com/workmgmt/3.0.0/js/support.js"></script>
+
+  <script type="text/javascript">
+    $(document).ready(function() {
+      ractive.set('title','User Profile');
+      if (ractive.brandingCallbacks==undefined) ractive.brandingCallbacks = $.Callbacks();
+      ractive.brandingCallbacks.add(function() {
+        ractive.edit(ractive.get('profile'));
+        $('#currentSect').css('display','inline').show();
+      });
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,61 @@
+<section id="currentSect" style="display:none">
+  <form class="inline-form form" id="currentForm">
+    <h2 class="form-inline">
+      <span>{{current.category}}</span>
+      <span class="pull-right">
+        <a class="clickable glyphicon icon-btn kp-icon-remove" aria-hidden="true" on-click="@this.delete(current)" title="Delete this record"></a>
+      </span>
+    </h2>
+
+    <div class="currentBody col-md-6 col-sm-12 col-xs-12">
+      <ul class="form edit-form">
+        {{#matchRole('admin')}}
+          <li>
+            <label class="col-md-4 required">Name:</label>
+            <input class="form-control" id="curName" {{#current.name!=undefined}}disabled readonly{{/}} value="{{current.name}}">
+          </li>
+        {{/}}
+        <li>
+          <label class="col-md-4 required">Category:</label>
+          <input class="form-control" id="curCategory" required value="{{current.category}}"/>
+          <p class="help-block col-xs-offset-4"></p>
+        </li>
+        <li>
+          <label class="col-md-4">Scope:</label>
+          <input class="form-control" id="curScope" value="{{current.scope}}"/>
+          <p class="help-block col-xs-offset-4"></p>
+        </li>
+        <li>
+          <label class="col-md-4 required">Applicable Period:</label>
+          <input class="form-control" id="curApplicablePeriod" required value="{{current.applicablePeriod}}"/>
+          <p class="help-block col-xs-offset-4"></p>
+        </li>
+      </ul>
+    </div>
+    <div class="currentBody col-md-6 col-sm-12 col-xs-12">
+      <ul class="form edit-form">
+        <li>
+          <label class="col-md-4">Source:</label>
+          <input class="form-control" id="curSource" value="{{current.source}}"/>
+          <p class="help-block col-xs-offset-4"></p>
+        </li>
+        <li>
+          <label class="col-md-4 required">Value:</label>
+          <input class="form-control" id="curValue" required value="{{current.value}}"/>
+          <p class="help-block col-xs-offset-4"></p>
+        </li>
+        <li>
+          <label class="col-md-4 required">Unit:</label>
+          <input class="form-control" id="curUnit" required value="{{current.unit}}"/>
+          <p class="help-block col-xs-offset-4"></p>
+        </li>
+        <li>
+          <label class="col-md-4">Comments:</label>
+          <input class="form-control" id="curComments" value="{{current.comments}}"/>
+          <p class="help-block col-xs-offset-4"></p>
+        </li>
+      </ul>
+    </div>
+
+  </form>
+</section>

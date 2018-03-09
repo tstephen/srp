@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Sustainable Resource Planning</title>
+  <!--link href="/webjars/bootstrap/3.3.5/css/bootstrap.min.css" rel="stylesheet"-->
+  <link rel="stylesheet" type="text/css" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"/>
+
+  <link href="vsn/css/srp.css" rel="stylesheet">
+  <link rel="icon" type="image/png" href="vsn/images/icon/srp-icon-32x32.png" />
+    <style>
+    html,body,section#main {
+      height:100%;
+      text-align: center;
+      width: 100%;
+    }
+    a,a:visited {
+      color: #949699;
+    }
+    a:hover,a:active {
+      color: #ec9300;
+    }
+    input {
+      border-style: solid;
+      border-width: 1px;
+    }
+    input#email {
+      margin-right:2px;
+      width: 400px;
+    }
+    section#main {
+      margin: auto;
+      padding-top: 45%;
+    }
+    @media (min-width: 480px) {
+      section#main {
+        padding-top: 30%;
+      }
+    }
+    @media (min-width: 768px) {
+      section#main {
+        padding-top: 20%;
+      }
+    }
+    section#login {
+      padding-top: 0;
+      padding-right: 20px;
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      width: 30%;
+    }
+    /*#container {
+      position: fixed;
+      top: 5px;
+      right: 20px;
+    }
+    #container div {
+      position: relative;
+      margin-top: 5px;
+      }
+      #container form {
+      text-align: right;
+    }
+    #container #messages {
+      margin: 0 auto;
+      width: 100%;
+      top: -5px;
+    }*/
+    .btn {
+      height: 45px;
+    }
+
+    @media (max-width: 480px) {
+      section#main {
+        padding-top: 45%;
+      }
+    }
+    @media (min-width: 481px) {
+      section#main {
+        padding-top: 30%;
+      }
+    }
+    @media (min-width: 769px) {
+      section#main {
+        padding-top: 10%;
+      }
+    }
+  </style>
+<head>
+<body>
+
+  <section id="container" class="container"></section>
+
+  <script id='template' type='text/ractive'>
+    {{>loginSect}}
+
+    <section id="currentSect">
+    {{#if surveyReturn}}
+      <section id="introSect">
+        <h1>Sustainability Report for {{formatAnswer('ORG_NAME')}} ({{formatAnswer('ORG_CODE')}})</h1>
+
+        <section id="trajectorySect">
+          <h3>Carbon emissions progress</h3>
+          <p>{{formatAnswer('trajectoryPerf')}}</p>
+
+            <svg data-src="//host:port/srp/examples/carbon-trajectory.csv"
+                 data-colors="#0072ce,#0BBDE5,#0BDBC9"
+                 data-y-axis-label="Emissions (tCO&#x2082;e)"
+                 class="rpt stacked" id="carbonTrajectoryGraph" width="600" height="400"></svg>
+          <p>
+            In this example the organisation target is 32% reduction from the 2011-12 baseline.
+          </p>
+        </section>
+
+      </section>
+
+    {{else}}
+      <section class="loading" id="loadingSect">
+        <span class="loading">Your report should load automatically in the next few moments.</span>
+        <button on-click="fetch()">Load it now</button>
+      </section>
+    {{/if}}
+    </section>
+  </script>
+
+  <script src="//code.jquery.com/jquery-1.11.0.min.js"></script>
+  <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pace/1.0.2/pace.js"></script>
+  <script src='https://cdnjs.cloudflare.com/ajax/libs/ractive/0.7.3/ractive.min.js'></script>
+  <script src="https://d3js.org/d3.v4.min.js"></script>
+
+  <script src="https://api.knowprocess.com/js/md5.min.js"></script>
+  <script src="2.1.0/js/string-functions-0.1.0.js"></script>
+  <script src="https://api.knowprocess.com/workmgmt/3.0.0/js/i18n.js"></script>
+
+  <script src="https://api.knowprocess.com/js/env.js"></script>
+  <script src="2.1.0/js/base.js"></script>
+  <script src="2.1.0/js/report.js"></script>
+  <script src="https://api.knowprocess.com/webjars/auth/1.1.0/js/auth.js"></script>
+
+  <script src="2.1.0/js/stacked.js"></script>
+  <script src="2.1.0/js/pie.js"></script>
+</body>
+</html>

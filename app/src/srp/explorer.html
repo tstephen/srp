@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Sustainable Resource Planning</title>
+  <!--link href="/webjars/bootstrap/3.3.5/css/bootstrap.min.css" rel="stylesheet"-->
+  <link rel="stylesheet" type="text/css" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"/>
+
+  <link href="https://api.knowprocess.com/workmgmt/3.0.0/css/base.css" rel="stylesheet">
+  <link href="./vsn/css/srp.css" rel="stylesheet">
+    <style>
+      .container-sticky {
+        display: none; /* TODO need to make this work? */
+      }
+    </style>
+<head>
+<body>
+  <div class="clearfix" id="messages"></div>
+  <section id="container" class="container"></section>
+
+  <script id='template' type='text/ractive'>
+  {{>profileArea}}
+  {{>titleArea}}
+  {{>loginSect}}
+
+  {{>answerCriteriaSect}}
+  {{>answerListSect}}
+  {{!>currentAnswerSect}}
+  {{!>sidebar { active: 'explorer.html' }}
+  {{!>helpModal}}
+  </script>
+
+  <script src="https://api.knowprocess.com/webjars/jquery/1.11.1/jquery.min.js"></script>
+  <script src="https://api.knowprocess.com/webjars/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+  <script src="https://api.knowprocess.com/webjars/ractive/0.7.3/ractive.min.js"></script>
+  <script async type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pace/1.0.2/pace.js"></script>
+
+  <script src="https://api.knowprocess.com/html2canvas/0.5.0-alpha1/js/html2canvas.js"></script>
+  <script src="https://api.knowprocess.com/js/autoNumeric.js"></script>
+  <script src="https://api.knowprocess.com/js/md5.min.js"></script>
+  <script src="2.1.0/js/string-functions-0.1.0.js"></script>
+  <script src="https://api.knowprocess.com/workmgmt/3.0.0/js/i18n.js"></script>
+
+  <script src="https://api.knowprocess.com/js/env.js"></script>
+  <script src="2.1.0/js/base.js"></script>
+  <script src="2.1.0/js/explorer.js"></script>
+  <script src="https://api.knowprocess.com/webjars/auth/1.1.0/js/auth.js"></script>
+
+  <script src="2.1.0/js/stacked.js"></script>
+  <script src="2.1.0/js/pie.js"></script>
+</body>
+</html>

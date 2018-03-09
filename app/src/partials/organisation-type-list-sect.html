@@ -1,0 +1,45 @@
+<section class="container navbar-sticky">
+  <h2>
+    {{>navbar}}
+    {{>profileArea}}
+  </h2>
+</section>
+<section id="organisationTypesSect">
+  <h2 class="navbar-top">
+    {{>navbar}}
+  </h2>
+  <table id="organisationTypesTable" class="table table-striped">
+    <thead>
+      <tr>
+        <th></th>
+        <th on-click="sort:name">Name<span class="sortable {{ sorted('name') }} glyphicon icon-btn "></span></th>
+        <th on-click="sort:count">Count<span class="sortable {{ sorted('count') }} glyphicon icon-btn "></span></th>
+        <th on-click="sort:sector">Sector<span class="sortable {{ sorted('sector') }} glyphicon icon-btn "></span></th>
+        <th on-click="sort:reportingType">Inc. in SDU Report?<span class="sortable {{ sorted('reportingType') }} glyphicon icon-btn "></span></th>
+        <th class="col-actions">Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+    {{#each sort(organisationTypes,sortColumn,sortAsc):i}}
+      {{# matchSearch(this) && matchFilter(this) }}
+          <tr data-href="{{links[rel=='self'].href}}" on-click="edit(this)">
+            <td>{{i+1}}</td>
+            <td>{{name}}</td>
+            <td>{{count}}</td>
+            <td>{{sector}}</td>
+            <td>{{#if reportingType==true}}<span class="glyphicon glyphicon-ok-circle"></span>{{else}}<span class="glyphicon glyphicon-ban-circle"></span>{{/if}}</td>
+            <td class="col-actions">
+              <a class="clickable admin glyphicon icon-btn kp-icon-remove" aria-hidden="true" on-click="delete(this)" title="Delete this record"></a>
+              <a class="clickable glyphicon icon-btn kp-icon-pencil" aria-hidden="true" on-click="edit(this)" title="View or edit this organisationType"></a>
+            </td>
+          </tr>
+      {{/}}
+    {{/each}}
+    </tbody>
+    <tfoot>
+      {{# searchTerm!=undefined }}
+        <tr><th colspan="9">{{searchMatched == 0 ? 'No' : searchMatched}} matching organisation type{{searchMatched==1 ? '' : 's'}}</th></tr>
+      {{/}}
+    </tfoot>
+  </table>
+</section>

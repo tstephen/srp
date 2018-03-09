@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="x-ua-compatible" content="IE=Edge"/>
+  <!-- as the **very** first line just after head-->
+  <meta charset="UTF-8">
+  <title>SRP</title>
+  <link href="https://api.knowprocess.com/webjars/bootstrap/3.3.5/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://api.knowprocess.com/webjars/bootstrap/3.3.5/css/bootstrap-theme.min.css" rel="stylesheet">
+
+  <link href="https://api.knowprocess.com/workmgmt/3.0.0/css/base.css" rel="stylesheet">
+  <link href="./vsn/css/srp.css" rel="stylesheet">
+  <link rel="icon" type="image/png" href="./vsn/images/icon/srp-icon-32x32.png"/>
+</head>
+<body>
+
+  <div class="clearfix" id="messages"></div>
+  <div class="container" id="container"></div>
+  <script id='template' type='text/ractive'>
+    {{>profileArea}}
+    {{>titleArea}}
+    {{>loginSect}}
+
+    {{>wfactorListSect}}
+    {{>wfactorCurrentSect}}
+    {{>helpModal}}
+
+    {{>sidebar { active: 'wfactors.html' }}}
+  </script>
+
+  <script src="https://api.knowprocess.com/webjars/jquery/1.11.1/jquery.min.js"></script>
+  <script src="https://api.knowprocess.com/webjars/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/ractive/1.0.0-build-9/ractive.min.js"></script>
+  <!--script src="/webjars/ractive/0.7.3/ractive.min.js"></script-->
+
+  <script src="https://api.knowprocess.com/js/autoNumeric.min.js"></script>
+  <script src="https://api.knowprocess.com/js/md5.min.js"></script>
+  <script src="https://api.knowprocess.com/js/env.js"></script>
+  <script src="https://api.knowprocess.com/workmgmt/3.0.0/js/string-functions.js"></script>
+  <script src="https://api.knowprocess.com/workmgmt/3.0.0/js/i18n.js"></script>
+
+  <script src="./vsn/js/base.js"></script>
+  <script src="./vsn/js/wfactors.js"></script>
+  <script src="https://api.knowprocess.com/webjars/auth/1.1.0/js/auth.js"></script>
+  <!--script src="2.1.0/js/embed.js"></script-->
+</body>
+</html>

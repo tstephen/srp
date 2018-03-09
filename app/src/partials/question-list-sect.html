@@ -1,0 +1,45 @@
+<section class="container navbar-sticky">
+  <h2>
+    {{>navbar}}
+    {{>profileArea}}
+  </h2>
+</section>
+<section id="questionsSect">
+  <h2 class="navbar-top">
+    {{>navbar}}
+  </h2>
+  <table id="questionsTable" class="table table-striped">
+    <thead>
+      <tr>
+        <th></th>
+        <th on-click="sort:name">Name<span class="sortable {{ sorted('name') }} glyphicon icon-btn"></span></th>
+        <th on-click="sort:type">Type<span class="sortable {{ sorted('type') }} glyphicon icon-btn"></span></th>
+        <th on-click="sort:source">Source<span class="sortable {{ sorted('source') }} glyphicon icon-btn"></span></th>
+        <th on-click="sort:required">Required<span class="sortable {{ sorted('required') }} glyphicon icon-btn"></span></th>
+        <th class="col-actions">Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+    {{#each sort(questions,sortColumn,sortAsc):i}}
+      {{# matchSearch(this) }}
+        <tr data-href="{{links[rel=='self'].href}}" on-click="edit(this)">
+          <td>{{i+1}}</td>
+          <td>{{name}}</td>
+          <td>{{#type}}{{type}}{{else}}text{{/}}</td>
+          <td>{{#source}}{{source}}{{else}}SDU{{/}}</td>
+          <td>{{required}}</td>
+          <td class="col-actions">
+            <a class="clickable admin glyphicon icon-btn kp-icon-remove" aria-hidden="true" on-click="@this.delete(.)" title="Delete this record"></a>
+            <a class="clickable glyphicon icon-btn kp-icon-pencil" aria-hidden="true" on-click="@this.edit(.)" title="View or edit this intervention"></a>
+          </td>
+        </tr>
+      {{/}}
+    {{/each}}
+    </tbody>
+    <tfoot>
+      {{# searchTerm!=undefined }}
+        <tr><th colspan="11">{{searchMatched == 0 ? 'No' : searchMatched}} matching question{{searchMatched==1 ? '' : 's'}}</th></tr>
+      {{/}}
+    </tfoot>
+  </table>
+</section>
