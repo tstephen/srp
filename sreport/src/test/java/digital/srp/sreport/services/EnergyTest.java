@@ -21,17 +21,16 @@ import digital.srp.sreport.model.WeightingFactor;
 
 public class EnergyTest {
 
-    private static final String NO_STAFF = "4987";
+    // ELEC
     private static final String ELEC_USED = "8865457";
     private static final String ELEC_EXPORTED = "554091";
     private static final String ELEC_3RD_PTY_RENEWABLE_USED = "1100182";
     private static final String ELEC_USED_GREEN_TARIFF = "1108182";
-    private static final String GREEN_TARIFF_ADDITIONAL_PCT = "50";
-    private static final String THIRD_PARTY_ADDITIONAL_PCT = "50";
 
-    private static final String GAS_USED = "17730913";
-    private static final String OIL_USED = "3546183";
-    private static final String COAL_USED = "1773091";
+    // THERMAL
+    private static final String GAS_USED = "17555360";
+    private static final String OIL_USED = "3511072";
+    private static final String COAL_USED = "1755536";
     private static final String STEAM_USED = "1773091";
     private static final String HOT_WATER_USED = "1773091";
     private static final String ORG_CODE = "ZZ1";
@@ -49,26 +48,81 @@ public class EnergyTest {
     }
 
     @Test
-    public void testElecEmissions() {
+    public void testElec0PctGreenEmissions2017() {
         SurveyReturn rtn = new SurveyReturn().applicablePeriod(PERIOD).org(ORG_CODE);
-        rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD).question(Q.NO_STAFF).response(NO_STAFF));
         rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD).question(Q.ELEC_USED).response(ELEC_USED));
         rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD).question(Q.ELEC_EXPORTED).response(ELEC_EXPORTED));
         rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD).question(Q.ELEC_USED_GREEN_TARIFF).response(ELEC_USED_GREEN_TARIFF));
-        rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD).question(Q.GREEN_TARIFF_ADDITIONAL_PCT).response(GREEN_TARIFF_ADDITIONAL_PCT));
+        rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD).question(Q.GREEN_TARIFF_ADDITIONAL_PCT).response("0"));
         rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD).question(Q.ELEC_3RD_PTY_RENEWABLE_USED).response(ELEC_3RD_PTY_RENEWABLE_USED));
-        rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD).question(Q.THIRD_PARTY_ADDITIONAL_PCT).response(THIRD_PARTY_ADDITIONAL_PCT));
+        rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD).question(Q.THIRD_PARTY_ADDITIONAL_PCT).response("0"));
         rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD).question(Q.ELEC_OWNED_RENEWABLE_USED_SDU).response("8000"));
 
-        rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD).question(Q.ELEC_TOTAL_RENEWABLE_USED));
-        rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD).question(Q.ELEC_NON_RENEWABLE_GREEN_TARIFF));
-        rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD).question(Q.ELEC_NON_RENEWABLE_3RD_PARTY));
-        rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD).question(Q.ELEC_NON_RENEWABLE_GREEN_TARIFF_CO2E));
-        rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD).question(Q.ELEC_NON_RENEWABLE_3RD_PARTY_CO2E));
-        rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD).question(Q.ELEC_RENEWABLE_CO2E));
-        rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD).question(Q.ELEC_CO2E));
-        rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD).question(Q.ELEC_EXPORTED_CO2E));
-        rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD).question(Q.NET_ELEC_CO2E));
+        initCalculatedAnswers(rtn, PERIOD);
+
+        svc.crunchElectricityUsed(PERIOD, rtn);
+        assertEquals(new BigDecimal("3952"), rtn.answer(PERIOD, Q.ELEC_CO2E).get().responseAsBigDecimal().setScale(0, RoundingMode.HALF_UP));
+        assertEquals(new BigDecimal("494"), rtn.answer(PERIOD, Q.ELEC_NON_RENEWABLE_GREEN_TARIFF_CO2E).get().responseAsBigDecimal().setScale(0, RoundingMode.HALF_UP));
+        assertEquals(new BigDecimal("490"), rtn.answer(PERIOD, Q.ELEC_NON_RENEWABLE_3RD_PARTY_CO2E).get().responseAsBigDecimal().setScale(0, RoundingMode.HALF_UP));
+        assertEquals(new BigDecimal("142"), rtn.answer(PERIOD, Q.ELEC_EXPORTED_CO2E).get().responseAsBigDecimal().setScale(0, RoundingMode.HALF_UP));
+        assertEquals(new BigDecimal("3810"), rtn.answer(PERIOD, Q.NET_ELEC_CO2E).get().responseAsBigDecimal().setScale(0, RoundingMode.HALF_UP));
+        assertEquals(new BigDecimal("2216364"), rtn.answer(PERIOD, Q.ELEC_TOTAL_RENEWABLE_USED).get().responseAsBigDecimal().setScale(0, RoundingMode.HALF_UP));
+        assertEquals(new BigDecimal("984"), rtn.answer(PERIOD, Q.ELEC_RENEWABLE_CO2E).get().responseAsBigDecimal().setScale(0, RoundingMode.HALF_UP));
+
+        // check inputs unchanged
+        assertEquals(new BigDecimal(ELEC_USED), rtn.answer(PERIOD, Q.ELEC_USED).get().responseAsBigDecimal());
+    }
+
+    @Test
+    public void testElec0PctGreenEmissions2016() {
+        String period = "2016-17";
+        SurveyReturn rtn = new SurveyReturn().applicablePeriod(period ).org(ORG_CODE);
+        String elecUsed = "8777680";
+        rtn.getAnswers().add(new Answer().applicablePeriod(period).question(Q.ELEC_USED).response(elecUsed));
+        rtn.getAnswers().add(new Answer().applicablePeriod(period).question(Q.ELEC_EXPORTED).response(ELEC_EXPORTED));
+        rtn.getAnswers().add(new Answer().applicablePeriod(period).question(Q.ELEC_USED_GREEN_TARIFF).response("1097210"));
+        rtn.getAnswers().add(new Answer().applicablePeriod(period).question(Q.GREEN_TARIFF_ADDITIONAL_PCT).response("0"));
+        rtn.getAnswers().add(new Answer().applicablePeriod(period).question(Q.ELEC_3RD_PTY_RENEWABLE_USED).response("1097210"));
+        rtn.getAnswers().add(new Answer().applicablePeriod(period).question(Q.THIRD_PARTY_ADDITIONAL_PCT).response("0"));
+        rtn.getAnswers().add(new Answer().applicablePeriod(period).question(Q.ELEC_OWNED_RENEWABLE_USED_SDU).response("0"));
+
+        initCalculatedAnswers(rtn, period);
+
+        svc.crunchElectricityUsed(period, rtn);
+        assertEquals(new BigDecimal("567"), rtn.answer(period, Q.ELEC_NON_RENEWABLE_GREEN_TARIFF_CO2E).get().responseAsBigDecimal().setScale(0, RoundingMode.HALF_UP));
+        assertEquals(new BigDecimal("567"), rtn.answer(period, Q.ELEC_NON_RENEWABLE_3RD_PARTY_CO2E).get().responseAsBigDecimal().setScale(0, RoundingMode.HALF_UP));
+        assertEquals(new BigDecimal("4397"), rtn.answer(period, Q.NET_ELEC_CO2E).get().responseAsBigDecimal().setScale(0, RoundingMode.HALF_UP));
+        assertEquals(new BigDecimal("2194420"), rtn.answer(period, Q.ELEC_TOTAL_RENEWABLE_USED).get().responseAsBigDecimal().setScale(0, RoundingMode.HALF_UP));
+        assertEquals(new BigDecimal("1134"), rtn.answer(period, Q.ELEC_RENEWABLE_CO2E).get().responseAsBigDecimal().setScale(0, RoundingMode.HALF_UP));
+
+        // check inputs unchanged
+        assertEquals(new BigDecimal(elecUsed), rtn.answer(period, Q.ELEC_USED).get().responseAsBigDecimal());
+    }
+
+    protected void initCalculatedAnswers(SurveyReturn rtn, String period) {
+        rtn.getAnswers().add(new Answer().applicablePeriod(period).question(Q.ELEC_TOTAL_RENEWABLE_USED));
+        rtn.getAnswers().add(new Answer().applicablePeriod(period).question(Q.ELEC_NON_RENEWABLE_GREEN_TARIFF));
+        rtn.getAnswers().add(new Answer().applicablePeriod(period).question(Q.ELEC_NON_RENEWABLE_3RD_PARTY));
+        rtn.getAnswers().add(new Answer().applicablePeriod(period).question(Q.ELEC_NON_RENEWABLE_GREEN_TARIFF_CO2E));
+        rtn.getAnswers().add(new Answer().applicablePeriod(period).question(Q.ELEC_NON_RENEWABLE_3RD_PARTY_CO2E));
+        rtn.getAnswers().add(new Answer().applicablePeriod(period).question(Q.ELEC_RENEWABLE_CO2E));
+        rtn.getAnswers().add(new Answer().applicablePeriod(period).question(Q.ELEC_CO2E));
+        rtn.getAnswers().add(new Answer().applicablePeriod(period).question(Q.ELEC_EXPORTED_CO2E));
+        rtn.getAnswers().add(new Answer().applicablePeriod(period).question(Q.NET_ELEC_CO2E));
+    }
+
+    @Test
+    public void testElec50PctGreenEmissions() {
+        SurveyReturn rtn = new SurveyReturn().applicablePeriod(PERIOD).org(ORG_CODE);
+        rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD).question(Q.ELEC_USED).response(ELEC_USED));
+        rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD).question(Q.ELEC_EXPORTED).response(ELEC_EXPORTED));
+        rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD).question(Q.ELEC_USED_GREEN_TARIFF).response(ELEC_USED_GREEN_TARIFF));
+        rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD).question(Q.GREEN_TARIFF_ADDITIONAL_PCT).response("50"));
+        rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD).question(Q.ELEC_3RD_PTY_RENEWABLE_USED).response(ELEC_3RD_PTY_RENEWABLE_USED));
+        rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD).question(Q.THIRD_PARTY_ADDITIONAL_PCT).response("50"));
+        rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD).question(Q.ELEC_OWNED_RENEWABLE_USED_SDU).response("8000"));
+
+        initCalculatedAnswers(rtn, PERIOD);
 
         svc.crunchElectricityUsed(PERIOD, rtn);
         assertEquals(new BigDecimal("3952"), rtn.answer(PERIOD, Q.ELEC_CO2E).get().responseAsBigDecimal().setScale(0, RoundingMode.HALF_UP));
@@ -84,15 +138,13 @@ public class EnergyTest {
     }
 
     @Test
-    public void testEnergyCalcs() {
+    public void testThermalEnergyCalcs() {
         SurveyReturn rtn = new SurveyReturn().applicablePeriod(PERIOD).org(ORG_CODE);
-        rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD).question(Q.NO_STAFF).response(NO_STAFF));
         rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD).question(Q.GAS_USED).response(GAS_USED));
         rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD).question(Q.OIL_USED).response(OIL_USED));
         rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD).question(Q.COAL_USED).response(COAL_USED));
         rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD).question(Q.STEAM_USED).response(STEAM_USED));
         rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD).question(Q.HOT_WATER_USED).response(HOT_WATER_USED));
-        rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD).question(Q.ELEC_OWNED_RENEWABLE_USED_SDU).response("0"));
         rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD).question(Q.EXPORTED_THERMAL_ENERGY).response("100"));
 
         rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD).question(Q.TOTAL_ENERGY));
@@ -107,11 +159,9 @@ public class EnergyTest {
         rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD).question(Q.ELEC_TOTAL_RENEWABLE_USED));
 
         svc.crunchOwnedBuildings(PERIOD, rtn);
-        assertEquals(new BigDecimal("3759"), rtn.answer(PERIOD, Q.OWNED_BUILDINGS_GAS).get().responseAsBigDecimal().setScale(0, RoundingMode.HALF_UP));
-        assertEquals(new BigDecimal("1159"), rtn.answer(PERIOD, Q.OWNED_BUILDINGS_OIL).get().responseAsBigDecimal().setScale(0, RoundingMode.HALF_UP));
-        assertEquals(new BigDecimal("664"), rtn.answer(PERIOD, Q.OWNED_BUILDINGS_COAL).get().responseAsBigDecimal().setScale(0, RoundingMode.HALF_UP));
-
-        svc.calcEnergyConsumption(PERIOD, rtn);
+        assertEquals(new BigDecimal("3722"), rtn.answer(PERIOD, Q.OWNED_BUILDINGS_GAS).get().responseAsBigDecimal().setScale(0, RoundingMode.HALF_UP));
+        assertEquals(new BigDecimal("1147"), rtn.answer(PERIOD, Q.OWNED_BUILDINGS_OIL).get().responseAsBigDecimal().setScale(0, RoundingMode.HALF_UP));
+        assertEquals(new BigDecimal("658"), rtn.answer(PERIOD, Q.OWNED_BUILDINGS_COAL).get().responseAsBigDecimal().setScale(0, RoundingMode.HALF_UP));
 
         // check inputs unchanged
         assertEquals(new BigDecimal(COAL_USED), rtn.answer(PERIOD, Q.COAL_USED).get().responseAsBigDecimal());
