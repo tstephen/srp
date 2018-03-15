@@ -4,6 +4,10 @@ Sustainable Resource Planning
 Release History
 ---------------
 
+2.1.0 - 15 Mar 18
+
+  - Revised benchmarking in reports
+
 2.0.0 - 28 Feb 18 
 
   - SDU reporting project
