@@ -282,7 +282,7 @@ public class SustainabilityReturnStepDefs extends IntegrationTestSupport impleme
 
     @Then("^calculations for SDU Carbon profile are present for (\\d+) years \\(at least\\)$")
     public void calculations_for_SDU_Carbon_profile_are_present(int minNoOfYears) throws Throwable {
-        specified_calculations_are_present(SDU_CARBON_PROFILE_HDRS, minNoOfYears);
+        specified_calculations_are_present(SDU_PROFILE_HDRS, minNoOfYears);
     }
 
     @When("^the SDU (\\d+)-(\\d+) return of (\\w+) for period (\\d+)-(\\d+) is requested$")

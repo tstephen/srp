@@ -3,9 +3,7 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <groupId>digital.srp</groupId>
   <artifactId>integration-tests</artifactId>
-  <version>${srp-digital.version}</version>
   <packaging>jar</packaging>
 
   <name>Integration Tests</name>
@@ -71,12 +69,6 @@
       <version>${commons-io.version}</version>
     </dependency>
 
-
-    <dependency>
-      <groupId>com.fasterxml.jackson.core</groupId>
-      <artifactId>jackson-core</artifactId>
-    </dependency>
-
     <dependency>
       <groupId>com.knowprocess</groupId>
       <artifactId>spring-cucumber-rest</artifactId>
@@ -86,17 +78,13 @@
     <dependency>
       <groupId>digital.srp</groupId>
       <artifactId>sreport</artifactId>
-      <version>${srp-digital.version}</version>
+      <version>${project.version}</version>
     </dependency>
     
   </dependencies>
 
   <build>
     <plugins>
-      <plugin>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-maven-plugin</artifactId>
-      </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
