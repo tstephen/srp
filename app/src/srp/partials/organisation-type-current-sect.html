@@ -1,0 +1,96 @@
+<section id="currentSect" style="display:none">
+  <form class="form" id="currentForm">
+    <h2 class="form-inline">Edit Organisation Type
+      <span class="pull-right">
+        <a class="clickable glyphicon icon-btn kp-icon-remove" aria-hidden="true" on-click="delete(current)" title="Delete this record"></a>
+      </span>
+    </h2>
+
+    <div class="currentBody col-md-6 col-sm-12">
+      <ul class="form inline-form edit-form">
+        <li class="form-group">
+          <label class="col-md-4 col-sm-4 required">Name:</label>
+          <input class="form-control" id="curName" required value="{{current.name}}">
+          <p class="help-block col-xs-offset-4"></p>
+        </li>
+        <li class="form-group">
+          <label class="col-md-4 col-sm-4">Icon:</label>
+          <input class="form-control" id="curIcon" value="{{current.icon}}"/>
+          <p class="help-block col-md-offset-4">Name of the icon to use in the intervention planner.</p>
+        </li>
+        <li class="form-group">
+          <label class="col-md-4 col-sm-4 required">Status:</label>
+          <input class="form-control" id="curStatus" list="status" placeholder="Start typing to filter options" required value="{{current.status}}"/>
+          <p class="help-block col-xs-offset-4">Green will be included in public pages; red will not; amber to be determined.</p>
+        </li>
+        <li class="form-group">
+          <label class="col-md-4 col-sm-4">Sector:</label>
+          <input class="form-control" id="curSector" list="sectors" value="{{current.sector}}"/>
+          <p class="help-block col-md-offset-4">Whether the organisation is part of NHS, Public Health or Social Care</p>
+        </li>
+        <!-- <li class="form-group">
+          <label class="">Annual Turnover (£):</label>
+          <input class="form-control" id="curAnnualTurnover" type="number" checked="{{current.annualTurnover}}"/>
+          <p class="help-block col-md-offset-4">Annual turnover of the organisation</p>
+        </li>
+        <li class="form-group">
+          <label class="">Annual Energy Use:</label>
+          <input class="form-control" id="curAnnualEnergyUse" type="number" value="{{current.annualEnergyUse}}">
+          <p class="help-block col-md-offset-4">Annual energy use. TODO how to measure this? Use cost as a proxy?</p>
+        </li>
+        <li class="form-group">
+          <label class="">Floor Area: </label>
+          <input class="form-control" id="curFloorArea" type="number" value="{{current.floorArea}}">
+          <p class="help-block col-md-offset-4">Floor area of the organisation can be a useful way to estimate effect of lighting and heating interventions</p>
+        </li>-->
+      </ul>
+    </div>
+    <div class="currentBody col-md-6 col-sm-12">
+      <ul class="form inline-form edit-form">
+        <li class="form-group">
+          <label class="col-md-4 col-sm-4">Commissioner:</label>
+          <input class="form-control" data-a-pad="false" id="curCommissioner" type="checkbox" checked="{{current.commissioner}}"/>
+          <span class="secondary-label">{{#current.commissioner==true}}Yes{{else}}No{{/}}</span>
+          <p class="help-block col-xs-offset-4">Organisations of this type influence or commission services delivered by others.</p>
+        </li>
+        <li class="form-group">
+          <label class="col-md-4 col-sm-4">Inc. in SDU report?:</label>
+          <input class="form-control" data-a-pad="false" id="curReportingType" type="checkbox" checked="{{current.reportingType}}"/>
+          <span class="secondary-label">{{#current.reportingType==true}}Yes{{else}}No{{/}}</span>
+          <p class="help-block col-xs-offset-4">This organisation type should be listed in the SDU return.</p>
+        </li>
+        <li class="form-group">
+          <label class="col-md-4 col-sm-4">Count:</label>
+          <input class="form-control" id="curCount" type="number" value="{{current.count}}"/>
+          <p class="help-block col-md-offset-4">Number of this type of organisation within England</p>
+        </li>
+        <!--<li class="form-group">
+          <label class="col-md-4 col-sm-4">Staff:</label>
+          <input class="form-control" id="curNoOfStaff" type="number"  value="{{current.noOfStaff}}"/>
+          <p class="help-block col-md-offset-4">The number of staff (full time equivalents) employed directly or indirectly by the organisation</p>
+        </li>
+        <li class="form-group">
+          <label class="col-md-4 col-sm-4">Patient Interactions:</label>
+          <input class="form-control" id="curNoOfPatientInteractions" type="number" value="{{current.noOfPatientInteractions}}"/>
+          <p class="help-block col-md-offset-4">The number of patient interactions per annum</p>
+        </li>
+        <li class="form-group">
+          <label class="col-md-4 col-sm-4">In-Patients:</label>
+          <input class="form-control" id="curNoOfInPatients" type="number" value="{{current.noOfInPatients}}"/>
+          <p class="help-block col-md-offset-4">The number of in patients (beds) available to the organisation</p>
+        </li>
+        <li class="form-group">
+          <label class="col-md-4 col-sm-4">Annual Mileage:</label>
+          <input class="form-control" id="curAnnualMileage" type="number" value="{{current.annualMileage}}"/>
+          <p class="help-block col-md-offset-4">The annual mileage of the organisation made by staff in the course of their duties.</p>
+        </li>
+        <li class="form-group">
+          <label class="col-md-4 col-sm-4">Journey Distance:</label>
+          <input class="form-control" id="curTypicalJourneyDistance" type="number" value="{{current.typicalJourneyDistance}}"/>
+          <p class="help-block col-md-offset-4">Typical journey distance (miles)</p>
+        </li>-->
+      </ul>
+    </div>
+
+  </form>
+</section>

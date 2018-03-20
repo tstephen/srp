@@ -1,0 +1,12 @@
+<div class="col-sm-6 col-xs-12">
+  <a id="interventionsTableToggle" class="clickable glyphicon icon-btn kp-icon-caret-down" aria-hidden="true" on-click="toggleResults()" title="Collapse or expand the intervention table"></a>
+  <span>Interventions</span>
+  <a class="clickable glyphicon icon-btn kp-icon-plus" aria-hidden="true" on-click="add()" title="Add a new intervention"></a>
+  <a class="clickable glyphicon icon-btn kp-icon-refresh" aria-hidden="true" on-click="fetch()" title="Refresh the list"></a>
+</div>
+<div class="col-sm-6 col-xs-12">
+  <input type="search" class="form-control search" accesskey="k" placeholder="Search" value="{{searchTerm}}">
+  <a class="glyphicon icon-btn kp-icon-search" aria-hidden="true" title="Search for matching interventions"></a>
+  <a class="clickable glyphicon icon-btn kp-icon-cloud-download" aria-hidden="true" on-click="download()" title="Download interventions"></a>
+</div>
+<div style="clear:both"></div>

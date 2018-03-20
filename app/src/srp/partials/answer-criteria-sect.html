@@ -1,0 +1,58 @@
+<datalist id="fields">
+  <option value="category"/>
+  <option value="organisation"/>
+  <option value="organisation type"/>
+  <option value="period"/>
+  <option value="question"/>
+  <!--option value="question"/ QUARTILES-->
+  <option value="region"/>
+  <option value="status"/>
+</datalist>
+<datalist id="operators">
+  <option value="="> = </option>
+</datalist>
+<datalist id="periods">
+  <option value="2017-18"> 2017-18 </option>
+  <option value="2016-17"> 2016-17 </option>
+  <option value="2015-16"> 2015-16 </option>
+  <option value="2014-15"> 2014-15 </option>
+  <option value="2013-14"> 2013-14 </option>
+  <option value="2012-13"> 2012-13 </option>
+</datalist>
+<datalist id="regions">
+  <option value="London"> London </option>
+  <option value="Midlands and East"> Midlands and East </option>
+  <option value="North"> North </option>
+  <option value="South"> South </option>
+</datalist>
+<datalist id="status">
+  <option value="Draft"> Draft </option>
+  <option value="Published"> Published </option>
+</datalist>
+<section id="criteriaSect">
+  <form class="form-inline" id="criteriaForm">
+      <h2>Search Criteria
+      <!--a class="clickable glyphicon icon-btn kp-icon-attachment" href="#notes" title="Jump to Notes"></a-->
+      <span class="pull-right">
+        <a class="glyphicon icon-btn kp-icon-plus" aria-hidden="true" on-click="addCriterion()" title="Add another criterion"></a>
+        <a class="clickable glyphicon icon-btn kp-icon-search" aria-hidden="true" on-click="search()" style="border-radius:5px;border:1px solid;height:34px;margin-left:5px;" title="Search with these criteria"></a>
+      </span>
+    </h2>
+
+    <div class="criteriaBody col-md-12">
+      <ul class="" style="list-style: none">
+        {{#criteria:i}}
+          <li class="form-group criteria">
+            <input class="col-md-4 form-control criteria-field" list="fields" placeholder="Start typing to filter options" id="field{{idx}}" required value="{{field}}">
+            <input class="col-md-1 form-control criteria-operator" list="operators" placeholder="Start typing to filter options" id="operator{{idx}}" required value="{{operator}}">
+            <input class="col-md-5 form-control criteria-value" id="value{{idx}}" required value="{{value}}">
+            <span class="col-md-1">
+              <a class="glyphicon icon-btn kp-icon-remove" aria-hidden="true" on-click="deleteCriterion(i)" title="Remove this criterion"></a>
+            </span>
+            <!--p class="help-block">Draft, Ready for review, Published etc.</p-->
+          </li>
+        {{/}}
+      </ul>
+    </div>
+  </form>
+</section>
