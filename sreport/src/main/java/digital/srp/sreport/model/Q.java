@@ -151,6 +151,11 @@ public enum Q implements QuestionEnum {
     REC_EQUIPT_AND_SOUVENIRS_CO2E,
     CONSULTING_SVCS_AND_EXPENSES_CO2E,
 
+    /**
+     * @deprecated
+     */
+    CITIZEN_CO2E,
+
     // Carbon emissions profile over time
     CORE_CO2E, PROCUREMENT_CO2E,
 

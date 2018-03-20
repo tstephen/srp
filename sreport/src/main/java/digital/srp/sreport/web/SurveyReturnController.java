@@ -162,20 +162,24 @@ public class SurveyReturnController {
                 .org(org)
                 .applicablePeriod(requested.applicablePeriod())
                 .answers(emptyAnswers);
+        ensureInitialized(requested, rtn);
+
+        return addLinks(rtn);
+    }
+
+    protected void ensureInitialized(Survey requested, SurveyReturn rtn) {
         for (SurveyCategory cat : requested.categories()) {
             for (Q q : cat.questionEnums()) {
                 Question question = qRepo.findByName(q.name());
                 Answer answer = new Answer().question(question ).addSurveyReturn(rtn)
                         .applicablePeriod(requested.applicablePeriod());
                 if (q.equals(Q.ORG_CODE)) {
-                    answer.response(org);
+                    answer.response(rtn.org());
                 }
-                emptyAnswers.add(answer);
+                rtn.answers().add(answer);
             }
         }
         returnRepo.save(rtn);
-
-        return addLinks(rtn);
     }
 
     @RequestMapping(value = "/findCurrentBySurveyNameAndOrg/{surveyName}/{org}", method = RequestMethod.GET)

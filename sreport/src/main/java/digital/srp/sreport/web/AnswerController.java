@@ -41,7 +41,9 @@ import digital.srp.sreport.model.SurveyCategory;
 import digital.srp.sreport.model.SurveyReturn;
 import digital.srp.sreport.model.views.AnswerViews;
 import digital.srp.sreport.repositories.AnswerRepository;
+import digital.srp.sreport.repositories.QuestionRepository;
 import digital.srp.sreport.repositories.SurveyCategoryRepository;
+import digital.srp.sreport.repositories.SurveyReturnRepository;
 
 /**
  * REST web service for accessing answers.
@@ -63,6 +65,12 @@ public class AnswerController {
 
     @Autowired
     protected AnswerRepository answerRepo;
+
+    @Autowired
+    protected QuestionRepository qRepo;
+
+    @Autowired
+    protected SurveyReturnRepository rtnRepo;
 
     @Autowired
     protected SurveyCategoryRepository catRepo;
@@ -220,9 +228,7 @@ public class AnswerController {
     }
 
     /**
-     * Return a list of answers for a given survey, optionally paged.
-     *
-     * @return answers.
+     * @return list of answers for a given period, optionally paged.
      */
     @RequestMapping(value = "/findByPeriod/{period}", method = RequestMethod.GET)
     @JsonView(AnswerViews.Detailed.class)
@@ -243,6 +249,42 @@ public class AnswerController {
 
         addQuestionCategory(list);
         return list;
+    }
+
+    /**
+     * @return answer to the given question for the specified return and period.
+     */
+    @RequestMapping(value = "/findByReturnPeriodAndQ/{rtn}/{period}/{q}", method = RequestMethod.GET)
+    @JsonView(AnswerViews.Detailed.class)
+    public @ResponseBody Answer findByReturnPeriodAndQ(
+            @PathVariable("rtn") Long rtnId,
+            @PathVariable("period") String period,
+            @PathVariable("q") String q) {
+        LOGGER.info("find answer by rtn {}, period {} and q {}", rtnId, period, q);
+
+        List<Answer> list = answerRepo.findByReturnPeriodAndQ(rtnId, period, q);
+        Answer a;
+        switch (list.size()) {
+        case 0:
+            Question question = qRepo.findByName(q);
+            SurveyReturn rtn = rtnRepo.findOne(rtnId);
+            a = new Answer().question(question).addSurveyReturn(rtn)
+                    .applicablePeriod(period);
+            if (q.equals(Q.ORG_CODE.code())) {
+                a.response(rtn.org());
+            }
+            answerRepo.save(a);
+            break;
+        case 1:
+            a = list.get(0);
+            break;
+        default:
+            list.sort((r1,r2) -> r1.revision().compareTo(r2.revision()));
+            a = list.get(0);
+            break;
+        }
+
+        return a;
     }
 
     /**

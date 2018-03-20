@@ -88,6 +88,14 @@ public interface AnswerRepository extends CrudRepository<Answer, Long> {
             + "AND a.applicablePeriod = :period")
     List<Answer> findByPeriod(@Param("period") String period);
 
+    @Query("SELECT a FROM Answer a JOIN a.surveyReturns r JOIN a.question q "
+            + "WHERE a.applicablePeriod = :period "
+            + "AND  r.id = :rtnId "
+            + "AND  q.name = :q")
+    List<Answer> findByReturnPeriodAndQ(@Param("rtnId") Long rtnId,
+            @Param("period") String period,
+            @Param("q") String q);
+
     @Query("SELECT a FROM Answer a LEFT JOIN a.surveyReturns r "
             + "WHERE a.revision = (SELECT MAX(o.revision) FROM Answer o LEFT JOIN o.surveyReturns r WHERE o.question.name IN :qNames AND r.org = :org AND o.applicablePeriod = :period)"
             + "AND a.applicablePeriod = :period")

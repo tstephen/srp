@@ -8,6 +8,7 @@ var $r = (function ($, ractive, $auth) {
   var _isIE = false;
   var _orgType;
   var _server = $env.server;
+  //var _server = 'http://localhost:8083';
   var _survey;
   var _surveyPeriod = '2017-18'; // TODO read system param
   var _now = new Date();
@@ -188,10 +189,18 @@ var $r = (function ($, ractive, $auth) {
           var id = $(ev.target).data('id');
           if (id == undefined) id = ev.target.id;
           var answer = $r.getAnswer(id, _period);
-          answer.response = ev.target.value;
-          me.saveAnswer(answer);
-        });
-
+          // #261 16 Mar 18: lazy initialisation of questions
+          if (answer == undefined) {
+            $.getJSON(_server+'/answers/findByReturnPeriodAndQ/'+$r.rtn.id+'/'+_period+'/'+id, function(answer) {
+              $r.rtn.answers.push(answer);
+              answer.response = ev.target.value;
+              me.saveAnswer(answer);
+            });
+          } else {
+            answer.response = ev.target.value;
+            me.saveAnswer(answer);
+          }
+    });
     // Set questionnaire details specific to SDU return
     ractive.set('q.about.title', 'SDU return '+_period);
     ractive.set('q.about.options.previous', '$r.movePrevious()');
