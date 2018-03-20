@@ -72,6 +72,9 @@ var $r = (function ($, ractive, $auth) {
       console.info('skip fetch return while logging in');
       $auth.addLoginCallback(_fetchReturn);
       return;
+    } else {
+      // #262 WORKAROUND for login sect visibility being driven off this ractive data
+      ractive.set('username', $auth.getClaim('sub'));
     }
 
     $.getJSON(_server+'/returns/findCurrentBySurveyNameAndOrg/'+_surveyName+'/'+$auth.getClaim('org'),function(data) {
