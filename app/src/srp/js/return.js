@@ -91,7 +91,7 @@ var $r = (function ($, ractive, $auth) {
         console.log('  fill: '+survey.categories[i].questions[j].name);
 
         // reset question
-        //ractive.set('q.categories.'+i+'.questions.'+j+'.response', undefined);
+        ractive.set('q.categories.'+i+'.questions.'+j+'.response', undefined);
         $('#'+survey.categories[i].questions[j].name).removeAttr('readonly').removeAttr('disabled');
 
         // fill answer
