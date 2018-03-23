@@ -52,7 +52,7 @@ public class SduReportController implements SduQuestions {
 
     private DecimalFormat rawDecimalFormat = new DecimalFormat("#");
     // #183 remove round to 3 sig fig
-    private Format prettyPrintDecimalFormat = rawDecimalFormat;
+    private Format prettyPrintDecimalFormat = new DecimalFormat("#,###");
 
     private Aggregator totaller = new Totaller();
 
