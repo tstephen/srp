@@ -423,7 +423,7 @@ public class SduReportController implements SduQuestions {
             Model model) {
         LOGGER.info(String.format("footprintCsv for %1$s %2$s", org, period));
 
-        new ReportModelHelper(answerRepo).fillModel(org, period, FOOTPRINT_2017_PCT_HDRS, model, true, prettyPrintDecimalFormat, maxPeriods, true, Optional.empty());
+        new ReportModelHelper(answerRepo).fillModel(org, period, FOOTPRINT_2017_PCT_HDRS, model, true, rawDecimalFormat, maxPeriods, true, Optional.empty());
         return "csv-period-as-col";
     }
 

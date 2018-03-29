@@ -165,14 +165,19 @@ public class EricCsvImporter implements EricQuestions {
         case "Number of patients sustaining injuries during evacuation (No.)":
             return Q.NO_EVAC_INJURIES;
         case "Hard FM (Estates) costs (£)":
+        case "Other Hard FM (Estates) costs (£)":
             return Q.HARD_FM_COSTS;
         case "Soft FM (Hotel Services) costs (£)":
         case "Soft FM (Hotel services) costs (£)":
+        case "Other Soft FM (Hotel Services) costs (£)":
             return Q.SOFT_FM_COSTS;
         case "Estates and facilities finance costs (£)":
             return Q.FM_FINANCE_COSTS;
         case "Maintenance service costs (£)":
+        case "Estates and property maintenance (£)":
             return Q.MAINT_COSTS;
+        case "Grounds and gardens maintenance (£)":
+            return Q.GROUNDS_COSTS;
         case "Income received for area leased out for retail sales (£)":
             return Q.INCOME_RETAIL;
         case "Area leased out for retail sales (m²)":
@@ -190,7 +195,10 @@ public class EricCsvImporter implements EricQuestions {
             return Q.BLDG_FOOTPRINT;
         case "Site footprint (m²)":
         case "Site land area (Hectare)":
+        case "Land area owned (Hectares)":
             return Q.SITE_FOOTPRINT;
+        case "Land area not delivering services (Hectares)":
+            return Q.SITE_UNUSED_FOOTPRINT;
         case "Patient occupied floor area (m²)":
             return Q.PATIENT_OCCUPIED_FLOOR_AREA;
         case "Non-patient occupied floor area (m²)":
@@ -276,6 +284,12 @@ public class EricCsvImporter implements EricQuestions {
             return Q.ELEC_USED_LOCAL;
         case "Electricity consumed - renewable (kWh)":
             return Q.ELEC_RENEWABLE_USED;
+        case "Electricity consumed - green energy tariff (kWh)":
+            return Q.ELEC_USED_GREEN_TARIFF;
+        case "Electricity consumed - third party owned renewable (kWh)":
+            return Q.ELEC_3RD_PTY_RENEWABLE_USED;
+        case "Electrical energy output of owned onsite renewables (kWh)":
+            return Q.ELEC_OWNED_RENEWABLE_USED;
         case "Non-fossil fuel consumed - renewable (kWh)":
             return Q.RENEWABLE_USED;
         case "Fossil energy input to the CHP system/s (kWh)":
@@ -321,7 +335,14 @@ public class EricCsvImporter implements EricQuestions {
         case "Domestic waste cost (£)":
             return Q.DOMESTIC_WASTE_COST;
         case "Waste recycling, recovery cost (£)":
+        case "Waste reycling cost (£)":
             return Q.WASTE_RECYLING_COST;
+        case "Waste reycling volume (Tonnes)":
+            return Q.WASTE_RECYLING_WEIGHT;
+        case "Incineration disposal cost (£)":
+            return Q.WASTE_INCINERATION_COST;
+        case "Incineration disposal volume (Tonnes)":
+            return Q.WASTE_INCINERATION_WEIGHT;
         case "High temperature disposal waste weight involving combustion with energy recovery (Tonnes)":
             return Q.HIGH_TEMP_DISPOSAL_WITH_RECOVERY_WEIGHT;
         case "High temperature disposal waste weight (Tonnes)":
@@ -333,9 +354,14 @@ public class EricCsvImporter implements EricQuestions {
         case "Preparing for re-use volume (Tonnes)":
             return Q.REUSE_WEIGHT;
         case "Landfill disposal waste weight (Tonnes)":
+        case "Landfill disposal volume (Tonnes)":
             return Q.LANDFILL_WEIGHT;
+        case "Landfill disposal cost (£)":
+            return Q.LANDFILL_COST;
         case "Other recovery volume (Tonnes)":
             return Q.OTHER_RECOVERY_WEIGHT;
+        case "Other recovery cost (£)":
+            return Q.OTHER_RECOVERY_COST;
         case "Waste recycling volume (Tonnes)":
             return Q.RECYCLING_WEIGHT;
         case "Waste recycling, recovery and preparing for re-use cost (£)":
@@ -424,6 +450,24 @@ public class EricCsvImporter implements EricQuestions {
             return Q.OVERHEATING_EVENTS;
         case PCT_TEMP_MONITORED:
             return Q.PCT_TEMP_MONITORED;
+        case "Electro Bio Medical Equipment maintenance cost (£)":
+            return Q.ELECTRO_BIO_MEDICAL_EQUIPT;
+        case "Isolation rooms (No.)":
+            return Q.ISOLATION_ROOMS;
+        case "Cost to eradicate Safety related Critical Infrastructure Risk (£)":
+            return Q.COST_SAFETY_RISK;
+        case "Cost to eradicate non-compliance related Critical Infrastructure Risk (£)":
+            return Q.COST_COMPLIANCE_RISK;
+        case "Cost to eradicate continuity related Critical Infrastructure Risk (£)":
+            return Q.COST_CONTINUITY_RISK;
+        case "CHP unit/s size (Watts)":
+            return Q.CHP_SIZE;
+        case "CHP unit/s efficiency (%)":
+            return Q.CHP_EFFICIENCY;
+        case "Peak electrical load (MW)":
+            return Q.ELEC_PEAK_LOAD;
+        case "Maximum electrical load (MW)":
+            return Q.ELEC_MAX_LOAD;
         }
         throw new IllegalArgumentException(
                 String.format("ERIC data not expected to include %1$s", hdr));

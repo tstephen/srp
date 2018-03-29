@@ -244,3 +244,18 @@ WARD_FOOD_WASTE$Ward food waste - unserved meals$%$ERIC$$number$$$$
 INCOME_ALL$$$ERIC$$number$$$$
 PFI_CHARGES$PFI Unitary charges$£$ERIC$$number$$$$
 HIGH_TEMP_DISPOSAL_WITH_RECOVERY_WEIGHT$High temperature disposal waste weight involving combustion with energy recovery$tonnes$ERIC$$number$$$$
+GROUNDS_COSTS$$$ERIC$$number$$$$
+ELECTRO_BIO_MEDICAL_EQUIPT$$$ERIC$$number$$$$
+SITE_UNUSED_FOOTPRINT$$$ERIC$$number$$$$
+ISOLATION_ROOMS$$$ERIC$$number$$$$
+WASTE_RECYLING_WEIGHT$$$ERIC$$number$$$$
+WASTE_INCINERATION_COST$$$ERIC$$number$$$$
+WASTE_INCINERATION_WEIGHT$$$ERIC$$number$$$$
+OTHER_RECOVERY_COST$$$ERIC$$number$$$$
+COST_SAFETY_RISK$$$ERIC$$number$$$$
+COST_COMPLIANCE_RISK$$$ERIC$$number$$$$
+COST_CONTINUITY_RISK$$$ERIC$$number$$$$
+CHP_SIZE$$$ERIC$$number$$$$
+CHP_EFFICIENCY$$$ERIC$$number$$$$
+ELEC_PEAK_LOAD$$$ERIC$$number$$$$
+ELEC_MAX_LOAD$$$ERIC$$number$$$$

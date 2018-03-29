@@ -133,7 +133,7 @@ public interface SduQuestions {
             /* #203 drop as no Carbon factor Q.OTHER_PROCUREMENT_CO2E */
             Q.PAPER_AND_CARD_CO2E, Q.PHARMA_CO2E,
             /* commissioning */
-            Q.COMMISSIONING_CO2E,
+//            Q.COMMISSIONING_CO2E,
             /* core */
             Q.OWNED_BUILDINGS_COAL,
             Q.NET_ELEC_CO2E,
@@ -142,7 +142,9 @@ public interface SduQuestions {
             Q.LEASED_ASSETS_ENERGY_USE,
             Q.BIZ_MILEAGE_CO2E,
             Q.ANAESTHETIC_GASES_CO2E,
-            Q.WASTE_AND_WATER_CO2E
+            Q.WASTE_AND_WATER_CO2E,
+            Q.TOTAL_COMMISSIONING_CO2E,
+            Q.COMMISSIONING_CO2E
     };
 
     Q[] BIOMASS_CO2E_WTT_HDRS = new Q[] {
@@ -200,6 +202,7 @@ public interface SduQuestions {
             Q.PATIENT_AND_VISITOR_MILEAGE_CO2E
     };
 
+    /** @deprecated {@link BENCHMARK_2017_HDRS} provides the preferred categories */
     Q[] BENCHMARK_HDRS = new Q[] {
             Q.TOTAL_ENERGY_CO2E,
             Q.SCOPE_3_TRAVEL,
