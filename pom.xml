@@ -78,7 +78,7 @@
     <module>macc</module>
     <module>server</module>
     <module>sreport</module>
-    <module>integration-tests</module>
+    <!--module>integration-tests</module-->
   </modules>
 
   <build>
