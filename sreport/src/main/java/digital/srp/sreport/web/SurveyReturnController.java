@@ -196,7 +196,8 @@ public class SurveyReturnController {
         List<SurveyReturn> returns = findBySurveyAndOrg(surveyName, org);
         returns.sort((r1,r2) -> r1.revision().compareTo(r2.revision()));
         SurveyReturn rtn = returns.get(returns.size()-1);
-        LOGGER.info("Found {} returns for {},{} returning revision {}", returns.size(), surveyName, org, rtn.revision());
+        LOGGER.info("Found {} returns for {},{} returning revision {} (id:{})",
+                returns.size(), surveyName, org, rtn.revision(), rtn.id());
 
         validator.validate(rtn);
         return addLinks(rtn);
