@@ -16,6 +16,12 @@ gulp.task('clean', function(done) {
 });
 
 gulp.task('assets', function() {
+  gulp.src([ 'src/faq/*.html' ])
+      .pipe(replace('/vsn/', '/'+vsn+'/'))
+      .pipe(gulp.dest('dist/faq'));
+  gulp.src([ 'src/faq/public/*.html' ])
+      .pipe(replace('/vsn/', '/'+vsn+'/'))
+      .pipe(gulp.dest('dist/faq/public'));
   gulp.src([ 'src/srp/*.html' ])
       .pipe(replace('/vsn/', '/'+vsn+'/'))
       .pipe(gulp.dest('dist/srp'));
@@ -67,6 +73,18 @@ gulp.task('compile',
 );
 
 gulp.task('dev2prod', function() {
+  gulp.src([
+      'src/faq/*.html',
+    ])
+    .pipe(replace('/vsn/', '/'+vsn+'/'))
+    .pipe(replace('http://localhost:8083', 'https://api.knowprocess.com'))
+    .pipe(gulp.dest('dist/faq'));
+  gulp.src([
+      'src/faq/public/*.html'
+    ])
+    .pipe(replace('/vsn/', '/'+vsn+'/'))
+    .pipe(replace('http://localhost:8083', 'https://api.knowprocess.com'))
+    .pipe(gulp.dest('dist/faq/public'));
   gulp.src([
       'src/srp/*.html',
     ])

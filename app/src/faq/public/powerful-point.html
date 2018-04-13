@@ -1,0 +1,228 @@
+<!doctype html>
+<!--
+   Copyright 2018 Tim Stephenson and contributors
+  
+   Licensed under the Apache License, Version 2.0 (the "License"); you may not
+   use this file except in compliance with the License.  You may obtain a copy
+   of the License at
+  
+     http://www.apache.org/licenses/LICENSE-2.0
+  
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+   WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+   License for the specific language governing permissions and limitations under
+   the License.
+-->
+<html lang='en-GB'>
+<head>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta charset='utf-8'>
+  <title>FAQs</title>
+  <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+  <link href="http://localhost:8083/webjars/tag-it/2.0/css/jquery.tagit.css" rel="stylesheet" type="text/css">
+  <link href="http://localhost:8083/webjars/faq/1.0.0/css/faq.css" rel="stylesheet">
+  <link href="https://api.knowprocess.com/css/sdu-1.0.0.css" rel="stylesheet">
+  <link rel="icon" type="image/png" href="/images/icon/knowprocess-icon-16x16.png" />
+  <style>
+    h2,h3 {
+      border: none !important;
+      background-color: rgba(153,195,68,.5);
+      font-weight: 700;
+      position: relative;
+    }
+    h2 {
+      font-size: 4.5rem;
+      padding: 20px;
+      height: 85px !important;
+      top: 50px;
+    }
+    h3 {
+      font-size: 3.5rem !important;
+      margin: auto -15px;
+      padding: 20px !important;
+    }
+    h4 {
+      border: none !important;
+      font-size: 3.5rem !important;
+    }
+    img.faq-featured {
+      margin-top: -45px;
+    }
+    .faq-desc {
+      font-size: 3.5rem;
+      padding: 2rem;
+      background-color: rgba(0,61,97,1);
+      margin-top: 1rem;
+      color: white;
+    }
+    .faq-more {
+      font-size: 2.5rem;
+      padding: 2rem;
+      background-color: rgba(0,122,195,1);
+      margin-top: 1rem;
+      color: white;
+    }
+    .faq-related {
+      margin: 1rem auto;
+    }
+    .faq-related ul {
+      list-style:none;
+    }
+    .faq-related li {
+      clear:both;
+      height: 150px;
+      margin-top: 1.5rem;
+    }
+    .meta {
+      font-size: 2rem !important;
+      background-color: #999;
+      color: rgba(251,222,8,1);
+    }
+    .sdg-section {
+      padding-left: 0;
+      margin-left: -10px;
+    }
+    .sdat-section {
+      padding-left: 0;
+    }
+    .sdat-section img {
+      margin-top: 1rem;
+    }
+  </style>
+</head>
+<body class="faqPage">
+  <div class="clearfix" id="messages"></div>
+  <div class="container" id="container"></div>
+  <script id='template' type='text/ractive'>
+    <section id="currentSect">
+      <h2>
+        {{#current.name}}{{current.name}}{{else}}Headline goes here{{/}}
+        {{#current.link}}
+          <span class="pull-right">
+            <a href="{{current.link}}" target="_blank">
+              <span>View</span>
+              {{#current.paywall}}(behind paywall){{/}}
+              <span class="kp-icon-new-tab"></span>
+            </a>
+          </span>
+        {{/}}
+      </h2>
+      <img class="img-responsive faq-featured" src="{{current.featuredImage}}">
+
+      <div class="col-md-12 faq-desc">
+        <p>{{current.description}}</p>
+      </div>
+      <div class="col-md-12 faq-more">
+        <p>{{current.moreInfo}}</p>
+      </div>
+
+      <div class="col-md-6 sdg-section">{{{formatSdgs(current.tags)}}}</div>
+
+      <div class="col-md-2 sdat-section">
+          <div class="tile">
+            <img src="/sdat/images/corporate_approach_blue.png">
+          </div>
+            <div class="tile">
+              <img src="/sdat/images/facilities_management_yellow.png">
+            </div>
+      </div>
+      <div class="col-md-2 sdat-section">
+            <div class="tile">
+              <img src="/sdat/images/travel_and_logistics.png">
+            </div>
+            <div class="tile">
+              <img src="/sdat/images/adaptation_blue.png">
+            </div>
+      </div>
+      <div class="col-md-2 sdat-section">
+            <div class="tile">
+              <img src="/sdat/images/buildings_blue.png">
+            </div>
+            <div class="tile">
+              <img src="/sdat/images/green_space_green.png">
+            </div>
+      </div>
+
+      <div class="col-md-12 meta">
+        <label for="source">Source:</label>
+        <span id="source">{{current.reference}}</span>
+      </div>
+
+      <div class="col-md-6 meta">
+        <label for="created">Created:</label>
+        <span id="created">{{formatDate(current.created)}}</span>
+      </div>
+
+      <div class="col-md-6 meta">
+        <label for="lastUpdated">Updated:</label>
+        <span id="lastUpdated">{{formatDate(current.lastUpdated)}}</span>
+      </div>
+
+      <div class="col-md-12 faq-related">
+        <h3>Did you also know?</h3>
+        <ul>
+          {{#current.related}}
+            <li>{{.}}</li>
+          {{else}}
+            <li>
+              <img class="img-responsive col-md-3" src="//farm6.staticflickr.com/5573/15284557906_f612bb5358_k.jpg"><h4 class="col-md-9">Lorem Ipsum 1</h4>
+            </li>
+            <li>
+              <img class="img-responsive col-md-3" src="//farm6.staticflickr.com/5573/15284557906_f612bb5358_k.jpg"><h4 class="col-md-9">Lorem Ipsum 1</h4>
+            </li>
+            <li>
+              <img class="img-responsive col-md-3" src="//farm6.staticflickr.com/5573/15284557906_f612bb5358_k.jpg"><h4 class="col-md-9">Lorem Ipsum 1</h4>
+            </li>
+          {{/}}
+        </ul>
+      </div>
+
+      {{#tenant.faqFields.length>0}}
+        {{#if haveCustomExtension('FaqExtension')}}
+          <div id="currentFaqExtended" style="clear: both">
+            {{>(tenant.id+'FaqExtension')}}
+          </div>
+        {{else}}
+          <div id="currentFaqExtended" style="clear: both">
+            {{>currentFaqExtensionSect}}
+          </div>
+        {{/if}}
+      {{/}}
+
+    </section>
+
+  </script>
+
+  <script src="https://code.jquery.com/jquery-2.2.4.min.js"
+          integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44="
+          crossorigin="anonymous"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/ractive@0.7.3/ractive.min.js"></script>
+  <script src="https://code.jquery.com/ui/1.11.4/jquery-ui.min.js"
+          integrity="sha256-xNjb53/rY+WmG+4L6tTl9m6PpqknWZvRt0rO1SRnJzw="
+          crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/autolinker@1.4.3/dist/Autolinker.min.js"></script>
+  <script src="https://cdn.ckeditor.com/4.8.0/standard/ckeditor.js"></script>
+  <script src="http://localhost:8083/webjars/tag-it/2.0/js/tag-it.js" type="text/javascript"></script>
+  <script src="http://localhost:8083/webjars/faq/1.0.0/js/base.js"></script>
+  <script src="http://localhost:8083/webjars/faq/1.0.0/js/faq.js"></script>
+  <script src="https://api.knowprocess.com/js/md5.min.js"></script>
+  <script src="http://localhost:8083/js/env.js"></script>
+  <script src="http://localhost:8083/webjars/auth/1.1.0/js/auth.js"></script>
+  <script>
+    $(function() {
+      ractive.set('server', $env.server);
+      ractive.set('tenant', { id: 'powerfulpoints' });
+      ractive.loadStandardPartials();
+
+      ractive.on('partialsLoaded', function() {
+        console.info('partialsLoaded');
+        ractive.select({links:[
+          {rel: "self", href: $env.server+"/faqs/"+getSearchParameters()['q']}
+        ]});
+      });
+    });
+  </script>
+</body>
+</html>

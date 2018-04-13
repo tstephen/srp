@@ -1,0 +1,78 @@
+<!doctype html>
+<!--
+   Copyright 2018 Tim Stephenson and contributors
+  
+   Licensed under the Apache License, Version 2.0 (the "License"); you may not
+   use this file except in compliance with the License.  You may obtain a copy
+   of the License at
+  
+     http://www.apache.org/licenses/LICENSE-2.0
+  
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+   WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+   License for the specific language governing permissions and limitations under
+   the License.
+-->
+<html lang='en-GB'>
+<head>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta charset='utf-8'>
+  <title>FAQs</title>
+  <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+  <link href="http://localhost:8083/webjars/tag-it/2.0/css/jquery.tagit.css" rel="stylesheet" type="text/css">
+  <link href="http://localhost:8083/webjars/faq/1.0.0/css/faq.css" rel="stylesheet">
+  <link rel="icon" type="image/png" href="/images/icon/knowprocess-icon-16x16.png" />
+</head>
+<body class="faqPage">
+  <div class="clearfix" id="messages"></div>
+  <div class="container" id="container"></div>
+  <script id='template' type='text/ractive'>
+    {{>profileArea}}
+    {{>titleArea { title: title }}}
+    {{>loginSect}}
+
+    {{>faqListSect}}
+    {{>currentFaqSect}}
+    {{>poweredBy}}
+    {{>sidebar { active: 'faqs.html' }}}
+    {{>helpModal}}
+  </script>
+
+  <script src="https://code.jquery.com/jquery-2.2.4.min.js"
+          integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44="
+          crossorigin="anonymous"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/ractive@0.7.3/ractive.min.js"></script>
+  <script src="https://code.jquery.com/ui/1.11.4/jquery-ui.min.js"
+          integrity="sha256-xNjb53/rY+WmG+4L6tTl9m6PpqknWZvRt0rO1SRnJzw="
+          crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/autolinker@1.4.3/dist/Autolinker.min.js"></script>
+  <script src="https://cdn.ckeditor.com/4.8.0/standard/ckeditor.js"></script>
+  <script src="http://localhost:8083/webjars/tag-it/2.0/js/tag-it.js" type="text/javascript"></script>
+  <script src="http://localhost:8083/webjars/faq/1.0.0/js/base.js"></script>
+  <script src="http://localhost:8083/webjars/faq/1.0.0/js/faq.js"></script>
+  <script src="https://api.knowprocess.com/js/md5.min.js"></script>
+  <script src="http://localhost:8083/js/env.js"></script>
+  <script src="http://localhost:8083/webjars/auth/1.1.0/js/auth.js"></script>
+  <script>
+    $(function() {
+      ractive.set('server', $env.server);
+      ractive.push('stdPartials', { "name": "helpModal", "url": "/partials/help-modal.html"});
+      ractive.push('stdPartials', { "name": "loginSect", "url": "/webjars/auth/1.0.0/partials/login-sect.html"});
+      ractive.push('stdPartials', { "name": "profileArea", "url": "/partials/profile-area.html"});
+      ractive.push('stdPartials', { "name": "sidebar", "url": "/partials/sidebar.html"});
+      ractive.push('stdPartials', { "name": "supportBar", "url": "/webjars/supportservices/3.0.0/partials/support-bar.html"});
+      ractive.loadStandardPartials();
+
+      ractive.on('partialsLoaded', function() {
+        console.info('partialsLoaded');
+        $auth.getClaim('sub');
+        ractive.getProfile();
+        $auth.addLoginCallback(ractive.getProfile);
+        ractive.fetch();
+      });
+    });
+  </script>
+</body>
+</html>
