@@ -297,16 +297,52 @@ text.inverse {
 .legend {
   width: 2em;
 }
-.core_co2e_pct {
+.core_co2e_pct,
+.owned_buildings_coal,
+.elec_co2e,
+.elec_renewable_co2e,
+.exported_thermal_energy_co2e,
+.hot_water_co2e,
+.net_elec_co2e,
+.owned_buildings_gas,
+.owned_buildings_oil,
+.owned_vehicles,
+.net_thermal_energy_co2e,
+.leased_assets_energy_use,
+.biz_mileage_co2e,
+.biz_mileage_road_co2e,
+.biz_mileage_rail_co2e,
+.biz_mileage_air_co2e,
+.anaesthetic_gases_co2e,
+.scope_3_energy_wtt,
+.scope_3_waste,
+.scope_3_water,
+.steam_co2e,
+.waste_and_water_co2e {
   background-color: #a9d156;
 }
-.commissioning_co2e_pct {
+.commissioning_co2e_pct,
+.commissioning_co2e {
   background-color: #003d61;
 }
-.community_co2e_pct {
+.community_co2e_pct,
+.patient_and_visitor_mileage_co2e,
+.staff_commute_miles_co2e {
   background-color: #fbde06;
 }
 .procurement_co2e_pct,
+.biz_svcs_co2e,
+.capital_co2e,
+.construction_co2e,
+.catering_co2e,
+.freight_co2e,
+.ict_co2e,
+.chem_and_gas_co2e,
+.med_instr_co2e,
+.other_manufactured_co2e,
+.paper_and_card_co2e,
+.pharma_co2e,
+.procurement_co2e,
 .procurement_2017_co2e_pct {
   background-color: #007ac3;
 }
