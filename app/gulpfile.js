@@ -37,6 +37,8 @@ gulp.task('assets', function() {
 });
 
 gulp.task('scripts', function() {
+  gulp.src([ 'src/sw.js' ])
+      .pipe(gulp.dest('dist'));
   return gulp.src([
     'src/srp/js/**/*.js'
   ])
