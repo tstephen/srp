@@ -3,11 +3,11 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <title>Repository</title>
+  <title>Search</title>
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
   <link href="https://api.knowprocess.com/css/jquery.tagit.css" rel="stylesheet" type="text/css">
 
-  <link href="http://localhost:8083/webjars/faq/1.0.0/css/faq.css" rel="stylesheet">
+  <link href="https://api.knowprocess.com/webjars/faq/1.0.0/css/faq.css" rel="stylesheet">
   <link rel="icon" type="image/png" href="https://srp.digital/sdu/2.0.0/images/icon/sdu-icon-16x16.png"/>
 </head>
 <body class="container">
@@ -32,33 +32,11 @@
             <span class="input-group-text kp-icon-search" title="Search"></span>
           </div>
         </div>
-        <div id="searchOptions" class="" style="display:none">
-          <ul class="form-horizontal">
-            <li class="form-group">
-              <label class="">{{#tenant.strings.faqName}}{{tenant.strings.faqName}}{{else}}Name{{/}} includes:</label>
-              <input class="form-control" id="searchName" maxlength="100" placeholder="" value="{{search.name}}"/>
-            </li>
-            <li class="form-group">
-              <label class="">{{#tenant.strings.link}}{{tenant.strings.link}}{{else}}Link{{/}} includes:</label>
-              <input class="form-control" id="searchLink" value="{{search.link}}"/>
-            </li>
-            <li class="form-group">
-              <label class="">{{#tenant.strings.faqStatus}}{{tenant.strings.faqStatus}}{{else}}Status{{/}} matches:</label>
-              <input class="form-control" list="faqStatus" placeholder="Start typing to filter options" id="searchStatus" maxlength="30" value="{{search.status}}"/>
-            </li>
-            <li class="form-group">
-              <label class="">{{# tenant.strings.faqTags}}{{tenant.strings.faqTags}}{{else}}Tags{{/}} includes:</label>
-              <input class="form-control" id="searchFaqTags" value="{{search.tags}}"/>
-            </li>
-            <li class="button-group float-right">
-              <a class="btn-search" href="#"><span class="glyphicon icon-btn kp-icon-search"></span></a>
-            </li>
-          </ul>
-        </div>
+        {{>faqAdvancedSearchSect}}
       </div>
     </section>
       <section id="results">
-{{>faqListTable { view: '/faq/public/powerful-point.html' }}}
+        {{>faqListTable { view: '/faq/public/case-study.html' }}}
       </section>
   </script>
 
@@ -78,21 +56,22 @@
     // Check that service workers are registered
     if ('serviceWorker' in navigator) {
       // Use the window load event to keep the page load performant
-      window.addEventListener('load', () => {
+      window.addEventListener('load', function() {
         navigator.serviceWorker.register('/sw.js');
       });
     }
 
     $(function() {
       ractive.set('server', $env.server);
-      ractive.set('tenant', { id: 'powerfulpoints' });
+      ractive.set('tenant', { id: 'casestudies' });
       $('.input-group .kp-icon-caret-down').click(ractive.toggleSearchOptions); 
-      $('.btn-search').click(ractive.search); 
-      $.getJSON($env.server+'/tenants/powerfulpoints.json',function(data) {ractive.set('tenant', data);});
-      ractive.loadStandardPartial('faqListTable', ractive.getServer()+'/webjars/faq/1.0.0/partials/faq-list-table.html');
-      ractive.on('fetched', function() {
-        $('#faqsTable th').css('border-bottom-style','none').css('border-top-style','none');
+      $.getJSON($env.server+'/tenants/casestudies.json',function(data) {
+        ractive.set('tenant', data);
+        var status = Array.findBy('name','faqStatus',ractive.get('tenant.typeaheadControls'));
+        ractive.addDataList(status, status.values);
       });
+      ractive.loadStandardPartial('faqListTable', ractive.getServer()+'/webjars/faq/1.0.0/partials/faq-list-table.html');
+      ractive.loadStandardPartial('faqAdvancedSearchSect', ractive.getServer()+'/webjars/faq/1.0.0/partials/faq-advanced-search-sect.html');
     });
   </script>
 </body>

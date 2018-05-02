@@ -35,6 +35,7 @@
       font-size: 4.5rem;
       padding: 20px;
       height: 85px !important;
+      top: 50px;
     }
     h3 {
       font-size: 3.5rem !important;
@@ -44,6 +45,9 @@
     h4 {
       border: none !important;
       font-size: 3.5rem !important;
+    }
+    img.faq-featured {
+      margin-top: -45px;
     }
     .faq-desc {
       font-size: 3.5rem;
@@ -75,11 +79,15 @@
       background-color: #999;
       color: rgba(251,222,8,1);
     }
-    ul.tagit {
-      min-height: 1em;
+    .sdg-section {
+      padding-left: 0;
+      margin-left: -10px;
     }
-    ul.tagit li.tagit-choice {
-      background-color: rgba(153, 195, 68, 0.55555);
+    .sdat-section {
+      padding-left: 0;
+    }
+    .sdat-section img {
+      margin-top: 1rem;
     }
   </style>
 </head>
@@ -111,11 +119,29 @@
 
       <div class="col-md-6 sdg-section">{{{formatSdgs(current.tags)}}}</div>
 
-      <div class="col-md-6 sdat-section">{{{formatSdats(current.tags)}}}</div>
-
-      <div class="col-md-12 meta tags-section">
-        <label for="source">Tags:</label>
-        <span>{{{formatTags(current.tags)}}}</span>
+      <div class="col-md-2 sdat-section">
+          <div class="tile">
+            <img src="/sdat/images/corporate_approach_blue.png">
+          </div>
+            <div class="tile">
+              <img src="/sdat/images/facilities_management_yellow.png">
+            </div>
+      </div>
+      <div class="col-md-2 sdat-section">
+            <div class="tile">
+              <img src="/sdat/images/travel_and_logistics.png">
+            </div>
+            <div class="tile">
+              <img src="/sdat/images/adaptation_blue.png">
+            </div>
+      </div>
+      <div class="col-md-2 sdat-section">
+            <div class="tile">
+              <img src="/sdat/images/buildings_blue.png">
+            </div>
+            <div class="tile">
+              <img src="/sdat/images/green_space_green.png">
+            </div>
       </div>
 
       <div class="col-md-12 meta">
@@ -133,7 +159,24 @@
         <span id="lastUpdated">{{formatDate(current.lastUpdated)}}</span>
       </div>
 
-      {{>faqRelatedSect}}
+      <div class="col-md-12 faq-related">
+        <h3>Did you also know?</h3>
+        <ul>
+          {{#current.related}}
+            <li>{{.}}</li>
+          {{else}}
+            <li>
+              <img class="img-responsive col-md-3" src="//farm6.staticflickr.com/5573/15284557906_f612bb5358_k.jpg"><h4 class="col-md-9">Lorem Ipsum 1</h4>
+            </li>
+            <li>
+              <img class="img-responsive col-md-3" src="//farm6.staticflickr.com/5573/15284557906_f612bb5358_k.jpg"><h4 class="col-md-9">Lorem Ipsum 1</h4>
+            </li>
+            <li>
+              <img class="img-responsive col-md-3" src="//farm6.staticflickr.com/5573/15284557906_f612bb5358_k.jpg"><h4 class="col-md-9">Lorem Ipsum 1</h4>
+            </li>
+          {{/}}
+        </ul>
+      </div>
 
       {{#tenant.faqFields.length>0}}
         {{#if haveCustomExtension('FaqExtension')}}
@@ -169,7 +212,7 @@
   <script>
     $(function() {
       ractive.set('server', $env.server);
-      ractive.set('tenant', { id: 'powerfulpoints' });
+      ractive.set('tenant', { id: 'casestudies' });
       ractive.loadStandardPartials();
 
       ractive.on('partialsLoaded', function() {

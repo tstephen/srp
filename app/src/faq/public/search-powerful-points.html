@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <title>Search</title>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+  <link href="https://api.knowprocess.com/css/jquery.tagit.css" rel="stylesheet" type="text/css">
+
+  <link href="https://api.knowprocess.com/webjars/faq/1.0.0/css/faq.css" rel="stylesheet">
+  <link rel="icon" type="image/png" href="https://srp.digital/sdu/2.0.0/images/icon/sdu-icon-16x16.png"/>
+</head>
+<body class="container">
+
+  <div class="clearfix" id="messages"></div>
+  <div>
+    <div id="container"></div>
+  </div>
+
+  <script id='template' type='text/ractive'>
+    <section id="main">
+      <h1>
+        <span>{{#tenant.strings.faqs}}{{tenant.strings.faqs}}{{else}}FAQs{{/}}</span>
+      </h1>
+      <div>
+        <div class="input-group">
+          <input autofocus class="form-control col-md-12" name="search"
+                 placeholder="Search for point or open advanced search options"
+                 type="search" value="{{searchTerm}}"/>
+          <div class="input-group-append">
+            <span class="input-group-text kp-icon-caret-down" title="Show search options"></span>
+            <span class="input-group-text kp-icon-search" title="Search"></span>
+          </div>
+        </div>
+        {{>faqAdvancedSearchSect}}
+      </div>
+    </section>
+      <section id="results">
+        {{>faqListTable { view: '/faq/public/powerful-point.html' }}}
+      </section>
+  </script>
+
+<script
+  src="https://code.jquery.com/jquery-3.3.1.min.js"
+  integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+  crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pace/1.0.2/pace.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/ractive@0.7.3/ractive.min.js"></script>
+  <script src="http://localhost:8083/js/env.js"></script>
+  <script src="http://localhost:8083/webjars/faq/1.0.0/js/base.js"></script>
+  <script src="http://localhost:8083/webjars/faq/1.0.0/js/faq.js"></script>
+
+  <script>
+    // Check that service workers are registered
+    if ('serviceWorker' in navigator) {
+      // Use the window load event to keep the page load performant
+      window.addEventListener('load', function() {
+        navigator.serviceWorker.register('/sw.js');
+      });
+    }
+
+    $(function() {
+      ractive.set('server', $env.server);
+      ractive.set('tenant', { id: 'powerfulpoints' });
+      $('.input-group .kp-icon-caret-down').click(ractive.toggleSearchOptions); 
+      $.getJSON($env.server+'/tenants/powerfulpoints.json',function(data) {
+        ractive.set('tenant', data);
+        var status = Array.findBy('name','faqStatus',ractive.get('tenant.typeaheadControls'));
+        ractive.addDataList(status, status.values);
+      });
+      ractive.loadStandardPartial('faqListTable', ractive.getServer()+'/webjars/faq/1.0.0/partials/faq-list-table.html');
+      ractive.loadStandardPartial('faqAdvancedSearchSect', ractive.getServer()+'/webjars/faq/1.0.0/partials/faq-advanced-search-sect.html');
+    });
+  </script>
+</body>
+</html>
