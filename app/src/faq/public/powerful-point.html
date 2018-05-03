@@ -32,29 +32,49 @@
       position: relative;
     }
     h2 {
-      font-size: 4.5rem;
-      padding: 20px;
-      height: 85px !important;
+      font-size: 2.2rem;
+      padding: 2.2rem;
+      height: 4rem !important;
     }
-    h3 {
-      font-size: 3.5rem !important;
-      margin: auto -15px;
-      padding: 20px !important;
+    h3, .faq-desc {
+      font-size: 1.7rem;
+      padding: 1.7rem;
     }
-    h4 {
+    h4, .faq-more, .meta {
       border: none !important;
-      font-size: 3.5rem !important;
+      font-size: 1.4rem;
+      padding: 1.4rem;
     }
+@media (min-width: 720px) {
+    h2 {
+      font-size: 3rem;
+      height: 5rem !important;
+    }
+    h3, .faq-desc {
+      font-size: 3.2rem;
+    }
+    h4, .faq-more, .meta {
+      font-size: 1.9rem;
+    }
+}
+@media (min-width: 992px) {
+    h2 {
+      font-size: 4rem;
+      height: 6rem !important;
+    }
+    h3, .faq-desc {
+      font-size: 3.2rem;
+    }
+    h4, .faq-more, .meta {
+      font-size: 2rem;
+    }
+}
     .faq-desc {
-      font-size: 3.5rem;
-      padding: 2rem;
       background-color: rgba(0,61,97,1);
       margin-top: 1rem;
       color: white;
     }
     .faq-more {
-      font-size: 2.5rem;
-      padding: 2rem;
       background-color: rgba(0,122,195,1);
       margin-top: 1rem;
       color: white;
@@ -71,7 +91,6 @@
       margin-top: 1.5rem;
     }
     .meta {
-      font-size: 2rem !important;
       background-color: #999;
       color: rgba(251,222,8,1);
     }
@@ -80,6 +99,12 @@
     }
     ul.tagit li.tagit-choice {
       background-color: rgba(153, 195, 68, 0.55555);
+    }
+    #currentRelatedSect {
+      display: grid;
+    }
+    #currentRelatedSect h2 {
+      margin-top: 1rem;
     }
   </style>
 </head>
@@ -102,33 +127,37 @@
       </h2>
       <img class="img-responsive faq-featured" src="{{current.featuredImage}}">
 
-      <div class="col-md-12 faq-desc">
+      <div class="col-xs-12 faq-desc">
         <p>{{current.description}}</p>
       </div>
-      <div class="col-md-12 faq-more">
-        <p>{{current.moreInfo}}</p>
-      </div>
+      {{#current.customFields.moreInfo}}
+        <div class="col-xs-12 faq-more">
+          <p>{{current.customFields.moreInfo}}</p>
+        </div>
+      {{/}}
 
-      <div class="col-md-6 sdg-section">{{{formatSdgs(current.tags)}}}</div>
+      <div class="col-xs-6 sdg-section">{{{formatSdgs(current.tags)}}}</div>
 
-      <div class="col-md-6 sdat-section">{{{formatSdats(current.tags)}}}</div>
+      <div class="col-xs-6 sdat-section">{{{formatSdats(current.tags)}}}</div>
 
-      <div class="col-md-12 meta tags-section">
+      <div class="col-xs-12 meta tags-section">
         <label for="source">Tags:</label>
         <span>{{{formatTags(current.tags)}}}</span>
       </div>
 
-      <div class="col-md-12 meta">
-        <label for="source">Source:</label>
-        <span id="source">{{current.reference}}</span>
-      </div>
+      {{#current.reference}}
+        <div class="col-xs-12 meta">
+          <label for="source">Source:</label>
+          <span id="source">{{current.reference}}</span>
+        </div>
+      {{/}}
 
-      <div class="col-md-6 meta">
+      <div class="col-xs-6 meta">
         <label for="created">Created:</label>
         <span id="created">{{formatDate(current.created)}}</span>
       </div>
 
-      <div class="col-md-6 meta">
+      <div class="col-xs-6 meta">
         <label for="lastUpdated">Updated:</label>
         <span id="lastUpdated">{{formatDate(current.lastUpdated)}}</span>
       </div>
