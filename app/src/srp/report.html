@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta charset="utf-8">
   <title>Sustainable Resource Planning</title>
   <!--link href="/webjars/bootstrap/3.3.5/css/bootstrap.min.css" rel="stylesheet"-->
   <link rel="stylesheet" type="text/css" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"/>
@@ -115,7 +117,7 @@
           {{#if formatAnswer('LAST_GCC_DATE')!=undefined && formatAnswer('LAST_GCC_DATE')!=''}}
             One of the ways in which we measure our impact as an organisation on corporate social responsibility is through the use of the <a href="https://www.sduhealth.org.uk/sdat/">Sustainable Development Assessment Tool</a> (SDAT) tool.
               The last time we used the SDAT self assessment was in {{formatAnswer('LAST_GCC_DATE')}}
-              scoring {{formatAnswer('LAST_GCC_SCORE')}}%.
+              {{#if formatAnswer('LAST_GCC_SCORE')!='NaN'}} scoring {{formatAnswer('LAST_GCC_SCORE')}}%{{/if}}.
             {{#if formatAnswer('promoteSustainabilityToStaff')}}
               As an organisation that acknowledges its responsibility towards creating a sustainable future, we help acheive that goal by running awareness campaigns that promote the benefits of sustainability to our staff.
             {{/if}}
