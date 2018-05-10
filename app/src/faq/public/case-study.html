@@ -23,11 +23,15 @@
   <link href="http://localhost:8083/webjars/tag-it/2.0/css/jquery.tagit.css" rel="stylesheet" type="text/css">
   <link href="http://localhost:8083/webjars/faq/1.0.0/css/faq.css" rel="stylesheet">
   <link href="https://api.knowprocess.com/css/sdu-1.0.0.css" rel="stylesheet">
+  <link href='http://fonts.googleapis.com/css?family=Pacifico' rel='stylesheet' type='text/css'>
   <link rel="icon" type="image/png" href="/images/icon/knowprocess-icon-16x16.png" />
   <style>
+    blockquote {
+      border-left: 0 none;
+    }
     h2,h3 {
+      background-color: rgba(0,61,97,1);
       border: none !important;
-      background-color: rgba(153,195,68,.5);
       font-weight: 700;
       position: relative;
     }
@@ -36,8 +40,12 @@
       padding: 2.2rem;
       height: 4rem !important;
     }
+    h2, h2 a:hover, h2 a:active, h3 {
+      color: white !important;
+    }
     h3, .faq-desc {
       font-size: 1.7rem;
+      margin: 1rem auto;
       padding: 1.7rem;
     }
     h4, .faq-more, .meta {
@@ -45,39 +53,48 @@
       font-size: 1.4rem;
       padding: 1.4rem;
     }
-@media (min-width: 720px) {
-    h2 {
-      font-size: 3rem;
-      height: 5rem !important;
+    @media (min-width: 720px) {
+      h2 {
+        font-size: 3rem;
+        height: 5rem !important;
+      }
+      h3, .faq-desc {
+        font-size: 3.2rem;
+      }
+      h4, .faq-more, .meta {
+        font-size: 1.9rem;
+      }
     }
-    h3, .faq-desc {
-      font-size: 3.2rem;
+    @media (min-width: 992px) {
+      h2 {
+        font-size: 4rem;
+        height: 6rem !important;
+      }
+      h3, .faq-desc {
+        font-size: 3.2rem;
+      }
+      h4, .faq-more, .meta {
+        font-size: 2rem;
+      }
     }
-    h4, .faq-more, .meta {
-      font-size: 1.9rem;
-    }
-}
-@media (min-width: 992px) {
-    h2 {
-      font-size: 4rem;
-      height: 6rem !important;
-    }
-    h3, .faq-desc {
-      font-size: 3.2rem;
-    }
-    h4, .faq-more, .meta {
-      font-size: 2rem;
-    }
-}
     .faq-desc {
-      background-color: rgba(0,61,97,1);
+      background-color: rgba(153,195,68,1);
+      color: rgba(0,61,97,1);
       margin-top: 1rem;
       color: white;
     }
     .faq-more {
       background-color: rgba(0,122,195,1);
-      margin-top: 1rem;
       color: white;
+    }
+    .faq-quote {
+      background-color: rgba(251,222,8,1) !important;
+      margin: 1rem auto;
+      color: xwrgba(0,122,195,1) !important;
+    }
+    .faq-quote blockquote {
+      font-family: 'Pacifico',sans-serif;
+      font-size: 2rem;
     }
     .faq-related {
       margin: 1rem auto;
@@ -130,9 +147,46 @@
       <div class="col-xs-12 faq-desc">
         <p>{{current.description}}</p>
       </div>
-      {{#current.customFields.moreInfo}}
+
+      {{#current.customFields['issue']}}
+        <h3 class="col-xs-12">{{Array.findBy('name','issue',tenant.faqFields).hint}}</h3>
         <div class="col-xs-12 faq-more">
-          <p>{{current.customFields.moreInfo}}</p>
+          <p id="issue">{{current.customFields['issue']}}</p>
+        </div>
+      {{/}}
+
+      {{#current.customFields['action']}}
+        <h3 class="col-xs-12">{{Array.findBy('name','action',tenant.faqFields).hint}}</h3>
+        <div class="col-xs-12 faq-more">
+          <p id="action">{{current.customFields['action']}}</p>
+        </div>
+      {{/}}
+
+      {{#current.customFields['impact']}}
+        <h3 class="col-xs-12">{{Array.findBy('name','impact',tenant.faqFields).hint}}</h3>
+        <div class="col-xs-12 faq-more">
+          <p id="impact">{{current.customFields['impact']}}</p>
+        </div>
+      {{/}}
+
+      {{#current.customFields['lessons']}}
+        <h3 class="col-xs-12">{{Array.findBy('name','lessons',tenant.faqFields).hint}}</h3>
+        <div class="col-xs-12 faq-more">
+          <p id="lessons">{{current.customFields['lessons']}}</p>
+        </div>
+      {{/}}
+
+      {{#current.customFields['scaling']}}
+        <h3 class="col-xs-12">{{Array.findBy('name','scaling',tenant.faqFields).hint}}</h3>
+        <div class="col-xs-12 faq-more">
+          <p id="scaling">{{current.customFields['scaling']}}</p>
+        </div>
+      {{/}}
+
+      {{#current.customFields['quote']}}
+        <div class="col-xs-12 faq-quote">
+          <blockquote id="quote">{{current.customFields['quote']}}</blockquote>
+          <p class="pull-right" id="quoteBy"><em>{{current.customFields['quoteBy']}}</em></p>
         </div>
       {{/}}
 
@@ -145,12 +199,20 @@
         <span>{{{formatTags(current.tags)}}}</span>
       </div>
 
-      {{#current.reference}}
-        <div class="col-xs-12 meta">
-          <label for="source">Source:</label>
-          <span id="source">{{current.reference}}</span>
-        </div>
-      {{/}}
+      <div class="col-xs-12 meta">
+        <label for="orgName">Org'n Name:</label>
+        <span id="orgName">{{current.customFields['orgName']}}</span>
+      </div>
+
+      <div class="col-xs-6 meta">
+        <label for="orgType">Org'n Type:</label>
+        <span id="orgType">{{current.customFields['orgType']}}</span>
+      </div>
+
+      <div class="col-xs-6 meta">
+        <label for="geography">Geography:</label>
+        <span id="geography">{{current.customFields['geography']}}</span>
+      </div>
 
       <div class="col-xs-6 meta">
         <label for="created">Created:</label>
@@ -163,18 +225,6 @@
       </div>
 
       {{>faqRelatedSect}}
-
-      {{#tenant.faqFields.length>0}}
-        {{#if haveCustomExtension('FaqExtension')}}
-          <div id="currentFaqExtended" style="clear: both">
-            {{>(tenant.id+'FaqExtension')}}
-          </div>
-        {{else}}
-          <div id="currentFaqExtended" style="clear: both">
-            {{>currentFaqExtensionSect}}
-          </div>
-        {{/if}}
-      {{/}}
 
     </section>
 
@@ -199,6 +249,7 @@
     $(function() {
       ractive.set('server', $env.server);
       ractive.set('tenant', { id: 'casestudies' });
+      ractive.loadTenantConfig(ractive.get('tenant.id'));
       ractive.loadStandardPartials();
 
       ractive.on('partialsLoaded', function() {

@@ -70,8 +70,9 @@
         var status = Array.findBy('name','faqStatus',ractive.get('tenant.typeaheadControls'));
         ractive.addDataList(status, status.values);
       });
-      ractive.loadStandardPartial('faqListTable', ractive.getServer()+'/webjars/faq/1.0.0/partials/faq-list-table.html');
-      ractive.loadStandardPartial('faqAdvancedSearchSect', ractive.getServer()+'/webjars/faq/1.0.0/partials/faq-advanced-search-sect.html');
+      ractive.loadStandardPartials([
+        { "name": "faqListTable", "url": "/webjars/faq/1.0.0/partials/faq-list-table.html" },
+        { "name": "faqAdvancedSearchSect", "url": "/webjars/faq/1.0.0/partials/faq-advanced-search-sect.html" }]);
     });
   </script>
 </body>
