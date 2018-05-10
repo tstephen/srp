@@ -218,6 +218,7 @@ var $r = (function ($, ractive, $auth) {
     });
     $('[data-id="PROC_SUPPLIER_SUSTAINABILITY"]').off().on('change', function(ev) {
       var answer = $r.getAnswer('PROC_SUPPLIER_SUSTAINABILITY', _period);
+      if (answer.response == null) answer.response = [];
       if (ev.target.checked) answer.response.push(ev.target.value);
       else answer.response.splice(answer.response.indexOf(ev.target.value), 1);
       $r.dirty = true;
@@ -225,6 +226,7 @@ var $r = (function ($, ractive, $auth) {
     });
     $('[data-id="SDG_CLEAR"]').off().on('change', function(ev) {
       var answer = $r.getAnswer('SDG_CLEAR', _period);
+      if (answer.response == null) answer.response = [];
       if (ev.target.checked) answer.response.push(ev.target.value);
       else answer.response.splice(answer.response.indexOf(ev.target.value), 1);
       $r.dirty = true;
@@ -232,6 +234,7 @@ var $r = (function ($, ractive, $auth) {
     });
     $('[data-id="SDG_STARTING"]').off().on('change', function(ev) {
       var answer = $r.getAnswer('SDG_STARTING', _period);
+      if (answer.response == null) answer.response = [];
       if (ev.target.checked) answer.response.push(ev.target.value);
       else answer.response.splice(answer.response.indexOf(ev.target.value), 1);
       $r.dirty = true;
