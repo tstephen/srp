@@ -211,6 +211,7 @@ var $r = (function ($, ractive, $auth) {
     ractive.set('q.about.options.finalSubmitButton', true);
     $('[data-id="ECLASS_USER"]').off().on('blur', function(ev) {
       var answer = $r.getAnswer('ECLASS_USER', _period);
+      if (answer.response == null) answer.response = [];
       answer.response = ev.target.value;
       $r.dirty = true;
       $r.saveAnswer(answer);
