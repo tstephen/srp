@@ -158,6 +158,7 @@ public class Cruncher implements digital.srp.sreport.model.surveys.SduQuestions,
                 /* all travel excepting individual citizens (patients, visitors and staff) */
                 Q.BIZ_MILEAGE_CO2E,
                 /* All energy */
+                // TODO this is more complete than totalEnergyCo2e already calculated above????
                 Q.LEASED_ASSETS_ENERGY_USE,
                 Q.NET_ELEC_CO2E, Q.NET_THERMAL_ENERGY_CO2E,
                 Q.OWNED_BUILDINGS_COAL,
@@ -165,30 +166,63 @@ public class Cruncher implements digital.srp.sreport.model.surveys.SduQuestions,
                 Q.OWNED_BUILDINGS_GAS,
                 Q.OTHER_AOI_CORE).responseAsBigDecimal();
 
-        BigDecimal totalCommissioningCo2e = sumAnswers(period, rtn,
-                Q.TOTAL_COMMISSIONING_CO2E,
-                Q.COMMISSIONING_CO2E,
-                Q.PURCHASED_HEALTHCARE_CO2E).responseAsBigDecimal();
+        BigDecimal totalCommissioningCo2e;
+        if (isEClassUser(rtn)) {
+            totalCommissioningCo2e = sumAnswers(period, rtn,
+                    Q.TOTAL_COMMISSIONING_CO2E,
+                    Q.PURCHASED_HEALTHCARE_CO2E).responseAsBigDecimal();
+        } else {
+            totalCommissioningCo2e = sumAnswers(period, rtn,
+                    Q.TOTAL_COMMISSIONING_CO2E,
+                    Q.COMMISSIONING_CO2E).responseAsBigDecimal();
+        }
+
 
         BigDecimal totalCommunityCo2e = sumAnswers(period, rtn,
                 Q.TOTAL_COMMUNITY_CO2E,
                 Q.STAFF_COMMUTE_MILES_CO2E,
                 Q.PATIENT_AND_VISITOR_MILEAGE_CO2E).responseAsBigDecimal();
 
-        BigDecimal totalProcurement2017Co2e = sumAnswers(period, rtn,
-                Q.TOTAL_PROCUREMENT_2017_CO2E,
-                Q.CAPITAL_CO2E,
-                Q.BIZ_SVCS_CO2E,
-                Q.CONSTRUCTION_CO2E,
-                Q.CATERING_CO2E,
-                Q.FREIGHT_CO2E,
-                Q.ICT_CO2E,
-                Q.CHEM_AND_GAS_CO2E,
-                Q.MED_INSTR_CO2E,
-                Q.OTHER_MANUFACTURED_CO2E,
-                /* #203 drop as no Carbon factor Q.OTHER_PROCUREMENT_CO2E */
-                Q.PAPER_AND_CARD_CO2E,
-                Q.PHARMA_CO2E).responseAsBigDecimal();
+        BigDecimal totalProcurement2017Co2e;
+        if (isEClassUser(rtn)) {
+            totalProcurement2017Co2e = sumAnswers(period, rtn,
+                    Q.TOTAL_PROCUREMENT_2017_CO2E,
+                    Q.PROVISIONS_CO2E,
+                    Q.STAFF_CLOTHING_CO2E,
+                    Q.PATIENTS_CLOTHING_AND_FOOTWEAR_CO2E,
+                    Q.PHARMA_BLOOD_PROD_AND_MED_GASES_CO2E,
+                    Q.DRESSINGS_CO2E,
+                    Q.MEDICAL_AND_SURGICAL_EQUIPT_CO2E,
+                    Q.PATIENTS_APPLIANCES_CO2E,
+                    Q.CHEMICALS_AND_REAGENTS_CO2E,
+                    Q.DENTAL_AND_OPTICAL_EQUIPT_CO2E,
+                    Q.LAB_EQUIPT_AND_SVCS_CO2E,
+                    Q.HOTEL_EQUIPT_MATERIALS_AND_SVCS_CO2E,
+                    Q.BLDG_AND_ENG_PROD_AND_SVCS_CO2E,
+                    Q.GARDENING_AND_FARMING_CO2E,
+                    Q.FURNITURE_FITTINGS_CO2E,
+                    Q.HARDWARE_CROCKERY_CO2E,
+                    Q.BEDDING_LINEN_AND_TEXTILES_CO2E,
+                    Q.OFFICE_EQUIPT_TELCO_COMPUTERS_AND_STATIONERY_CO2E,
+                    Q.REC_EQUIPT_AND_SOUVENIRS_CO2E,
+                    Q.CONSULTING_SVCS_AND_EXPENSES_CO2E,
+                    Q.PHARMA_CO2E).responseAsBigDecimal();
+        } else {
+            totalProcurement2017Co2e = sumAnswers(period, rtn,
+                    Q.TOTAL_PROCUREMENT_2017_CO2E,
+                    Q.CAPITAL_CO2E,
+                    Q.BIZ_SVCS_CO2E,
+                    Q.CONSTRUCTION_CO2E,
+                    Q.CATERING_CO2E,
+                    Q.FREIGHT_CO2E,
+                    Q.ICT_CO2E,
+                    Q.CHEM_AND_GAS_CO2E,
+                    Q.MED_INSTR_CO2E,
+                    Q.OTHER_MANUFACTURED_CO2E,
+                    /* #203 drop as no Carbon factor Q.OTHER_PROCUREMENT_CO2E */
+                    Q.PAPER_AND_CARD_CO2E,
+                    Q.PHARMA_CO2E).responseAsBigDecimal();
+        }
 
         Answer totalCo2eA = sumAnswers(period, rtn, Q.TOTAL_CO2E,
                 Q.TOTAL_CORE_CO2E,

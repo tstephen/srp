@@ -355,11 +355,13 @@
 =IF(E106=0,"",(IF($Input.$B$20="",$Input.$B$18,$Input.$B$20)&" has spent £"&$Input.M69&" on energy in 2017/18, which is a "&IF(F106>E106,ROUND((F106-E106)*100/E106,1),ROUND((E106-F106)*100/E106,1))&IF(F106>E106,"% increase","% decrease")&" on energy spend from last year."))
 -->
           {{#formatAnswer('TOTAL_ENERGY_COST')!='NaN'}}
-            <p>{{formatAnswer('ORG_NAME')}} has spent &pound;{{formatAnswer('TOTAL_ENERGY_COST')}} on energy in {{surveyReturn.applicablePeriod
-}}, which is a
+            <p>{{formatAnswer('ORG_NAME')}} has spent &pound;{{formatAnswer('TOTAL_ENERGY_COST')}} on energy in {{surveyReturn.applicablePeriod}}
+{{#if isNaN(formatAnswer('ENERGY_COST_CHANGE_PCT'))}}.
+{{else}}, which is a
             {{formatAnswer('ENERGY_COST_CHANGE_PCT')}}%
             {{#if isNaN(formatAnswer('ENERGY_COST_CHANGE_PCT')) || formatAnswer('ENERGY_COST_CHANGE_PCT').indexOf('-')==-1}} increase {{else}} decrease {{/if}}
             on energy spend from last year.
+{{/if}}
             </p>
           {{/}}
           <h4>Energy used</h4>
@@ -462,7 +464,7 @@
           <section class="col-md-6 col-xs-12">
             <p>
               <svg data-src="/reports/{{org}}/{{surveyReturn.applicablePeriod}}/carbon-footprint.csv?maxPeriods=1"
-                   data-colors="#a9d156,#003d61,#007ac3,#fbde06"
+                   data-colors="#a9d156,#007ac3,#fbde06,#003d61"
                    data-labels="false"
                    data-other="0"
                    class="rpt pie" id="carbonFootprintPieChart" width="600" height="400"></svg>
@@ -473,9 +475,12 @@
             <div class="rpt table" id="carbonFootprintRptTable"
                 data-src="/reports/{{org}}/{{surveyReturn.applicablePeriod}}/carbon-footprint.html?maxPeriods=1"></div>
           </section>
-          {{#if getAnswer('ECLASS_USER')}}
+          {{#if isEClassUser()}}
             <section id="eclassCarbonProfileSect" style="clear:both">
               <h2>E-Class Procurement Profile</h2>
+              <p>Calculated from operating expenditure of <em>&pound;{{formatAnswer('OP_EX')}},000</em>
+                {{# formatAnswer('ECLASS_SPEND')}} of which <em>&pound;{{formatAnswer('ECLASS_SPEND')}},000</em> is E-Class classified spend.{{/}}
+              </p>
               <div class="rpt table" id="eclassProfileRptTable" data-src="/reports/{{org}}/{{surveyReturn.applicablePeriod}}/eclass-carbon-profile.html?maxPeriods=4"></div>
             </section>
           {{else}}

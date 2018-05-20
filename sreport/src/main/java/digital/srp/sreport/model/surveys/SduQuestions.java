@@ -132,8 +132,6 @@ public interface SduQuestions {
             Q.OTHER_MANUFACTURED_CO2E,
             /* #203 drop as no Carbon factor Q.OTHER_PROCUREMENT_CO2E */
             Q.PAPER_AND_CARD_CO2E, Q.PHARMA_CO2E,
-            /* commissioning */
-//            Q.COMMISSIONING_CO2E,
             /* core */
             Q.OWNED_BUILDINGS_COAL,
             Q.NET_ELEC_CO2E,
@@ -143,8 +141,8 @@ public interface SduQuestions {
             Q.BIZ_MILEAGE_CO2E,
             Q.ANAESTHETIC_GASES_CO2E,
             Q.WASTE_AND_WATER_CO2E,
-            Q.TOTAL_COMMISSIONING_CO2E,
-            Q.COMMISSIONING_CO2E
+            /* commissioning */
+            Q.TOTAL_COMMISSIONING_CO2E
     };
 
     Q[] BIOMASS_CO2E_WTT_HDRS = new Q[] {
@@ -164,21 +162,35 @@ public interface SduQuestions {
     };
 
     Q[] ECLASS_PROFILE_HDRS = new Q[] {
+            /* community */
+            Q.PATIENT_AND_VISITOR_MILEAGE_CO2E,
+            Q.STAFF_COMMUTE_MILES_CO2E,
+            /* procurement */
             Q.PROVISIONS_CO2E, Q.STAFF_CLOTHING_CO2E,
             Q.PATIENTS_CLOTHING_AND_FOOTWEAR_CO2E,
             Q.PHARMA_BLOOD_PROD_AND_MED_GASES_CO2E, Q.DRESSINGS_CO2E,
             Q.MEDICAL_AND_SURGICAL_EQUIPT_CO2E, Q.PATIENTS_APPLIANCES_CO2E,
             Q.CHEMICALS_AND_REAGENTS_CO2E, Q.DENTAL_AND_OPTICAL_EQUIPT_CO2E,
             Q.IMAGING_AND_RADIOTHERAPY_EQUIPT_AND_SVCS_CO2E,
-            Q.LAB_EQUIPT_AND_SVCS_CO2E, Q.FUEL_LIGHT_POWER_WATER_CO2E,
+            Q.LAB_EQUIPT_AND_SVCS_CO2E,
             Q.HOTEL_EQUIPT_MATERIALS_AND_SVCS_CO2E,
             Q.BLDG_AND_ENG_PROD_AND_SVCS_CO2E, Q.PURCHASED_HEALTHCARE_CO2E,
             Q.GARDENING_AND_FARMING_CO2E, Q.FURNITURE_FITTINGS_CO2E,
             Q.HARDWARE_CROCKERY_CO2E, Q.BEDDING_LINEN_AND_TEXTILES_CO2E,
             Q.OFFICE_EQUIPT_TELCO_COMPUTERS_AND_STATIONERY_CO2E,
-            Q.TRANSPORTATION_CO2E,
             Q.REC_EQUIPT_AND_SOUVENIRS_CO2E,
-            Q.CONSULTING_SVCS_AND_EXPENSES_CO2E
+            Q.CONSULTING_SVCS_AND_EXPENSES_CO2E,
+            /* core */
+            Q.OWNED_BUILDINGS_COAL,
+            Q.NET_ELEC_CO2E,
+            Q.OWNED_BUILDINGS_GAS, Q.OWNED_BUILDINGS_OIL,
+            Q.NET_THERMAL_ENERGY_CO2E,
+            Q.LEASED_ASSETS_ENERGY_USE,
+            Q.BIZ_MILEAGE_CO2E,
+            Q.ANAESTHETIC_GASES_CO2E,
+            Q.WASTE_AND_WATER_CO2E,
+            /* commissioning */
+            Q.TOTAL_COMMISSIONING_CO2E
     };
 
     Q[] CORE_CO2E_HDRS = new Q[] {

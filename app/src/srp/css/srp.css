@@ -297,6 +297,7 @@ text.inverse {
 .legend {
   width: 2em;
 }
+.core,
 .core_co2e_pct,
 .owned_buildings_coal,
 .elec_co2e,
@@ -318,17 +319,25 @@ text.inverse {
 .scope_3_waste,
 .scope_3_water,
 .steam_co2e,
+.total_core_co2e,
 .waste_and_water_co2e {
   background-color: #a9d156;
+  fill: #a9d156;
 }
 .commissioning_co2e_pct,
-.commissioning_co2e {
+.commissioning,
+.commissioning_co2e,
+.total_commissioning_co2e {
   background-color: #003d61;
+  fill: #003d61;
 }
+.community,
 .community_co2e_pct,
 .patient_and_visitor_mileage_co2e,
-.staff_commute_miles_co2e {
+.staff_commute_miles_co2e,
+.total_community_co2e {
   background-color: #fbde06;
+  fill: #fbde06;
 }
 .procurement_co2e_pct,
 .biz_svcs_co2e,
@@ -342,9 +351,33 @@ text.inverse {
 .other_manufactured_co2e,
 .paper_and_card_co2e,
 .pharma_co2e,
+.procurement,
 .procurement_co2e,
-.procurement_2017_co2e_pct {
+.procurement_2017_co2e_pct,
+.provisions_co2e,
+.staff_clothing_co2e,
+.patients_clothing_and_footwear_co2e,
+.pharma_blood_prod_and_med_gases_co2e,
+.dressings_co2e,
+.medical_and_surgical_equipt_co2e,
+.patients_appliances_co2e,
+.chemicals_and_reagents_co2e,
+.dental_and_optical_equipt_co2e,
+.imaging_and_radiotherapy_equipt_and_svcs_co2e,
+.lab_equipt_and_svcs_co2e,
+.hotel_equipt_materials_and_svcs_co2e,
+.bldg_and_eng_prod_and_svcs_co2e,
+.purchased_healthcare_co2e,
+.gardening_and_farming_co2e,
+.furniture_fittings_co2e,
+.hardware_crockery_co2e,
+.bedding_linen_and_textiles_co2e,
+.office_equipt_telco_computers_and_stationery_co2e,
+.rec_equipt_and_souvenirs_co2e,
+.consulting_svcs_and_expenses_co2e,
+.total_procurement_2017_co2e {
   background-color: #007ac3;
+  fill: #007ac3;
 }
 .macc-tooltip {
   border: 1px solid #666666;

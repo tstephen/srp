@@ -71,6 +71,9 @@ var ractive = new BaseRactive({
     isCcg: function() {
       return ractive.isCcg();
     },
+    isEClassUser: function() {
+      return ractive.isEClassUser();
+    },
     stdPartials: [
       { "name": "loginSect", "url": $env.server+"/webjars/auth/1.1.0/partials/login-sect.html"},
       { "name": "statusSect", "url": "/srp/2.1.0/partials/status-sect.html"}
@@ -360,6 +363,10 @@ var ractive = new BaseRactive({
   isCcg: function() {
     if (ractive.get('surveyReturn')==undefined) return false;
     if (ractive.getAnswer('ORG_TYPE')=='Clinical Commissioning Group') return true;
+    else return false;
+  },
+  isEClassUser: function() {
+    if (ractive.getAnswer('ECLASS_USER')!=undefined && ractive.getAnswer('ECLASS_USER').charAt(0)==0) return true;
     else return false;
   },
   oninit: function() {
