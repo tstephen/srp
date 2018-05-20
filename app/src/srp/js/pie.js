@@ -51,6 +51,7 @@ function renderPie(selector, csvString, options) {
 
   arc.append("path")
       .attr("d", path)
+      .attr('class', function(d) { return d.data.classification.toLowerCase() })
       .attr("fill", function(d) { return color(d.data.classification); });
 
   if (options.labels) {
