@@ -19,6 +19,8 @@ gulp.task('assets', function() {
   gulp.src([ 'src/faq/*.html' ])
       .pipe(replace('/vsn/', '/'+vsn+'/'))
       .pipe(gulp.dest('dist/faq'));
+  gulp.src([ 'src/faq/config/*.json' ])
+      .pipe(gulp.dest('dist/faq/config/'));
   gulp.src([ 'src/faq/public/*.html' ])
       .pipe(replace('/vsn/', '/'+vsn+'/'))
       .pipe(gulp.dest('dist/faq/public'));

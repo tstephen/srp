@@ -1,0 +1,37 @@
+{
+  "about": {
+    "author": "Tim Stephenson",
+    "email": "tim@knowprocess.com",
+    "name": "Submit a Powerful Point",
+    "options": {
+      "contactAtTop": false,
+      "contactAtBottom": false,
+      "categoryAtATime": false
+    },
+    "title": "Do you have a powerful point to share with others?",
+    "subTitle": "",
+    "instructions": "<p>If you complete the form below we add it to the library for others to use too. <em>Please note: We do review these submissions by hand so it may take us a few days to get back to you</em>.</p>"
+  },
+  "questionsTitle": "Please tell us about your point",
+  "categories": [
+    { 
+      "name": "", "always": true, "questions": [
+        { "id": 1, "name": "name", "hint":"A short, high-impact headline for your point", "label": "Headline", "required": true, "type": "text" },
+        { "id": 2, "name": "link", "hint":"A link to the source or reference of your point", "label": "Link", "required": false, "type": "url" },
+        { "id": 3, "name": "paywall", "hint":"Tick if the link is behind a paywall", "label": "Paywall?", "required": false, "type": "yesno" },
+        { "id": 4, "name": "tags", "hint":"Comma-separated list of hastags", "label": "Tags", "required": false, "type": "text" },
+        { "id": 5, "name": "featuredImage", "hint":"Link to a high-definition image that supports or illustrates your point", "label": "Featured image", "required": false, "type": "url" },
+        { "id": 6, "name": "description", "hint":"The key information summarising your point, no need to duplicate all of the content of the link!", "label": "Description", "required": false, "type": "textarea" },
+        { "id": 7, "name": "moreInfo", "hint":"Anything else? Again please don't simply repeat the content of the link.", "label": "More information", "required": false, "type": "textarea" },
+        { "id": 8,"name": "reference", "hint":"The source of the point to reference", "label": "Reference", "required": false, "type": "textarea" }
+      ]
+    }
+  ],
+  "submit": {
+    "endpoint":"https://api.knowprocess.com/msg/powerfulpoints/pp.questionnaire.json",
+    "message":"New Questionnaire Response",
+    "text":"Thanks for your point, we will get back to you in the next few days.",
+    "title":"That's it!",
+    "buttonText":"Submit Now"
+  }
+}
