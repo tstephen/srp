@@ -145,10 +145,10 @@
         <span>{{{formatTags(current.tags)}}}</span>
       </div>
 
-      {{#current.reference}}
+      {{#current.customFields.reference}}
         <div class="col-xs-12 meta">
           <label for="source">Source:</label>
-          <span id="source">{{current.reference}}</span>
+          <span id="source">{{current.customFields.reference}}</span>
         </div>
       {{/}}
 
