@@ -45,30 +45,30 @@
       font-size: 1.4rem;
       padding: 1.4rem;
     }
-@media (min-width: 720px) {
-    h2 {
-      font-size: 3rem;
-      height: 5rem !important;
+    @media (min-width: 720px) {
+      h2 {
+        font-size: 3rem;
+        height: 5rem !important;
+      }
+      h3, .faq-desc {
+        font-size: 3.2rem;
+      }
+      h4, .faq-more, .meta {
+        font-size: 1.9rem;
+      }
     }
-    h3, .faq-desc {
-      font-size: 3.2rem;
+    @media (min-width: 992px) {
+      h2 {
+        font-size: 4rem;
+        height: 6rem !important;
+      }
+      h3, .faq-desc {
+        font-size: 3.2rem;
+      }
+      h4, .faq-more, .meta {
+        font-size: 2rem;
+      }
     }
-    h4, .faq-more, .meta {
-      font-size: 1.9rem;
-    }
-}
-@media (min-width: 992px) {
-    h2 {
-      font-size: 4rem;
-      height: 6rem !important;
-    }
-    h3, .faq-desc {
-      font-size: 3.2rem;
-    }
-    h4, .faq-more, .meta {
-      font-size: 2rem;
-    }
-}
     .faq-desc {
       background-color: rgba(0,61,97,1);
       margin-top: 1rem;
@@ -77,6 +77,15 @@
     .faq-more {
       background-color: rgba(0,122,195,1);
       margin-top: 1rem;
+      color: white;
+    }
+    .faq-more a {
+      text-decoration: underline;
+    }
+    .faq-more a:hover, .faq-more a:active {
+      color: rgba(251,222,8,1);
+    }
+    .faq-more a:visited, .faq-more a {
       color: white;
     }
     .faq-paywall {
@@ -131,11 +140,11 @@
       <img class="img-responsive faq-featured" src="{{current.featuredImage}}">
 
       <div class="col-xs-12 faq-desc">
-        <p>{{current.description}}</p>
+        <p>{{{formatContent(current.description)}}}</p>
       </div>
       {{#current.customFields.moreInfo}}
         <div class="col-xs-12 faq-more">
-          <p>{{current.customFields.moreInfo}}</p>
+          <p>{{{formatContent(current.customFields.moreInfo)}}}</p>
         </div>
       {{/}}
 
@@ -192,7 +201,7 @@
           integrity="sha256-xNjb53/rY+WmG+4L6tTl9m6PpqknWZvRt0rO1SRnJzw="
           crossorigin="anonymous"></script>
   <script src="https://cdn.jsdelivr.net/npm/autolinker@1.4.3/dist/Autolinker.min.js"></script>
-  <script src="https://cdn.ckeditor.com/4.8.0/standard/ckeditor.js"></script>
+  <script src="https://api.knowprocess.com/Autolinker.js/1.4.3/js/Autolinker.min.js"></script>
   <script src="http://localhost:8083/webjars/tag-it/2.0/js/tag-it.js" type="text/javascript"></script>
   <script src="http://localhost:8083/webjars/faq/1.0.0/js/base.js"></script>
   <script src="http://localhost:8083/webjars/faq/1.0.0/js/faq.js"></script>
