@@ -34,7 +34,7 @@ gulp.task('assets', function() {
       .pipe(gulp.dest('dist/srp/public'));
   gulp.src([ 'src/srp/partials/*.html' ])
       .pipe(gulp.dest('dist/srp/'+vsn+'/partials'));
-  gulp.src([ 'src/srp/**/*.png' ])
+  gulp.src([ 'src/**/*.png' ])
       .pipe(gulp.dest('dist'));
   return gulp.src([ 'questionnaire/**/*' ])
       .pipe(gulp.dest('dist/questionnaire'));
