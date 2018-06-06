@@ -7,7 +7,7 @@
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
   <link href="https://api.knowprocess.com/css/jquery.tagit.css" rel="stylesheet" type="text/css">
 
-  <link href="https://api.knowprocess.com/webjars/faq/1.0.0/css/faq.css" rel="stylesheet">
+  <link href="http://localhost:8083/webjars/faq/1.0.0/css/faq.css" rel="stylesheet">
   <link rel="icon" type="image/png" href="https://srp.digital/sdu/images/icon/sdu-icon-16x16.png"/>
 </head>
 <body class="container">
@@ -23,7 +23,7 @@
         <span>{{#tenant.strings.faqs}}{{tenant.strings.faqs}}{{else}}FAQs{{/}}</span>
       </h1>
       <div>
-        <div class="input-group">
+        <div id="searchOmniBox" class="input-group" style="display:none">
           <input autofocus class="form-control col-md-12" name="search"
                  placeholder="Search for point or open advanced search options"
                  type="search" value="{{searchTerm}}"/>
@@ -68,6 +68,7 @@
         ractive.set('tenant', data);
         var status = Array.findBy('name','faqStatus',ractive.get('tenant.typeaheadControls'));
         ractive.addDataList(status, status.values);
+        if ($('#searchOmniBox:visible').length == 0) $('#searchOptions').slideDown();
       });
       ractive.loadStandardPartials([
         { "name": "faqListTable", "url": "/webjars/faq/1.0.0/partials/faq-list-table.html" },

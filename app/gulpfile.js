@@ -67,11 +67,11 @@ gulp.task('compile',
 
 gulp.task('dev2prod', function() {
   gulp.src([
-      'src/faq/*.html',
+      'src/**/*.html',
     ])
     .pipe(replace('/vsn/', '/'+vsn+'/'))
     .pipe(replace('http://localhost:8083', 'https://api.knowprocess.com'))
-    .pipe(gulp.dest('dist/faq'));
+    .pipe(gulp.dest('dist'));
   gulp.src([
       'src/faq/public/*.html'
     ])

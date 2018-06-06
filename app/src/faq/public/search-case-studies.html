@@ -23,7 +23,7 @@
         <span>{{#tenant.strings.faqs}}{{tenant.strings.faqs}}{{else}}FAQs{{/}}</span>
       </h1>
       <div>
-        <div class="input-group">
+        <div id="searchOmniBox" class="input-group" style="display:none">
           <input autofocus class="form-control col-md-12" name="search"
                  placeholder="Search for point or open advanced search options"
                  type="search" value="{{searchTerm}}"/>
@@ -68,6 +68,7 @@
         ractive.set('tenant', data);
         var status = Array.findBy('name','faqStatus',ractive.get('tenant.typeaheadControls'));
         ractive.addDataList(status, status.values);
+        if ($('#searchOmniBox:visible').length == 0) $('#searchOptions').slideDown();
       });
       ractive.loadStandardPartials([
         { "name": "faqListTable", "url": "/webjars/faq/1.0.0/partials/faq-list-table.html" },
