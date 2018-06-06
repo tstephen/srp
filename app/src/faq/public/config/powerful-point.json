@@ -19,7 +19,7 @@
         { "id": 1, "name": "name", "hint":"A short, high-impact headline for your point", "label": "Headline", "required": true, "type": "text" },
         { "id": 2, "name": "link", "hint":"A link to the source or reference of your point", "label": "Link", "required": false, "type": "url" },
         { "id": 3, "name": "paywall", "hint":"Tick if the link is behind a paywall", "label": "Paywall?", "required": false, "type": "yesno" },
-        { "id": 4, "name": "tags", "hint":"Comma-separated list of hastags", "label": "Tags", "required": false, "type": "text" },
+        { "id": 4, "name": "tags", "hint":"Comma-separated list of hashtags", "label": "Tags", "required": false, "type": "text" },
         { "id": 5, "name": "featuredImage", "hint":"Link to a high-definition image that supports or illustrates your point", "label": "Featured image", "required": false, "type": "url" },
         { "id": 6, "name": "description", "hint":"The key information summarising your point, no need to duplicate all of the content of the link!", "label": "Description", "required": false, "type": "textarea" },
         { "id": 7, "name": "moreInfo", "hint":"Anything else? Again please don't simply repeat the content of the link.", "label": "More information", "required": false, "type": "textarea" },

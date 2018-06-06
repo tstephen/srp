@@ -16,26 +16,13 @@ gulp.task('clean', function(done) {
 });
 
 gulp.task('assets', function() {
-  gulp.src([ 'src/faq/*.html' ])
+  gulp.src([ 'src/**/*.html' ])
       .pipe(replace('/vsn/', '/'+vsn+'/'))
-      .pipe(gulp.dest('dist/faq'));
-  gulp.src([ 'src/faq/config/*.json' ])
-      .pipe(gulp.dest('dist/faq/config/'));
-  gulp.src([ 'src/faq/public/*.html' ])
-      .pipe(replace('/vsn/', '/'+vsn+'/'))
-      .pipe(gulp.dest('dist/faq/public'));
+      .pipe(gulp.dest('dist'));
+  gulp.src([ 'src/**/*.json' ])
+      .pipe(gulp.dest('dist/'));
   gulp.src([ 'src/sdat/**/*' ])
       .pipe(gulp.dest('dist/sdat'));
-  gulp.src([ 'src/srp/*.html' ])
-      .pipe(replace('/vsn/', '/'+vsn+'/'))
-      .pipe(gulp.dest('dist/srp'));
-  gulp.src([ 'src/srp/public/*.html' ])
-      .pipe(replace('/vsn/', '/'+vsn+'/'))
-      .pipe(gulp.dest('dist/srp/public'));
-  gulp.src([ 'src/srp/partials/*.html' ])
-      .pipe(gulp.dest('dist/srp/'+vsn+'/partials'));
-  gulp.src([ 'src/**/*.png' ])
-      .pipe(gulp.dest('dist'));
   return gulp.src([ 'questionnaire/**/*' ])
       .pipe(gulp.dest('dist/questionnaire'));
 });
