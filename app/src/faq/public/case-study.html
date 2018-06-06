@@ -23,7 +23,7 @@
   <link href="http://localhost:8083/webjars/tag-it/2.0/css/jquery.tagit.css" rel="stylesheet" type="text/css">
   <link href="http://localhost:8083/webjars/faq/1.0.0/css/faq.css" rel="stylesheet">
   <link href="https://api.knowprocess.com/css/sdu-1.0.0.css" rel="stylesheet">
-  <link href='http://fonts.googleapis.com/css?family=Pacifico' rel='stylesheet' type='text/css'>
+  <link href='//fonts.googleapis.com/css?family=Pacifico' rel='stylesheet' type='text/css'>
   <link rel="icon" type="image/png" href="/sdu/images/icon//sdu-icon-16x16.png" />
   <style>
     blockquote {
@@ -165,35 +165,35 @@
       {{#current.customFields['issue']}}
         <h3 class="col-xs-12">{{Array.findBy('name','issue',tenant.faqFields).hint}}</h3>
         <div class="col-xs-12 faq-more">
-          <p id="issue">{{{formatContent(current.customFields['issue']}}}</p>
+          <p id="issue">{{{formatContent(current.customFields['issue'])}}}</p>
         </div>
       {{/}}
 
       {{#current.customFields['action']}}
         <h3 class="col-xs-12">{{Array.findBy('name','action',tenant.faqFields).hint}}</h3>
         <div class="col-xs-12 faq-more">
-          <p id="action">{{{formatContent(current.customFields['action']}}}</p>
+          <p id="action">{{{formatContent(current.customFields['action'])}}}</p>
         </div>
       {{/}}
 
       {{#current.customFields['impact']}}
         <h3 class="col-xs-12">{{Array.findBy('name','impact',tenant.faqFields).hint}}</h3>
         <div class="col-xs-12 faq-more">
-          <p id="impact">{{{formatContent(current.customFields['impact']}}}</p>
+          <p id="impact">{{{formatContent(current.customFields['impact'])}}}</p>
         </div>
       {{/}}
 
       {{#current.customFields['lessons']}}
         <h3 class="col-xs-12">{{Array.findBy('name','lessons',tenant.faqFields).hint}}</h3>
         <div class="col-xs-12 faq-more">
-          <p id="lessons">{{{formatContent(current.customFields['lessons']}}}</p>
+          <p id="lessons">{{{formatContent(current.customFields['lessons'])}}}</p>
         </div>
       {{/}}
 
       {{#current.customFields['scaling']}}
         <h3 class="col-xs-12">{{Array.findBy('name','scaling',tenant.faqFields).hint}}</h3>
         <div class="col-xs-12 faq-more">
-          <p id="scaling">{{{formatContent(current.customFields['scaling']}}}</p>
+          <p id="scaling">{{{formatContent(current.customFields['scaling'])}}}</p>
         </div>
       {{/}}
 
