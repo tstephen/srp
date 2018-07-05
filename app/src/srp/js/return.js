@@ -188,6 +188,10 @@ var $r = (function ($, ractive, $auth) {
 
     $('#questionnaireForm input, #questionnaireForm select, #questionnaireForm textarea')
         .off().on('blur', function(ev) {
+          if (!me.validate(ev.target)) {
+            ractive.showError('Please select one of the available values for '+ev.target.id.toLabel());
+            return false;
+          }
           $r.dirty = true;
           var id = $(ev.target).data('id');
           if (id == undefined) id = ev.target.id;
@@ -477,6 +481,22 @@ var $r = (function ($, ractive, $auth) {
           $r.dirty = false;
         }
       });
+  };
+  me.validate = function(ctrl) {
+    console.info('validate '+ctrl.id);
+    if (ctrl.getAttribute('list')!=undefined && ctrl.value != undefined && ctrl.value != '') {
+      var org = ractive.get(ctrl.getAttribute('list')).find(function(element) {
+        return element.name == ctrl.value;
+      });
+      if (org == undefined) {
+        console.error('selected illegal value for '+ctrl.id);
+        ctrl.setCustomValidity("Please select from the existing values");
+      } else {
+        ctrl.setCustomValidity("");
+      }
+    }
+    console.log('ctrl is valid: '+$(ctrl).is(':valid'));
+    return $(ctrl).is(':valid');
   };
 
   ractive.observe('q.activeCategory', function (newValue, oldValue, keypath) {
