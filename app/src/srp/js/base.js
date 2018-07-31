@@ -166,7 +166,7 @@ var BaseRactive = Ractive.extend({
     return id.substring(id.lastIndexOf('/')+1);
   },
   initAbout: function() {
-    $('.powered-by-icon').empty().append('<img src="/srp/2.1.0/images/icon/srp-icon-32x32.png" alt="Sustainable Resource Planning™">');
+    $('.powered-by-icon').empty().append('<img src="/srp/images/icon/srp-icon-32x32.png" alt="Sustainable Resource Planning™">');
   },
   initAutoComplete: function() {
     console.log('initAutoComplete');
@@ -519,7 +519,7 @@ var BaseRactive = Ractive.extend({
   },
   toggleSidebar: function() {
     console.info('toggleSidebar');
-    $('.omny-bar-left').toggle(EASING_DURATION);
+    $('.toolbar-left').toggle(EASING_DURATION);
   },
   upload: function(formId) {
     console.log('upload, id: '+formId);

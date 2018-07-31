@@ -129,9 +129,9 @@ var ractive = new BaseRactive({
       { "name": "helpModal", "url": $env.server+"/partials/help-modal.html"},
       { "name": "loginSect", "url": $env.server+"/webjars/auth/1.1.0/partials/login-sect.html"},
       { "name": "navbar", "url": "./vsn/partials/wfactor-navbar.html"},
-      { "name": "profileArea", "url": "./vsn/partials/profile-area.html"},
-      { "name": "sidebar", "url": "./vsn/partials/sidebar.html"},
-      { "name": "titleArea", "url": "./vsn/partials/title-area.html"},
+      { "name": "profileArea", "url": $env.server+"/partials/profile-area.html"},
+      { "name": "sidebar", "url": $env.server+"/partials/sidebar.html"},
+      { "name": "titleArea", "url": $env.server+"/partials/title-area.html"},
       { "name": "wfactorListSect", "url": "./vsn/partials/wfactor-list-sect.html"},
       { "name": "wfactorCurrentSect", "url": "./vsn/partials/wfactor-current-sect.html"}
     ],

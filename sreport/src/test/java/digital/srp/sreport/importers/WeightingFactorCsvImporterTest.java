@@ -30,14 +30,14 @@ public class WeightingFactorCsvImporterTest {
             assertEquals(new BigDecimal("898385085"), factors.get(fifthAcuteIdx).carbonValue());
             assertEquals(new BigDecimal("5913115000"), factors.get(fifthAcuteIdx).moneyValue());
             assertEquals(new BigDecimal("0.152"), factors.get(fifthAcuteIdx).intensityValue());
-            assertEquals(new BigDecimal("0.274"), factors.get(fifthAcuteIdx).proportionOfTotal());
+            assertEquals(new BigDecimal("0.267"), factors.get(fifthAcuteIdx).proportionOfTotal());
 
             assertEquals("Mental health learning disability", factors.get(fifthAcuteIdx+5).orgType());
             assertEquals("BIZ_SVCS", factors.get(fifthAcuteIdx+5).category());
             assertEquals(new BigDecimal("153255016"), factors.get(fifthAcuteIdx+5).carbonValue());
             assertEquals(new BigDecimal("1008715000"), factors.get(fifthAcuteIdx+5).moneyValue());
             assertEquals(new BigDecimal("0.152"), factors.get(fifthAcuteIdx+5).intensityValue());
-            assertEquals(new BigDecimal("0.358"), factors.get(fifthAcuteIdx+5).proportionOfTotal());
+            assertEquals(new BigDecimal("0.343"), factors.get(fifthAcuteIdx+5).proportionOfTotal());
         } catch (IOException e) {
             e.printStackTrace();
             fail("Unexpected IO exception: " + e.getMessage());

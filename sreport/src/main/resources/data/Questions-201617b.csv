@@ -259,3 +259,5 @@ CHP_SIZE$$$ERIC$$number$$$$
 CHP_EFFICIENCY$$$ERIC$$number$$$$
 ELEC_PEAK_LOAD$$$ERIC$$number$$$$
 ELEC_MAX_LOAD$$$ERIC$$number$$$$
+RENEWABLE_USED$$$ERIC$$number$$$$
+LANDFILL_COST$$$ERIC$$number$$$$

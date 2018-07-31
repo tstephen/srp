@@ -142,7 +142,7 @@ var ractive = new BaseRactive({
       { "name": "helpModal", "url": $env.server+"/partials/help-modal.html"},
       { "name": "loginSect", "url": $env.server+"/webjars/auth/1.1.0/partials/login-sect.html"},
       { "name": "navbar", "url": "./vsn/partials/intervention-type-navbar.html"},
-      { "name": "profileArea", "url": "./vsn/partials/profile-area.html"},
+      { "name": "profileArea", "url": $env.server+"/partials/profile-area.html"},
       { "name": "sidebar", "url": "./vsn/partials/sidebar.html"},
       { "name": "titleArea", "url": "./vsn/partials/title-area.html"},
       { "name": "interventionTypeListSect", "url": "./vsn/partials/intervention-type-list-sect.html"},

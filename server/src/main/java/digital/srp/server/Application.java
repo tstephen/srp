@@ -35,33 +35,15 @@ import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.knowprocess.auth.AuthConfig;
-import com.knowprocess.bpm.BpmConfiguration;
 
 import digital.srp.macc.MaccConfig;
-import digital.srp.server.model.mixins.DocumentMixIn;
-import digital.srp.server.model.mixins.NoteMixIn;
 import digital.srp.server.model.mixins.SrpLinkMixIn;
 import digital.srp.sreport.internal.SReportConfiguration;
-import io.onedecision.engine.OneDecisionConfig;
-import io.onedecision.engine.domain.OneDecisionDomainConfig;
-import link.omny.acctmgmt.AcctMgmtConfig;
-import link.omny.acctmgmt.model.SystemConfig;
-import link.omny.catalog.CatalogConfig;
-import link.omny.custmgmt.CustMgmtConfig;
-import link.omny.custmgmt.model.Document;
-import link.omny.custmgmt.model.Note;
-import link.omny.supportservices.SupportServicesConfig;
 
 // See https://github.com/spring-projects/spring-boot/issues/6529 for alternative if JMX needed
 //@EnableAutoConfiguration(exclude = { EndpointMBeanExportAutoConfiguration.class })
 @Configuration
-@Import({ 
-        AuthConfig.class, OneDecisionConfig.class, OneDecisionDomainConfig.class,
-        AcctMgmtConfig.class, BpmConfiguration.class, 
-        CatalogConfig.class, CustMgmtConfig.class,
-        MaccConfig.class, SReportConfiguration.class, SrpConfig.class,
-        SupportServicesConfig.class })
+@Import({ MaccConfig.class, SReportConfiguration.class, SrpConfig.class })
 public class Application extends WebMvcConfigurerAdapter {
 
     protected static final Logger LOGGER = LoggerFactory
@@ -101,11 +83,6 @@ public class Application extends WebMvcConfigurerAdapter {
 
         return tomcat;
     }
-    
-    @Bean
-    public SystemConfig systemConfig() {
-        return new SystemConfig();
-    }
 
     @Override
     public void addViewControllers(ViewControllerRegistry registry) {
@@ -124,9 +101,7 @@ public class Application extends WebMvcConfigurerAdapter {
     public void configureMessageConverters(
             List<HttpMessageConverter<?>> converters) {
         ObjectMapper objectMapper = Jackson2ObjectMapperBuilder.json()
-                .mixIn(Document.class, DocumentMixIn.class)
                 .mixIn(Link.class, SrpLinkMixIn.class)
-                .mixIn(Note.class, NoteMixIn.class)
                 .build();
         converters.add(new MappingJackson2HttpMessageConverter(objectMapper));
         super.configureMessageConverters(converters);

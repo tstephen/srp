@@ -1,7 +1,7 @@
 { 
   "questions": ${questions?size},
-  "surveys": ${surveys?size},
+  "surveys": ${surveys?size!"n/a"},
   "answers": ${answers?size?replace(",", "")},
-  "returns": ${returns?size},
-  "orgs": ${orgs?size}
+  "returns": ${returns?size!"n/a"},
+  "orgs": ${orgs?size!"n/a"}
 }

@@ -28,7 +28,7 @@
     }
   ],
   "submit": {
-    "endpoint":"https://api.knowprocess.com/msg/powerfulpoints/pp.questionnaire.json",
+    "endpoint":"http://localhost:8083/msg/powerfulpoints/pp.questionnaire.json",
     "message":"New Questionnaire Response",
     "text":"Thanks for your point, we will get back to you in the next few days.",
     "title":"That's it!",

@@ -1,7 +1,7 @@
 <div class="omny-burger navbar-side" on-click="toggleSidebar()">
   <span class="clickable glyphicon icon-btn kp-icon-menu" title="{{title}}"></span>
 </div>
-<div class="omny-bar {{#profile.omnyBarPosition}}omny-bar-{{profile.omnyBarPosition}}{{/}} {{^profile.omnyBarPosition}}omny-bar-left{{/}}">
+<div class="toolbar {{#profile.toolbarPosition}}toolbar-{{profile.toolbarPosition}}{{/}} {{^profile.toolbarPosition}}toolbar-left{{/}}">
   <ul>
     <li>
       <span class="clickable glyphicon icon-btn kp-icon-menu" on-click="toggleSidebar()" title="{{title}}"></span>

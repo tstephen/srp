@@ -48,6 +48,8 @@ public class Sdu1617 {
                         Q.GCC_USER,
                         Q.LAST_GCC_DATE,
                         Q.LAST_GCC_SCORE,
+                        Q.SDG_STARTING,
+                        Q.SDG_CLEAR,
                         Q.PROMOTE_SUSTAINABILITY_TO_STAFF,
                         Q.ECLASS_USER,
                         Q.QUANT_ES_IMPACTS,

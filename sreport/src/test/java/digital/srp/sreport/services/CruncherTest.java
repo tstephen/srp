@@ -33,32 +33,32 @@ public class CruncherTest {
     private  static final String[] PHARMA_CO2E = { "94.6", "104", "113",
             "116", "0", "0", "0", "0", "0", "0" };
 
-    private  static final String[] PAPER_CO2E = { "997", "1,100", "1,190",
-            "1,230", "0", "0", "0", "0", "0", "0" };
+    private  static final String[] PAPER_CO2E = { "960", "1,050", "1,150",
+            "1,180", "0", "0", "0", "0", "0", "0" };
 
-    private  static final String[] OTHER_MANUFACTURED_CO2E = { "508", "558",
-            "608", "624", "0", "0", "0", "0", "0", "0" };
+    private  static final String[] OTHER_MANUFACTURED_CO2E = { "469", "515",
+            "561", "576", "0", "0", "0", "0", "0", "0" };
 
-    private  static final String[] MED_INSTR_CO2E = { "4,450", "4,890",
-            "5,330", "5,470", "0", "0", "0", "0", "0", "0" };
+    private  static final String[] MED_INSTR_CO2E = { "4,330", "4,750",
+            "5,180", "5,320", "0", "0", "0", "0", "0", "0" };
 
     private  static final String[] CHEM_AND_GAS_CO2E = { "1,220", "1,340",
             "1,460", "1,500", "0", "0", "0", "0", "0", "0" };
 
-    private  static final String[] ICT_CO2E = { "379", "416", "453", "466",
+    private  static final String[] ICT_CO2E = { "367", "403", "439", "451",
             "0", "0", "0", "0", "0", "0" };
 
-    private  static final String[] FREIGHT_CO2E = { "2,140", "2,350",
-            "2,560", "2,630", "0", "0", "0", "0", "0", "0" };
+    private  static final String[] FREIGHT_CO2E = { "2,050", "2,260",
+            "2,460", "2,520", "0", "0", "0", "0", "0", "0" };
 
-    private  static final String[] CATERING_CO2E = { "1,430", "1,570",
-            "1,720", "1,760", "0", "0", "0", "0", "0", "0" };
+    private  static final String[] CATERING_CO2E = { "1,400", "1,530",
+            "1,670", "1,720", "0", "0", "0", "0", "0", "0" };
 
-    private  static final String[] CONSTRUCTION_CO2E = { "829", "911",
-            "992", "1,020", "0", "0", "0", "0", "0", "0" };
+    private  static final String[] CONSTRUCTION_CO2E = { "810", "890",
+            "969", "996", "0", "0", "0", "0", "0", "0" };
 
-    private  static final String[] BIZ_SVCS_CO2E = { "4,180", "4,600",
-            "5,010", "5,140", "0", "0", "0", "0", "0", "0" };
+    private  static final String[] BIZ_SVCS_CO2E = { "4,070", "4,470",
+            "4,870", "5,010", "0", "0", "0", "0", "0", "0" };
 
     private  static final String[] WASTE_AND_WATER_CO2E = { "88.3", "96.7",
             "105", "118", "0", "0", "0", "0", "0", "0" };
