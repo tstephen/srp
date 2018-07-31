@@ -1,0 +1,35 @@
+module.exports = {
+  dev: {
+    js: {
+      uglify: false
+    },
+    css: {
+      cssnano: false
+    },
+    apiServerUrl: 'http://localhost:8080'
+  },
+  stage: {
+    js: {
+      uglify: true
+    },
+    css: {
+      cssnano: true
+    },
+    apiServerUrl: 'http://example.com'
+  },
+  prod: {
+    js: {
+      uglify: true
+    },
+    css: {
+      cssnano: true
+    },
+    apiServerUrl: 'http://example.com',
+    server: {
+      host: 'www.example.com',
+      usr: 'username',
+      dir: '/path/to/www/dir',
+      privateKey: '/home/username/.ssh/id_rsa'
+    }
+  }
+};

@@ -133,8 +133,8 @@ var ractive = new BaseRactive({
       { "name": "loginSect", "url": $env.server+"/webjars/auth/1.1.0/partials/login-sect.html"},
       { "name": "navbar", "url": "./vsn/partials/cfactor-navbar.html"},
       { "name": "profileArea", "url": $env.server+"/partials/profile-area.html"},
-      { "name": "sidebar", "url": "./vsn/partials/sidebar.html"},
-      { "name": "titleArea", "url": "./vsn/partials/title-area.html"},
+      { "name": "sidebar", "url": $env.server+"/partials/sidebar.html"},
+      { "name": "titleArea", "url": $env.server+"/partials/title-area.html"},
       { "name": "cfactorListSect", "url": "./vsn/partials/cfactor-list-sect.html"},
       { "name": "cfactorCurrentSect", "url": "./vsn/partials/cfactor-current-sect.html"}
     ],
@@ -212,7 +212,7 @@ var ractive = new BaseRactive({
     $('#cfactorsTable').slideUp();
     $('#currentSect').slideDown({ queue: true });
   },
-  postSelect(cfactor) {
+  postSelect: function(cfactor) {
     ractive.set('current', cfactor);
     ractive.initControls();
     // who knows why this is needed, but it is, at least for first time rendering

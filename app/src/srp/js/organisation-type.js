@@ -122,8 +122,8 @@ var ractive = new BaseRactive({
       { "name": "loginSect", "url": $env.server+"/webjars/auth/1.1.0/partials/login-sect.html"},
       { "name": "navbar", "url": "./vsn/partials/organisation-type-navbar.html"},
       { "name": "profileArea", "url": $env.server+"/partials/profile-area.html"},
-      { "name": "sidebar", "url": "./vsn/partials/sidebar.html"},
-      { "name": "titleArea", "url": "./vsn/partials/title-area.html"},
+      { "name": "sidebar", "url": $env.server+"/partials/sidebar.html"},
+      { "name": "titleArea", "url": $env.server+"/partials/title-area.html"},
       { "name": "organisationTypeListSect", "url": "./vsn/partials/organisation-type-list-sect.html"},
       { "name": "organisationTypeCurrentSect", "url": "./vsn/partials/organisation-type-current-sect.html"}
     ],

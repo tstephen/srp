@@ -87,9 +87,9 @@ var ractive = new BaseRactive({
     stdPartials: [
       { "name": "loginSect", "url": $env.server+"/webjars/auth/1.1.0/partials/login-sect.html"},
       { "name": "navbar", "url": "/srp/vsn/partials/answer-navbar.html"},
-      { "name": "profileArea", "url": "/srp/vsn/partials/profile-area.html"},
-      { "name": "sidebar", "url": "/srp/vsn/partials/sidebar.html"},
-      { "name": "titleArea", "url": "/srp/vsn/partials/title-area.html"},
+      { "name": "profileArea", "url": $env.server+"/partials/profile-area.html"},
+      { "name": "sidebar", "url": $env.server+"/partials/sidebar.html"},
+      { "name": "titleArea", "url": $env.server+"/partials/title-area.html"},
       { "name": "answerCriteriaSect", "url": "/srp/vsn/partials/answer-criteria-sect.html"},
       { "name": "answerListSect", "url": "/srp/vsn/partials/answer-list-sect.html"}
     ],
