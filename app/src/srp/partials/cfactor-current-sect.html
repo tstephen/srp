@@ -11,48 +11,48 @@
       <ul class="form edit-form">
         {{#matchRole('admin')}}
           <li>
-            <label class="col-md-4 required">Name:</label>
-            <input class="form-control" id="curName" {{#current.name!=undefined}}disabled readonly{{/}} value="{{current.name}}">
+            <label class="col-md-4 required">{{#tenant.strings.cfactorName}}{{tenant.strings.cfactorName}}{{else}}Name{{/}}:</label>
+            <input class="form-control" id="curName" {{#current.name!=undefined}}disabled readonly{{/}} maxlength="60" value="{{current.name}}">
           </li>
         {{/}}
         <li>
-          <label class="col-md-4 required">Category:</label>
-          <input class="form-control" id="curCategory" required value="{{current.category}}"/>
-          <p class="help-block col-xs-offset-4"></p>
+          <label class="col-md-4 required">{{#tenant.strings.cfactorCategory}}{{tenant.strings.cfactor}}{{else}}Category:{{/}}</label>
+          <input class="form-control" id="curCategory" maxlength="60" required value="{{current.category}}"/>
+          <p class="help-block col-xs-offset-4">{{#tenant.strings.cfactorCategoryHint}}{{tenant.strings.cfactorCategoryHint}}{{else}}{{/}}</p>
         </li>
         <li>
-          <label class="col-md-4">Scope:</label>
-          <input class="form-control" id="curScope" value="{{current.scope}}"/>
-          <p class="help-block col-xs-offset-4"></p>
+          <label class="col-md-4">{{#tenant.strings.cfactorScope}}{{tenant.strings.cfactorScope}}{{else}}Scope:{{/}}</label>
+          <input class="form-control" id="curScope" maxlength="1" value="{{current.scope}}"/>
+          <p class="help-block col-xs-offset-4">{{#tenant.strings.cfactorScopeHint}}{{tenant.strings.cfactorScopeHint}}{{else}}Typically 1,2 or 3. Leave blank if this factor spans scopes{{/}}</p>
         </li>
         <li>
-          <label class="col-md-4 required">Applicable Period:</label>
-          <input class="form-control" id="curApplicablePeriod" required value="{{current.applicablePeriod}}"/>
-          <p class="help-block col-xs-offset-4"></p>
+          <label class="col-md-4 required">{{#tenant.strings.cfactorApplicablePeriod}}{{tenant.strings.cfactorApplicablePeriod}}{{else}}Applicable Period:{{/}}</label>
+          <input class="form-control" id="curApplicablePeriod" maxlength="7" placeholder="yyyy-yy" required value="{{current.applicablePeriod}}"/>
+          <p class="help-block col-xs-offset-4">{{#tenant.strings.cfactorApplicablePeriodHint}}{{tenant.strings.cfactorApplicablePeriodHint}}{{else}}The financial year the factor applies to (yyyy-yy){{/}}</p>
         </li>
       </ul>
     </div>
     <div class="currentBody col-md-6 col-sm-12 col-xs-12">
       <ul class="form edit-form">
         <li>
-          <label class="col-md-4">Source:</label>
-          <input class="form-control" id="curSource" value="{{current.source}}"/>
-          <p class="help-block col-xs-offset-4"></p>
+          <label class="col-md-4">{{#tenant.strings.cfactorSource}}{{tenant.strings.cfactorSource}}{{else}}Source:{{/}}</label>
+          <input class="form-control" id="curSource" maxlength="255" value="{{current.source}}"/>
+          <p class="help-block col-xs-offset-4">{{#tenant.strings.cfactorSourceHint}}{{tenant.strings.cfactorSourceHint}}{{else}}Where did this factor come from (ideally cite the analysis){{/}}</p>
         </li>
         <li>
-          <label class="col-md-4 required">Value:</label>
-          <input class="form-control" id="curValue" required value="{{current.value}}"/>
-          <p class="help-block col-xs-offset-4"></p>
+          <label class="col-md-4 required">{{#tenant.strings.cfactorValue}}{{tenant.strings.cfactorValue}}{{else}}Value:{{/}}</label>
+          <input class="form-control" id="curValue" maxlength="16" required value="{{current.value}}"/>
+          <p class="help-block col-xs-offset-4">{{#tenant.strings.cfactorValueHint}}{{tenant.strings.cfactorValueHint}}{{else}}tCO<sub>2</sub>e emitted <em>per unit</em>{{/}}</p>
         </li>
         <li>
-          <label class="col-md-4 required">Unit:</label>
-          <input class="form-control" id="curUnit" required value="{{current.unit}}"/>
-          <p class="help-block col-xs-offset-4"></p>
+          <label class="col-md-4 required">{{#tenant.strings.cfactorUnit}}{{tenant.strings.cfactorUnit}}{{else}}Unit:{{/}}</label>
+          <input class="form-control" id="curUnit" maxlength="15" required value="{{current.unit}}"/>
+          <p class="help-block col-xs-offset-4">{{#tenant.strings.cfactorUnitHint}}{{tenant.strings.cfactorUnitHint}}{{else}}{{/}}</p>
         </li>
         <li>
-          <label class="col-md-4">Comments:</label>
-          <input class="form-control" id="curComments" value="{{current.comments}}"/>
-          <p class="help-block col-xs-offset-4"></p>
+          <label class="col-md-4">{{#tenant.strings.cfactorComments}}{{tenant.strings.cfactorComments}}{{else}}Comments:{{/}}</label>
+          <input class="form-control" id="curComments" maxlength="255" value="{{current.comments}}"/>
+          <p class="help-block col-xs-offset-4">{{#tenant.strings.cfactorCommentsHint}}{{tenant.strings.cfactorCommentsHint}}{{else}}{{/}}</p>
         </li>
       </ul>
     </div>

@@ -65,14 +65,13 @@ public class CarbonFactor {
     @Column(name = "category")
     private String category;
     
-    @NotNull
     @Size(max = 255)
     @JsonProperty
     @JsonView(CarbonFactorViews.Summary.class)
     @Column(name = "comments")
     private String comments;
     
-    @Size(max = 10)
+    @Size(max = 255)
     @JsonProperty
     @JsonView(CarbonFactorViews.Summary.class)
     @Column(name = "source")

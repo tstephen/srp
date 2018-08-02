@@ -35,24 +35,8 @@ figure {
 .navbar-static-top {
   border-bottom-color: #ec9300;
 }
-section h2 .search {
-  /*margin-bottom: 10px;*/
-  margin-right: 0;
-  border-bottom-right-radius: 0;
-  border-top-right-radius: 0;
-  border-color: #0060ad;
-  height: 32px;
-  position: relative;
-  bottom: 5px;
-}
 section h2 .kp-icon-search {
-  margin-left: 0px;
-  border-left:none;
-  border-bottom-left-radius: 0;
-  border-top-left-radius: 0;
-  position: relative;
-  height: 32px;
-  bottom: 5px;
+  top: -1px;
 }
 small {
   font-size: 75%;
@@ -177,10 +161,6 @@ form .criteria {
 }
 form .criteria input {
   margin: 2px 3px;
-}
-.form {
-	display: block;
-	list-style: none;
 }
 .form li {
 	margin: 5px 0 5px;
