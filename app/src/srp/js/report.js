@@ -167,9 +167,12 @@ var ractive = new BaseRactive({
     $( "#ajax-loader" ).show();
     ractive.set('saveObserver', false);
     ractive.set('surveyReturn.orgs', []);
-    for (var idx = 0 ; idx < ractive.get('orgAnswerNames').length ; idx++) {
+    var orgs = ractive.get('orgAnswerNames').filter(function(el, idx) {
+      return (ractive.isCcg() && el.startsWith('PROVIDER')) || (!ractive.isCcg() && el.startsWith('CCG'));
+    });
+    for (var idx = 0 ; idx < orgs.length ; idx++) {
       try {
-        var org = ractive.getAnswer(ractive.get('orgAnswerNames')[idx]);
+        var org = ractive.getAnswer(orgs[idx]);
         if (org == undefined || org.trim().length==0) continue;
         $.ajax({
           dataType: "json",
