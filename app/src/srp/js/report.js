@@ -280,6 +280,7 @@ var ractive = new BaseRactive({
     }
     ractive.set('surveyReturn.completeness.missingrequired',requiredMissing);
     ractive.initNarrative();
+    $('title').empty().append('Sustainability Report &ndash; '+ ractive.get('surveyReturn.applicablePeriod') +' &ndash; '+ ractive.get('surveyReturn.org'));
     ractive.set('saveObserver', true);
   },
   fetchTable: function(ctrl) {
