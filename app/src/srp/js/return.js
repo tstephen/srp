@@ -177,6 +177,13 @@ var $r = (function ($, ractive, $auth) {
                 ractive.set('q.categories.'+i+'.questions.'+j+'.response', '');
               }
             }
+            // Set status for all questions based on return status (above is selective for ERIC answers)
+            if ($r.rtn.status != 'Draft') {
+              $('#questionnaireForm input').attr('readonly','readonly').attr('disabled','disabled');
+            } else {
+              $('#questionnaireForm input').removeAttr('readonly').removeAttr('disabled');
+            }
+
             // store answer that needs to receive updates
             //ractive.set('q.categories.'+i+'.questions.'+j+'.answer', me.rtn.answers[k]);
             break;
