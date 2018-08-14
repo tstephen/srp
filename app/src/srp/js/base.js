@@ -203,6 +203,7 @@ var BaseRactive = Ractive.extend({
     ractive.initDatepicker();
     ractive.initContentEditable();
     ractive.initHelp();
+    ractive.initShortKeys();
   },
   initDatepicker: function() {
     console.log('initDatepicker');
@@ -226,6 +227,27 @@ var BaseRactive = Ractive.extend({
          $('#helpModal').modal({});
          event.preventDefault();
          break;
+      default:
+        //console.log("No Handler for .keypress() called with: "+event.which);
+      }
+    });
+  },
+  initShortKeys: function() {
+    $( "body" ).keypress(function( event ) {
+      if (event.target.tagName.toLowerCase() == 'input' || event.target.tagName.toLowerCase() == 'textarea') return;
+      switch (event.which) { // ref http://keycode.info/
+      case 13: // enter
+        $(event.target).blur().focus();
+        break;
+      case 47: // forward slash on both Mac and Linux
+      case 191: // forward slash (allegedly)
+        $('.search').focus();
+        event.preventDefault();
+        break;
+      case 63: // ?
+        $('#helpModal').modal({});
+        event.preventDefault();
+        break;
       default:
         //console.log("No Handler for .keypress() called with: "+event.which);
       }
@@ -292,6 +314,9 @@ var BaseRactive = Ractive.extend({
   },
   logout: function() {
     $auth.logout();
+  },
+  oninit: function() {
+    this.initShortKeys();
   },
   parseDate: function(timeString) {
     var d = new Date(timeString);
