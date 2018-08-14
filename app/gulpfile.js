@@ -1,19 +1,18 @@
 var del         = require('del');
 var log         = require('fancy-log');
 var gulp        = require('gulp');
-var gutil       = require('gulp-util');
 var jshint      = require('gulp-jshint');
 var uglify      = require('gulp-uglify');
-var concat      = require('gulp-concat');
-var less        = require('gulp-less');
 var minifyCSS   = require('gulp-minify-css');
-var prefix      = require('gulp-autoprefixer');
+var minimist    = require('minimist');
 var replace     = require('gulp-replace');
 var scp         = require('gulp-scp2');
+var through2    = require('through2');
 var zip         = require('gulp-zip');
 var vsn         = '2.1.0';
 
-var env = gutil.env.env || 'dev';
+var argv = minimist(process.argv.slice(2));
+var env = argv['env'] || 'dev';
 log.warn('ENVIRONMENT SET TO: '+env);
 var config = require('./config.js')[env];
 
@@ -50,7 +49,7 @@ gulp.task('scripts', function() {
   return gulp.src([
     'src/srp/js/**/*.js'
   ])
-  .pipe(config.js.uglify ? uglify({ mangle: true }) : gutil.noop())
+  .pipe(config.js.uglify ? uglify({ mangle: true }) : through2.obj())
   .pipe(replace('/vsn/', '/'+vsn+'/'))
   .pipe(gulp.dest('dist/srp/'+vsn+'/js'));
 });
@@ -69,7 +68,7 @@ gulp.task('styles', function() {
   return gulp.src([
     'src/srp/css/**/*.css'
   ])
-  .pipe(config.css.minify ? minifyCSS() : gutil.noop())
+  .pipe(config.css.minify ? minifyCSS() : through2.obj())
   .pipe(gulp.dest('dist/srp/'+vsn+'/css'));
 });
 
