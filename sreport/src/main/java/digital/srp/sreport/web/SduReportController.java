@@ -7,7 +7,6 @@ import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -37,9 +36,6 @@ public class SduReportController implements SduQuestions {
             .getLogger(SduReportController.class);
 
     private static final String DEFAULT_MAX_PERIODS = "4";
-
-    @Value("${kp.application.base-uri}")
-    protected String baseUrl;
 
     @Autowired
     protected SurveyRepository surveyRepo;
@@ -619,9 +615,8 @@ public class SduReportController implements SduQuestions {
     }
 
     /**
-     * Total Carbon footprint.
-     *
      * @return HTML table.
+     * @deprecated Use co2e2017Table
      */
     @RequestMapping(value = "/{org}/{period}/co2e-2016.html", method = RequestMethod.GET, produces = "text/html")
     public String co2eTable(@PathVariable("org") String org,
@@ -634,9 +629,8 @@ public class SduReportController implements SduQuestions {
     }
 
     /**
-     * Total Carbon footprint.
-     *
      * @return CSV with header row.
+     * @deprecated Use co2e2017Csv
      */
     @RequestMapping(value = "/{org}/{period}/co2e-2016.csv", method = RequestMethod.GET, produces = "text/csv")
     public String co2eCsv(@PathVariable("org") String org,

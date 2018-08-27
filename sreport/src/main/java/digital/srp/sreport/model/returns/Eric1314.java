@@ -2,33 +2,86 @@ package digital.srp.sreport.model.returns;
 
 public class Eric1314 implements EricDataSet {
 
-    private static final String PERIOD = "2013-14";
-    
+    public static final String PERIOD = "2013-14";
+
     public static final String NAME = "ERIC-" + PERIOD;
-    
+
     /*
-     * Combination of 
+     * Combination of
      * - HospitalEstatesAndFacilitiesStatistics_9902
      */
     public static final String DATA_FILE = "/data/ERIC-" + PERIOD + ".csv";
     public static final String[] HEADERS = {
             "Organisation Code",
-            "Organisation Name", "Commissioning Region", "Organisation Type",
-            "Gross internal site floor area (m²)", "Occupied floor area (m²)",
-            "NHS estate occupied floor area (%)", "Site heated volume (m³)",
-            "Site footprint (m²)", "Site land area (Hectare)",
+            "Organisation Name",
+            "Commissioning Region",
+            "Organisation Type",
+            "Number of sites - General acute hospital (No.)",
+            "Number of sites - Multi-service hospital (No.)",
+            "Number of sites - Short term non-acute hospital (No.)",
+            "Number of sites - Long stay hospital (No.)",
+            "Number of sites - Specialist hospital (No.)",
+            "Number of sites - Community hospital (No.)",
+            "Number of sites - Non in-patient facilities (No.)",
+            "Number of sites - Non-hospital (patient) (No.)",
+            "Number of sites - Support facilities (No.)",
+            "Total number of sites (No.)",
+            "Estates Development Strategy (Yes/No)",
+            "Board approved Adaptation Plan (Yes/No)",
+            "Percentage of hard FM (estates) and soft FM (hotel services) contracted out (%)",
+            "Value of contracted out services (£)",
+            "Capital investment for new build (£)",
+            "Capital investment for improving existing buildings (£)",
+            "Capital investment for equipment (£)",
+            "Total hard FM (estates) costs (£)",
+            "Total soft FM (Hotel Services) costs (£)",
+            "Total building and engineering maintenance costs (£)",
+            "Total grounds and gardens maintenance costs (£)",
+            "Investment to reduce backlog maintenance (£)",
+            "Income from building and land sales (£)",
+            "Building and land area sold (Hectare)",
+            "Forecast income from building and land sales for the next financial year (£)",
+            "Forecast building and land area to be sold for the next finacial year (Hectare)",
+            "Total number of staff employed (WTE)",
+            "Total number of staff employed in relation to the hard FM (estates) function (WTE)",
+            "Total number of staff employed in relation to the soft FM (hotel services) function (WTE)",
+            "Amount paid to patients and visitors through the Healthcare Travel Costs Scheme (£)",
+            "Number of claims paid through the Healthcare Travel Costs Scheme (No.)",
+            "Business mileage (Miles)",
+            "Patient transport mileage (Miles)",
+            "Healthy transport plan (Yes/No/None)",
+            "Fires recorded (No.)",
+            "False alarms (No.)",
+            "Number of deaths resulting from fire(s) (No.)",
+            "Number of people injured resulting from fire(s) (No.)",
+            "Number of patients sustaining injuries during evacuation (No.)",
+            "Cleaning services costs (£)",
+            "Number of cleaning staff (WTE)",
+            "Laundry and linen services cost (£)",
+            "Pieces per annum (No.)",
+            "Returned to laundry (%)",
+            "Gross internal site floor area (m²)",
+            "Occupied floor area (m²)",
+            "NHS estate occupied floor area (%)",
+            "Site heated volume (m³)",
+            "Site footprint (m²)",
+            "Site land area (Hectare)",
             "Patient occupied floor area (m²)",
             "Non-patient occupied floor area (m²)",
             "Not functionally suitable - occupied floor area (%)",
             "Not functionally suitable - patient occupied floor area (%)",
-            "Un-utilised space (%)", "Available beds (No.)",
+            "Un-utilised space (%)",
+            "Available beds (No.)",
             "Occupied beds (No.)",
             "Single bedrooms for patients with en-suite facilities (No.)",
             "Single bedrooms for patients without en-suite facilities (No.)",
             "Age profile - 2005 to present (%)",
-            "Age profile - 1995 to 2004 (%)", "Age profile - 1985 to 1994 (%)",
-            "Age profile - 1975 to 1984 (%)", "Age profile - 1965 to 1974 (%)",
-            "Age profile - 1955 to 1964 (%)", "Age profile - 1948 to 1954 (%)",
+            "Age profile - 1995 to 2004 (%)",
+            "Age profile - 1985 to 1994 (%)",
+            "Age profile - 1975 to 1984 (%)",
+            "Age profile - 1965 to 1974 (%)",
+            "Age profile - 1955 to 1964 (%)",
+            "Age profile - 1948 to 1954 (%)",
             "Age profile - pre 1948 (%)",
             "Age profile - total (must equal 100%) (%)",
             "Cost to eradicate high risk backlog (£)",
@@ -71,9 +124,9 @@ public class Eric1314 implements EricDataSet {
             "Cost of feeding one in-patient per day (in-patient meal day) (£)",
             "Ward food waste - unserved meals (%)",
             "Total in-patient main meals requested (No.)",
-            "Gross cost of in-patient services (£)" 
+            "Gross cost of in-patient services (£)"
     };
-    
+
     @Override
     public String getDataFile() {
         return DATA_FILE;

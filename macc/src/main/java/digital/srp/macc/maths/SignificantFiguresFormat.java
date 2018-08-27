@@ -29,33 +29,48 @@ public class SignificantFiguresFormat extends Format {
     private static final long serialVersionUID = -1964292745833277765L;
 
     private static final int NO_SIGNIFICANT_FIGURES = 3;
-    
+
     private static final NumberFormat NUMBER_FORMAT = NumberFormat
             .getInstance(Locale.UK);
 
-    public static String format(BigDecimal bd) {
+//    private static final SignificantFiguresFormat me = new SignificantFiguresFormat();
+
+    private final int noSigFigs;
+
+
+    public static SignificantFiguresFormat getInstance() {
+        return new SignificantFiguresFormat();
+    }
+
+    public SignificantFiguresFormat() {
+        this(NO_SIGNIFICANT_FIGURES);
+    }
+
+    public SignificantFiguresFormat(int noSigFigs) {
+        this.noSigFigs = noSigFigs;
+    }
+
+    public Double asDouble(BigDecimal bd) {
         if (bd == null) {
             return null;
         }
-        return NUMBER_FORMAT.format(asDouble(bd));
+        return Double.valueOf(String.format("%." + noSigFigs + "G", bd));
     }
 
-    public static Double asDouble(BigDecimal bd) {
-        if (bd == null) {
-            return null;
-        }
-        return Double.valueOf(String.format(
-                "%." + NO_SIGNIFICANT_FIGURES
-                + "G", bd));
-    }
-
-    public static BigDecimal round(BigDecimal bd) {
+    public BigDecimal round(BigDecimal bd) {
         try {
-            return bd.round(new MathContext(NO_SIGNIFICANT_FIGURES,
+            return bd.round(new MathContext(noSigFigs,
                     RoundingMode.HALF_UP));
         } catch (NullPointerException e) {
             return new BigDecimal(0.00);
         }
+    }
+
+    public String format(BigDecimal bd) {
+        if (bd == null) {
+            return null;
+        }
+        return NUMBER_FORMAT.format(asDouble(bd));
     }
 
     @Override
@@ -78,4 +93,5 @@ public class SignificantFiguresFormat extends Format {
     public Object parseObject(String source, ParsePosition pos) {
         return NUMBER_FORMAT.parseObject(source, pos);
     }
+
 }

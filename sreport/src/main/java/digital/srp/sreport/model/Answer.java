@@ -31,7 +31,6 @@ import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.annotation.LastModifiedDate;
-import org.springframework.data.domain.AuditorAware;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import org.springframework.hateoas.Link;
 
@@ -39,7 +38,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonView;
 
 import digital.srp.macc.maths.SignificantFiguresFormat;
-import digital.srp.sreport.internal.AuthUtils;
 import digital.srp.sreport.model.views.AnswerViews;
 import digital.srp.sreport.model.views.QuestionViews;
 import digital.srp.sreport.model.views.SurveyReturnViews;
@@ -61,7 +59,7 @@ import lombok.experimental.Accessors;
 @Entity
 @EntityListeners(AuditingEntityListener.class)
 @Table(name= "SR_ANSWER")
-public class Answer implements AuditorAware<String> {
+public class Answer {
 
     private static final Logger LOGGER = LoggerFactory
             .getLogger(Answer.class);
@@ -181,7 +179,7 @@ public class Answer implements AuditorAware<String> {
     }
 
     public String response3sf() {
-        return SignificantFiguresFormat.format(responseAsBigDecimal());
+        return SignificantFiguresFormat.getInstance().format(responseAsBigDecimal());
     }
 
     public Answer question(Question q) {
@@ -240,11 +238,6 @@ public class Answer implements AuditorAware<String> {
     public Answer addSurveyReturn(SurveyReturn rtn) {
         surveyReturns().add(rtn);
         return this;
-    }
-
-    @Override
-    public String getCurrentAuditor() {
-        return AuthUtils.getUserId();
     }
 
     public Long getId() {

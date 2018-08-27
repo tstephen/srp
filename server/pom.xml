@@ -1,4 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Copyright 2014-2018 Tim Stephenson and contributors
+
+   Licensed under the Apache License, Version 2.0 (the "License"); you may not
+   use this file except in compliance with the License.  You may obtain a copy
+   of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+   WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+   License for the specific language governing permissions and limitations under
+   the License.
+-->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
@@ -19,15 +34,8 @@
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <start-class>digital.srp.server.Application</start-class>
+    <jasmine-boot.version>1.0.0.20180830</jasmine-boot.version>
   </properties>
-
-  <repositories>
-    <repository>
-      <id>jcenter-snapshots</id>
-      <name>jcenter</name>
-      <url>https://jcenter.bintray.com/</url>
-    </repository>
-  </repositories>
 
   <dependencies>
     <dependency>
@@ -68,38 +76,101 @@
       <groupId>digital.srp</groupId>
       <artifactId>macc</artifactId>
       <version>${srp.version}</version>
-      <exclusions>
-        <exclusion>
-          <groupId>com.h2database</groupId>
-          <artifactId>h2</artifactId>
-        </exclusion>
-      </exclusions>
     </dependency>
     <dependency>
       <groupId>digital.srp</groupId>
       <artifactId>sreport</artifactId>
       <version>${srp.version}</version>
-      <exclusions>
-        <exclusion>
-          <groupId>com.h2database</groupId>
-          <artifactId>h2</artifactId>
-        </exclusion>
-      </exclusions>
     </dependency>
     <dependency>
       <groupId>digital.srp</groupId>
       <artifactId>srp-processes</artifactId>
       <version>${srp.version}</version>
+      <exclusions>
+        <exclusion>
+          <groupId>org.springframework.boot</groupId>
+          <artifactId>spring-boot-starter-security</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>io.onedecision</groupId>
+      <artifactId>onedecision-engine</artifactId>
+      <version>${onedecision.version}</version>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>io.onedecision</groupId>
+      <artifactId>onedecision-domain</artifactId>
+      <version>${onedecision.version}</version>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>io.onedecision</groupId>
+      <artifactId>onedecision-ui</artifactId>
+      <version>${onedecision.version}</version>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>com.knowprocess.bpaas</groupId>
+      <artifactId>kp-processes</artifactId>
+      <version>${work-mgmt.version}</version>
+      <exclusions>
+        <exclusion>
+          <groupId>org.springframework.boot</groupId>
+          <artifactId>spring-boot-starter-security</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>com.knowprocess.bpm</groupId>
+          <artifactId>work-mgmt</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <!-- Used to integration test REST API -->
+    <dependency>
+      <groupId>com.knowprocess.jasmine-boot</groupId>
+      <artifactId>jasmine-boot</artifactId>
+      <version>${jasmine-boot.version}</version>
     </dependency>
   </dependencies>
 
   <build>
     <plugins>
       <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-failsafe-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>default-integration-test</id>
+            <goals>
+              <goal>integration-test</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+      </plugin>
+      <plugin>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>pre-integration-test</id>
+            <goals>
+              <goal>start</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>post-integration-test</id>
+            <goals>
+              <goal>stop</goal>
+            </goals>
+          </execution>
+        </executions>
       </plugin>
     </plugins>
   </build>
-  
+
 </project>

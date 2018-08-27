@@ -24,7 +24,9 @@ import digital.srp.sreport.model.SurveyCategory;
 import digital.srp.sreport.model.SurveyReturn;
 import digital.srp.sreport.model.returns.EricDataSet;
 import digital.srp.sreport.model.returns.EricDataSetFactory;
+import digital.srp.sreport.model.surveys.Eric1516;
 import digital.srp.sreport.model.surveys.Sdu1617;
+import digital.srp.sreport.model.surveys.Sdu1718;
 import digital.srp.sreport.repositories.AnswerRepository;
 import digital.srp.sreport.repositories.QuestionRepository;
 import digital.srp.sreport.repositories.SurveyCategoryRepository;
@@ -100,7 +102,7 @@ public class MgmtController {
 
     @RequestMapping(value = "/surveys", method = RequestMethod.GET, headers = "Accept=application/json")
     public String initSurveys(Model model) throws IOException {
-        Survey[] expectedSurveys = { digital.srp.sreport.model.surveys.Eric1516.getSurvey(), Sdu1617.getSurvey() };
+        Survey[] expectedSurveys = { Eric1516.getSurvey(), Sdu1617.getSurvey(), Sdu1718.getSurvey() };
         for (Survey expected : expectedSurveys) {
             Survey survey = surveyRepo.findByName(expected.name());
             if (survey == null) {
@@ -177,13 +179,19 @@ public class MgmtController {
 
     private Question findQ(Answer answer) {
         LOGGER.info("findQ {}", answer.question().q().name());
-        Question q = qRepo.findByName(answer.question().name());
-        if (q == null) {
-            String msg = String.format("Missing question %1$s. You must create all questions before attempting to import returns that use them",
-                    answer.question().q().name());
+        try {
+            Question q = qRepo.findByName(answer.question().name());
+            if (q == null) {
+                String msg = String.format("Missing question %1$s. You must create all questions before attempting to import returns that use them",
+                        answer.question().q().name());
+                throw new IllegalStateException(msg);
+            }
+            return q;
+        } catch (Exception e) {
+            String msg = String.format("Cannot read question %1$s because: %2$s",
+                    answer.question().q().name(), e.getMessage());
             throw new IllegalStateException(msg);
         }
-        return q;
     }
     
     private void saveReturnAndAnswers(SurveyReturn surveyReturn) {

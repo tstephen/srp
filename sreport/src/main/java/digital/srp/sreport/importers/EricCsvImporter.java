@@ -55,7 +55,7 @@ public class EricCsvImporter implements EricQuestions {
             if (record.getRecordNumber() > 2) { // skip headers
                 Set<Answer> surveyAnswers = new HashSet<Answer>();
                 String org = record.get(0);
-                for (int i = 0; i < record.size(); i++) {
+                for (int i = 0; (i < record.size() && i < questions.size()); i++) {
                     surveyAnswers.add(new Answer()
                             .question(getQuestion(i)).response(record.get(i))
                             .applicablePeriod(period)
@@ -86,11 +86,21 @@ public class EricCsvImporter implements EricQuestions {
             return Q.COMMISSIONING_REGION;
         case "Organisation Type":
             return Q.ORG_TYPE;
+        case "Total number of staff employed (WTE)":
+            return Q.NO_STAFF;
+        case "Total number of staff employed in relation to the hard FM (estates) function (WTE)":
+            return Q.NO_HARD_FM_STAFF;
+        case "Total number of staff employed in relation to the soft FM (hotel services) function (WTE)":
+            return Q.NO_SOFT_FM_STAFF;
+        case "Total number of sites (No.)":
+            return Q.NO_SITES_TOTAL;
         case "Number of sites - General acute hospital (No.)":
             return Q.NO_ACUTE_SITES;
         case "Number of sites - Specialist hospital (acute only) (No.)":
+        case "Number of sites - Specialist hospital (No.)":
             return Q.NO_SPECIALIST_SITES;
         case "Number of sites - Mixed service hospital (No.)":
+        case "Number of sites - Multi-service hospital (No.)":
             return Q.NO_MIXED_SITES;
         case "Number of sites - Mental Health (including Specialist services) (No.)":
             return Q.NO_MENTAL_HEALTH_SITES;
@@ -99,28 +109,43 @@ public class EricCsvImporter implements EricQuestions {
         case "Number of sites - Mental Health and Learning Disabilities (No.)":
             return Q.NO_MENTAL_HEALTH_LD_SITES;
         case "Number of sites - Community hospital (with inpatient beds) (No.)":
+        case "Number of sites - Community hospital (No.)":
             return Q.NO_COMMUNITY_HOSPITAL_SITES;
         case "Number of sites - Other inpatient (No.)":
+        case "Number of sites - Short term non-acute hospital (No.)":
             return Q.NO_OTHER_INPATIENT_SITES;
+        case "Number of sites - Long stay hospital (No.)":
+            return Q.NO_LONG_STAY_HOSPITAL_SITES;
         case "Number of sites - Non inpatient (No.)":
+        case "Number of sites - Non in-patient facilities (No.)":
             return Q.NO_OUTPATIENT_SITES;
+        case "Number of sites - Non-hospital (patient) (No.)":
+            return Q.NO_NON_HOSPITAL_PATIENT_SITES;
         case "Number of sites - Support facilities (No.)":
             return Q.NO_SUPPORT_SITES;
         case "Number of sites - Unreported sites (No.)":
+        case "Number of sites - Not reported (No.)":
             return Q.NO_OTHER_SITES;
+        case "Area of sites not reported (m²)":
+            return Q.OTHER_SITES_AREA;
         case "Estates Development Strategy (Yes/No)":
             return Q.ESTATES_DEV_STRATEGY;
         case "Healthy transport plan (Yes/No)":
+        case "Healthy transport plan (Yes/No/None)":
             return Q.HEALTHY_TRANSPORT_PLAN;
         case "Board approved Adaptation Plan (Yes/No)":
             return Q.BOARD_ADAPTATION_PLAN;
         case "Sustainable Development Management Plan/Carbon Reduction Management Plan (Yes/No)":
+        case "Board approved Sustainable Development Management Plan (SDMP) (Yes/No)":
             return Q.SDMP_CRMP;
         case "Carbon reduction target (Select)":
+        case "Carbon reduction target ()":
             return Q.CARBON_REDUCTION_TARGET;
         case "NHS Premises and Facilities Assurance - Assessment/Approval (Select)":
+        case "NHS Premises Assurance Model ()":
             return Q.PFA_ASSESSMENT;
         case "NHS Premises and Facilities Assurance - action plan (Select)":
+        case "NHS Premises Assurance Model - Action Plan ()":
             return Q.PFA_ACTION_PLAN;
         case "Value of contracted out services (£)":
             return Q.CONTRACTING_OUT_VAL;
@@ -148,6 +173,15 @@ public class EricCsvImporter implements EricQuestions {
             return Q.INCOME_ALL;
         case "Income from services provided to other organisations - other (£)":
             return Q.INCOME_OTHER;
+        case "Income from building and land sales (£)":
+            return Q.INCOME_PROPERTY;
+        case "Building and land area sold (Hectare)":
+            return Q.PROPERTY_AREA_SOLD;
+        case "Forecast income from building and land sales for the next financial year (£)":
+            return Q.FORECAST_INCOME_PROPERTY;
+        case "Forecast building and land area to be sold for the next finacial year (Hectare)":
+        case "Forecast building and land area to be sold for the next financial year (Hectare)":
+            return Q.FORECAST_PROPERTY_AREA_SOLD;
         case "RIDDOR incidents (No.)":
             return Q.NO_RIDDOR_INCIDENTS;
         case "Estates and facilities related incidents (No.)":
@@ -158,6 +192,10 @@ public class EricCsvImporter implements EricQuestions {
             return Q.NO_FIRES;
         case "False alarms (No.)":
             return Q.NO_FALSE_ALARMS;
+        case "False alarms - Call out (No.)":
+            return Q.NO_FALSE_ALARMS_CALL_OUT;
+        case "False alarms - No call out (No.)":
+            return Q.NO_FALSE_ALARMS_NO_CALL_OUT;
         case "Number of deaths resulting from fire(s) (No.)":
             return Q.NO_FIRE_DEATHS;
         case "Number of people injured resulting from fire(s) (No.)":
@@ -166,17 +204,21 @@ public class EricCsvImporter implements EricQuestions {
             return Q.NO_EVAC_INJURIES;
         case "Hard FM (Estates) costs (£)":
         case "Other Hard FM (Estates) costs (£)":
+        case "Total hard FM (estates) costs (£)":
             return Q.HARD_FM_COSTS;
         case "Soft FM (Hotel Services) costs (£)":
         case "Soft FM (Hotel services) costs (£)":
         case "Other Soft FM (Hotel Services) costs (£)":
+        case "Total soft FM (Hotel Services) costs (£)":
             return Q.SOFT_FM_COSTS;
         case "Estates and facilities finance costs (£)":
             return Q.FM_FINANCE_COSTS;
         case "Maintenance service costs (£)":
         case "Estates and property maintenance (£)":
+        case "Total building and engineering maintenance costs (£)":
             return Q.MAINT_COSTS;
         case "Grounds and gardens maintenance (£)":
+        case "Total grounds and gardens maintenance costs (£)":
             return Q.GROUNDS_COSTS;
         case "Income received for area leased out for retail sales (£)":
             return Q.INCOME_RETAIL;
@@ -268,6 +310,7 @@ public class EricCsvImporter implements EricQuestions {
         case "Gas consumed - utility (kWh)":
         case "Gas consumed (kWh)":
             return Q.GAS_USED;
+        case "Oil consumed - utility (kWh)":
         case "Oil  consumed - utility (kWh)":
         case "Oil consumed (kWh)":
             return Q.OIL_USED;
@@ -280,7 +323,7 @@ public class EricCsvImporter implements EricQuestions {
         case "Hot water consumed - local (kWh)":
         case "Hot water consumed (kWh)":
             return Q.HOT_WATER_USED;
-        case "Electricity consumed - local (kWh)": 
+        case "Electricity consumed - local (kWh)":
             return Q.ELEC_USED_LOCAL;
         case "Electricity consumed - renewable (kWh)":
             return Q.ELEC_RENEWABLE_USED;
@@ -301,7 +344,7 @@ public class EricCsvImporter implements EricQuestions {
         case "Thermal energy output of CHP system/s (kWh)":
             return Q.CHP_THERMAL_OUTPUT;
         case "Electrical energy output of the CHP system/s (kWh)":
-        case "Total electrical energy output of the CHP system/s (kWh)":            
+        case "Total electrical energy output of the CHP system/s (kWh)":
         case "Electrical energy output of CHP system/s (kWh)":
             return Q.CHP_ELECTRICAL_OUTPUT;
         case "Exported electricity (kWh)":
@@ -369,7 +412,7 @@ public class EricCsvImporter implements EricQuestions {
         case "Waste cost (£)":
         case "Total waste cost (£)":
             return Q.TOTAL_WASTE_COST;
-        case "Patient/visitor concession scheme provided (Yes/No/None)": 
+        case "Patient/visitor concession scheme provided (Yes/No/None)":
             return Q.PATIENT_AND_VISITOR_CONCESSION_SCHEME;
         case "Total parking spaces available (No.)":
         case "Parking spaces available (No.)":
@@ -385,9 +428,11 @@ public class EricCsvImporter implements EricQuestions {
         case "Average fee charged per hour for staff parking (£)":
             return Q.AVG_STAFF_PARKING_FEE;
         case "Cleaning service cost (£)":
+        case "Cleaning services costs (£)":
             return Q.CLEANING_COST;
         case "Cleaning staff (WTE)":
-            return Q.NO_CLEANING_STAFF;            
+        case "Number of cleaning staff (WTE)":
+            return Q.NO_CLEANING_STAFF;
         case "Cost of cleaning occupied floor area assessed as Red/Very High Risk (£)":
             return Q.VH_RISK_CLEANING_COST;
         case "Occupied floor area assessed as Red/Very High Risk (%)":
@@ -430,9 +475,12 @@ public class EricCsvImporter implements EricQuestions {
         case "Ward food waste - unserved meals (%)":
             return Q.WARD_FOOD_WASTE;
         case "Laundry and linen service cost (£)":
+        case "Laundry and linen services cost (£)":
             return Q.LAUNDRY_COST;
         case "Pieces per annum (No.)":
             return Q.NO_LAUNDRY_ITEMS;
+        case "Returned to laundry (%)":
+            return Q.LAUNDRY_RETURN_PCT;
         case "Portering (internal patient transport) service cost (£)":
         case "Portering service cost (£)":
             return Q.PORTERING_COST;
@@ -468,6 +516,16 @@ public class EricCsvImporter implements EricQuestions {
             return Q.ELEC_PEAK_LOAD;
         case "Maximum electrical load (MW)":
             return Q.ELEC_MAX_LOAD;
+        case "Amount paid to patients and visitors through the Healthcare Travel Costs Scheme (£)":
+            return Q.HEALTHCARE_TRAVEL_CLAIMS_COST;
+        case "Number of claims paid through the Healthcare Travel Costs Scheme (No.)":
+            return Q.NO_HEALTHCARE_TRAVEL_CLAIMS;
+        case "Business mileage (Miles)":
+            return Q.BIZ_MILEAGE;
+        case "Patient transport mileage (Miles)":
+            return Q.PATIENT_MILEAGE;
+        case "Patient taxi cost (£)":
+            return Q.TAXI_COST;
         }
         throw new IllegalArgumentException(
                 String.format("ERIC data not expected to include %1$s", hdr));

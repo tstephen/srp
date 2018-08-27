@@ -4,6 +4,10 @@ Sustainable Resource Planning
 Release History
 ---------------
 
+2.2.0 - 
+
+  - Integration tests and bug fixes
+
 2.1.0 - 15 Mar 18
 
   - Revised benchmarking in reports

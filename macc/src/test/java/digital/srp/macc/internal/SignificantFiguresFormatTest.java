@@ -26,49 +26,52 @@ import digital.srp.macc.maths.SignificantFiguresFormat;
 
 public class SignificantFiguresFormatTest {
 
+    private static SignificantFiguresFormat sigFigFormatter;
+
     @BeforeClass
     public static void setUpBeforeClass() throws Exception {
+        sigFigFormatter = new SignificantFiguresFormat();
     }
 
     @Test
     public void testNull() {
-        assertEquals(null, SignificantFiguresFormat.format(null));
+        assertEquals(null, sigFigFormatter.format(null));
     }
 
     @Test
     public void testNegativeAsString() {
         assertEquals("-20,100",
-                SignificantFiguresFormat.format(new BigDecimal("-20133")));
+                sigFigFormatter.format(new BigDecimal("-20133")));
     }
 
     @Test
     public void testNegative() {
         assertEquals(new Double(-20100),
-                SignificantFiguresFormat.asDouble(new BigDecimal("-20133")));
+                sigFigFormatter.asDouble(new BigDecimal("-20133")));
     }
 
     @Test
     public void testFraction() {
         assertEquals("0.123",
-                SignificantFiguresFormat.format(new BigDecimal("0.123456")));
+                sigFigFormatter.format(new BigDecimal("0.123456")));
     }
 
     @Test
     public void testFormatTenThousands() {
         assertEquals("16,700",
-                SignificantFiguresFormat.format(new BigDecimal("16736")));
+                sigFigFormatter.format(new BigDecimal("16736")));
     }
 
     @Test
     public void testFormatMillions() {
         assertEquals("1,230,000",
-                SignificantFiguresFormat.format(new BigDecimal("1234567")));
+                sigFigFormatter.format(new BigDecimal("1234567")));
     }
     
     @Test
     public void testFormatHundredMillions() {
         assertEquals("416,000,000",
-                SignificantFiguresFormat.format(new BigDecimal("416012596")));
+                sigFigFormatter.format(new BigDecimal("416012596")));
     }    
 
 }

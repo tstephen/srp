@@ -16,15 +16,11 @@
 package digital.srp.macc;
 
 import org.springframework.boot.SpringApplication;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
-
-import digital.srp.macc.MaccConfig;
 
 @Configuration
 @Import({ MaccConfig.class })
@@ -37,11 +33,6 @@ public class TestApplication extends WebMvcConfigurerAdapter {
         registry.addViewController("/").setViewName("index");
         registry.addViewController("/login").setViewName("login");
         // registry.addViewController("/loginError").setViewName("loginError");
-    }
-
-    @Bean
-    public WebSecurityConfigurerAdapter applicationSecurity() {
-        return new DemoApplicationSecurity();
     }
 
     public static void main(String[] args) {

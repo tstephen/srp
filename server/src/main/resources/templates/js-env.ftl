@@ -1,4 +1,4 @@
-var $env = (function ($) {
+var $env = (function () {
   var me = {
     appName: '${appName}',
     server: '${restBaseUri}',
@@ -6,4 +6,4 @@ var $env = (function ($) {
   };
 
   return me;
-}($));
+}());

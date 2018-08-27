@@ -108,7 +108,7 @@ public class CsvInterventionTypeImporterTest {
             System.out.println(String.format("%1$s,%2$s,%3$d,%4$s",
                     intervention.getName(), intervention.getClassification(),
                     intervention.getCostPerTonneCo2e().longValue(),
-                    SignificantFiguresFormat.format(intervention
+                    SignificantFiguresFormat.getInstance().format(intervention
                             .getTonnesCo2eSavedTargetYear())));
         }
     }

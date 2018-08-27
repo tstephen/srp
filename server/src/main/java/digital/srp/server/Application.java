@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2015, 2017 Tim Stephenson and contributors
+ * Copyright 2015-2018 Tim Stephenson and contributors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,11 +39,15 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import digital.srp.macc.MaccConfig;
 import digital.srp.server.model.mixins.SrpLinkMixIn;
 import digital.srp.sreport.internal.SReportConfiguration;
+import io.onedecision.engine.OneDecisionConfig;
+import io.onedecision.engine.domain.OneDecisionDomainConfig;
 
 // See https://github.com/spring-projects/spring-boot/issues/6529 for alternative if JMX needed
 //@EnableAutoConfiguration(exclude = { EndpointMBeanExportAutoConfiguration.class })
 @Configuration
-@Import({ MaccConfig.class, SReportConfiguration.class, SrpConfig.class })
+@Import({ SrpConfig.class,
+        OneDecisionConfig.class, OneDecisionDomainConfig.class,
+        MaccConfig.class, SReportConfiguration.class })
 public class Application extends WebMvcConfigurerAdapter {
 
     protected static final Logger LOGGER = LoggerFactory
@@ -91,10 +95,18 @@ public class Application extends WebMvcConfigurerAdapter {
         LOGGER.debug("client context set to: " + clientContext);
         // Allegedly sets welcome page though does not appear to be working
         registry.addViewController(clientContext + "/").setViewName("index");
-        registry.addViewController(clientContext + "/login").setViewName(
-                "login");
-        registry.addViewController(clientContext + "/error").setViewName(
-                "loginPage?error");
+        registry.addViewController("/").setViewName("index.html");
+
+        registry.addRedirectViewController("/api-docs/",
+                "/v2/api-docs?group=restful-api");
+        registry.addRedirectViewController(
+                "/api-docs/swagger-resources/configuration/ui",
+                "/swagger-resources/configuration/ui");
+        registry.addRedirectViewController(
+                "/api-docs/swagger-resources/configuration/security",
+                "/swagger-resources/configuration/security");
+        registry.addRedirectViewController("/api-docs/swagger-resources",
+                "/swagger-resources");
     }
 
     @Override

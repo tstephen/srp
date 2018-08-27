@@ -171,7 +171,7 @@ public class OrganisationIntervention {
         if (unitCount == 0 && getOrganisationType().getCount() == 0) {
             return null;
         } else if (unitCount == 0) {
-            return SignificantFiguresFormat.round(
+            return SignificantFiguresFormat.getInstance().round(
                     getIntervention().getUnitCount().divide(
                     new BigDecimal(getOrganisationType().getCount()),
                     Finance.ROUND_MODE));

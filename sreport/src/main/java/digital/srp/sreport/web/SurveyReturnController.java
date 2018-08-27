@@ -6,7 +6,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
@@ -36,7 +35,6 @@ import com.fasterxml.jackson.annotation.JsonView;
 
 import digital.srp.sreport.api.Calculator;
 import digital.srp.sreport.api.exceptions.ObjectNotFoundException;
-import digital.srp.sreport.internal.AuthUtils;
 import digital.srp.sreport.internal.NullAwareBeanUtils;
 import digital.srp.sreport.model.Answer;
 import digital.srp.sreport.model.Q;
@@ -64,7 +62,7 @@ public class SurveyReturnController {
     private static final Logger LOGGER = LoggerFactory
             .getLogger(SurveyReturnController.class);
 
-    @Value("${kp.application.base-uri}")
+    @Value("${kp.application.base-uri:http://localhost:8080}")
     protected String baseUrl;
 
     @Autowired
@@ -152,19 +150,30 @@ public class SurveyReturnController {
     }
 
     protected SurveyReturn createBlankReturn(String surveyName, String org, String period) {
-        LOGGER.info(String.format("createBlankReturn of %1$s for %2$s", surveyName, org));
-        Survey requested = surveyRepo.findByName(surveyName);
-        Set<Answer> emptyAnswers = new HashSet<Answer>();
+        LOGGER.info("createBlankReturn of {} for {}", surveyName, org);
 
-        SurveyReturn rtn = new SurveyReturn()
-                .name(String.format("%1$s-%2$s", requested.name(),org))
-                .survey(requested)
-                .org(org)
-                .applicablePeriod(requested.applicablePeriod())
-                .answers(emptyAnswers);
-        ensureInitialized(requested, rtn);
+        try {
+            Survey requested = surveyRepo.findByName(surveyName);
+            SurveyReturn rtn = new SurveyReturn()
+                    .name(String.format("%1$s-%2$s", requested.name(), org))
+                    .survey(requested)
+                    .org(org)
+                    .applicablePeriod(requested.applicablePeriod())
+                    .answers(new HashSet<Answer>());
+            ensureInitialized(requested, rtn);
 
-        return addLinks(rtn);
+            return addLinks(rtn);
+        } catch (NullPointerException e) {
+            String msg = String.format(
+                    "Unable to create blank return for %1$s of %2$s",
+                    surveyName, org);
+            LOGGER.error(msg);
+            LOGGER.error("  have {} surveys currently", surveyRepo.count());
+            for (Survey s : surveyRepo.findAll()) {
+                LOGGER.error("  {}: {}", s.id(), s.name());
+            }
+            throw new IllegalStateException(msg);
+        }
     }
 
     protected void ensureInitialized(Survey requested, SurveyReturn rtn) {
@@ -474,8 +483,8 @@ public class SurveyReturnController {
     }
 
     protected void submit(SurveyReturn survey, String submitter) {
-        survey.updatedBy(submitter == null ? AuthUtils.getUserId() : submitter);
-        survey.submittedBy(submitter == null ? AuthUtils.getUserId() : submitter);
+        survey.updatedBy(submitter);
+        survey.submittedBy(submitter);
         survey.submittedDate(new Date());
         survey.status(StatusType.Submitted.name());
         for (Answer a : survey.answers()) {

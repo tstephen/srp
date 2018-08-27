@@ -2,19 +2,50 @@ package digital.srp.sreport.model.returns;
 
 public class Eric1415 implements EricDataSet {
 
-    private static final String PERIOD = "2014-15";
-    
+    public static final String PERIOD = "2014-15";
+
     public static final String NAME = "ERIC-" + PERIOD;
-    
+
     /*
-     * Combination of 
-     * - HospitalEstatesAndFacilitiesStatistics_11133
+     * Combination of - HospitalEstatesAndFacilitiesStatistics_11133
      */
-    public static final String DATA_FILE = "/data/ERIC-" + PERIOD +".csv";
-    public static final String[] HEADERS = {
-            "Organisation Code",
+    public static final String DATA_FILE = "/data/ERIC-" + PERIOD + ".csv";
+    public static final String[] HEADERS = { "Organisation Code",
             "Organisation Name", "Commissioning Region", "Organisation Type",
-            "Hard FM (Estates) costs (£)", "Soft FM (Hotel Services) costs (£)",
+            "Number of sites - General acute hospital (No.)",
+            "Number of sites - Multi-service hospital (No.)",
+            "Number of sites - Short term non-acute hospital (No.)",
+            "Number of sites - Long stay hospital (No.)",
+            "Number of sites - Specialist hospital (No.)",
+            "Number of sites - Community hospital (No.)",
+            "Number of sites - Non in-patient facilities (No.)",
+            "Number of sites - Non-hospital (patient) (No.)",
+            "Number of sites - Support facilities (No.)",
+            "Number of sites - Not reported (No.)",
+            "Total number of sites (No.)", "Area of sites not reported (m²)",
+            "Estates Development Strategy (Yes/No)",
+            "Healthy transport plan (Yes/No)",
+            "Board approved Adaptation Plan (Yes/No)",
+            "Board approved Sustainable Development Management Plan (SDMP) (Yes/No)",
+            "Carbon reduction target ()", "NHS Premises Assurance Model ()",
+            "NHS Premises Assurance Model - Action Plan ()",
+            "Value of contracted out services (£)",
+            "Percentage of hard FM (estates) and soft FM (hotel services) contracted out (%)",
+            "Capital investment for new build (£)",
+            "Capital investment for improving existing buildings (£)",
+            "Capital investment for equipment (£)",
+            "Private Sector investment (£)",
+            "Investment to reduce backlog maintenance (£)",
+            "Patient taxi cost (£)", "Income from building and land sales (£)",
+            "Building and land area sold (Hectare)",
+            "Forecast income from building and land sales for the next financial year (£)",
+            "Forecast building and land area to be sold for the next finacial year (Hectare)",
+            "Fires recorded (No.)", "False alarms (No.)",
+            "Number of deaths resulting from fire(s) (No.)",
+            "Number of people injured resulting from fire(s) (No.)",
+            "Number of patients sustaining injuries during evacuation (No.)",
+            "Hard FM (Estates) costs (£)",
+            "Soft FM (Hotel Services) costs (£)",
             "Estates and facilities finance costs (£)",
             "Maintenance service costs (£)",
             "Income received for area leased out for retail sales (£)",
@@ -31,12 +62,6 @@ public class Eric1415 implements EricDataSet {
             "Occupied beds (No.)",
             "Single bedrooms for patients with en-suite facilities (No.)",
             "Single bedrooms for patients without en-suite facilities (No.)",
-            "Age profile - 2015 to present (%)",
-            "Age profile - 2005 to 2014 (%)", "Age profile - 1995 to 2004 (%)",
-            "Age profile - 1985 to 1994 (%)", "Age profile - 1975 to 1984 (%)",
-            "Age profile - 1965 to 1974 (%)", "Age profile - 1955 to 1964 (%)",
-            "Age profile - 1948 to 1954 (%)", "Age profile - pre 1948 (%)",
-            "Age profile - total (must equal 100%) (%)",
             "Cost to eradicate high risk backlog (£)",
             "Cost to eradicate significant risk backlog (£)",
             "Cost to eradicate moderate risk backlog (£)",
@@ -50,7 +75,7 @@ public class Eric1415 implements EricDataSet {
             "Exported electricity (kWh)", "Exported thermal energy (kWh)",
             "Energy cost (all energy supplies) (£)",
             "Electricity consumed - utility (kWh)",
-            "Gas consumed - utility (kWh)", "Oil  consumed - utility (kWh)",
+            "Gas consumed - utility (kWh)", "Oil consumed - utility (kWh)",
             "Coal consumed - utility (kWh)",
             "Electricity consumed - local (kWh)",
             "Steam consumed - local (kWh)", "Hot water consumed - local (kWh)",
@@ -75,17 +100,18 @@ public class Eric1415 implements EricDataSet {
             "Cost of feeding one in-patient per day (in-patient meal day) (£)",
             "Laundry and linen service cost (£)", "Pieces per annum (No.)",
             "Portering (internal patient transport) service cost (£)",
-            "Portering staff (WTE)", "PFI Unitary charges (£)"
-    };
+            "Portering staff (WTE)" };
 
     @Override
     public String getDataFile() {
         return DATA_FILE;
     }
+
     @Override
     public String[] getHeaders() {
         return HEADERS;
     }
+
     @Override
     public String getPeriod() {
         return PERIOD;

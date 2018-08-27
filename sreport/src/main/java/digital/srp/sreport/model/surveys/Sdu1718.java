@@ -11,9 +11,9 @@ import digital.srp.sreport.model.SurveyCategory;
  *
  * @author Tim Stephenson
  */
-public class Sdu1617 {
+public class Sdu1718 {
 
-    public static final String PERIOD = "2016-17";
+    public static final String PERIOD = "2017-18";
     public static final String ID = "SDU-"+PERIOD;
 
     public static Survey getSurvey() {
@@ -204,7 +204,7 @@ public class Sdu1617 {
                 .name("Qualitative questions")
                 .questionEnums(SduQuestions.QUALITATIVE_QS);
         Survey survey = new Survey().name(ID).status("Draft")
-                .applicablePeriod("2016-17")
+                .applicablePeriod("2017-18")
                 .categories(catOrg, catPolicy, catPerf,
                         catFinancial, catEnergy, catWaste,
                         catWater, catBizTravel, catOtherTravel, catGases,

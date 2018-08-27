@@ -39,10 +39,12 @@ public class OrganisationInterventionTest {
     private static final BigDecimal ACTIVE_TRAVEL_UPTAKE = new BigDecimal(0.25);
     protected static final String TENANT_ID = "sdu";
     protected static OrganisationTypeController svc;
+    protected static SignificantFiguresFormat sigFigFormatter;
 
     @BeforeClass
     public static void setUpBeforeClass() throws Exception {
         svc = new OrganisationTypeController();
+        sigFigFormatter = SignificantFiguresFormat.getInstance();
     }
 
     @Test
@@ -62,7 +64,7 @@ public class OrganisationInterventionTest {
 
         log(interventionType, orgType, plan);
 
-        assertEquals(0.09, SignificantFiguresFormat.asDouble(plan
+        assertEquals(0.09, sigFigFormatter.asDouble(plan
                 .getTonnesCo2eSavedTargetYear()), 0.1);
         assertEquals(0, plan.getTargetYearSavings().floatValue(), 0.1);
 
@@ -85,7 +87,7 @@ public class OrganisationInterventionTest {
 
         log(interventionType, orgType, plan);
 
-        assertEquals(0.149, SignificantFiguresFormat.asDouble(plan
+        assertEquals(0.149, sigFigFormatter.asDouble(plan
                 .getTonnesCo2eSavedTargetYear()), 0.1);
         assertEquals(0, plan.getTargetYearSavings().floatValue(), 0.1);
     }
@@ -112,18 +114,18 @@ public class OrganisationInterventionTest {
         assertEquals(ACTIVE_TRAVEL_UP_FRONT
                 .multiply(ACTIVE_TRAVEL_UPTAKE)
                 .multiply(staffRatio).doubleValue(),
-                SignificantFiguresFormat.round(plan.getCashOutflowsUpFront())
+                sigFigFormatter.round(plan.getCashOutflowsUpFront())
                         .doubleValue(), 10);
         assertEquals(ACTIVE_TRAVEL_ANNUAL_IN
                 .multiply(ACTIVE_TRAVEL_UPTAKE)
                 .multiply(staffRatio).doubleValue(),
-                SignificantFiguresFormat.asDouble(
+                sigFigFormatter.asDouble(
                         plan.getAnnualCashInflowsTargetYear()).doubleValue(),
                 10);
         assertEquals(ACTIVE_TRAVEL_ANNUAL_OUT
                 .multiply(ACTIVE_TRAVEL_UPTAKE)
                         .multiply(staffRatio).doubleValue(),
-                SignificantFiguresFormat.asDouble(
+                        sigFigFormatter.asDouble(
                         plan.getAnnualCashOutflowsTargetYear()).doubleValue(),
                 10);
     }
@@ -151,7 +153,7 @@ public class OrganisationInterventionTest {
                         .getUnitCount().longValue());
         log(interventionType, orgType, plan);
 
-        assertEquals(42.8, SignificantFiguresFormat.asDouble(plan
+        assertEquals(42.8, sigFigFormatter.asDouble(plan
                 .getTonnesCo2eSavedTargetYear()), 0.1);
 
         assertEquals(0, plan.getTargetYearSavings().floatValue(), 0.1);
@@ -214,10 +216,10 @@ public class OrganisationInterventionTest {
 
         log(interventionType, orgType, plan);
 
-        assertEquals(0.70, SignificantFiguresFormat.asDouble(plan
+        assertEquals(0.70, sigFigFormatter.asDouble(plan
                 .getTonnesCo2eSavedTargetYear()), 0.1);
         assertEquals(-401,
-                SignificantFiguresFormat.asDouble(plan.getTargetYearSavings()),
+                sigFigFormatter.asDouble(plan.getTargetYearSavings()),
                 0.1);
     }
 

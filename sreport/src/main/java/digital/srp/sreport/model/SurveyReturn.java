@@ -32,7 +32,6 @@ import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.annotation.LastModifiedDate;
-import org.springframework.data.domain.AuditorAware;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import org.springframework.hateoas.Link;
 
@@ -40,7 +39,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonView;
 
 import digital.srp.sreport.api.MandatoryCurrentPeriodAnswersProvided;
-import digital.srp.sreport.internal.AuthUtils;
 import digital.srp.sreport.internal.EntityAuditorListener;
 import digital.srp.sreport.model.views.AnswerViews;
 import digital.srp.sreport.model.views.SurveyReturnViews;
@@ -68,7 +66,7 @@ import lombok.experimental.Accessors;
 // Take care that what is validated here must be provided by createBlankReturn
 //@MinimumPeriodsProvided(noPeriods = 4)
 @MandatoryCurrentPeriodAnswersProvided(requiredAnswers = {Q.ORG_CODE})
-public class SurveyReturn implements AuditorAware<String> {
+public class SurveyReturn {
     private static final Logger LOGGER = LoggerFactory
             .getLogger(SurveyReturn.class);
 
@@ -229,19 +227,19 @@ public class SurveyReturn implements AuditorAware<String> {
 
     protected Optional<Answer> answer(String qName, String period) {
         Answer a = null;
-        List<Answer> matches = new ArrayList<Answer>();
+        List<String> matches = new ArrayList<String>();
         for (Answer answer : answers) {
             if (qName.equals(answer.question().name()) && period.equals(answer.applicablePeriod())) {
-                matches.add(a);
+                matches.add(answer.id()+"="+answer.response());
                 a = answer;
             }
         }
         if (matches.size() > 1) {
             StringBuffer sb = new StringBuffer();
-            for (Answer answer : matches) {
-                sb.append(answer == null ? "" : answer.getId()).append(",");
+            for (String answer : matches) {
+                sb.append(answer == null ? "" : answer).append(",");
             }
-            LOGGER.error("Multiple answers to {} found for {} in {}. Review ids: {}",
+            LOGGER.error("Multiple answers to {} found for {} in {}. Review records: {}",
                     qName, org, period, sb.toString());
         }
         return Optional.ofNullable(a);
@@ -274,11 +272,6 @@ public class SurveyReturn implements AuditorAware<String> {
         } else {
             return BigDecimal.ZERO;
         }
-    }
-
-    @Override
-    public String getCurrentAuditor() {
-        return AuthUtils.getUserId();
     }
 
     public Long getId() {

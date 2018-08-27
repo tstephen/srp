@@ -14,6 +14,7 @@ NO_OTHER_INPATIENT_SITES$Number of sites - Other inpatient ()$$ERIC$$number$$$$
 NO_OUTPATIENT_SITES$Number of sites - Non inpatient ()$$ERIC$$number$$$$
 NO_SUPPORT_SITES$Number of sites - Support facilities ()$$ERIC$$number$$$$
 NO_OTHER_SITES$Number of sites - Unreported sites ()$$ERIC$$number$$$$
+NO_NHS_PROPERTY_SVCS_SITES$Number of NHS Property Services sites ()$$ERIC$$number$$$$
 ESTATES_DEV_STRATEGY$Estates Development Strategy$$ERIC$$yesno$$$$
 HEALTHY_TRANSPORT_PLAN$Do you have a healthy transport plan?$$ERIC$$yesno$$$$
 BOARD_ADAPTATION_PLAN$Board approved Adaptation Plan$$ERIC$$yesno$$$$
@@ -45,7 +46,6 @@ ORG_NICKNAME$Abbreviation or nick name of organisation used$$SDU$$$$$$
 FLOOR_AREA$Total gross internal floor space$m2$SDU$$number$$$$
 POPULATION$Registered population or population served$people$SDU$$number$$$$
 NO_STAFF$Total number of staff employed$WTE$SDU$$number$$$$
-NO_BEDS$Total number occupied beds$$SDU$$number$$$$
 NO_PATIENT_CONTACTS$Total number of patient contacts$$SDU$$number$$$$
 SDMP_BOARD_REVIEW_WITHIN_12_MONTHS$Was the SDMP reviewed or approved by the board in the last 12 months?$$SDU$$yesno$$$$
 SDMP_MISSION_STATEMENT$If your SDMP has a sustainability mission statement, what is it?$$SDU$$$$$$
@@ -55,6 +55,7 @@ PROC_SOC_ASSESSMENT$Do your commissioning, tendering and procurement processes i
 PROC_SUPPLIER_SUSTAINABILITY$Do your commissioning, tendering and procurement processes include a consideration of the suppliers' sustainability policies?$$SDU$$yesno$$$$
 STRATEGIC_SUSTAINABILITY_PARTNERSHIPS$Are you in a strategic partnership with other organisations on sustainability?$$SDU$$yesno$$$$
 STRATEGIC_SUSTAINABILITY_PARTNERS$Who are they?$$SDU$$$$$$
+GCC_USER$Does your organisation use the <a href=”http://www.sduhealth.org.uk/gcc/about.aspx”>Good Corporate Citizenship (GCC)</a> tool?$$SDU$$yesno$$$$
 LAST_GCC_DATE$If your organisation uses the <a href=”http://www.sduhealth.org.uk/sdat/”>Sustainable Development Assessment Tool (SDAT)</a> tool when was your last self assessment?$$SDU$$number$yyyy$$[\\d]{4}$
 LAST_GCC_SCORE$And what was your SDAT score?$%$SDU$$number$$$$
 PROMOTE_SUSTAINABILITY_TO_STAFF$Does your organisation promote sustainability to its employees?$$SDU$$yesno$$$$
@@ -70,8 +71,20 @@ PATIENT_CONTACT_MEASURE$Define the measure you have used for patient contacts$$S
 BOARD_LEAD_FOR_SUSTAINABILITY$If you have a Board Level lead for Sustainability, please enter their name and/or role here$$SDU$$yesno$$$$
 BOARD_SUSTAINABILITY_AS_RISK$Does your board consider sustainability issues as part of its risk management process?$$SDU$$yesno$$$$
 ADAPTATION_PLAN_INC$Do your board approved plans address the potential need to adapt the delivery of your organisation's activities and organisation's infrastructure as a result of climate change and adverse weather events?$$SDU$$yesno$$$$
-CCGS_SERVED$We provide services to the following CCGs$$SDU$$$$$$
-PROVIDERS_COMMISSIONED$We commission services from the following providers$$SDU$$$$$$
+CCG1_SERVED$We provide services to the following CCG$$SDU$$$$$$
+CCG2_SERVED$We provide services to the following CCG$$SDU$$$$$$
+CCG3_SERVED$We provide services to the following CCG$$SDU$$$$$$
+CCG4_SERVED$We provide services to the following CCG$$SDU$$$$$$
+CCG5_SERVED$We provide services to the following CCG$$SDU$$$$$$
+CCG6_SERVED$We provide services to the following CCG$$SDU$$$$$$
+PROVIDER1_COMMISSIONED$We commission services from the following provider$$SDU$$$$$$
+PROVIDER2_COMMISSIONED$We commission services from the following provider$$SDU$$$$$$
+PROVIDER3_COMMISSIONED$We commission services from the following provider$$SDU$$$$$$
+PROVIDER4_COMMISSIONED$We commission services from the following provider$$SDU$$$$$$
+PROVIDER5_COMMISSIONED$We commission services from the following provider$$SDU$$$$$$
+PROVIDER6_COMMISSIONED$We commission services from the following provider$$SDU$$$$$$
+PROVIDER7_COMMISSIONED$We commission services from the following provider$$SDU$$$$$$
+PROVIDER8_COMMISSIONED$We commission services from the following provider$$SDU$$$$$$
 TOTAL_ENERGY_COST$Total Energy Cost (all energy supplies)$£$ERIC S08_01$The total cost of electricity, gas, oil, and coal from all sources (including utility supplier, local source, renewable source), net of any costs that are charged to other organisations for which the trust provides energy (see apportionment rules).$number$$$$
 PAPER_SPEND$Paper cost$£$SDU$$number$$$$
 WATER_COST$Water Cost$£$ERIC S09_01$The total cost for water whether metred or not inclusive of bore hole, maintenance and operational costs together with billed amounts and water ratesWater and sewage costs associated with on-site central processing unit(s) (e.g. laundry) should be apportioned in accordance with the percentage output used by the trust for its own purposes. (E.g. if the trusts uses 30% of the processing unit output then the figure used should be 30% of the total cost of water supplied to the processing unit.) Where Water and Sewage costs are billed as a single amount, information on the method of calculating the separate charges should be sought from the supplier. If this is not available, trusts should provide an estimate of the split.$number$$$$
@@ -90,6 +103,7 @@ STEAM_USED$Steam Consumed$kWh$ERIC S08_06$Total annual amount of steam consumed 
 HOT_WATER_USED$Hot Water Consumed$kWh$ERIC S08_07$Total annual amount of hot water consumed which has been supplied by an organisation other than Regional/National supplier sources (e.g. a neighbouring organisation supplying hot water to the site from their main distribution system.) Exclude energy derived from an eligible renewable energy source.$number$$$$
 ELEC_USED_GREEN_TARIFF$Electricity Consumed - green energy tariff$kWh$ERIC S08_08$The total annual amount of electricity from renewable or green energy tariffs supplied by national / regional or local electricity supplier e.g. Crown Commercial Services “green energy”. If a proportion supplied electricity is from a green energy tariff then only the proportion which is a ‘green energy tariff’ should be reported here. The sum of the electricity consumed (S08_02), green energy tariff (S08_08) and Electricity consumed – third party owned renewable (S08_09) will be the total 'intake' of electrical energy delivered to the site.$number$$$$
 ELEC_OWNED_RENEWABLE_USED$Electricity consumed - owned onsite renewables$kWh$ERIC S08_11$The total annual amount of electricity output from owned onsite low or zero carbon renewable generation, inclusive of exported electricity. Excludes electrical energy output of CHP recorded separately. The sum of the electrical output of CHP (S07_06) and onsite renewable electrical energy (S08_11) will be the total 'generated' onsite electrical energy.$number$$$$
+ELEC_OWNED_RENEWABLE_USED_SDU$Electricity consumed - owned onsite renewables (SDU definition)$kWh$ERIC S08_11$Please state the amount of renewable electricity generated onsite by renewable technologies owned by your organisation (Solar, Wind, Bio CHP (not gas combustion CHP).\nPlease note this is note the same definition as the ERIC question on the subject.$number$$$$
 ELEC_3RD_PTY_RENEWABLE_USED$Electricity Consumed - third party owned renewable$kWh$ERIC S08_09$The total annual amount of electricity consumed from renewable sources owned and supplied by national / regional or local electricity supplier but not supplied through the national power grid e.g. onsite renewable rent-a-roof schemes, community owned/funded renewable energy projects or supplies bought via a private wire from a renewable supply. Exclude energy consumed via green energy tariffs (S08_08) and organisation owned renewable generation (S08_11). Exclude energy supplied to other sites. Include energy used by the organisation site for processing purposes (e.g. laundry, CSD). In cases where the organisation site includes an on-site central processing unit(s) which serves more than one organisation site, the input energy to this unit should be apportioned in accordance with the percentage output used by the organisation for its own purposes. (E.g. if the organisation uses 30% of the processing unit output then the figure included should be 30% of the total amount of energy supplied to the processing unit).$number$$$$
 ELEC_RENEWABLE_USED$Non-fossil fuel Consumed - renewable$kWh$ERIC S08_10$"The total annual amount of non-fossil fuel from renewable energy consumed for combustion (e.g. heating boilers) which has been supplied from an eligible renewable energy supply source as defined in Protocol A3 of DEFRA ""Guidelines for the Measurement and Reporting of Emissions by Direct Participants in the UK Emissions Trading Scheme"" (e.g. biomass, sewage gas, etc.) Such energy to be exempt from the Climate Change Levy (CCL),  which is evidenced by a Levy Exemption Certificate that confirms that electricity generated from qualifying renewable sources are exempt from the Levy. The sum of the utility, local and renewable fossil and non-fossil energy figures reported will be the total 'intake' of fossil and non-fossil energy delivered to the site. - Assumed to be an average of biomass supplies"$number$$$$
 ELEC_EXPORTED$Total exported electricity$kWh$SDU$Total amount of electricity exported from renewable sources only, please report energy exported and generate through combustion CHP below in additional breakdown information$number$$$$
@@ -190,7 +204,6 @@ RISK_ADJUSTED_BACKLOG_COST$Risk adjusted backlog cost$£$ERIC$$number$$$$
 ERADICATE_BACKLOG_COST$Cost to eradicate backlog$£$ERIC$$number$$$$
 FOSSIL_USED_IN_CHP$Fossil energy input to CHP system/s (kWh)$kWh$ERIC$$number$$$$
 CHP_THERMAL_OUTPUT$Thermal energy output of CHP system/s (kWh)$kWh$ERIC$$number$$$$
-SEWAGE_COST$Sewage cost$£$ERIC$$number$$$$
 CLINICAL_WASTE_COST$Clinical waste cost$£$ERIC$$number$$$$
 CLINICAL_WASTE_WEIGHT$Clinical waste volume$tonnes$ERIC$$number$$$$
 SPECIAL_WASTE_COST$Special waste cost$£$ERIC$$number$$$$
@@ -233,10 +246,6 @@ HIGH_TEMP_DISPOSAL_WEIGHT$High temperature disposal waste weight$tonnes$ERIC$$nu
 ALT_WASTE_DISPOSAL_WEIGHT$Non burn treatment (alternative treatment plant) disposal waste weight$tonnes$ERIC$$number$$$$
 WEEE_WEIGHT$Waste electrical and electronic equipment (WEEE) weight$tonnes$ERIC$$number$$$$
 REUSE_WEIGHT$Preparing for re-use volume$tonnes$ERIC$$number$$$$
-LANDFILL_WEIGHT$Landfill disposal waste weight$tonnes$ERIC$$number$$$$
-OTHER_RECOVERY_WEIGHT$Other recovery volume$tonnes$ERIC$$number$$$$
-RECYCLING_WEIGHT$Waste recycling volume$tonnes$ERIC$$number$$$$
-WASTE_RECYLING_COST$Waste recycling, recovery and preparing for re-use Cost$£$ERIC$$number$$$$
 TOTAL_WASTE_COST$Total waste cost$£$ERIC$$number$$$$
 PATIENT_AND_VISITOR_CONCESSION_SCHEME$Patient/visitor concession scheme provided (Yes/No/None)$$ERIC$$number$$$$
 DISABLED_STAFF_PARKING_SPACES$Designated parking spaces available for staff$$ERIC$$number$$$$
@@ -261,3 +270,56 @@ ELEC_PEAK_LOAD$$$ERIC$$number$$$$
 ELEC_MAX_LOAD$$$ERIC$$number$$$$
 RENEWABLE_USED$$$ERIC$$number$$$$
 LANDFILL_COST$$$ERIC$$number$$$$
+SDG_STARTING$$$SDU$$number$$$$
+SDG_CLEAR$$$SDU$$number$$$$
+PROVISIONS$$$SDU$$number$$$$
+PATIENTS_CLOTHING_AND_FOOTWEAR$$$SDU$$number$$$$
+STAFF_CLOTHING$$$SDU$$number$$$$
+CARBON_REDUCTION_BASELINE_USED$$$SDU$$number$$$$
+PHARMA_BLOOD_PROD_AND_MED_GASES$$$SDU$$number$$$$
+DRESSINGS$$$SDU$$number$$$$
+MEDICAL_AND_SURGICAL_EQUIPT$$$SDU$$number$$$$
+PATIENTS_APPLIANCES$$$SDU$$number$$$$
+CHEMICALS_AND_REAGENTS$$$SDU$$number$$$$
+DENTAL_AND_OPTICAL_EQUIPT$$$SDU$$number$$$$
+IMAGING_AND_RADIOTHERAPY_EQUIPT_AND_SVCS$$$SDU$$number$$$$
+LAB_EQUIPT_AND_SVCS$$$SDU$$number$$$$
+HOTEL_EQUIPT_MATERIALS_AND_SVCS$$$SDU$$number$$$$
+BLDG_AND_ENG_PROD_AND_SVCS$$$SDU$$number$$$$
+PURCHASED_HEALTHCARE$$$SDU$$number$$$$
+GARDENING_AND_FARMING$$$SDU$$number$$$$
+FURNITURE_FITTINGS$$$SDU$$number$$$$
+HARDWARE_CROCKERY$$$SDU$$number$$$$
+BEDDING_LINEN_AND_TEXTILES$$$SDU$$number$$$$
+OFFICE_EQUIPT_TELCO_COMPUTERS_AND_STATIONERY$$$SDU$$number$$$$
+REC_EQUIPT_AND_SOUVENIRS$$$SDU$$number$$$$
+CONSULTING_SVCS_AND_EXPENSES$$$SDU$$number$$$$
+ENERGY_CO2E_PER_POUND$$$SDU$$number$$$$
+COMMISSIONING_CO2E_PER_POUND$$$SDU$$number$$$$
+PROCUREMENT_CO2E_PER_POUND$$$SDU$$number$$$$
+TRAVEL_CO2E_PER_POUND$$$SDU$$number$$$$
+ADAPTATION_PERF$$$SDU$$$$$$
+ENERGY_PERF$$$SDU$$$$$$
+PAPER_PERF$$$SDU$$$$$$
+TRAJECTORY_PERF$$$SDU$$$$$$
+TRAVEL_PERF$$$SDU$$$$$$
+WASTE_PERF$$$SDU$$$$$$
+WATER_PERF$$$SDU$$$$$$
+ENERGY_CTXT$$$SDU$$$$$$
+WASTE_CTXT$$$SDU$$$$$$
+WATER_CTXT$$$SDU$$$$$$
+HEALTHCARE_TRAVEL_CLAIMS_COST$$$ERIC$$number$$$$
+OTHER_SITES_AREA$$$ERIC$$number$$$$
+NO_SITES_TOTAL$$$ERIC$$number$$$$
+NO_HARD_FM_STAFF$$$ERIC$$number$$$$
+NO_SOFT_FM_STAFF$$$ERIC$$number$$$$
+INCOME_PROPERTY$$$ERIC$$number$$$$
+PROPERTY_AREA_SOLD$$$ERIC$$number$$$$
+FORECAST_INCOME_PROPERTY$$$ERIC$$number$$$$
+FORECAST_PROPERTY_AREA_SOLD$$$ERIC$$number$$$$
+HEALTHCARE_TRAVEL_CLAIMS_COST$$$ERIC$$number$$$$
+NO_HEALTHCARE_TRAVEL_CLAIMS$$$ERIC$$number$$$$
+LAUNDRY_RETURN_PCT$$$ERIC$$number$$$$
+BIZ_MILEAGE$$$ERIC$$number$$$$
+NO_LONG_STAY_HOSPITAL_SITES$$$ERIC$$number$$$$
+NO_NON_HOSPITAL_PATIENT_SITES$$$ERIC$$number$$$$
