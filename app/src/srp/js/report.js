@@ -74,9 +74,51 @@ var ractive = new BaseRactive({
     isEClassUser: function() {
       return ractive.isEClassUser();
     },
+    matchSearch: function(obj) {
+      var searchTerm = ractive.get('searchTerm');
+      //console.info('matchSearch: '+searchTerm);
+      if (searchTerm==undefined || searchTerm.length==0) {
+        return true;
+      } else {
+        return obj.question.name.toLowerCase().indexOf(searchTerm.toLowerCase())>=0
+          || obj.applicablePeriod.toLowerCase().indexOf(searchTerm.toLowerCase())>=0
+          || obj.status.toLowerCase().indexOf(searchTerm.toLowerCase())>=0
+          || (searchTerm.startsWith('revision:') && obj.revision==searchTerm.substring(9))
+          || (searchTerm.startsWith('updated>') && new Date(obj.lastUpdated)>new Date(searchTerm.substring(8)))
+          || (searchTerm.startsWith('created>') && new Date(obj.created)>new Date(searchTerm.substring(8)))
+          || (searchTerm.startsWith('updated<') && new Date(obj.lastUpdated)<new Date(searchTerm.substring(8)))
+          || (searchTerm.startsWith('created<') && new Date(obj.created)<new Date(searchTerm.substring(8)));
+      }
+    },
+    sort: function (array, column, asc) {
+      console.info('sort '+(asc ? 'ascending' : 'descending')+' on: '+column);
+      array = array.slice(); // clone, so we don't modify the underlying data
+
+      return array.sort( function ( a, b ) {
+        console.log('sort '+a+','+b);
+        var aVal = eval('a.'+column);
+        var bVal = eval('b.'+column);
+        if (bVal==undefined || bVal==null || bVal=='') {
+          return (aVal==undefined || aVal==null || aVal=='') ? 0 : -1;
+        } else if (asc) {
+          return aVal < bVal ? -1 : 1;
+        } else {
+          return aVal > bVal ? -1 : 1;
+        }
+      });
+    },
+    sortAsc: true,
+    sortColumn: 'id',
+    sorted: function(column) {
+//      console.info('sorted:'+column);
+      return 'hidden'; // hide as sorting is disabled due to perf
+      if (ractive.get('sortColumn') == column && ractive.get('sortAsc')) return 'sort-asc';
+      else if (ractive.get('sortColumn') == column && !ractive.get('sortAsc')) return 'sort-desc'
+      else return 'hidden';
+    },
     stdPartials: [
       { "name": "loginSect", "url": $env.server+"/webjars/auth/1.1.0/partials/login-sect.html"},
-      { "name": "statusSect", "url": "/srp/vsn/partials/status-sect.html"}
+      { "name": "statusSect", "url": "/srp/2.1.0/partials/status-sect.html"}
     ],
   },
   partials: {
@@ -109,6 +151,23 @@ var ractive = new BaseRactive({
   },
   fetch: function() {
     console.info('fetch...');
+    if (getSearchParameters()['id']==undefined || !ractive.hasRole('analyst')) ractive.fetchImplicit();
+    else ractive.fetchExplicit();
+  },
+  fetchExplicit: function() {
+    $.ajax({
+      dataType: "json",
+      url: ractive.getServer()+'/returns/'+getSearchParameters()['id'],
+      crossDomain: true,
+      headers: {
+        "X-Requested-With": "XMLHttpRequest",
+        "X-Authorization": "Bearer "+localStorage['token'],
+        "Cache-Control": "no-cache"
+      },
+      success: ractive.fetchSuccessHandler
+    });
+  },
+  fetchImplicit: function() {
     if ($auth.getClaim('org') == undefined) return;
     ractive.set('org',$auth.getClaim('org'));
     $.ajax({
@@ -493,3 +552,17 @@ $(document).ready(function() {
   $auth.addLoginCallback(ractive.fetch);
   $auth.addLoginCallback(ractive.getProfile);
 })
+
+ractive.observe('searchTerm', function(newValue, oldValue, keypath) {
+  console.log('searchTerm changed');
+  //ractive.showResults();
+  setTimeout(function() {
+    ractive.set('searchMatched',$('#answersTable tbody tr').length);
+  }, 500);
+});
+ractive.on( 'sort', function ( event, column ) {
+  console.info('sort on '+column);
+  // if already sorted by this column reverse order
+  if (this.get('sortColumn')==column) this.set('sortAsc', !this.get('sortAsc'));
+  this.set( 'sortColumn', column );
+});
