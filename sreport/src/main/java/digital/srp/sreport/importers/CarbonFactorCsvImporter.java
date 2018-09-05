@@ -21,10 +21,10 @@ public class CarbonFactorCsvImporter {
 
     static final Logger LOGGER = LoggerFactory
             .getLogger(CarbonFactorCsvImporter.class);
-    
+
     public static final String DATA = "/data/CarbonFactors.csv";
-    public static final String[] HEADERS = { 
-            "category","name","unit","scope","2007-08","2008-09","2009-10","2010-11","2011-12","2012-13","2013-14","2014-15","2015-16","2016-17","2017-18","comments"};
+    public static final String[] HEADERS = {
+            "category","name","unit","scope","2007-08","2008-09","2009-10","2010-11","2011-12","2012-13","2013-14","2014-15","2015-16","2016-17","2017-18","2018-19","comments"};
 
     public List<CarbonFactor> readCarbonFactors()
             throws IOException {
@@ -33,7 +33,7 @@ public class CarbonFactorCsvImporter {
             return readCarbonFactors(isr, HEADERS);
         }
     }
-    
+
     public List<CarbonFactor> readCarbonFactors(Reader in, String[] headers)
             throws IOException {
         final CSVParser parser = new CSVParser(in,
@@ -59,6 +59,7 @@ public class CarbonFactorCsvImporter {
                     cfactors.add(newCarbonFactor(record, "2015-16", 12));
                     cfactors.add(newCarbonFactor(record, "2016-17", 13));
                     cfactors.add(newCarbonFactor(record, "2017-18", 14));
+                    cfactors.add(newCarbonFactor(record, "2018-19", 15));
                 } catch (Exception e) {
                     LOGGER.error(String.format("Problem with record: %1$d: %2$s", record.getRecordNumber(), e.getMessage()));
                     e.printStackTrace();
@@ -72,11 +73,11 @@ public class CarbonFactorCsvImporter {
 
     private CarbonFactor newCarbonFactor(CSVRecord record, String period, int idx) {
         String value = record.get(idx);
-        if (value.startsWith(".")) { 
+        if (value.startsWith(".")) {
             value = "0" + value;
         }
         LOGGER.debug("value: {}", value);
-        
+
         CarbonFactor factor = new CarbonFactor().category(record.get(0))
                 .name(StringUtils.toConst(record.get(1))).unit(record.get(2))
                 .applicablePeriod(period)
