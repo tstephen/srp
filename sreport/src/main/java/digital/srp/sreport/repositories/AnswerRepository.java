@@ -1,6 +1,7 @@
 package digital.srp.sreport.repositories;
 
 import java.util.List;
+import java.util.Set;
 
 import javax.transaction.Transactional;
 
@@ -27,30 +28,18 @@ public interface AnswerRepository extends CrudRepository<Answer, Long> {
     List<Answer> findByQuestion(@Param("qNames") String... qNames);
 
     @Query("SELECT a FROM Answer a LEFT JOIN a.surveyReturns r "
-            + "WHERE a.revision = (SELECT MAX(o.revision) FROM Answer o LEFT JOIN o.surveyReturns r WHERE o.question.name IN :qNames AND r.org = :org) "
-            + "AND a.question.name IN :qNames AND r.org = :org "
-            + "ORDER BY a.applicablePeriod DESC")
-    List<Answer> findByOrgAndQuestion(@Param("org") String org, @Param("qNames") String... qNames);
-
-    @Query("SELECT a FROM Answer a LEFT JOIN a.surveyReturns r "
-            + "WHERE a.revision = (SELECT MAX(o.revision) FROM Answer o LEFT JOIN o.surveyReturns r WHERE o.question.name IN :qNames AND r.org = :org) "
-            + "AND a.question.name IN :qNames AND r.org = :org "
-            + "ORDER BY a.applicablePeriod ASC")
-    List<Answer> findByOrgAndQuestionAsc(@Param("org") String org, @Param("qNames") String... qNames);
-
-    @Query("SELECT a FROM Answer a LEFT JOIN a.surveyReturns r "
-            + "WHERE a.revision = (SELECT MAX(o.revision) FROM Answer o LEFT JOIN o.surveyReturns r WHERE o.applicablePeriod IN :periods AND o.question.name IN :qNames AND r.org = :org) "
+            + "WHERE a.revision = (SELECT MAX(o.revision) FROM SurveyReturn o WHERE o.applicablePeriod = :rtnPeriod AND o.org = :org) "
             + "AND a.applicablePeriod IN :periods "
             + "AND a.question.name IN :qNames AND r.org = :org "
             + "ORDER BY a.applicablePeriod DESC")
-    List<Answer> findByOrgPeriodAndQuestion(@Param("org") String org, @Param("periods") String[] periods, @Param("qNames") String... qNames);
+    List<Answer> findByOrgPeriodAndQuestion(@Param("org") String org, @Param("rtnPeriod") String rtnPeriod, @Param("periods") String[] periods, @Param("qNames") String... qNames);
 
     @Query("SELECT a FROM Answer a LEFT JOIN a.surveyReturns r "
-            + "WHERE a.revision = (SELECT MAX(o.revision) FROM Answer o LEFT JOIN o.surveyReturns r WHERE o.applicablePeriod IN :periods AND o.question.name IN :qNames AND r.org = :org) "
+            + "WHERE a.revision = (SELECT MAX(o.revision) FROM SurveyReturn o WHERE o.applicablePeriod = :rtnPeriod AND o.org = :org) "
             + "AND a.applicablePeriod IN :periods "
             + "AND a.question.name IN :qNames AND r.org = :org "
             + "ORDER BY a.applicablePeriod ASC")
-    List<Answer> findByOrgPeriodAndQuestionAsc(@Param("org") String org, @Param("periods") String[] periods, @Param("qNames") String... qNames);
+    List<Answer> findByOrgPeriodAndQuestionAsc(@Param("org") String org, @Param("rtnPeriod") String rtnPeriod, @Param("periods") String[] periods, @Param("qNames") String... qNames);
 
     @Query("SELECT a FROM Answer a LEFT JOIN a.surveyReturns r "
             + "WHERE r.org = :org "
@@ -63,11 +52,6 @@ public interface AnswerRepository extends CrudRepository<Answer, Long> {
             + "ORDER BY a.applicablePeriod DESC")
     List<Answer> findByOrgName(@Param("orgName") String orgName);
 
-    @Query("SELECT a FROM Answer a LEFT JOIN a.surveyReturns r "
-            + "WHERE a.revision = (SELECT MAX(o.revision) FROM Answer o LEFT JOIN o.surveyReturns r WHERE o.question.name IN :qNames AND r.org = :org AND o.applicablePeriod = :period)"
-            + "AND a.question.name IN :qNames AND r.org = :org AND a.applicablePeriod = :period")
-    List<Answer> findByOrgPeriodAndQuestion(@Param("org") String org, @Param("period") String period, @Param("qNames") String... qNames);
-
     @Query(value = "SELECT a.* from SR_ANSWER a "
             + "INNER JOIN SR_RETURN_ANSWER ra ON a.id = ra.answer_id "
             + "INNER JOIN SR_RETURN r ON ra.survey_return_id = r.id "
@@ -75,7 +59,7 @@ public interface AnswerRepository extends CrudRepository<Answer, Long> {
             + "WHERE r.org = :org "
             + "AND s.name = :surveyToImport "
             + "AND a.id NOT IN (SELECT answer_id FROM SR_RETURN_ANSWER WHERE survey_return_id = :targetReturnId)", nativeQuery = true)
-    List<Answer> findAnswersToImport(@Param("targetReturnId") Long targetReturnId, @Param("org") String org, @Param("surveyToImport") String surveyToImport);
+    Set<Answer> findAnswersToImport(@Param("targetReturnId") Long targetReturnId, @Param("org") String org, @Param("surveyToImport") String surveyToImport);
 
     @Query("SELECT o FROM Answer o ORDER BY o.lastUpdated DESC")
     List<Answer> findAll();

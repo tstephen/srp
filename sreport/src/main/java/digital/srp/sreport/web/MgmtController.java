@@ -2,7 +2,6 @@ package digital.srp.sreport.web;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Optional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,6 +31,7 @@ import digital.srp.sreport.repositories.QuestionRepository;
 import digital.srp.sreport.repositories.SurveyCategoryRepository;
 import digital.srp.sreport.repositories.SurveyRepository;
 import digital.srp.sreport.repositories.SurveyReturnRepository;
+import digital.srp.sreport.services.HistoricDataMerger;
 
 /**
  * REST web service for managing application data.
@@ -44,6 +44,9 @@ public class MgmtController {
 
     private static final Logger LOGGER = LoggerFactory
             .getLogger(MgmtController.class);
+
+    @Autowired
+    protected HistoricDataMerger historicDataMerger;
 
     @Autowired
     protected QuestionRepository qRepo;
@@ -159,19 +162,7 @@ public class MgmtController {
                 saveReturnAndAnswers(surveyReturn);
             } else {
                 LOGGER.debug("Starting to add answers for org: {}", surveyReturn.org());
-                long count = 0;
-                for (Answer answer: surveyReturn.answers()) {
-                    LOGGER.debug("Looking for answer for org: {}, period: {} and question: {}", 
-                            surveyReturn.org(), answer.applicablePeriod(), answer.question().name());
-                    Optional<Answer> existingAnswer = existingReturn.answer(answer.applicablePeriod(), answer.question().q());
-                    if (!existingAnswer.isPresent()
-                            && answerRepo.findByOrgPeriodAndQuestion(surveyReturn.org(), answer.applicablePeriod(), answer.question().name()).size() == 0) {
-                        answer.question(findQ(answer));
-                        answer.addSurveyReturn(existingReturn);
-                        answer = answerRepo.save(answer);
-                        count++;
-                    }
-                }
+                long count = historicDataMerger.merge(surveyReturn.answers(), existingReturn);
                 LOGGER.debug("... added {} answers for org: {}", count, surveyReturn.org());
             }
         }

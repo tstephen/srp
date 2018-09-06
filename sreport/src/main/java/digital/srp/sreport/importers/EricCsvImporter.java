@@ -22,6 +22,12 @@ import digital.srp.sreport.model.SurveyReturn;
 import digital.srp.sreport.model.returns.EricDataSet;
 import digital.srp.sreport.model.returns.EricQuestions;
 
+/**
+ * Import completed ERIC Trust level returns as published on
+ * <a href="http://hefs.hscic.gov.uk/ERIC.asp">Hospital Estates and Facilities Statistics</a>.
+ *
+ * @author Tim Stephenson
+ */
 public class EricCsvImporter implements EricQuestions {
 
     private static final Logger LOGGER = LoggerFactory

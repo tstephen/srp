@@ -12,7 +12,7 @@ import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 import digital.srp.sreport.model.SurveyReturn;
 
 /**
- * 
+ *
  * @author Tim Stephenson
  */
 @RepositoryRestResource(exported = false)
@@ -25,7 +25,7 @@ public interface SurveyReturnRepository extends CrudRepository<SurveyReturn, Lon
     @Query("SELECT o FROM SurveyReturn o WHERE o.status != 'Superseded' "
             + "ORDER BY o.name ASC")
     List<SurveyReturn> findPage(Pageable pageable);
-    
+
     @Query("SELECT o FROM SurveyReturn o WHERE o.status != 'Superseded' "
             + "AND o.org = :org ORDER BY o.name ASC")
     List<SurveyReturn> findByOrg(@Param("org") String org);
@@ -41,17 +41,12 @@ public interface SurveyReturnRepository extends CrudRepository<SurveyReturn, Lon
     @Query("SELECT o FROM SurveyReturn o WHERE o.status != 'Superseded' "
             + "AND o.survey.name = :surveyName AND o.org = :org "
             + "ORDER BY o.applicablePeriod DESC, o.name ASC")
-    List<SurveyReturn> findBySurveyAndOrg(@Param("surveyName") String surveyName, 
+    List<SurveyReturn> findBySurveyAndOrg(@Param("surveyName") String surveyName,
             @Param("org") String org);
-    
+
     @Query("SELECT o FROM SurveyReturn o WHERE o.status != 'Superseded' "
             + "ORDER BY o.applicablePeriod DESC, o.name ASC")
     List<SurveyReturn> findPageBySurvey(@Param("surveyId") Long surveyId, Pageable pageable);
-    
-    @Override
-    @Query("UPDATE #{#entityName} x set x.status = 'Superseded' where x.id = :id")
-    @Modifying(clearAutomatically = true)
-    void delete(@Param("id") Long id);
 
     @Query(value = "INSERT INTO SR_RETURN_ANSWER (survey_return_id, answer_id) "
             + "SELECT :id, a.id from SR_ANSWER a "

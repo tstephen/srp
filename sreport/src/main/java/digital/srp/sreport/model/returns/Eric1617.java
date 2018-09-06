@@ -7,6 +7,7 @@ public class Eric1617 implements EricDataSet, EricQuestions {
     public static final String NAME = "ERIC-" + PERIOD;
 
     public static final String DATA_FILE = "/data/ERIC-" + PERIOD + ".csv";
+
     public static final String[] HEADERS = {
             "Organisation Code",
             "Organisation Name", "Commissioning Region", "Organisation Type",

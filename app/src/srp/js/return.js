@@ -349,9 +349,6 @@ var $r = (function ($, ractive, $auth) {
   function _showQuestionnaire() {
     if (_survey == undefined) _fetchReturn();
     $('section.questionnaire').slideDown();
-    // Add ERIC import button
-    $('h1 .importEric').remove();
-    $('h1').append('<button class="btn pull-right importEric" onclick="$r.importEric()">Import ERIC data<span class="glyphicon glyphicon-import"></span></button>');
   }
 
   me.fill = function(survey) {
@@ -370,19 +367,6 @@ var $r = (function ($, ractive, $auth) {
         }
       }
     }
-  }
-
-  me.importEric = function() {
-    return $.ajax({
-        url: _server+'/returns/importEric/'+_surveyName+'/'+$auth.getClaim('org'),
-        type: 'GET',
-        contentType: 'application/json',
-        success: function(data, textStatus, jqXHR) {
-          console.log('imported ERIC data ok, data: '+ data);
-          me.rtn = data;
-          if (_survey!=undefined) _fill(_survey);
-        }
-      });
   }
 
   me.moveNext = function() {

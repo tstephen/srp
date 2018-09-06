@@ -228,7 +228,7 @@ public class SurveyReturn {
     protected Optional<Answer> answer(String qName, String period) {
         Answer a = null;
         List<String> matches = new ArrayList<String>();
-        for (Answer answer : answers) {
+        for (Answer answer : answers()) {
             if (qName.equals(answer.question().name()) && period.equals(answer.applicablePeriod())) {
                 matches.add(answer.id()+"="+answer.response());
                 a = answer;

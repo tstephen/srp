@@ -1,12 +1,15 @@
 package digital.srp.sreport.web;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
+import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
 
@@ -49,6 +52,7 @@ import digital.srp.sreport.repositories.QuestionRepository;
 import digital.srp.sreport.repositories.SurveyRepository;
 import digital.srp.sreport.repositories.SurveyReturnRepository;
 import digital.srp.sreport.services.DefaultCompletenessValidator;
+import digital.srp.sreport.services.HistoricDataMerger;
 
 /**
  * REST web service for accessing returned returns.
@@ -69,6 +73,9 @@ public class SurveyReturnController {
     protected Calculator cruncher;
 
     @Autowired
+    protected HistoricDataMerger historicDataMerger;
+
+    @Autowired
     protected SurveyRepository surveyRepo;
 
     @Autowired
@@ -77,11 +84,19 @@ public class SurveyReturnController {
     @Autowired
     protected QuestionRepository qRepo;
 
+    protected List<Question> questions;
+
     @Autowired
     protected AnswerRepository answerRepo;
 
     @Autowired
     protected DefaultCompletenessValidator validator = new DefaultCompletenessValidator();
+
+    @PostConstruct
+    protected void init() throws IOException {
+        questions = qRepo.findAll();
+        LOGGER.info("Cached {} questions", questions.size());
+    }
 
     /**
      * Return a single survey return with the specified id.
@@ -149,7 +164,7 @@ public class SurveyReturnController {
         return surveyName.substring(surveyName.indexOf('-')+1);
     }
 
-    protected SurveyReturn createBlankReturn(String surveyName, String org, String period) {
+    protected synchronized SurveyReturn createBlankReturn(String surveyName, String org, String period) {
         LOGGER.info("createBlankReturn of {} for {}", surveyName, org);
 
         try {
@@ -161,6 +176,7 @@ public class SurveyReturnController {
                     .applicablePeriod(requested.applicablePeriod())
                     .answers(new HashSet<Answer>());
             ensureInitialized(requested, rtn);
+            importEricAnswers(surveyName, org);
 
             return addLinks(rtn);
         } catch (NullPointerException e) {
@@ -179,13 +195,15 @@ public class SurveyReturnController {
     protected void ensureInitialized(Survey requested, SurveyReturn rtn) {
         for (SurveyCategory cat : requested.categories()) {
             for (Q q : cat.questionEnums()) {
-                Question question = qRepo.findByName(q.name());
-                Answer answer = new Answer().question(question ).addSurveyReturn(rtn)
-                        .applicablePeriod(requested.applicablePeriod());
-                if (q.equals(Q.ORG_CODE)) {
-                    answer.response(rtn.org());
+                if (!rtn.answer(rtn.applicablePeriod(), q).isPresent()) {
+                    Optional<Question> question = findQuestion(q.name());
+                    Answer answer = new Answer().question(question.get()).addSurveyReturn(rtn)
+                            .applicablePeriod(requested.applicablePeriod());
+                    if (q.equals(Q.ORG_CODE)) {
+                        answer.response(rtn.org());
+                    }
+                    rtn.answers().add(answer);
                 }
-                rtn.answers().add(answer);
             }
         }
         returnRepo.save(rtn);
@@ -226,21 +244,16 @@ public class SurveyReturnController {
     public @ResponseBody SurveyReturn importEricAnswers(
             @PathVariable("surveyName") String surveyName,
             @PathVariable("org") String org) {
+        long count = 0;
+        long start = System.currentTimeMillis();
         SurveyReturn rtn  = findCurrentBySurveyNameAndOrg(surveyName, org);
         List<Survey> surveys = surveyRepo.findEricSurveys();
         for (Survey survey : surveys) {
-            List<Answer> answersToImport = answerRepo.findAnswersToImport(rtn.id(), rtn.org(), survey.name());
+            Set<Answer> answersToImport = answerRepo.findAnswersToImport(rtn.id(), rtn.org(), survey.name());
             LOGGER.info("Found {} answers to import from {} to {}", answersToImport.size(), survey.name(), rtn.id());
-            for (Answer a : answersToImport) {
-                rtn.answers().add(new Answer()
-                        .applicablePeriod(a.applicablePeriod())
-                        .revision(new Integer(a.revision()+1).shortValue())
-                        .status(StatusType.Draft.name())
-                        .response(a.response())
-                        .question(a.question())
-                        .addSurveyReturn(rtn));
-            }
+            count += historicDataMerger.merge(answersToImport, rtn);
         }
+        LOGGER.info("Importing ERIC data added {} records and took {}ms", count, (System.currentTimeMillis()-start));
         return findCurrentBySurveyNameAndOrg(surveyName, org);
     }
 
@@ -376,17 +389,26 @@ public class SurveyReturnController {
             answer.get().response(updatedAns).derived(false);
         } else {
             LOGGER.warn("Creating new answer to {} for {} in {}", q, rtn.org(), period);
-            Question existingQ = qRepo.findByName(q);
-            if (existingQ == null) {
-                throw new ObjectNotFoundException(Question.class, q);
-            } else {
-                rtn.initAnswer(rtn, period, existingQ)
+            Optional<Question> existingQ = findQuestion(q);
+            if (existingQ.isPresent()) {
+                rtn.initAnswer(rtn, period, existingQ.get())
                         .response(updatedAns).derived(false);
+            } else {
+                throw new ObjectNotFoundException(Question.class, q);
             }
         }
         DefaultCompletenessValidator validator = new DefaultCompletenessValidator() ;
         validator.validate(rtn);
         returnRepo.save(rtn);
+    }
+
+    protected Optional<Question> findQuestion(String q) {
+        for (Question question : questions) {
+            if (q.equals(question.q().name())) {
+                return Optional.of(question);
+            }
+        }
+        return Optional.empty();
     }
 
     private int createOrMergeAnswers(SurveyReturn updatedReturn,
@@ -396,14 +418,8 @@ public class SurveyReturnController {
             Answer existingAnswer = existing.answer(answer.applicablePeriod(), answer.question().q())
                     .orElse(existing.createEmptyAnswer(answer.applicablePeriod(), answer.question()));
             if (existingAnswer.question().id() == null) {
-                Question q;
-                try {
-                    q = qRepo.findByName(answer.question().name());
-                } catch (Throwable e) {
-                    LOGGER.error("Data issue, more than one question named {}: ", answer.question().q());
-                    throw e;
-                }
-                existingAnswer = answerRepo.save(answer.question(q).addSurveyReturn(existing));
+                Optional<Question> q = findQuestion(answer.question().name());
+                existingAnswer = answerRepo.save(answer.question(q.get()).addSurveyReturn(existing));
                 existing.answers().add(existingAnswer);
                 changeCount++;
             } else if (answer.response() != null && !answer.response().equals(existingAnswer.response())) {

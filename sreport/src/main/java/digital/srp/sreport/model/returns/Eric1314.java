@@ -7,7 +7,7 @@ public class Eric1314 implements EricDataSet {
     public static final String NAME = "ERIC-" + PERIOD;
 
     /*
-     * Combination of
+     * Combination of Trust and Site data from
      * - HospitalEstatesAndFacilitiesStatistics_9902
      */
     public static final String DATA_FILE = "/data/ERIC-" + PERIOD + ".csv";

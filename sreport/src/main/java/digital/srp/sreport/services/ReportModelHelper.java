@@ -32,6 +32,7 @@ public class ReportModelHelper {
     public synchronized void fillModel(String org, String period, Q[] headers, final Model model,
             boolean periodAsCol, Format decimalFormat, Integer maxPeriods,
             boolean ascending, Optional<Aggregator> aggregator) {
+        LOGGER.info("fill questions {} for {} in {} looking back {} periods", headers, org, period, maxPeriods);
         TabularDataSetHelper tdsHelper = new TabularDataSetHelper();
         String[] headerNames = new String[headers.length];
         for (int i = 0 ; i < headers.length ; i++) {
@@ -42,13 +43,12 @@ public class ReportModelHelper {
         model.addAttribute("periods", periods);
         List<Answer> answers;
         if (ascending) {
-            answers = answerRepo.findByOrgPeriodAndQuestionAsc(org, periods.toArray(new String[periods.size()]), headerNames);
+            answers = answerRepo.findByOrgPeriodAndQuestionAsc(org, period, periods.toArray(new String[periods.size()]), headerNames);
         } else {
-            answers = answerRepo.findByOrgPeriodAndQuestion(org, periods.toArray(new String[periods.size()]), headerNames);
+            answers = answerRepo.findByOrgPeriodAndQuestion(org, period, periods.toArray(new String[periods.size()]), headerNames);
         }
-        LOGGER.info(
-                String.format("Found %1$s answers about organisation for %2$s",
-                        answers.size(), org));
+        LOGGER.info("Found {} answers about organisation {}",
+                answers.size(), org);
         if (LOGGER.isDebugEnabled()) {
             for (Answer answer : answers) {
                 LOGGER.debug(answer.toString());

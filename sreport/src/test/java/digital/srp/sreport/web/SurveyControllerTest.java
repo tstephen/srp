@@ -22,7 +22,7 @@ import digital.srp.sreport.model.surveys.Eric1516;
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest(classes = Application.class)
 @WebAppConfiguration
-public class SurveyControllerITest {
+public class SurveyControllerTest {
 
     @Autowired
     private SurveyController svc;
@@ -34,26 +34,26 @@ public class SurveyControllerITest {
     }
 
     @Test
-    @Ignore
     public void givenNoPreq_whenFirstLoad_thenDefaultSurveys() {
         List<Survey> surveys = svc.list(null, null);
         assertNotNull(surveys);
-        assertEquals(2, surveys.size()); // current ERIC and current SDU
+        assertEquals(6, surveys.size()); // 4 current ERIC and 2 current SDU
         
         // check have expected summary
-        assertEquals(Eric1516.ID, surveys.get(0).name());
-        assertEquals(StatusType.Published.name(), surveys.get(0).status());
-        assertEquals("2015-16", surveys.get(0).applicablePeriod());
-        assertNotNull(surveys.get(0).created());
-        assertNotNull(surveys.get(0).lastUpdated());
+        Survey eric1516 = surveys.get(2);
+        assertEquals(Eric1516.ID, eric1516.name());
+        assertEquals(StatusType.Published.name(), eric1516.status());
+        assertEquals("2015-16", eric1516.applicablePeriod());
+        assertNotNull(eric1516.created());
+        assertNotNull(eric1516.lastUpdated());
         try {
-            System.out.println(surveys.get(0).categories().size());
+            System.out.println(eric1516.categories().size());
             fail("Should not have categories in summary list");
         } catch (Exception e) {
             ; // expected
         }
         
-        Survey eric1516 = svc.findById(surveys.get(0).id());
+        eric1516 = svc.findById(eric1516.id());
         assertNotNull(eric1516);
         assertEquals(Eric1516.ID, eric1516.name());
         assertEquals(StatusType.Published.name(), eric1516.status());

@@ -7,11 +7,16 @@ public class Eric1415 implements EricDataSet {
     public static final String NAME = "ERIC-" + PERIOD;
 
     /*
-     * Combination of - HospitalEstatesAndFacilitiesStatistics_11133
+     * Combination of Trust and Site data from
+     * - HospitalEstatesAndFacilitiesStatistics_11133
      */
-    public static final String DATA_FILE = "/data/ERIC-" + PERIOD + ".csv";
-    public static final String[] HEADERS = { "Organisation Code",
-            "Organisation Name", "Commissioning Region", "Organisation Type",
+    public static final String DATA_FILE = "/data/ERIC-" + PERIOD +".csv";
+
+    public static final String[] HEADERS = {
+            "Organisation Code",
+            "Organisation Name",
+            "Commissioning Region",
+            "Organisation Type",
             "Number of sites - General acute hospital (No.)",
             "Number of sites - Multi-service hospital (No.)",
             "Number of sites - Short term non-acute hospital (No.)",

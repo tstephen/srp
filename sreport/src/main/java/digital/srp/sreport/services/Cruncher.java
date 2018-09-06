@@ -836,7 +836,9 @@ public class Cruncher implements digital.srp.sreport.model.surveys.SduQuestions,
         // Intentional use of return period for org type
         String orgType = getAnswer(rtn.applicablePeriod(), rtn, Q.ORG_TYPE).response();
         if (isEmpty(orgType)) {
-            String msg = String.format("Cannot model carbon profile of %1$s as no org type specified", rtn.org());
+            String msg = String.format(
+                    "Cannot model carbon profile of %1$s in %2$s as no org type specified",
+                    rtn.org(), period);
             throw new IllegalStateException(msg);
         }
         BigDecimal nonPaySpend = getAnswer(period, rtn, Q.NON_PAY_SPEND).responseAsBigDecimal();
