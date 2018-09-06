@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.fasterxml.jackson.annotation.JsonView;
 
 import digital.srp.sreport.api.Calculator;
+import digital.srp.sreport.api.exceptions.ObjectNotFoundException;
 import digital.srp.sreport.internal.PeriodUtil;
 import digital.srp.sreport.model.SurveyReturn;
 import digital.srp.sreport.model.views.SurveyReturnViews;
@@ -87,8 +88,12 @@ public class CalculationController {
     private SurveyReturn findLatestReturn(String surveyName, String org) {
         List<SurveyReturn> returns = returnRepo.findBySurveyAndOrg(surveyName, org);
         returns.sort((r1,r2) -> r1.revision().compareTo(r2.revision()));
-        SurveyReturn rtn = returns.get(returns.size()-1);
-        return rtn;
+        try {
+            SurveyReturn rtn = returns.get(returns.size()-1);
+            return rtn;
+        } catch (ArrayIndexOutOfBoundsException e) {
+            throw new ObjectNotFoundException(SurveyReturn.class, surveyName+"/"+org);
+        }
     }
 
     private void calculate(SurveyReturn rtn, int yearsToCalc) {

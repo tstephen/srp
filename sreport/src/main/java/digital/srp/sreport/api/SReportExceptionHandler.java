@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
-import digital.srp.sreport.api.exceptions.SReportObjectNotFoundException;
+import digital.srp.sreport.api.exceptions.ObjectNotFoundException;
 
 @ControllerAdvice
 public class SReportExceptionHandler {
@@ -43,9 +43,9 @@ public class SReportExceptionHandler {
     }
 
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    @ExceptionHandler(SReportObjectNotFoundException.class)
+    @ExceptionHandler(ObjectNotFoundException.class)
     public @ResponseBody String handleEntityNotFoundException(
-            SReportObjectNotFoundException e) {
+            ObjectNotFoundException e) {
         LOGGER.warn(e.getMessage(), e);
         return String.format("{\"message\":\"%1$s\"}", e.getMessage());
     }

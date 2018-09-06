@@ -15,7 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import digital.srp.sreport.api.Calculator;
-import digital.srp.sreport.api.exceptions.SReportObjectNotFoundException;
+import digital.srp.sreport.api.exceptions.ObjectNotFoundException;
 import digital.srp.sreport.internal.PeriodUtil;
 import digital.srp.sreport.model.Answer;
 import digital.srp.sreport.model.CarbonFactor;
@@ -78,7 +78,7 @@ public class Cruncher implements digital.srp.sreport.model.surveys.SduQuestions,
                 } else {
                     calcCarbonProfileSduMethod(period, rtn);
                 }
-            } catch (IllegalStateException | SReportObjectNotFoundException e) {
+            } catch (IllegalStateException | ObjectNotFoundException e) {
                 LOGGER.error(e.getMessage());
             } catch (Exception e) {
                 LOGGER.error(e.getMessage());
@@ -1211,7 +1211,7 @@ public class Cruncher implements digital.srp.sreport.model.surveys.SduQuestions,
             }
         }
         LOGGER.error("Unable to find Carbon Factor {} for period {}", cfName, period);
-        throw new SReportObjectNotFoundException(CarbonFactor.class, cfName);
+        throw new ObjectNotFoundException(CarbonFactor.class, cfName.name());
     }
 
     private Answer crunchWeighting(String period, SurveyReturn rtn, BigDecimal nonPaySpend,
@@ -1294,6 +1294,6 @@ public class Cruncher implements digital.srp.sreport.model.surveys.SduQuestions,
         }
         LOGGER.error("Unable to find any Weighting Factor {} for period {} and org type {}",
                 wName, period, orgType);
-        throw new SReportObjectNotFoundException(WeightingFactor.class, wName);
+        throw new ObjectNotFoundException(WeightingFactor.class, wName.name());
     }
 }
