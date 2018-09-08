@@ -1,0 +1,16 @@
+{
+  "id":247,"name":"SDU-2017-18-RDR","org":"RDR","status":"Draft","applicablePeriod":"2017-18",
+  "revision":1,"submittedDate":null,"submittedBy":null,"answers":[
+    {"id":10745,"applicablePeriod":"2017-18","response":"RDR","question":{"id":242,"name":"ORG_CODE"}},
+    {"id":10746,"applicablePeriod":"2017-18","response":"RDR","question":{"id":242,"name":"ORG_CODE"}},
+    {"id":10785,"applicablePeriod":"2017-18","response":"734728","question":{"id":281,"name":"ELEC_USED"}},
+    {"id":10786,"applicablePeriod":"2017-18","response":"734729","question":{"id":281,"name":"ELEC_USED"}},
+    {"id":20746,"applicablePeriod":"2016-17","response":"RDR","question":{"id":242,"name":"ORG_CODE"}},
+    {"id":20785,"applicablePeriod":"2016-17","response":"804728","question":{"id":281,"name":"ELEC_USED"}},
+    {"id":30746,"applicablePeriod":"2015-16","response":"RDR","question":{"id":242,"name":"ORG_CODE"}},
+    {"id":30785,"applicablePeriod":"2015-16","response":"884728","question":{"id":281,"name":"ELEC_USED"}},
+    {"id":40746,"applicablePeriod":"2014-15","response":"RDR","question":{"id":242,"name":"ORG_CODE"}},
+    {"id":40785,"applicablePeriod":"2014-15","response":"944728","question":{"id":281,"name":"ELEC_USED"}}
+  ],
+  "links":[{"rel":"self","href":"http://localhost:8083/returns/247"}]
+}

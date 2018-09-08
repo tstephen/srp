@@ -106,7 +106,7 @@ public class Answer {
      * allows for a re-statement if needed.
      */
     @JsonProperty
-    @JsonView({ AnswerViews.Detailed.class })
+    @JsonView({ AnswerViews.Summary.class, SurveyReturnViews.Detailed.class })
     @Column(name = "revision")
     private Short revision = 1;
 

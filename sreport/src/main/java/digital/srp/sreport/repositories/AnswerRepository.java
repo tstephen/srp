@@ -90,4 +90,8 @@ public interface AnswerRepository extends CrudRepository<Answer, Long> {
     @Transactional
     void deleteDerivedAnswers(@Param("ids") Long[] ids);
 
+    @Query("DELETE FROM Answer a WHERE a.id in :ids")
+    @Modifying(clearAutomatically = true)
+    @Transactional
+    void deleteAnswers(@Param("ids") Long[] ids);
 }

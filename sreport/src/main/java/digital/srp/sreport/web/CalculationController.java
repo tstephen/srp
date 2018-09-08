@@ -1,5 +1,8 @@
 package digital.srp.sreport.web;
 
+import java.util.Set;
+
+import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 
 import org.slf4j.Logger;
@@ -20,6 +23,7 @@ import digital.srp.sreport.model.views.SurveyReturnViews;
 import digital.srp.sreport.repositories.AnswerRepository;
 import digital.srp.sreport.repositories.QuestionRepository;
 import digital.srp.sreport.repositories.SurveyReturnRepository;
+import digital.srp.sreport.services.HealthChecker;
 import digital.srp.sreport.services.PersistentAnswerFactory;
 
 /**
@@ -36,6 +40,9 @@ public class CalculationController {
 
     @Autowired
     protected Calculator cruncher;
+
+    @Autowired
+    protected HealthChecker healthCheck;
 
     @Autowired
     protected SurveyReturnRepository returnRepo;
@@ -87,14 +94,24 @@ public class CalculationController {
 
     private void calculate(SurveyReturn rtn, int yearsToCalc) {
         if (isUpToDate(rtn)) {
-            LOGGER.info("Skipping calculations for {} in {}", rtn.org(), rtn.applicablePeriod());
+            LOGGER.info("Skipping calculations for {} in {}", rtn.org(),
+                    rtn.applicablePeriod());
         } else {
-            rtn = cruncher.calculate(rtn, yearsToCalc, answerFactory);
-        }
-        try {
-            returnRepo.save(rtn);
-        } catch (RuntimeException e) {
-            unwrapException(e);
+            Set<ConstraintViolation<SurveyReturn>> issues = healthCheck
+                    .validate(rtn);
+            if (issues.size() == 0) {
+                rtn = cruncher.calculate(rtn, yearsToCalc, answerFactory);
+            } else {
+                String msg = String.format(
+                        "Found %1$d issues, cannot run calculations until they are corrected",
+                        issues.size());
+                throw new ConstraintViolationException(msg, issues);
+            }
+            try {
+                returnRepo.save(rtn);
+            } catch (RuntimeException e) {
+                unwrapException(e);
+            }
         }
     }
 
@@ -103,7 +120,7 @@ public class CalculationController {
         if (e.getCause() instanceof ConstraintViolationException) {
             throw (ConstraintViolationException) e.getCause();
         } else if (e.getCause() == null) {
-            throw new  RuntimeException(e);
+            throw new RuntimeException(e);
         } else {
             unwrapException(e.getCause());
         }
