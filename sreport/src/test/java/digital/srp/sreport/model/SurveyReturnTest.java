@@ -1,10 +1,12 @@
 package digital.srp.sreport.model;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Optional;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -99,6 +101,20 @@ public class SurveyReturnTest implements EricQuestions{
                         new Answer().id(1l).question(q1).response("response")
                 )).revision(new Short("2"));
         assertEquals(return1, return2);
+    }
+
+    @Test
+    public void testGetAnswer() {
+        Question q = new Question().q(Q.ELEC_USED);
+
+        String period = "2015-16";
+        SurveyReturn rtn = new SurveyReturn().id(1l).name("15-16 return for ACME")
+                .answers(Collections.singleton(
+                        new Answer().id(1l).question(q).applicablePeriod(period).response("123456")
+                )).revision(new Short("1"));
+        Optional<Answer> answer = rtn.answer(period, Q.ELEC_USED);
+        assertTrue(answer.isPresent());
+        assertEquals(period, answer.get().applicablePeriod());
     }
 
     @Test

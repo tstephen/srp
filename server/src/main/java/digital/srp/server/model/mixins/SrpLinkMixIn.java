@@ -8,6 +8,7 @@ import digital.srp.macc.views.ModelParameterViews;
 import digital.srp.macc.views.OrganisationInterventionViews;
 import digital.srp.macc.views.OrganisationTypeViews;
 import digital.srp.sreport.model.views.QuestionViews;
+import digital.srp.sreport.model.views.HealthCheckViews;
 import digital.srp.sreport.model.views.SurveyReturnViews;
 import digital.srp.sreport.model.views.SurveyViews;
 
@@ -24,7 +25,8 @@ public abstract class SrpLinkMixIn {
         // sreport
         QuestionViews.Summary.class,
         SurveyViews.Summary.class,
-        SurveyReturnViews.Summary.class
+        SurveyReturnViews.Summary.class,
+        HealthCheckViews.Summary.class
     } )
     private long rel;
 
@@ -39,7 +41,8 @@ public abstract class SrpLinkMixIn {
         //sreport
         QuestionViews.Summary.class,
         SurveyViews.Summary.class,
-        SurveyReturnViews.Summary.class
+        SurveyReturnViews.Summary.class,
+        HealthCheckViews.Summary.class
     } )
     private long href;
 

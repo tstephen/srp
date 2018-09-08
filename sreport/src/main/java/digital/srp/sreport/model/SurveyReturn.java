@@ -41,6 +41,7 @@ import com.fasterxml.jackson.annotation.JsonView;
 import digital.srp.sreport.api.MandatoryCurrentPeriodAnswersProvided;
 import digital.srp.sreport.internal.EntityAuditorListener;
 import digital.srp.sreport.model.views.AnswerViews;
+import digital.srp.sreport.model.views.HealthCheckViews;
 import digital.srp.sreport.model.views.SurveyReturnViews;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -80,7 +81,7 @@ public class SurveyReturn {
     @NotNull
     @Size(max = 50)
     @JsonProperty
-    @JsonView({ AnswerViews.Detailed.class, SurveyReturnViews.Summary.class })
+    @JsonView({ AnswerViews.Detailed.class, HealthCheckViews.Summary.class, SurveyReturnViews.Summary.class })
     @Column(name = "name")
     private String name;
 
@@ -91,14 +92,14 @@ public class SurveyReturn {
     @NotNull
     @Size(max = 50)
     @JsonProperty
-    @JsonView({ AnswerViews.Detailed.class, SurveyReturnViews.Summary.class })
+    @JsonView({ AnswerViews.Detailed.class, HealthCheckViews.Summary.class, SurveyReturnViews.Summary.class })
     @Column(name = "org")
     private String org;
 
     @NotNull
     @Size(max = 50)
     @JsonProperty
-    @JsonView(SurveyReturnViews.Summary.class)
+    @JsonView({ HealthCheckViews.Summary.class, SurveyReturnViews.Summary.class })
     @Column(name = "status")
     private String status = StatusType.Draft.name();
 
@@ -110,7 +111,7 @@ public class SurveyReturn {
     @NotNull
     @JsonProperty
     @Size(max = 20)
-    @JsonView(SurveyReturnViews.Summary.class)
+    @JsonView({ HealthCheckViews.Summary.class, SurveyReturnViews.Summary.class })
     @Column(name = "applicable_period")
     private String applicablePeriod;
 
@@ -119,7 +120,7 @@ public class SurveyReturn {
      * allows for a re-statement if needed.
      */
     @JsonProperty
-    @JsonView(SurveyReturnViews.Summary.class)
+    @JsonView({ HealthCheckViews.Summary.class, SurveyReturnViews.Summary.class })
     @Column(name = "revision")
     private Short revision = 1;
 
@@ -222,25 +223,23 @@ public class SurveyReturn {
     }
 
     public Optional<Answer> answer(String period, Q q) {
-        return answer(q.name(), period);
-    }
-
-    protected Optional<Answer> answer(String qName, String period) {
         Answer a = null;
-        List<String> matches = new ArrayList<String>();
-        for (Answer answer : answers()) {
-            if (qName.equals(answer.question().name()) && period.equals(answer.applicablePeriod())) {
-                matches.add(answer.id()+"="+answer.response());
-                a = answer;
+        List<Answer> matches = new ArrayList<Answer>();
+        for (Answer answer1 : answers()) {
+            if (answer1.question().q().equals(q) && answer1.applicablePeriod().equals(period)) {
+                matches.add(answer1);
+                a = answer1;
             }
         }
         if (matches.size() > 1) {
             StringBuffer sb = new StringBuffer();
-            for (String answer : matches) {
-                sb.append(answer == null ? "" : answer).append(",");
+            for (Answer answer2 : matches) {
+                if (answer2!=null) {
+                sb.append(answer2.id() == null ? "" : answer2.id()).append("=").append(answer2.response());
+                }
             }
             LOGGER.error("Multiple answers to {} found for {} in {}. Review records: {}",
-                    qName, org, period, sb.toString());
+                    q.name(), org, period, sb.toString());
         }
         return Optional.ofNullable(a);
     }
@@ -308,6 +307,14 @@ public class SurveyReturn {
 
     public String getApplicablePeriod() {
         return applicablePeriod;
+    }
+
+    public Set<String> getIncludedPeriods() {
+        Set<String> periods = new HashSet<String>();
+        for (Answer answer : answers()) {
+            periods.add(answer.applicablePeriod());
+        }
+        return periods;
     }
 
     public void setApplicablePeriod(String applicablePeriod) {

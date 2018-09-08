@@ -11,7 +11,6 @@ import javax.transaction.Transactional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import digital.srp.sreport.api.Calculator;
@@ -26,7 +25,6 @@ import digital.srp.sreport.model.WeightingFactor;
 import digital.srp.sreport.model.WeightingFactors;
 import digital.srp.sreport.model.surveys.Sdu1617;
 import digital.srp.sreport.model.surveys.SduQuestions;
-import digital.srp.sreport.repositories.AnswerRepository;
 
 @Component
 public class Cruncher implements digital.srp.sreport.model.surveys.SduQuestions, Calculator {
@@ -47,8 +45,8 @@ public class Cruncher implements digital.srp.sreport.model.surveys.SduQuestions,
 
     protected final List<WeightingFactor> wfactors;
 
-    @Autowired
-    private AnswerRepository answerRepo;
+//    @Autowired
+//    private AnswerRepository answerRepo;
 
     public Cruncher(final List<CarbonFactor> cfactors2,
             final List<WeightingFactor> wfactors2) {
@@ -528,17 +526,17 @@ public class Cruncher implements digital.srp.sreport.model.surveys.SduQuestions,
                 Answer b = matches.get(i);
                 if (a.response() == b.response()
                         || (b.response() != null && b.response().equals(a.response()))) {
-                    LOGGER.warn("Removing duplicate answer: {}={} to {} for {} in {}",
+                    LOGGER.error("Remove duplicate answer: {}={} to {} for {} in {}",
                             b.id(), b.response(), q.name(), rtn.org(), period, sb.toString());
-                    rtn.answers().remove(b);
-                    answerRepo.delete(b.id());
+//                    rtn.answers().remove(b);
+//                    answerRepo.delete(b.id());
                 } else {
                     sb.append(b == null ? "" : b.getId()).append(",");
                 }
             }
             if (sb.length() > 0) {
-                sb.append(a.id());
-                LOGGER.error("Multiple answers to {} found for {} in {}. Review ids: {}",
+                sb = sb.append(a.id());
+                LOGGER.error("Multiple different answers to {} found for {} in {}. Review ids: {}",
                         q.name(), rtn.org(), period, sb.toString());
             }
             return a;
