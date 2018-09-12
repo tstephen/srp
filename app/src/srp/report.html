@@ -61,11 +61,11 @@
           reducing the carbon footprint of the NHS, public health and social
           care system by 34% (from a 1990 baseline) equivalent to a 28%
           reduction from a 2013 baseline by 2020. It is our aim to
-          {{#if formatAnswer('CARBON_REDUCTION_TARGET')}}supersede{{else}}meet{{/if}}
+          {{#if formatAnswer('CARBON_REDUCTION_TARGET')==true}}supersede{{else}}meet{{/if}}
           this target by reducing our carbon emissions
-          {{#if formatAnswer('CARBON_REDUCTION_TARGET')!=true}}28%{{else}}{{formatAnswer('CARBON_REDUCTION_TARGET_PCT')}}%{{/if}}
-          by {{#if formatAnswer('CARBON_REDUCTION_TARGET')!=true}}{{formatAnswer('CARBON_REDUCTION_DEADLINE_YEAR')}}{{else}}2020-21{{/if}}
-          using {{#if formatAnswer('CARBON_REDUCTION_TARGET')!=true}}{{formatAnswer('CARBON_REDUCTION_BASE_YEAR')}}{{else}}2007-08{{/if}}
+          {{#if formatAnswer('CARBON_REDUCTION_TARGET')==true}}{{formatAnswer('CARBON_REDUCTION_TARGET_PCT')}}%{{else}}28%{{/if}}
+          by {{#if formatAnswer('CARBON_REDUCTION_TARGET')==true}}{{formatAnswer('CARBON_REDUCTION_DEADLINE_YEAR')}}{{else}}2020-21{{/if}}
+          using {{#if formatAnswer('CARBON_REDUCTION_TARGET')==true}}{{formatAnswer('CARBON_REDUCTION_BASE_YEAR')}}{{else}}2007-08{{/if}}
           as the baseline year.</p>
       </section>
 
@@ -118,11 +118,13 @@
             One of the ways in which we measure our impact as an organisation on corporate social responsibility is through the use of the <a href="https://www.sduhealth.org.uk/sdat/">Sustainable Development Assessment Tool</a> (SDAT) tool.
               The last time we used the SDAT self assessment was in {{formatAnswer('LAST_GCC_DATE')}}
               {{#if formatAnswer('LAST_GCC_SCORE')!='NaN'}} scoring {{formatAnswer('LAST_GCC_SCORE')}}%{{/if}}.
-            {{#if formatAnswer('promoteSustainabilityToStaff')}}
-              As an organisation that acknowledges its responsibility towards creating a sustainable future, we help acheive that goal by running awareness campaigns that promote the benefits of sustainability to our staff.
-            {{/if}}
           {{else}}
-            We do not currently use the <a href="https://www.sduhealth.org.uk/sdat/">Sustainable Development Assessment Tool</a> (SDAT) tool or run awareness campaigns promoting sustainability.
+            We do not currently use the <a href="https://www.sduhealth.org.uk/sdat/">Sustainable Development Assessment Tool</a> (SDAT) tool.
+          {{/if}}
+          {{#if formatAnswer('PROMOTE_SUSTAINABILITY_TO_STAFF')}}
+            As an organisation that acknowledges its responsibility towards creating a sustainable future, we help acheive that goal by running awareness campaigns that promote the benefits of sustainability to our staff.
+          {{else}}
+            We do not currently run awareness campaigns promoting sustainability.
           {{/if}}
         </p>
         {{#formatAnswer('SDG_STARTING')==''}}
@@ -405,7 +407,12 @@
           <h3>Travel</h3>
           <p>We can improve local air quality and improve the health of our community by promoting active travel to our staff and to the patients and public that use our services.
           <p>Every action counts and we are a lean organisation trying to realise efficiencies across the board for cost and carbon (CO<sub>2</sub>e) reductions. We support a culture for active travel to improve staff wellbeing and reduce sickness. Air pollution, accidents and noise all cause health problems for our local population, patients, staff and visitors and are caused by cars, as well as other forms of transport.</p>
-          <p>We have used the SDU Health Outcomes of Travel Tool and we have calculated the total economic impact on health and society from travel we control or influence is &pound;{{formatAnswer('HEALTH_IMPACT_OF_TRAVEL')}} - we have identified the hotspots and will look to reduce these impacts.</p>
+          {{#if formatAnswer('QUANT_TRAVEL_IMPACTS')==true}}
+            <p>We have used the SDU Health Outcomes of Travel Tool and we have identified the hotspots and will look to reduce these impacts.</p>
+          {{/if}}
+          {{#if !isNaN(formatAnswer('HEALTH_IMPACT_OF_TRAVEL'))}}
+            <p>Furthermore, we have calculated the total economic impact on health and society from travel we control or influence is &pound;{{formatAnswer('HEALTH_IMPACT_OF_TRAVEL')}}.</p>
+          {{/if}}
 
           <h4>Travel undertaken</h4>
           <p>All travel is shown in miles.</p>
