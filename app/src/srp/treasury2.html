@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Sustainable Resource Planning</title>
+  <!--link href="/webjars/bootstrap/3.3.5/css/bootstrap.min.css" rel="stylesheet"-->
+  <link rel="stylesheet" type="text/css" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"/>
+
+  <link href="./vsn/css/srp.css" rel="stylesheet">
+  <link rel="icon" type="image/png" href="/srp/images/icon/srp-icon-32x32.png" />
+<head>
+<body>
+  <div class="clearfix" id="messages"></div>
+  <section id="container" class="container"></section>
+
+  <script id='template' type='text/ractive'>
+    {{>loginSect}}
+
+    <section id="currentSect">
+    {{#if surveyReturn}}
+      <section id="introSect">
+        <h1>Full Treasury and Benchmarking Report for {{formatAnswer('ORG_NAME')}} ({{formatAnswer('ORG_CODE')}})</h1>
+        {{>statusSect}}
+      </section>
+
+      <section id="overallSect">
+        <h2>Overall Progress</h2>
+        <p>CO<sub>2</sub> Emissions (tCO<sub>2</sub>e)</p>
+        <div class="rpt table2" id="overallRptTable2" data-total="true"
+             data-qs="SCOPE_1,SCOPE_2,SCOPE_3" data-periods="4"></div>
+      </section>
+      <section id="scope1Sect">
+        <h2>Scope 1 - Direct</h2>
+        <p>CO<sub>2</sub> Emissions (tCO<sub>2</sub>e)</p>
+        <div class="rpt table2" id="scope1RptTable2" data-total="true"
+             data-qs="OWNED_BUILDINGS_GAS,OWNED_BUILDINGS_OIL,OWNED_BUILDINGS_COAL,OWNED_VEHICLES,ANAESTHETIC_GASES_CO2E" data-periods="4"></div>
+      </section>
+      <section id="scope2Sect">
+        <h2>Scope 2 - Indirect</h2>
+        <p>CO<sub>2</sub> Emissions (tCO<sub>2</sub>e)</p>
+        <div class="rpt table2" id="scope2RptTable2" data-total="true"
+             data-qs="NET_THERMAL_ENERGY_CO2E,NET_ELEC_CO2E" data-periods="4"></div>
+      </section>
+      <section id="scope3Sect">
+        <h2>Scope 3 - Indirect</h2>
+        <p>CO<sub>2</sub> Emissions (tCO<sub>2</sub>e)</p>
+        <div class="rpt table2" id="scope3RptTable2" data-total="true"
+             data-qs="PROCUREMENT_CO2E,COMMISSIONING_CO2E,SCOPE_3_TRAVEL,SCOPE_3_WASTE,SCOPE_3_WATER,LEASED_ASSETS_ENERGY_USE,SCOPE_3_ENERGY_WTT" data-periods="4"></div>
+        <section id="scope3TravelSect">
+          <h3>Scope 3 Breakdown - Travel</h3>
+          <p>CO<sub>2</sub> Emissions (tCO<sub>2</sub>e)</p>
+          <div class="rpt table2" id="travelRptTable2" data-total="true"
+               data-qs="BIZ_MILEAGE_ROAD_CO2E,BIZ_MILEAGE_RAIL_CO2E,BIZ_MILEAGE_AIR_CO2E,PATIENT_AND_VISITOR_MILEAGE_CO2E,STAFF_COMMUTE_MILES_CO2E" data-periods="4"></div>
+        </section>
+        <section id="scope3WaterSect">
+          <h3>Scope 3 Breakdown - Water</h3>
+          <p>CO<sub>2</sub> Emissions (tCO<sub>2</sub>e)</p>
+          <div class="rpt table2" id="waterRptTable2" data-total="true"
+               data-qs="WATER_CO2E,WATER_TREATMENT_CO2E" data-periods="4"></div>
+        </section>
+        <section id="scope3WasteSect">
+          <h3>Scope 3 Breakdown - Waste</h3>
+          <p>CO<sub>2</sub> Emissions (tCO<sub>2</sub>e)</p>
+          <div class="rpt table2" id="wasteRptTable2" data-total="true"
+               data-qs="RECYCLING_CO2E,OTHER_RECOVERY_CO2E,INCINERATION_CO2E,LANDFILL_CO2E" data-periods="4"></div>
+        </section>
+        <section id="scope3BiomassSect">
+          <h3>Scope 3 Breakdown - Biomass (well to tank)</h3>
+          <p>CO<sub>2</sub> Emissions (tCO<sub>2</sub>e)</p>
+          <div class="rpt table2" id="biomassRptTable2" data-total="true"
+               data-qs="WOOD_LOGS_WTT_CO2E,WOOD_CHIPS_WTT_CO2E,WOOD_PELLETS_WTT_CO2E" data-periods="4"></div>
+        </section>
+      </section>
+
+      <section id="outsideScopesSect">
+        <h3>Outside Scopes - Biomass (total)</h3>
+        <p>CO<sub>2</sub> Emissions (tCO<sub>2</sub>e)</p>
+        <div class="rpt table2" id="biomassRptTable2" data-total="true"
+               data-qs="Q.WOOD_LOGS_CO2E,WOOD_CHIPS_CO2E.WOOD_PELLETS_CO2E" data-periods="4"></div>
+        <div class="rpt table" id="biomassRptTable" data-src="/reports/{{org}}/{{surveyReturn.applicablePeriod}}/biomass-co2e-noscope.html"></div>
+      </section>
+
+      {{#if formatAnswer('ECLASS_USER') == '0-E-Class'}}
+        <section id="eclassCarbonProfileSect">
+          <h2>E-Class Procurement Profile</h2>
+          <p>CO<sub>2</sub> Emissions (tCO<sub>2</sub>e)</p>
+          <div class="rpt table2" id="eclassProfileRptTable2" data-total="true"
+               data-qs="PATIENT_AND_VISITOR_MILEAGE_CO2E,STAFF_COMMUTE_MILES_CO2E,PROVISIONS_CO2E,STAFF_CLOTHING_CO2E,PATIENTS_CLOTHING_AND_FOOTWEAR_CO2E,PHARMA_BLOOD_PROD_AND_MED_GASES_CO2E,DRESSINGS_CO2E,MEDICAL_AND_SURGICAL_EQUIPT_CO2E,PATIENTS_APPLIANCES_CO2E,CHEMICALS_AND_REAGENTS_CO2E,DENTAL_AND_OPTICAL_EQUIPT_CO2E,IMAGING_AND_RADIOTHERAPY_EQUIPT_AND_SVCS_CO2E,LAB_EQUIPT_AND_SVCS_CO2E,HOTEL_EQUIPT_MATERIALS_AND_SVCS_CO2E,BLDG_AND_ENG_PROD_AND_SVCS_CO2E,PURCHASED_HEALTHCARE_CO2E,GARDENING_AND_FARMING_CO2E,FURNITURE_FITTINGS_CO2E,HARDWARE_CROCKERY_CO2E,BEDDING_LINEN_AND_TEXTILES_CO2E,OFFICE_EQUIPT_TELCO_COMPUTERS_AND_STATIONERY_CO2E,REC_EQUIPT_AND_SOUVENIRS_CO2E,CONSULTING_SVCS_AND_EXPENSES_CO2E,OWNED_BUILDINGS_COAL,NET_ELEC_CO2E,OWNED_BUILDINGS_GAS,OWNED_BUILDINGS_OIL,NET_THERMAL_ENERGY_CO2E,LEASED_ASSETS_ENERGY_USE,BIZ_MILEAGE_CO2E,ANAESTHETIC_GASES_CO2E,WASTE_AND_WATER_CO2E,TOTAL_COMMISSIONING_CO2E" data-periods="4"></div>
+        </section>
+      {{else}}
+        <section id="sduCarbonProfileSect">
+          <h2>SDU whole organisation carbon profile</h2>
+          <p>CO<sub>2</sub> Emissions (tCO<sub>2</sub>e)</p>
+          <div class="rpt table2" id="sduProfileRptTable2" data-total="true"
+               data-qs="PATIENT_AND_VISITOR_MILEAGE_CO2E,STAFF_COMMUTE_MILES_CO2E,BIZ_SVCS_CO2E,CAPITAL_CO2E,CONSTRUCTION_CO2E,CATERING_CO2E,FREIGHT_CO2E,ICT_CO2E,CHEM_AND_GAS_CO2E,MED_INSTR_CO2E,OTHER_MANUFACTURED_CO2E,PAPER_AND_CARD_CO2E,PHARMA_CO2E,OWNED_BUILDINGS_COAL,NET_ELEC_CO2E,OWNED_BUILDINGS_GAS,OWNED_BUILDINGS_OIL,NET_THERMAL_ENERGY_CO2E,LEASED_ASSETS_ENERGY_USE,BIZ_MILEAGE_CO2E,ANAESTHETIC_GASES_CO2E,WASTE_AND_WATER_CO2E,TOTAL_COMMISSIONING_CO2E" data-periods="4"></div>
+        </section>
+      {{/if}}
+
+      <section id="benchmarkingSect">
+        <h2 id="benchmarking">Benchmarking</h2>
+
+        <section id="totalEmissionsSect">
+          <h3>Carbon footprint (tCO<sub>2</sub>e)</h3>
+          <p>
+            <svg data-qs="TOTAL_CORE_CO2E,TOTAL_COMMISSIONING_CO2E,TOTAL_PROCUREMENT_2017_CO2E,TOTAL_COMMUNITY_CO2E"
+                 data-periods="4"
+                 data-colors="#a9d156,#003d61,#007ac3,#fbde06"
+                 class="rpt stacked2" id="emissionsProfileGraph" width="600" height="400"></svg>
+          </p>
+          <div class="rpt table2" id="totalEmissionsTable2" data-total="true"
+               data-qs="TOTAL_CORE_CO2E,TOTAL_COMMISSIONING_CO2E,TOTAL_PROCUREMENT_2017_CO2E,TOTAL_COMMUNITY_CO2E" data-periods="4"></div>
+        </section>
+
+        <section id="totalEmissionsByPopulationSect">
+          <h3>Benchmarking by population (kgCO<sub>2</sub>e/person)</h3>
+          {{#if formatAnswer('NO_POPULATION') == ''}}
+            <p>No population data available</p>
+          {{else}}
+            <p>
+              <svg data-qs="TOTAL_CORE_CO2E_BY_POP,TOTAL_COMMISSIONING_CO2E_BY_POP,TOTAL_PROCUREMENT_2017_CO2E_BY_POP,TOTAL_COMMUNITY_CO2E_BY_POP"
+                   data-periods="4"
+                   data-colors="#a9d156,#003d61,#007ac3,#fbde06"
+                   data-y-axis-label="kg CO&#x2082;e"
+                   class="rpt stacked2" id="emissionsByPopulationGraph" width="600" height="400"></svg>
+            </p>
+            <div class="rpt table2" id="co2eByPopulationRptTable2" data-total="true"
+                 data-qs="TOTAL_CORE_CO2E_BY_POP,TOTAL_COMMISSIONING_CO2E_BY_POP,TOTAL_PROCUREMENT_2017_CO2E_BY_POP,TOTAL_COMMUNITY_CO2E_BY_POP" data-periods="4"></div>
+          {{/if}}
+        </section>
+
+        <section id="totalEmissionsByFloorAreaSect">
+          <h3>Benchmarking by gross internal area (kgCO<sub>2</sub>e/m<sup>2</sup>)</h3>
+          {{#if formatAnswer('FLOOR_AREA') == ''}}
+            <p>No floor area data available</p>
+          {{else}}
+            <p>
+              <svg data-qs="TOTAL_CORE_CO2E_BY_FLOOR,TOTAL_COMMISSIONING_CO2E_BY_FLOOR,TOTAL_PROCUREMENT_2017_CO2E_BY_FLOOR,TOTAL_COMMUNITY_CO2E_BY_FLOOR"
+                   data-periods="4"
+                   data-colors="#a9d156,#003d61,#007ac3,#fbde06"
+                   data-y-axis-label="kg CO&#x2082;e"
+                   class="rpt stacked2" id="emissionsByFloorAreaGraph" width="600" height="400"></svg>
+            </p>
+            <div class="rpt table2" id="co2eByFloorAreaRptTable2" data-total="true"
+                 data-qs="TOTAL_CORE_CO2E_BY_FLOOR,TOTAL_COMMISSIONING_CO2E_BY_FLOOR,TOTAL_PROCUREMENT_2017_CO2E_BY_FLOOR,TOTAL_COMMUNITY_CO2E_BY_FLOOR" data-periods="4"></div>
+          {{/if}}
+        </section>
+
+        <section id="totalEmissionsByWteSect">
+          <h3>Benchmarking by number of staff (tCO<sub>2</sub>e/WTE)</h3>
+          {{#if formatAnswer('NO_STAFF') == ''}}
+            <p>No staff data available</p>
+          {{else}}
+            <p>
+              <svg data-qs="TOTAL_CORE_CO2E_BY_WTE,TOTAL_COMMISSIONING_CO2E_BY_WTE,TOTAL_PROCUREMENT_2017_CO2E_BY_WTE,TOTAL_COMMUNITY_CO2E_BY_WTE"
+                   data-periods="4"
+                   data-colors="#a9d156,#003d61,#007ac3,#fbde06"
+                   class="rpt stacked2" id="emissionsByWteGraph" width="600" height="400"></svg>
+            </p>
+            <div class="rpt table2" id="co2eByWteRptTable2" data-total="true"
+                 data-qs="TOTAL_CORE_CO2E_BY_WTE,TOTAL_COMMISSIONING_CO2E_BY_WTE,TOTAL_PROCUREMENT_2017_CO2E_BY_WTE,TOTAL_COMMUNITY_CO2E_BY_WTE" data-periods="4"></div>
+          {{/if}}
+        </section>
+
+        <section id="totalEmissionsByOccupiedBedsSect">
+          <h3>Benchmarking by number of occupied beds (kgCO<sub>2</sub>e/bed)</h3>
+          {{#if formatAnswer('NO_BEDS') == ''}}
+            <p>No bed data available</p>
+          {{else}}
+            <p>
+              <svg data-qs="TOTAL_CORE_CO2E_BY_BEDS,TOTAL_COMMISSIONING_CO2E_BY_BEDS,TOTAL_PROCUREMENT_2017_CO2E_BY_BEDS,TOTAL_COMMUNITY_CO2E_BY_BEDS"
+                   data-periods="4"
+                   data-colors="#a9d156,#003d61,#007ac3,#fbde06"
+                   data-y-axis-label="kg CO&#x2082;e"
+                   class="rpt stacked2" id="emissionsByOccupiedBedsGraph" width="600" height="400"></svg>
+            </p>
+            <div class="rpt table2" id="co2eByBedsRptTable2" data-total="true"
+                 data-qs="TOTAL_CORE_CO2E_BY_BEDS,TOTAL_COMMISSIONING_CO2E_BY_BEDS,TOTAL_PROCUREMENT_2017_CO2E_BY_BEDS,TOTAL_COMMUNITY_CO2E_BY_BEDS" data-periods="4"></div>
+          {{/if}}
+        </section>
+
+        <section id="totalEmissionsByPatientContactsSect">
+          <h3>Benchmarking by total patient contacts (kgCO<sub>2</sub>e/patient contact)</h3>
+          {{#if formatAnswer('NO_PATIENT_CONTACTS') == ''}}
+            <p>No patient contact data available</p>
+          {{else}}
+            <p>
+              <svg data-qs="TOTAL_CORE_CO2E_BY_PATIENT_CONTACT,TOTAL_COMMISSIONING_CO2E_BY_PATIENT_CONTACT,TOTAL_PROCUREMENT_2017_CO2E_BY_PATIENT_CONTACT,TOTAL_COMMUNITY_CO2E_BY_PATIENT_CONTACT"
+                   data-periods="4"
+                   data-colors="#a9d156,#003d61,#007ac3,#fbde06"
+                   data-y-axis-label="kg CO&#x2082;e"
+                   class="rpt stacked2" id="emissionsByPatientContactsGraph" width="600" height="400"></svg>
+            </p>
+            <div class="rpt table2" id="co2eByPatientContactsRptTable2" data-total="true"
+                 data-qs="TOTAL_CORE_CO2E_BY_PATIENT_CONTACT,TOTAL_COMMISSIONING_CO2E_BY_PATIENT_CONTACT,TOTAL_PROCUREMENT_2017_CO2E_BY_PATIENT_CONTACT,TOTAL_COMMUNITY_CO2E_BY_PATIENT_CONTACT" data-periods="4"></div>
+          {{/if}}
+        </section>
+
+        <section id="totalEmissionsByOpExSect">
+          <h3>Benchmarking by operating expenditure (kgCO<sub>2</sub>e/&pound;)</h3>
+          {{#if formatAnswer('OP_EX') == ''}}
+            <p>No operating expenditure data available</p>
+          {{else}}
+            <p>
+              <svg data-qs="TOTAL_CORE_CO2E_BY_OPEX,TOTAL_COMMISSIONING_CO2E_BY_OPEX,TOTAL_PROCUREMENT_2017_CO2E_BY_OPEX,TOTAL_COMMUNITY_CO2E_BY_OPEX" 
+                   data-periods="4"
+                   data-colors="#a9d156,#003d61,#007ac3,#fbde06"
+                   data-y-axis-label="kg CO&#x2082;e"
+                   class="rpt stacked2" id="emissionsByOpexGraph" width="600" height="400"></svg>
+            </p>
+            <div class="rpt table2" id="co2eByOpexRptTable2" data-total="true"
+                 data-qs="TOTAL_CORE_CO2E_BY_OPEX,TOTAL_COMMISSIONING_CO2E_BY_OPEX,TOTAL_PROCUREMENT_2017_CO2E_BY_OPEX,TOTAL_COMMUNITY_CO2E_BY_OPEX" data-periods="4"></div>
+          {{/if}}
+        </section>
+      </section>
+    {{else}}
+      <section class="loading" id="loadingSect">
+        <span class="loading">Your report should load automatically in the next few moments.</span>
+        <button on-click="fetch()">Load it now</button>
+      </section>
+    {{/if}}
+    </section>
+  </script>
+
+  <script src="//code.jquery.com/jquery-1.11.0.min.js"></script>
+  <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pace/1.0.2/pace.js"></script>
+  <script src='https://cdnjs.cloudflare.com/ajax/libs/ractive/0.7.3/ractive.min.js'></script>
+  <script src="http://localhost:8083/js/md5.min.js"></script>
+  <script src="./vsn/js/string-functions-0.1.0.js"></script>
+
+  <script src="http://localhost:8083/workmgmt/3.0.0/js/i18n.js"></script>
+  <script src="http://localhost:8083/js/env.js"></script>
+  <script src="./vsn/js/base.js"></script>
+  <script src="./vsn/js/report.js"></script>
+  <script src="http://localhost:8083/webjars/auth/2.0.0/js/auth.js"></script>
+
+  <script src="https://d3js.org/d3.v4.min.js"></script>
+  <script src="./vsn/js/stacked.js"></script>
+  <script src="./vsn/js/pie.js"></script>
+</body>
+</html>
