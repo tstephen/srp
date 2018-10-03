@@ -181,6 +181,13 @@ form .criteria input {
 .form.create-form {
   padding-bottom: 2px;
 }
+@media screen {
+  .narrative.hidden-print {
+    font-style: italic;
+    background-color: #fbde06;
+    padding: 0.5rem 1rem;
+  }
+}
 .navbar-sticky {
   position:fixed;
   top: 0;

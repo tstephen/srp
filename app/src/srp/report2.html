@@ -377,7 +377,7 @@
           <div class="rpt table2" id="energyCo2eRptTable2" data-total="true"
                data-qs="ELEC_CO2E,OWNED_BUILDINGS_GAS,OWNED_BUILDINGS_OIL,OWNED_BUILDINGS_COAL,STEAM_CO2E,HOT_WATER_CO2E,ELEC_RENEWABLE_CO2E,EXPORTED_THERMAL_ENERGY_CO2E" data-periods="4"></div>
 
-          <p class="narrative performance" data-q="ENERGY_PERF">{{formatAnswer('ENERGY_PERF')}}</p>
+          <p class="narrative performance {{#if !haveAnswer('ENERGY_PERF')}}hidden-print{{/if}}" data-q="ENERGY_PERF">{{formatAnswer('ENERGY_PERF')}}</p>
           <p>
             {{! TODO to calculate, perhaps server side }}
             {{#if formatAnswer('ELEC_USED_3RD_PTY_PCT')}}
@@ -387,7 +387,7 @@
             {{/if}}
             % of our electricity use comes from renewable sources.
           </p>
-          <p class="narrative context" contenteditable data-q="ENERGY_CTXT">{{formatAnswer('ENERGY_CTXT')}}</p>
+          <p class="narrative context {{#if !haveAnswer('ENERGY_CTXT')}}hidden-print{{/if}}" contenteditable data-q="ENERGY_CTXT">{{formatAnswer('ENERGY_CTXT')}}</p>
         </section>
 
         <section id="paperSect">
@@ -421,7 +421,7 @@
           </p>
           <p>CO<sub>2</sub> Emissions (tCO<sub>2</sub>e)</p>
           <div class="rpt table2" id="travelCo2eRptTable2" data-total="true" data-qs="BIZ_MILEAGE_ROAD_CO2E,BIZ_MILEAGE_RAIL_CO2E,BIZ_MILEAGE_AIR_CO2E,PATIENT_AND_VISITOR_MILEAGE_CO2E,STAFF_COMMUTE_MILES_CO2E" data-periods="4"></div>
-          <p class="narrative performance" data-q="TRAVEL_PERF">{{formatAnswer('TRAVEL_PERF')}}</p>
+          <p class="narrative performance {{#if !haveAnswer('TRAVEL_PERF')}}hidden-print{{/if}}" data-q="TRAVEL_PERF">{{formatAnswer('TRAVEL_PERF')}}</p>
         </section>
 
         <section id="wasteSect">
@@ -438,8 +438,8 @@
           <p>CO<sub>2</sub> Emissions (tCO<sub>2</sub>e)</p>
 
           <div class="rpt table2" id="wasteCo2eRptTable2" data-total="true" data-qs="RECYCLING_CO2E,OTHER_RECOVERY_CO2E,INCINERATION_CO2E,LANDFILL_CO2E" data-periods="4"></div>
-          <p class="narrative performance" data-q="WASTE_PERF">{{formatAnswer('WASTE_PERF')}}</p>
-          <p class="narrative context" data-q="WASTE_CONTEXT">{{formatAnswer('WASTE_CONTEXT')}}</p>
+          <p class="narrative performance {{#if !haveAnswer('WASTE_PERF')}}hidden-print{{/if}}" data-q="WASTE_PERF">{{formatAnswer('WASTE_PERF')}}</p>
+          <p class="narrative context {{#if !haveAnswer('WASTE_CONTEXT')}}hidden-print{{/if}}" data-q="WASTE_CONTEXT">{{formatAnswer('WASTE_CONTEXT')}}</p>
         </section>
 
         <section id="waterSect">
@@ -454,8 +454,8 @@
           <p>CO<sub>2</sub> Emissions (tCO<sub>2</sub>e)</p>
 
           <div class="rpt table2" id="waterCo2eRptTable2" data-total="true" data-qs="WATER_CO2E,WATER_TREATMENT_CO2E" data-periods="4"></div>
-          <p class="narrative performance" data-q="WATER_PERF">{{formatAnswer('WATER_PERF')}}</p>
-          <p class="narrative context" data-q="WATER_CONTEXT">{{formatAnswer('WATER_CONTEXT')}}</p>
+          <p class="narrative performance {{#if !haveAnswer('WATER_PERF')}}hidden-print{{/if}}" data-q="WATER_PERF">{{formatAnswer('WATER_PERF')}}</p>
+          <p class="narrative context {{#if !haveAnswer('WATER_CONTEXT')}}hidden-print{{/if}}" data-q="WATER_CONTEXT">{{formatAnswer('WATER_CONTEXT')}}</p>
         </section>
 
         <section id="carbonFootprintSect">
@@ -497,7 +497,7 @@
 
         <section id="trajectorySect">
           <h3>Carbon emissions progress</h3>
-          <p class="narrative performance" data-q="TRAJECTORY_PERF">{{formatAnswer('TRAJECTORY_PERF')}}</p>
+          <p class="narrative performance {{#if !haveAnswer('TRAJECTORY_PERF')}}hidden-print{{/if}}" data-q="TRAJECTORY_PERF">{{formatAnswer('TRAJECTORY_PERF')}}</p>
           <p>
             <svg data-qs="TOTAL_CORE_CO2E,TOTAL_COMMISSIONING_CO2E,TOTAL_PROCUREMENT_2017_CO2E,TOTAL_COMMUNITY_CO2E"
                 data-colors="#a9d156,#003d61,#007ac3,#fbde06" data-periods="11"
@@ -509,10 +509,34 @@
 
       </section>
 
+      <section id="socialValueSect" style="display:none">
+        <h2>Social Value</h2>
+
+	<p> Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Dolor sed viverra ipsum nunc. In dictum non consectetur a. Sed sed risus pretium quam. Nulla pharetra diam sit amet nisl suscipit. Ullamcorper dignissim cras tincidunt lobortis feugiat vivamus at. Quam viverra orci sagittis eu volutpat odio. Morbi blandit cursus risus at. Amet consectetur adipiscing elit pellentesque habitant. Diam maecenas sed enim ut sem. Vulputate dignissim suspendisse in est. Ultrices mi tempus imperdiet nulla malesuada pellentesque elit.</p>
+
+        <p>Augue interdum velit euismod in. Ultricies lacus sed turpis tincidunt. Est ullamcorper eget nulla facilisi. Elit ullamcorper dignissim cras tincidunt lobortis feugiat. Lacinia quis vel eros donec ac odio tempor orci. Sollicitudin ac orci phasellus egestas tellus. Ut enim blandit volutpat maecenas volutpat blandit aliquam. Velit sed ullamcorper morbi tincidunt ornare massa. Habitant morbi tristique senectus et. Nisi porta lorem mollis aliquam. Ut consequat semper viverra nam libero. Viverra suspendisse potenti nullam ac tortor vitae. Elementum curabitur vitae nunc sed. Dolor sit amet consectetur adipiscing elit pellentesque. Tortor at auctor urna nunc id cursus metus aliquam. Lorem mollis aliquam ut porttitor leo a diam. Turpis massa sed elementum tempus. Nibh sit amet commodo nulla facilisi nullam vehicula ipsum. Ante in nibh mauris cursus mattis molestie a.
+        </p>
+
+        <table class="table table-striped">
+          <thead>
+            <tr>
+	      <th></th><th>2014-15</th>
+	      <th>2015-16</th><th>2016-17</th>
+	      <th>2017-18</th>
+	    </tr>
+          </thead>
+          <tbody>
+            <tr><td>Total Social Value</td><td>0</td><td>0</td><td>0</td><td>0</td></tr>
+	    <tr><td>Total Investment Recorded</td><td>0</td><td>0</td><td>0</td><td>0</td></tr>
+          </tbody>
+        </table>
+
+      </section>
+
       <section id="adaptationSect">
         <h2>Adaptation</h2>
         <p>Events such as heatwaves, cold snaps and flooding are expected to increase as a result of climate change. To ensure that our services continue to meet the needs of our local population during such events we have developed and implemented a number of policies and protocols in partnership with other local agencies these include:</p>
-        <p class="narrative performance" data-q="ADAPTATION_PERF">{{formatAnswer('ADAPTATION_PERF')}}</p>
+        <p class="narrative performance {{#if !haveAnswer('ADAPTATION_PERF')}}hidden-print{{/if}}" data-q="ADAPTATION_PERF">{{formatAnswer('ADAPTATION_PERF')}}</p>
       </section>
       <section id="biodversitySect">
         <h2>Biodoversity Action Plan</h2>
