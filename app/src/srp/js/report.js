@@ -465,6 +465,16 @@ var ractive = new BaseRactive({
         }
       }
     },
+    haveAnswer: function(qName) {
+      try {
+        var a = ractive.getAnswer(qName);
+        return (a == undefined || a == '' || a == ractive.get('narrativeCtxtPrompt') || a == ractive.get('narrativePerfPrompt'))
+            ? false
+            : true;
+      } catch (e) {
+        return false;
+      }
+    },
     isCcg: function() {
       return ractive.isCcg();
     },
