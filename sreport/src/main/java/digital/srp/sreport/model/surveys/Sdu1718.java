@@ -71,6 +71,7 @@ public class Sdu1718 {
                         Q.ADAPTATION_PLAN_INC,
                         Q.CCG1_SERVED, Q.CCG2_SERVED, Q.CCG3_SERVED,
                         Q.CCG4_SERVED, Q.CCG5_SERVED, Q.CCG6_SERVED,
+                        Q.CCG7_SERVED, Q.CCG8_SERVED,
                         Q.PROVIDER1_COMMISSIONED, Q.PROVIDER2_COMMISSIONED,
                         Q.PROVIDER3_COMMISSIONED, Q.PROVIDER4_COMMISSIONED,
                         Q.PROVIDER5_COMMISSIONED, Q.PROVIDER6_COMMISSIONED,
