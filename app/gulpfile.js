@@ -3,7 +3,7 @@ var log         = require('fancy-log');
 var gulp        = require('gulp');
 var jshint      = require('gulp-jshint');
 var uglify      = require('gulp-uglify');
-var minifyCSS   = require('gulp-minify-css');
+var cleanCSS    = require('gulp-clean-css');
 var minimist    = require('minimist');
 var replace     = require('gulp-replace');
 var scp         = require('gulp-scp2');
@@ -68,7 +68,7 @@ gulp.task('styles', function() {
   return gulp.src([
     'src/srp/css/**/*.css'
   ])
-  .pipe(config.css.minify ? minifyCSS() : through2.obj())
+  .pipe(config.css.minify ? cleanCSS() : through2.obj())
   .pipe(gulp.dest('dist/srp/'+vsn+'/css'));
 });
 
