@@ -21,7 +21,6 @@ import static org.junit.Assert.assertTrue;
 import java.math.BigDecimal;
 import java.math.MathContext;
 
-import org.junit.Ignore;
 import org.junit.Test;
 
 import digital.srp.macc.maths.InterventionTypeValidator;
@@ -367,7 +366,6 @@ public class InterventionTypeTest {
     }
 
     @Test
-    @Ignore
     public void testSolarThermalWithRHI() {
         InterventionType interventionType = new InterventionType();
         interventionType.setName("Solar Thermal");

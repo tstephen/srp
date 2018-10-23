@@ -22,6 +22,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class RestApiIT {
 
+    private static final String VSN = "2.3.0";
+
     private static ScheduledExecutorService globalScheduledThreadPool = Executors.newScheduledThreadPool(20);
 
     private ObjectMapper objectMapper = new ObjectMapper();
@@ -31,7 +33,7 @@ public class RestApiIT {
     public void test10MgmtApi() throws IOException {
         StringBuilder sb = createScript(
                 "classpath:META-INF/resources/webjars/jasmine-boot/1.0.0/js/rest-helper.js",
-                "classpath:META-INF/resources/webjars/sreport/2.2.0/specs/MgmtSpec.js" );
+                "classpath:META-INF/resources/webjars/sreport/"+VSN+"/specs/MgmtSpec.js" );
 
         JsonNode report = runScript(sb);
         assertEquals(7, report.get("suite").get("totalSpecsDefined").asInt());
@@ -42,7 +44,7 @@ public class RestApiIT {
     public void test20SustainabilityReturnApi() throws IOException {
         StringBuilder sb = createScript(
                 "classpath:META-INF/resources/webjars/jasmine-boot/1.0.0/js/rest-helper.js",
-                "classpath:META-INF/resources/webjars/sreport/2.2.0/specs/ReturnSpec.js" );
+                "classpath:META-INF/resources/webjars/sreport/"+VSN+"/specs/ReturnSpec.js" );
 
         JsonNode report = runScript(sb);
         assertEquals(4, report.get("suite").get("totalSpecsDefined").asInt());

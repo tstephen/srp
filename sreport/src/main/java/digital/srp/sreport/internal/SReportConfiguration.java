@@ -16,8 +16,11 @@ import digital.srp.sreport.services.Cruncher;
 
 @Configuration
 @ComponentScan(basePackages = { "digital.srp.sreport" })
-@EntityScan({ "digital.srp.sreport.model" })
-@EnableJpaRepositories({ "digital.srp.sreport.repositories" })
+@EntityScan({ "digital.srp.sreport.model", "io.onedecision.engine.decisions.model",
+    "io.onedecision.engine.domain.model" })
+@EnableJpaRepositories({ "digital.srp.sreport.repositories",
+    "io.onedecision.engine.decisions.repositories",
+    "io.onedecision.engine.domain.repositories" })
 @EnableJpaAuditing
 public class SReportConfiguration extends RepositoryRestMvcConfiguration {
 

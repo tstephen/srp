@@ -9,7 +9,7 @@ var replace     = require('gulp-replace');
 var scp         = require('gulp-scp2');
 var through2    = require('through2');
 var zip         = require('gulp-zip');
-var vsn         = '2.1.0';
+var vsn         = '2.3.0';
 
 var argv = minimist(process.argv.slice(2));
 var env = argv['env'] || 'dev';

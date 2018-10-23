@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.util.List;
 
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import digital.srp.sreport.importers.CarbonFactorCsvImporter;
@@ -25,22 +24,22 @@ public class CarbonEmissionsProgressTest {
     private static final String NO_PATIENT_CONTACTS = "2100000";
     private static final String OCCUPIED_BEDS = "997.5";
     private static final String OP_EX = "262500";
-    
+
     private static final String OWNED_BUILDINGS = "107740";
     private static final String ANAESTHETIC_GASES_CO2E = "35350";
-    private static final String BIZ_SVCS_CO2E = "4146";
-    private static final String COMMISSIONING_CO2E = "948";
-    private static final String PHARMA_CO2E = "3497";
-    private static final String PAPER_CO2E = "1206";
-    private static final String OTHER_MANUFACTURED_CO2E = "1474";
-    private static final String MED_INSTR_CO2E = "8858";
-    private static final String CHEM_AND_GAS_CO2E = "1723";
-    private static final String ICT_CO2E = "628";
-    private static final String FREIGHT_CO2E = "1596";
-    private static final String CATERING_CO2E = "3019";
-    private static final String CONSTRUCTION_CO2E = "1461";    
-    private static final String NET_ELEC_CO2E = "35350";
-    private static final String TRAVEL_CO2E = "994";
+    private static final String BIZ_SVCS_CO2E = "4,140";
+    private static final String COMMISSIONING_CO2E = "946";
+    private static final String PHARMA_CO2E = "3,500";
+    private static final String PAPER_CO2E = "1,240";
+    private static final String OTHER_MANUFACTURED_CO2E = "1,500";
+    private static final String MED_INSTR_CO2E = "8,880";
+    private static final String CHEM_AND_GAS_CO2E = "1,750";
+    private static final String ICT_CO2E = "634";
+    private static final String FREIGHT_CO2E = "1,640";
+    private static final String CATERING_CO2E = "3,050";
+    private static final String CONSTRUCTION_CO2E = "1,450";
+    private static final String NET_ELEC_CO2E = "35,350";
+    private static final String TRAVEL_CO2E = "1,010";
     private static final String PROCUREMENT_CO2E = "191.0";
     private static final String BIOMASS_WTT_CO2E = "314.0";
     private static final String WASTE_CO2E = "191.0";
@@ -61,7 +60,6 @@ public class CarbonEmissionsProgressTest {
     }
 
     @Test
-    @Ignore
     public void testCalcEmissionsProgress() {
         SurveyReturn rtn = new SurveyReturn().applicablePeriod(PERIOD).org("ZZ1");
         rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD).question(Q.ORG_TYPE).response("Acute Trust"));
@@ -93,6 +91,7 @@ public class CarbonEmissionsProgressTest {
         rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD).question(Q.MED_INSTR_SPEND));
         rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD).question(Q.OTHER_MANUFACTURED_SPEND));
         rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD).question(Q.OTHER_SPEND));
+        rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD).question(Q.PAPER_AND_CARD_SPEND));
         rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD).question(Q.PAPER_SPEND));
         rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD).question(Q.PHARMA_SPEND));
         rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD).question(Q.TRAVEL_SPEND));
@@ -108,6 +107,7 @@ public class CarbonEmissionsProgressTest {
         rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD).question(Q.MED_INSTR_CO2E));
         rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD).question(Q.OTHER_MANUFACTURED_CO2E));
         rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD).question(Q.OTHER_PROCUREMENT_CO2E));
+        rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD).question(Q.PAPER_AND_CARD_CO2E));
         rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD).question(Q.PHARMA_CO2E));
         rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD).question(Q.TRAVEL_CO2E));
         rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD).question(Q.TOTAL_CO2E));
@@ -117,19 +117,19 @@ public class CarbonEmissionsProgressTest {
         rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD).question(Q.WASTE_AND_WATER_CO2E));
 
         svc.calcCarbonProfileSduMethod(PERIOD, rtn);
-        
+
         // CO2e
-        assertEquals(BIZ_SVCS_CO2E, rtn.answer(PERIOD, Q.BIZ_SVCS_CO2E).get().response());
-        assertEquals(CONSTRUCTION_CO2E, rtn.answer(PERIOD, Q.CONSTRUCTION_CO2E).get().response());
-        assertEquals(CATERING_CO2E, rtn.answer(PERIOD, Q.CATERING_CO2E).get().response());
-        assertEquals(FREIGHT_CO2E, rtn.answer(PERIOD, Q.FREIGHT_CO2E).get().response());
-        assertEquals(ICT_CO2E, rtn.answer(PERIOD, Q.ICT_CO2E).get().response());
-        assertEquals(CHEM_AND_GAS_CO2E, rtn.answer(PERIOD, Q.CHEM_AND_GAS_CO2E).get().response());
-        assertEquals(MED_INSTR_CO2E, rtn.answer(PERIOD, Q.MED_INSTR_CO2E).get().response());
-        assertEquals(OTHER_MANUFACTURED_CO2E, rtn.answer(PERIOD, Q.OTHER_MANUFACTURED_CO2E).get().response());
-        assertEquals(PAPER_CO2E, rtn.answer(PERIOD, Q.PAPER_AND_CARD_CO2E).get().response());
-        assertEquals(PHARMA_CO2E, rtn.answer(PERIOD, Q.PHARMA_CO2E).get().response());
-        assertEquals(TRAVEL_CO2E, rtn.answer(PERIOD, Q.TRAVEL_CO2E).get().response());
-        assertEquals(COMMISSIONING_CO2E, rtn.answer(PERIOD, Q.COMMISSIONING_CO2E).get().response());        
+        assertEquals(BIZ_SVCS_CO2E, rtn.answer(PERIOD, Q.BIZ_SVCS_CO2E).get().response3sf());
+        assertEquals(CONSTRUCTION_CO2E, rtn.answer(PERIOD, Q.CONSTRUCTION_CO2E).get().response3sf());
+        assertEquals(CATERING_CO2E, rtn.answer(PERIOD, Q.CATERING_CO2E).get().response3sf());
+        assertEquals(FREIGHT_CO2E, rtn.answer(PERIOD, Q.FREIGHT_CO2E).get().response3sf());
+        assertEquals(ICT_CO2E, rtn.answer(PERIOD, Q.ICT_CO2E).get().response3sf());
+        assertEquals(CHEM_AND_GAS_CO2E, rtn.answer(PERIOD, Q.CHEM_AND_GAS_CO2E).get().response3sf());
+        assertEquals(MED_INSTR_CO2E, rtn.answer(PERIOD, Q.MED_INSTR_CO2E).get().response3sf());
+        assertEquals(OTHER_MANUFACTURED_CO2E, rtn.answer(PERIOD, Q.OTHER_MANUFACTURED_CO2E).get().response3sf());
+        assertEquals(PAPER_CO2E, rtn.answer(PERIOD, Q.PAPER_AND_CARD_CO2E).get().response3sf());
+        assertEquals(PHARMA_CO2E, rtn.answer(PERIOD, Q.PHARMA_CO2E).get().response3sf());
+        assertEquals(TRAVEL_CO2E, rtn.answer(PERIOD, Q.TRAVEL_CO2E).get().response3sf());
+        assertEquals(COMMISSIONING_CO2E, rtn.answer(PERIOD, Q.COMMISSIONING_CO2E).get().response3sf());
     }
 }

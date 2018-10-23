@@ -4,9 +4,15 @@ Sustainable Resource Planning
 Release History
 ---------------
 
-2.2.0 - 
+2.3.0 - 23 Oct 18
 
-  - Integration tests and bug fixes
+  - #288 Implement 'health-check' for returns
+  - #286 Render tables and graphs client side 
+  - #284 Remove 'Import ERIC data' (now implicit)
+
+2.2.0 - 02 Aug 18 - 3515b3c38eed136e3a5663340489bdc31041f786
+
+  - cosmetic changes and bug fixes
 
 2.1.0 - 15 Mar 18
 
