@@ -36,6 +36,8 @@
           Public Services (Social Value) Act (2012) are met.</p>
 
         {{#if formatAnswer('SDMP_CRMP')}}
+	  <span class="glyphicon glyphicon-question-sign no-print pull-right" onclick="ractive.toggleFieldHint('SDMP_CRMP')" title="{{formatHint('SDMP_CRMP')}}"></span>
+          <p class="help-block no-print hidden" id="SDMP_CRMPHint">{{{formatHint('SDMP_CRMP')}}}</p>
           <p>
             In order to fulfil our responsibilities for the role we play,
             {{#if formatAnswer('ORG_NICKNAME')}}
@@ -46,15 +48,21 @@
             has created a sustainable development management plan (SDMP).
           </p>
         {{else}}
+	  <span class="glyphicon glyphicon-question-sign no-print pull-right" onclick="ractive.toggleFieldHint('SDMP_CRMP')" title="{{formatHint('SDMP_CRMP')}}"></span>
+          <p class="help-block no-print hidden" id="SDMP_CRMPHint">{{{formatHint('SDMP_CRMP')}}}</p>
           <p>
             We acknowledge this responsibility to our patients, local
             communities and the environment by working hard to minimise our footprint.</p>
         {{/if}}
 
         {{#if formatAnswer('SDMP_MISSION_STATEMENT')}}
+	  <span class="glyphicon glyphicon-question-sign no-print pull-right" onclick="ractive.toggleFieldHint('SDMP_MISSION_STATEMENT')" title="{{formatHint('SDMP_MISSION_STATEMENT')}}"></span>
+          <p class="help-block no-print hidden" id="SDMP_MISSION_STATEMENTHint">{{{formatHint('SDMP_MISSION_STATEMENT')}}}</p>
           <p>Our sustainability mission statement is: {{formatAnswer('SDMP_MISSION_STATEMENT')}}</p>
         {{/if}}
 
+	<span class="glyphicon glyphicon-question-sign no-print pull-right" onclick="ractive.toggleFieldHint('CARBON_REDUCTION_TARGET')" title="{{formatHint('CARBON_REDUCTION_TARGET')}}"></span>
+        <p class="help-block no-print hidden" id="CARBON_REDUCTION_TARGETHint">{{{formatHint('CARBON_REDUCTION_TARGET')}}}</p>
         <p>
           As a part of the NHS, public health and social care system, it is our
           duty to contribute towards the level of ambition set in 2014 of
@@ -74,19 +82,41 @@
         <p>In order to embed sustainability within our business it is important to explain where in our process and procedures sustainability features.</p>
         <table class="table table-striped">
           <thead>
-            <tr><th>Area</th><th>Is sustainability considered?</th></tr>
+	    <tr><th>Area</th><th>Is sustainability considered?</th>
+	      <th class="no-print"><span class="glyphicon glyphicon-question-sign pull-right"></span></th>
+	    </tr>
           </thead>
           <tbody>
-            <tr><td>Travel</td><td>{{#formatAnswer('HEALTHY_TRANSPORT_PLAN')==false || formatAnswer('HEALTHY_TRANSPORT_PLAN').indexOf('0')==-1}}No{{else}}Yes{{/}}</td></tr>
-            <tr><td>Procurement (environmental)</td><td>{{#formatAnswer('PROC_SUPPLIER_SUSTAINABILITY').indexOf('0')!=-1}}Yes{{else}}No{{/}}</td></tr>
-            <tr><td>Procurement (social impact)</td><td>{{#formatAnswer('PROC_SUPPLIER_SUSTAINABILITY').indexOf('1')!=-1}}Yes{{else}}No{{/}}</td></tr>
-            <tr><td>Suppliers&apos; impact</td><td>{{#formatAnswer('PROC_SUPPLIER_SUSTAINABILITY').indexOf('2')!=-1}}Yes{{else}}No{{/}}</td></tr>
+            <tr>
+	      <td>Travel</td>
+	      <td>{{#formatAnswer('HEALTHY_TRANSPORT_PLAN')==false || formatAnswer('HEALTHY_TRANSPORT_PLAN').indexOf('0')==-1}}No{{else}}Yes{{/}}</td>
+	      <td class="no-print">
+                <span class="help-block" id="HEALTHY_TRANSPORT_PLANHint">{{{formatHint('HEALTHY_TRANSPORT_PLAN')}}}</span>
+	      </td>
+	    </tr>
+            <tr><td>Procurement (environmental)</td><td>{{#formatAnswer('PROC_SUPPLIER_SUSTAINABILITY').indexOf('0')!=-1}}Yes{{else}}No{{/}}</td>
+	      <td class="no-print">
+                <span class="help-block" id="PROC_SUPPLIER_SUSTAINABILITYHint">{{{formatHint('PROC_SUPPLIER_SUSTAINABILITY')}}}</span>
+	      </td>
+	    </tr>
+            <tr><td>Procurement (social impact)</td><td>{{#formatAnswer('PROC_SUPPLIER_SUSTAINABILITY').indexOf('1')!=-1}}Yes{{else}}No{{/}}</td>
+	      <td class="no-print">
+                <span class="help-block" id="PROC_SUPPLIER_SUSTAINABILITYHint">{{{formatHint('PROC_SUPPLIER_SUSTAINABILITY')}}}</span>
+	      </td>
+	    </tr>
+            <tr><td>Suppliers&apos; impact</td><td>{{#formatAnswer('PROC_SUPPLIER_SUSTAINABILITY').indexOf('2')!=-1}}Yes{{else}}No{{/}}</td>
+	      <td class="no-print">
+                <span class="help-block" id="PROC_SUPPLIER_SUSTAINABILITYHint">{{{formatHint('PROC_SUPPLIER_SUSTAINABILITY')}}}</span>
+	      </td>
+	    </tr>
           </tbody>
         </table>
         <p>One of the ways in which an organisation can embed sustainability is
           through the use of
           {{#if formatAnswer('SDMP_CRMP')}}
-            {{#if formatAnswer('SDMP_BOARD_REVIEW_WITHIN_12_MONTHS')}}
+            <span class="glyphicon glyphicon-question-sign no-print pull-right" onclick="ractive.toggleFieldHint('SDMP_BOARD_REVIEW_WITHIN_12_MONTHS')" title="{{formatHint('SDMP_BOARD_REVIEW_WITHIN_12_MONTHS')}}"></span>
+            <p class="help-block no-print hidden" id="SDMP_BOARD_REVIEW_WITHIN_12_MONTHSHint">{{{formatHint('SDMP_BOARD_REVIEW_WITHIN_12_MONTHS')}}}</p>
+            {{#if formatAnswer('')}}
               an SDMP. The board approved our SDMP in the last 12 months so our plans for a sustainable future are well known within the organisation and clearly laid out.
             {{else}}
               an SDMP. An update to our SDMP is required because it has not been approved by the board in the last 12 months.
@@ -96,6 +126,8 @@
           {{/if}}
         </p>
         {{#if formatAnswer('PROC_SUPPLIER_ENGAGEMENT')}}
+          <span class="glyphicon glyphicon-question-sign no-print pull-right" onclick="ractive.toggleFieldHint('PROC_SUPPLIER_ENGAGEMENT')" title="{{formatHint('PROC_SUPPLIER_ENGAGEMENT')}}"></span>
+          <p class="help-block no-print hidden" id="PROC_SUPPLIER_ENGAGEMENT">{{{formatHint('PROC_SUPPLIER_ENGAGEMENT')}}}</p>
           <p>{{formatAnswer('PROC_SUPPLIER_ENGAGEMENT')}}</p>
         {{/if}}
         <p>
@@ -103,6 +135,10 @@
           effects to the healthcare estates, but also to patient health.
           Examples of recent years include the effects of heat waves, extreme
           temperatures and prolonged periods of cold, floods, droughts etc.
+        </p>
+          <span class="glyphicon glyphicon-question-sign no-print pull-right" onclick="ractive.toggleFieldHint('ADAPTATION_PLAN_INC')" title="{{formatHint('ADAPTATION_PLAN_INC')}}"></span>
+          <p class="help-block no-print hidden" id="ADAPTATION_PLAN_INCHint">{{{formatHint('ADAPTATION_PLAN_INC')}}}</p>
+        <p>
           {{#if formatAnswer('ADAPTATION_PLAN_INC')}}
             Our board approved plans address the potential need to adapt the
             delivery the organisation&apos;s activities and infrastructure to climate
@@ -113,6 +149,9 @@
             area.
           {{/if}}
         </p>
+
+        <span class="glyphicon glyphicon-question-sign no-print pull-right" onclick="ractive.toggleFieldHint('LAST_GCC_DATE')" title="{{formatHint('LAST_GCC_DATE')}}"></span>
+        <p class="help-block no-print hidden" id="LAST_GCC_DATEHint">{{{formatHint('LAST_GCC_DATE')}}}</p>
         <p>
           {{#if formatAnswer('LAST_GCC_DATE')!=undefined && formatAnswer('LAST_GCC_DATE')!=''}}
             One of the ways in which we measure our impact as an organisation on corporate social responsibility is through the use of the <a href="https://www.sduhealth.org.uk/sdat/">Sustainable Development Assessment Tool</a> (SDAT) tool.
@@ -121,12 +160,19 @@
           {{else}}
             We do not currently use the <a href="https://www.sduhealth.org.uk/sdat/">Sustainable Development Assessment Tool</a> (SDAT) tool.
           {{/if}}
+	</p>
+        <span class="glyphicon glyphicon-question-sign no-print pull-right" onclick="ractive.toggleFieldHint('PROMOTE_SUSTAINABILITY_TO_STAFF')" title="{{formatHint('PROMOTE_SUSTAINABILITY_TO_STAFF')}}"></span>
+        <p class="help-block no-print hidden" id="PROMOTE_SUSTAINABILITY_TO_STAFFHint">{{{formatHint('PROMOTE_SUSTAINABILITY_TO_STAFF')}}}</p>
+        <p>
           {{#if formatAnswer('PROMOTE_SUSTAINABILITY_TO_STAFF')}}
             As an organisation that acknowledges its responsibility towards creating a sustainable future, we help acheive that goal by running awareness campaigns that promote the benefits of sustainability to our staff.
           {{else}}
             We do not currently run awareness campaigns promoting sustainability.
           {{/if}}
         </p>
+
+        <span class="glyphicon glyphicon-question-sign no-print pull-right" onclick="ractive.toggleFieldHint('SDG_STARTING')" title="{{formatHint('SDG_STARTING')}}"></span>
+        <p class="help-block no-print hidden" id="SDG_STARTINGHint">{{{formatHint('SDG_STARTING')}}}</p>
         {{#formatAnswer('SDG_STARTING')==''}}
           {{! Nothing here #178 }}
         {{/}}
@@ -153,6 +199,9 @@
             <div class="col-xs-2"><img class="img-responsive" src="/wp-content/uploads/2017/11/E_Logo_No-UN-Emblem-02-180x180.png" alt="Icon for Sustainable Development Goals"/></div>
           </div>
         {{/}}
+
+        <span class="glyphicon glyphicon-question-sign no-print pull-right" onclick="ractive.toggleFieldHint('SDG_CLEAR')" title="{{formatHint('SDG_CLEAR')}}"></span>
+        <p class="help-block no-print hidden" id="SDG_CLEARHint">{{{formatHint('SDG_CLEAR')}}}</p>
         {{#formatAnswer('SDG_CLEAR')==''}}
           {{! Nothing here #178 }}
         {{/}}
@@ -182,6 +231,8 @@
         </div>
         {{/}}
 
+        <span class="glyphicon glyphicon-question-sign no-print pull-right" onclick="ractive.toggleFieldHint('QUANT_ES_IMPACTS')" title="{{formatHint('QUANT_ES_IMPACTS')}}"></span>
+        <p class="help-block no-print hidden" id="QUANT_ES_IMPACTSHint">{{{formatHint('QUANT_ES_IMPACTS')}}}</p>
         <p>
           {{#if formatAnswer('QUANT_ES_IMPACTS')}}
             {{formatAnswer('QUANT_ES_IMPACTS')}}
@@ -189,6 +240,9 @@
             We have not assessed the social and environmental impacts for the organisation.
           {{/if}}
         </p>
+
+        <span class="glyphicon glyphicon-question-sign no-print pull-right" onclick="ractive.toggleFieldHint('MOD_SLAVERY')" title="{{formatHint('MOD_SLAVERY')}}"></span>
+        <p class="help-block no-print hidden" id="MOD_SLAVERYHint">{{{formatHint('MOD_SLAVERY')}}}</p>
         <p>
           {{#if formatAnswer('MOD_SLAVERY')}}
             Our statement on Modern Slavery is: {{formatAnswer('MOD_SLAVERY')}}
@@ -196,6 +250,9 @@
             We have not currently issued a statement on Modern Slavery.
           {{/if}}
         </p>
+
+        <span class="glyphicon glyphicon-question-sign no-print pull-right" onclick="ractive.toggleFieldHint('SOCIAL_VALUE')" title="{{formatHint('SOCIAL_VALUE')}}"></span>
+        <p class="help-block no-print hidden" id="SOCIAL_VALUEHint">{{{formatHint('SOCIAL_VALUE')}}}</p>
         <p>
           {{#if formatAnswer('SOCIAL_VALUE')}}
             Our statement on Public Services (Social Value) Act is: {{formatAnswer('SOCIAL_VALUE')}}
@@ -214,6 +271,8 @@
           <p>The NHS policy framework already sets the scene for commissioners and providers to operate in a sustainable manner. Crucially for us as a provider, evidence of this commitment will need to be provided in part through contracting mechanisms.</p>
         {{/if}}
 
+        <span class="glyphicon glyphicon-question-sign no-print pull-right" onclick="ractive.toggleFieldHint('STRATEGIC_SUSTAINABILITY_PARTNERS')" title="{{formatHint('STRATEGIC_SUSTAINABILITY_PARTNERS')}}"></span>
+        <p class="help-block no-print hidden" id="STRATEGIC_SUSTAINABILITY_PARTNERSHint">{{{formatHint('STRATEGIC_SUSTAINABILITY_PARTNERS')}}}</p>
         {{#if formatAnswer('STRATEGIC_SUSTAINABILITY_PARTNERS')}}
           <p>Strategic partnerships are already established with the following
           organisations: {{formatAnswer('STRATEGIC_SUSTAINABILITY_PARTNERS')}}.</p>
@@ -285,6 +344,8 @@
 
         <section id="orgPerformanceSect">
           <h3>Organisation</h3>
+          <span class="glyphicon glyphicon-question-sign no-print pull-right" onclick="ractive.toggleFieldHint('CARBON_REDUCTION_TARGET')" title="{{formatHint('CARBON_REDUCTION_TARGET')}}"></span>
+          <p class="help-block no-print hidden" id="CARBON_REDUCTION_TARGETHint">{{{formatHint('CARBON_REDUCTION_TARGET')}}}</p>
           {{#if isCcg()}}
             <p>As a part of the NHS, public health and social care system, it is
             our duty to contribute towards the level of ambition set in 2014 of
@@ -353,6 +414,8 @@
 
         <section id="energySect">
           <h3>Energy</h3>
+          <span class="glyphicon glyphicon-question-sign no-print pull-right" onclick="ractive.toggleFieldHint('TOTAL_ENERGY_COST')" title="{{formatHint('TOTAL_ENERGY_COST')}}"></span>
+          <p class="help-block no-print hidden" id="TOTAL_ENERGY_COSTHint">{{{formatHint('TOTAL_ENERGY_COST')}}}</p>
           {{#formatAnswer('TOTAL_ENERGY_COST')!='NaN'}}
             <p>{{formatAnswer('ORG_NAME')}} has spent &pound;{{formatAnswer('TOTAL_ENERGY_COST')}} on energy in {{surveyReturn.applicablePeriod}}
 {{#if isNaN(formatAnswer('ENERGY_COST_CHANGE_PCT'))}}.
@@ -364,6 +427,8 @@
             </p>
           {{/}}
           <h4>Energy used</h4>
+            <span class="glyphicon glyphicon-question-sign no-print pull-right" onclick="ractive.toggleFieldHint('ENERGY')" title="{{formatHint('ENERGY')}}"></span>
+            <p class="help-block no-print hidden" id="ENERGYHint">{{{formatHint('ENERGY')}}}</p>
           <p>Energy consumption in kWh</p>
           <div class="rpt table2" id="energyRptTable2" data-periods="4" data-total="true"
                data-qs="ELEC_USED,GAS_USED,OIL_USED,COAL_USED,STEAM_USED,HOT_WATER_USED,ELEC_TOTAL_RENEWABLE_USED"></div>
@@ -378,6 +443,8 @@
                data-qs="ELEC_CO2E,OWNED_BUILDINGS_GAS,OWNED_BUILDINGS_OIL,OWNED_BUILDINGS_COAL,STEAM_CO2E,HOT_WATER_CO2E,ELEC_RENEWABLE_CO2E,EXPORTED_THERMAL_ENERGY_CO2E" data-periods="4"></div>
 
           <p class="narrative performance {{#if !haveAnswer('ENERGY_PERF')}}hidden-print{{/if}}" data-q="ENERGY_PERF">{{formatAnswer('ENERGY_PERF')}}</p>
+          <!-- TODO span class="glyphicon glyphicon-question-sign no-print pull-right" onclick="ractive.toggleFieldHint('ELEC_USED_3RD_PTY_PCT')" title="{{formatHint('ELEC_USED_3RD_PTY_PCT')}}"></span>
+          <p class="help-block no-print hidden" id="ELEC_USED_3RD_PTY_PCTHint">{{{formatHint('ELEC_USED_3RD_PTY_PCT')}}}</p>
           <p>
             {{! TODO to calculate, perhaps server side }}
             {{#if formatAnswer('ELEC_USED_3RD_PTY_PCT')}}
@@ -386,7 +453,7 @@
               0
             {{/if}}
             % of our electricity use comes from renewable sources.
-          </p>
+          </p-->
           <p class="narrative context {{#if !haveAnswer('ENERGY_CTXT')}}hidden-print{{/if}}" contenteditable data-q="ENERGY_CTXT">{{formatAnswer('ENERGY_CTXT')}}</p>
         </section>
 
@@ -395,6 +462,8 @@
           <p>The movement to a Paperless NHS can be supported by staff reducing the use of paper at all levels, this reduces the environmental impact of paper, reducing cost of paper to the NHS and can help improve information security.</p>
 
           <h4>Paper consumed</h4>
+          <span class="glyphicon glyphicon-question-sign no-print pull-right" onclick="ractive.toggleFieldHint('PAPER')" title="{{formatHint('PAPER')}}"></span>
+          <p class="help-block no-print hidden" id="PAPERHint">{{{formatHint('PAPER')}}}</p>
           <p>Cost is in pounds and weight in tonnes.</p>
           <div class="rpt table2" id="paperRptTable2" data-qs="PAPER_SPEND,PAPER_USED" data-periods="4"></div>
         </section>
@@ -404,13 +473,19 @@
           <p>We can improve local air quality and improve the health of our community by promoting active travel to our staff and to the patients and public that use our services.
           <p>Every action counts and we are a lean organisation trying to realise efficiencies across the board for cost and carbon (CO<sub>2</sub>e) reductions. We support a culture for active travel to improve staff wellbeing and reduce sickness. Air pollution, accidents and noise all cause health problems for our local population, patients, staff and visitors and are caused by cars, as well as other forms of transport.</p>
           {{#if formatAnswer('QUANT_TRAVEL_IMPACTS')==true}}
+            <span class="glyphicon glyphicon-question-sign no-print pull-right" onclick="ractive.toggleFieldHint('QUANT_TRAVEL_IMPACTS')" title="{{formatHint('QUANT_TRAVEL_IMPACTS')}}"></span>
+            <p class="help-block no-print hidden" id="QUANT_TRAVEL_IMPACTSHint">{{{formatHint('QUANT_TRAVEL_IMPACTS')}}}</p>
             <p>We have used the SDU Health Outcomes of Travel Tool and we have identified the hotspots and will look to reduce these impacts.</p>
           {{/if}}
           {{#if !isNaN(formatAnswer('HEALTH_IMPACT_OF_TRAVEL'))}}
+            <span class="glyphicon glyphicon-question-sign no-print pull-right" onclick="ractive.toggleFieldHint('HEALTH_IMPACT_OF_TRAVEL')" title="{{formatHint('HEALTH_IMPACT_OF_TRAVEL')}}"></span>
+            <p class="help-block no-print hidden" id="HEALTH_IMPACT_OF_TRAVELHint">{{{formatHint('HEALTH_IMPACT_OF_TRAVEL')}}}</p>
             <p>Furthermore, we have calculated the total economic impact on health and society from travel we control or influence is &pound;{{formatAnswer('HEALTH_IMPACT_OF_TRAVEL')}}.</p>
           {{/if}}
 
           <h4>Travel undertaken</h4>
+            <span class="glyphicon glyphicon-question-sign no-print pull-right" onclick="ractive.toggleFieldHint('TRAVEL')" title="{{formatHint('TRAVEL')}}"></span>
+            <p class="help-block no-print hidden" id="TRAVELHint">{{{formatHint('TRAVEL')}}}</p>
           <p>All travel is shown in miles.</p>
           <div class="rpt table2" id="travelRptTable2" data-total="true" data-qs="PATIENT_AND_VISITOR_MILEAGE,BIZ_MILEAGE,STAFF_COMMUTE_MILES_TOTAL" data-periods="4"></div>
           <h4>Carbon emissions resulting</h4>
@@ -427,6 +502,8 @@
         <section id="wasteSect">
           <h3>Waste</h3>
           <h4>Waste produced</h4>
+          <span class="glyphicon glyphicon-question-sign no-print pull-right" onclick="ractive.toggleFieldHint('WASTE')" title="{{formatHint('WASTE')}}"></span>
+          <p class="help-block no-print hidden" id="WASTEHint">{{{formatHint('WASTE')}}}</p>
           <p>Waste in tonnes</p>
           <div class="rpt table2" id="wasteRptTable2" data-total="true" data-qs="RECYCLING_WEIGHT,OTHER_RECOVERY_WEIGHT,INCINERATION_WEIGHT,LANDFILL_WEIGHT" data-periods="4"></div>
           <h4>Carbon emissions resulting</h4>
@@ -444,6 +521,8 @@
 
         <section id="waterSect">
           <h3>Finite resource use - Water</h3>
+          <span class="glyphicon glyphicon-question-sign no-print pull-right" onclick="ractive.toggleFieldHint('WATER')" title="{{formatHint('WATER')}}"></span>
+          <p class="help-block no-print hidden" id="WATERHint">{{{formatHint('WATER')}}}</p>
           <div class="rpt table2" id="waterRptTable2" data-qs="WATER_VOL,WASTE_WATER,WATER_AND_SEWAGE_COST" data-periods="4"></div>
           <h4>Carbon emissions resulting</h4>
           <p>
@@ -540,6 +619,8 @@
       </section>
       <section id="biodversitySect">
         <h2>Biodoversity Action Plan</h2>
+        <span class="glyphicon glyphicon-question-sign no-print pull-right" onclick="ractive.toggleFieldHint('BIODIVERSITY')" title="{{formatHint('BIODIVERSITY')}}"></span>
+        <p class="help-block no-print hidden" id="BIODIVERSITYHint">{{{formatHint('BIODIVERSITY')}}}</p>
         <p>
           {{#if formatAnswer('BIODIVERSITY')}}
             {{formatAnswer('BIODIVERSITY')}}

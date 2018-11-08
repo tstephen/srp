@@ -103,6 +103,7 @@ var ractive = new BaseRactive({
         'ELEC_USED_GREEN_TARIFF': 'Green Tariff Electricity Used',
         'ELEC_USED_LOCAL': 'Electricity Consumed - local',
         'ELEC_USED_RENEWABLE': 'Electricity Consumed - renewable',
+        'ENERGY': 'This is based on your response to the questions in the Electricity and Thermal sections',
         'ENERGY_CO2E_PCT': 'Energy',
         'ENERGY_CO2E_PER_POUND': 'Energy (tCO\u2082e)',
         'ENERGY_CTXT': 'Energy Context',
@@ -212,6 +213,7 @@ var ractive = new BaseRactive({
         'OWNED_FLEET_TRAVEL_CO2E': 'Business and fleet estimate',
         'OWNED_FLEET_TRAVEL': 'Organisation Owned Fleet/Pool Road Travel',
         'OWNED_VEHICLES': 'Owned vehicles',
+        'PAPER': 'This is based on your response to Spend question 5 and Waste question 3',
         'PAPER_CO2E': 'Paper emissions (tCO\u2082e)',
         'PAPER_AND_CARD_CO2E': 'Paper products',
         'PAPER_AND_CARD_SPEND': 'Paper products spend',
@@ -361,6 +363,7 @@ var ractive = new BaseRactive({
         'TOTAL_TRAVEL_CO2E_BY_WTE': 'Travel',
         'TRAJECTORY_PERF': 'Trajectory performance',
         'TRANSPORTATION_CO2E': 'Transportation',
+        'TRAVEL': 'This is based on your response to the questions in the Business and Other Travel sections',
         'TRAVEL_CO2E_PCT': 'Travel',
         'TRAVEL_CO2E_PER_POUND': 'Travel (tCO\u2082e)',
         'TRAVEL_CO2E': 'Travel',
@@ -368,6 +371,7 @@ var ractive = new BaseRactive({
         'TRAVEL_PERF': 'Travel performance',
         'TRAVEL_SPEND': 'Business travel and fleet',
         'VISITOR_MILEAGE': 'Patient and Visitor Travel',
+        'WASTE': 'This is based on your response to the questions in the Waste section',
         'WASTE_AND_WATER_CO2E': 'Waste and Water',
         'WASTE_AND_WATER': 'Waste and Water',
         'WASTE_CO2E': 'Waste products and recycling',
@@ -375,6 +379,7 @@ var ractive = new BaseRactive({
         'WASTE_PERF': 'Waste performance',
         'WASTE_RECYLING_COST': 'Waste recycling, recovery and preparing for re-use cost',
         'WASTE_WATER': 'Waste water volume (m\u00B3)',
+        'WATER': 'This is based on your response to the questions in the Water section',
         'WATER_AND_SEWAGE_COST': 'Water and sewage cost (£)',
         'WATER_CO2E': 'Water related emissions',
         'WATER_COST': 'Water cost (£)',
@@ -453,6 +458,15 @@ var ractive = new BaseRactive({
       // console.log('formatDate: '+timeString);
       if (timeString==undefined) return 'n/a';
       return new Date(timeString).toLocaleString(navigator.languages);
+    },
+    formatHint: function(qName) {
+      for (i in ractive.get('q.categories')) {
+        for (j in ractive.get('q.categories.'+i+'.questions')) {
+          if (ractive.get('q.categories.'+i+'.questions.'+j+'.name')==qName) return 'This is based on your response to '+ractive.get('q.categories.'+i+'.name')+' question '+(parseInt(j)+1);
+        }
+      }
+      if (ractive.get('labels.'+qName)!=undefined) return ractive.get('labels.'+qName);
+      else return qName;
     },
     formatProviderAnswer: function(idx,qName) {
       if (qName==undefined || ractive.get('surveyReturn.providers.'+idx)==undefined) return '';
@@ -761,7 +775,20 @@ var ractive = new BaseRactive({
     ractive.set('surveyReturn.completeness.missingrequired',requiredMissing);
     ractive.initNarrative();
     $('title').empty().append('Sustainability Report &ndash; '+ ractive.get('surveyReturn.applicablePeriod') +' &ndash; '+ ractive.get('surveyReturn.org'));
+    ractive.fetchSurvey();
     ractive.set('saveObserver', true);
+  },
+  fetchSurvey: function() {
+    console.info('fetchSurvey');
+    $.ajax({
+       type: 'GET',
+       url: ractive.getServer()+'/surveys/findByName/'+ractive.get('survey'),
+       dataType: 'json',
+       success: function(data, textStatus, jqxhr) {
+         console.log('success:'+data);
+         ractive.set('q', data);
+       }
+    });
   },
   fetchTable: function(ctrl) {
     $.ajax({
@@ -1065,12 +1092,20 @@ var ractive = new BaseRactive({
       }
     });
   },
+  toggleFieldHint: function(id) {
+    console.log('toggleFieldHint');
+    if ($('#'+id+'Hint:visible').length == 0) {
+      $('#'+id+'Hint').slideDown(ractive.get('easingDuration')).removeClass('hidden');
+    } else {
+      $('#'+id+'Hint').slideUp(ractive.get('easingDuration'));
+    }
+  },
   total: function(qs, period) {
     var total = 0;
     var answers = ractive.get('surveyReturn.answers');
     for (i = 0 ; i < qs.length ; i++) {
       var val = ractive.getAnswerFromArray(qs[i], period, answers, true);
-      total += val;
+      if (!isNaN(val)) total += parseFloat(val);
     }
     return total.formatDecimal(0);
   }
