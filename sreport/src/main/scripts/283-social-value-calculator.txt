@@ -1,0 +1,2 @@
+kp -v http://localhost:8083/admin/data-mgmt/questions
+kp -v http://localhost:8083/admin/data-mgmt/surveys/SDU-2018-19

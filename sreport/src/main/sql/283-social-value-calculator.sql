@@ -1,0 +1,1 @@
+update SR_CAT set questions = replace(questions, 'PROC_SUPPLIER_SUSTAINABILITY,','') where id = 55;  

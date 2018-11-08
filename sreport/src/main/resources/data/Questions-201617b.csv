@@ -331,3 +331,15 @@ NO_FALSE_ALARMS_NO_CALL_OUT$$$ERIC$$number$$$$
 OVERHEATING_EVENTS$$$ERIC$$number$$$$
 CIP_PLANNED_VAL$$$ERIC$$number$$$$
 CIP_ACTUAL_VAL$$$ERIC$$number$$$$
+SV_SOCIAL$Social Value due to social activities$£$SDU$$number$$$$
+SI_SOCIAL$Reported investment to provided additional social activities$£$SDU$$number$$$$
+SV_JOBS$Social Value arising from additional jobs$£$SDU$$number$$$$
+SI_JOBS$Reported investment to create additional jobs$£$SDU$$number$$$$
+SV_GROWTH$Social Value arising from additional growth$£$SDU$$number$$$$
+SI_GROWTH$Reported investment to create additional growth$£$SDU$$number$$$$
+SV_ENVIRONMENT$Social Value due to environmental measures$£$SDU$$number$$$$
+SI_ENVIRONMENT$Reported investment on environmental measures$£$SDU$$number$$$$
+SV_INNOVATION$Social Value arising from innovation$£$SDU$$number$$$$
+SI_INNOVATION$Reported investment to stimulate innovation$£$SDU$$number$$$$
+SV_TOTAL$Total Social Value$£$SDU$$number$$$$
+SI_TOTAL$Total reported investment$£$SDU$$number$$$$

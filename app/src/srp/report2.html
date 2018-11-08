@@ -80,37 +80,6 @@
       <section id="policiesSect">
         <h2>Policies</h2>
         <p>In order to embed sustainability within our business it is important to explain where in our process and procedures sustainability features.</p>
-        <table class="table table-striped">
-          <thead>
-	    <tr><th>Area</th><th>Is sustainability considered?</th>
-	      <th class="no-print"><span class="glyphicon glyphicon-question-sign pull-right"></span></th>
-	    </tr>
-          </thead>
-          <tbody>
-            <tr>
-	      <td>Travel</td>
-	      <td>{{#formatAnswer('HEALTHY_TRANSPORT_PLAN')==false || formatAnswer('HEALTHY_TRANSPORT_PLAN').indexOf('0')==-1}}No{{else}}Yes{{/}}</td>
-	      <td class="no-print">
-                <span class="help-block" id="HEALTHY_TRANSPORT_PLANHint">{{{formatHint('HEALTHY_TRANSPORT_PLAN')}}}</span>
-	      </td>
-	    </tr>
-            <tr><td>Procurement (environmental)</td><td>{{#formatAnswer('PROC_SUPPLIER_SUSTAINABILITY').indexOf('0')!=-1}}Yes{{else}}No{{/}}</td>
-	      <td class="no-print">
-                <span class="help-block" id="PROC_SUPPLIER_SUSTAINABILITYHint">{{{formatHint('PROC_SUPPLIER_SUSTAINABILITY')}}}</span>
-	      </td>
-	    </tr>
-            <tr><td>Procurement (social impact)</td><td>{{#formatAnswer('PROC_SUPPLIER_SUSTAINABILITY').indexOf('1')!=-1}}Yes{{else}}No{{/}}</td>
-	      <td class="no-print">
-                <span class="help-block" id="PROC_SUPPLIER_SUSTAINABILITYHint">{{{formatHint('PROC_SUPPLIER_SUSTAINABILITY')}}}</span>
-	      </td>
-	    </tr>
-            <tr><td>Suppliers&apos; impact</td><td>{{#formatAnswer('PROC_SUPPLIER_SUSTAINABILITY').indexOf('2')!=-1}}Yes{{else}}No{{/}}</td>
-	      <td class="no-print">
-                <span class="help-block" id="PROC_SUPPLIER_SUSTAINABILITYHint">{{{formatHint('PROC_SUPPLIER_SUSTAINABILITY')}}}</span>
-	      </td>
-	    </tr>
-          </tbody>
-        </table>
         <p>One of the ways in which an organisation can embed sustainability is
           through the use of
           {{#if formatAnswer('SDMP_CRMP')}}
@@ -470,6 +439,11 @@
 
         <section id="travelSect">
           <h3>Travel</h3>
+	  {{#formatAnswer('HEALTHY_TRANSPORT_PLAN')==false || formatAnswer('HEALTHY_TRANSPORT_PLAN').indexOf('0')==-1}}
+	    <p>We recognise that a Healthy Transport Plan is a foundational part of our Travel Policy and we will be putting that in place as soon as possible.</p>
+	  {{else}}
+	    <p>We recognise that a Healthy Transport Plan is a foundational part of our Travel Policy and we have completed that and keep it under review.</p>
+	  {{/}}
           <p>We can improve local air quality and improve the health of our community by promoting active travel to our staff and to the patients and public that use our services.
           <p>Every action counts and we are a lean organisation trying to realise efficiencies across the board for cost and carbon (CO<sub>2</sub>e) reductions. We support a culture for active travel to improve staff wellbeing and reduce sickness. Air pollution, accidents and noise all cause health problems for our local population, patients, staff and visitors and are caused by cars, as well as other forms of transport.</p>
           {{#if formatAnswer('QUANT_TRAVEL_IMPACTS')==true}}
@@ -588,27 +562,14 @@
 
       </section>
 
-      <section id="socialValueSect" style="display:none">
+      <section id="socialValueSect">
         <h2>Social Value</h2>
 
-	<p> Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Dolor sed viverra ipsum nunc. In dictum non consectetur a. Sed sed risus pretium quam. Nulla pharetra diam sit amet nisl suscipit. Ullamcorper dignissim cras tincidunt lobortis feugiat vivamus at. Quam viverra orci sagittis eu volutpat odio. Morbi blandit cursus risus at. Amet consectetur adipiscing elit pellentesque habitant. Diam maecenas sed enim ut sem. Vulputate dignissim suspendisse in est. Ultrices mi tempus imperdiet nulla malesuada pellentesque elit.</p>
+	<p></p>
 
-        <p>Augue interdum velit euismod in. Ultricies lacus sed turpis tincidunt. Est ullamcorper eget nulla facilisi. Elit ullamcorper dignissim cras tincidunt lobortis feugiat. Lacinia quis vel eros donec ac odio tempor orci. Sollicitudin ac orci phasellus egestas tellus. Ut enim blandit volutpat maecenas volutpat blandit aliquam. Velit sed ullamcorper morbi tincidunt ornare massa. Habitant morbi tristique senectus et. Nisi porta lorem mollis aliquam. Ut consequat semper viverra nam libero. Viverra suspendisse potenti nullam ac tortor vitae. Elementum curabitur vitae nunc sed. Dolor sit amet consectetur adipiscing elit pellentesque. Tortor at auctor urna nunc id cursus metus aliquam. Lorem mollis aliquam ut porttitor leo a diam. Turpis massa sed elementum tempus. Nibh sit amet commodo nulla facilisi nullam vehicula ipsum. Ante in nibh mauris cursus mattis molestie a.
-        </p>
+	<p></p>
 
-        <table class="table table-striped">
-          <thead>
-            <tr>
-	      <th></th><th>2014-15</th>
-	      <th>2015-16</th><th>2016-17</th>
-	      <th>2017-18</th>
-	    </tr>
-          </thead>
-          <tbody>
-            <tr><td>Total Social Value</td><td>0</td><td>0</td><td>0</td><td>0</td></tr>
-	    <tr><td>Total Investment Recorded</td><td>0</td><td>0</td><td>0</td><td>0</td></tr>
-          </tbody>
-        </table>
+        <div class="rpt table2" id="socialValueRptTable2" data-qs="SV_TOTAL,SI_TOTAL" data-periods="4"></div>
 
       </section>
 

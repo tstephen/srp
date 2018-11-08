@@ -26,16 +26,18 @@ import digital.srp.sreport.model.returns.EricDataSetFactory;
 import digital.srp.sreport.model.surveys.Eric1516;
 import digital.srp.sreport.model.surveys.Sdu1617;
 import digital.srp.sreport.model.surveys.Sdu1718;
+import digital.srp.sreport.model.surveys.Sdu1819;
 import digital.srp.sreport.repositories.AnswerRepository;
 import digital.srp.sreport.repositories.QuestionRepository;
 import digital.srp.sreport.repositories.SurveyCategoryRepository;
 import digital.srp.sreport.repositories.SurveyRepository;
 import digital.srp.sreport.repositories.SurveyReturnRepository;
 import digital.srp.sreport.services.HistoricDataMerger;
+import javassist.tools.rmi.ObjectNotFoundException;
 
 /**
  * REST web service for managing application data.
- * 
+ *
  * @author Tim Stephenson
  */
 @Controller
@@ -50,7 +52,7 @@ public class MgmtController {
 
     @Autowired
     protected QuestionRepository qRepo;
-    
+
     @Autowired
     protected SurveyRepository surveyRepo;
 
@@ -59,10 +61,10 @@ public class MgmtController {
 
     @Autowired
     protected AnswerRepository answerRepo;
-    
+
     @Autowired
     protected SurveyReturnRepository returnRepo;
-    
+
     @RequestMapping(value = "/", method = RequestMethod.GET, headers = "Accept=application/json")
     public String initAndShowStatus(Model model) throws IOException {
         LOGGER.info(String.format("initAndShowStatus"));
@@ -74,7 +76,7 @@ public class MgmtController {
         for (String ericDataSet : ericDataSets) {
             initEricReturns(ericDataSet);
         }
-        
+
         model.addAttribute("answers", answerRepo.findAll());
         model.addAttribute("returns", returnRepo.findAll());
         return "jsonStatus";
@@ -89,7 +91,7 @@ public class MgmtController {
                 qRepo.save(question);
             }
         }
-        
+
         model.addAttribute("questions", qRepo.findAll());
         return "jsonStatus";
     }
@@ -105,36 +107,63 @@ public class MgmtController {
 
     @RequestMapping(value = "/surveys", method = RequestMethod.GET, headers = "Accept=application/json")
     public String initSurveys(Model model) throws IOException {
-        Survey[] expectedSurveys = { Eric1516.getSurvey(), Sdu1617.getSurvey(), Sdu1718.getSurvey() };
+        Survey[] expectedSurveys = { Eric1516.getSurvey(), Sdu1617.getSurvey(),
+                Sdu1718.getSurvey(), Sdu1819.getSurvey() };
         for (Survey expected : expectedSurveys) {
-            Survey survey = surveyRepo.findByName(expected.name());
-            if (survey == null) {
-                LOGGER.warn(String.format(
-                        "Could not find expected survey %1$s, attempt to create",
-                        expected));
-                surveyRepo.save(expected);
-            } else {
-                LOGGER.debug(String.format("Expected survey %1$s found, checking categories", expected));
-                for (SurveyCategory cat : expected.categories()) {
-                    SurveyCategory existingCat = catRepo.findBySurveyAndCategory(expected.name(), cat.name());
-                    if (existingCat == null) { 
-                        catRepo.save(cat.survey(survey));
-                    } else {
-                        catRepo.save(existingCat.questionEnums(cat.questionEnums()));
-                    }
+            initSurvey(expected);
+        }
+
+        model.addAttribute("surveys", surveyRepo.findAll());
+        return "jsonStatus";
+    }
+
+    private void initSurvey(Survey expected) {
+        Survey survey = surveyRepo.findByName(expected.name());
+        if (survey == null) {
+            LOGGER.warn(String.format(
+                    "Could not find expected survey %1$s, attempt to create",
+                    expected));
+            surveyRepo.save(expected);
+        } else {
+            LOGGER.debug(String.format("Expected survey %1$s found, checking categories", expected));
+            for (SurveyCategory cat : expected.categories()) {
+                SurveyCategory existingCat = catRepo.findBySurveyAndCategory(expected.name(), cat.name());
+                if (existingCat == null) {
+                    catRepo.save(cat.survey(survey));
+                } else {
+                    catRepo.save(existingCat.questionEnums(cat.questionEnums()));
                 }
             }
         }
-        
+    }
+
+    @RequestMapping(value = "/surveys/{surveyName}", method = RequestMethod.GET, headers = "Accept=application/json")
+    public String initSurvey(@PathVariable("surveyName") String surveyName, Model model) throws IOException, Exception {
+        initSurvey(lookupSurvey(surveyName));
         model.addAttribute("surveys", surveyRepo.findAll());
         return "jsonStatus";
+    }
+
+    private Survey lookupSurvey(String surveyName) throws ObjectNotFoundException {
+        switch (surveyName) {
+        case "ERIC-2015-16":
+            return Eric1516.getSurvey();
+        case "SDU-2016-17":
+            return Sdu1617.getSurvey();
+        case "SDU-2017-18":
+            return Sdu1718.getSurvey();
+        case "SDU-2018-19":
+            return Sdu1819.getSurvey();
+        default:
+            throw new ObjectNotFoundException(String.format("No survey named %1$s is known", surveyName));
+        }
     }
 
     @RequestMapping(value = "/answers/{ericDataSet}", method = RequestMethod.GET, headers = "Accept=application/json")
     public @ResponseBody String initEricReturns(@PathVariable("ericDataSet") String ericDataSet) {
         List<SurveyReturn> existingReturns = returnRepo.findBySurveyName(ericDataSet);
         LOGGER.debug(" ... {} existing returns", existingReturns.size());
-        
+
         EricDataSet ericDS = EricDataSetFactory.getInstance(ericDataSet);
         try {
             List<SurveyReturn> returns = new EricCsvImporter().readEricReturns(ericDS);
@@ -184,7 +213,7 @@ public class MgmtController {
             throw new IllegalStateException(msg);
         }
     }
-    
+
     private void saveReturnAndAnswers(SurveyReturn surveyReturn) {
         LOGGER.info("Save new return {} for {} with {} answers", surveyReturn.name(), surveyReturn.org(), surveyReturn.answers().size());
         for (Answer answer : surveyReturn.answers()) {
@@ -196,8 +225,8 @@ public class MgmtController {
 
     private SurveyReturn findBySurveyAndOrg(List<SurveyReturn> existingReturns,
             SurveyReturn surveyReturn) {
-        for (SurveyReturn ret : existingReturns) { 
-            if (ret.name().equals(surveyReturn.name()) 
+        for (SurveyReturn ret : existingReturns) {
+            if (ret.name().equals(surveyReturn.name())
                     && ret.org().equals(surveyReturn.org())) {
                 LOGGER.info(String.format("Skipping insert of return for %1$s because %2$d matches name and org", surveyReturn.name(), ret.id()));
                 return ret;
