@@ -344,6 +344,7 @@ var $r = (function ($, ractive, $auth) {
     if (_survey == undefined) ractive.fetch();
     if (me.rtn == undefined) _fetchReturn();
     if (ractive.get('orgTypes') == undefined) _fetchLists();
+    if (ractive.get('profile') == undefined) me.getProfile();
   }
 
   function _showQuestionnaire() {
@@ -367,6 +368,44 @@ var $r = (function ($, ractive, $auth) {
         }
       }
     }
+  }
+
+  me.getProfile = function() {
+    if ($auth.loginInProgress) {
+      console.info('skip fetch profile while logging in');
+      return;
+    }
+    var username = $auth.getClaim('sub');
+    console.log('getProfile: '+username);
+    if (username) {
+      $.getJSON(ractive.getServer()+'/users/'+username, function(profile) {
+        ractive.set('saveObserver', false);
+        ractive.set('profile',profile);
+        $('.profile-img').empty().append('<img class="img-rounded" src="//www.gravatar.com/avatar/'+ractive.hash(ractive.get('profile.email'))+'?s=34" title="'+ractive.get('profile.email')+'"/>');
+        if ($auth.getClaim('scopes').indexOf('super_admin')!=-1) $('.super-admin').show();
+        me.loadTenantConfig(ractive.get('profile.tenant'));
+        ractive.set('saveObserver', true);
+      });
+    } else {
+      $auth.showLogin();
+    }
+  }
+
+  me.loadTenantConfig = function(tenant) {
+    if ($auth.loginInProgress) {
+      console.info('skip tenant load while logging in');
+      return;
+    }
+    if (tenant==undefined || tenant=='undefined') $auth.showLogin();
+    console.info('loadTenantConfig:'+tenant);
+    $.getJSON(ractive.getServer()+'/tenants/'+tenant+'.json', function(response) {
+      //console.log('... response: '+JSON.stringify(response));
+      ractive.set('saveObserver', false);
+      ractive.set('tenant', response);
+      ractive.applyBranding();
+      ractive.initAutoComplete();
+      ractive.set('saveObserver', true);
+    });
   }
 
   me.moveNext = function() {
@@ -520,9 +559,9 @@ var $r = (function ($, ractive, $auth) {
 
   // Correct std partial paths
   ractive.set('stdPartials', [
-      { "name": "loginSect", "url": $env.server+"/webjars/auth/1.1.0/partials/login-sect.html"},
       { "name": "questionnaire", "url": "/questionnaire/partials/questionnaire.html"},
-      { "name": "questionnaireContact", "url": "/questionnaire/partials/questionnaire-contact.html"}
+      { "name": "questionnaireContact", "url": "/questionnaire/partials/questionnaire-contact.html"},
+      { "name": "sidebar", "url": $env.server+"/partials/sidebar.html"},
     ])
   ractive.loadStandardPartials(ractive.get('stdPartials'));
 
@@ -537,6 +576,10 @@ var $r = (function ($, ractive, $auth) {
   ractive.fetchCallbacks.add(_hideCalcs);
   ractive.fetchCallbacks.add(me.fill);
   ractive.fetchCallbacks.add(_showQuestionnaire);
+  ractive.toggleSidebar = function() {
+    console.info('toggleSidebar');
+    $('.toolbar-left').toggle(EASING_DURATION);
+  }
 
   try { _isIE = navigator.userAgent.match(/trident/i)!=null; } catch (e) {
   }

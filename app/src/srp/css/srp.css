@@ -1,8 +1,7 @@
 /* FONTS */
 @import url('//fonts.googleapis.com/css?family=Roboto:400italic,400,700');
 @import url('//fonts.googleapis.com/css?family=Ubuntu:400italic,400,700');
-
-@import url('//api.knowprocess.com/webjars/knowprocess-icons/3.0.0/style.css ');
+@import url('//api.knowprocess.com/webjars/knowprocess-icons/3.1.0/style.css ');
 /* END FONTS */
 
 /*
@@ -49,6 +48,17 @@ small {
 .help-block {
   color: #99c344;
   font-style: italic;
+}
+.glyphicon {
+  margin: 2px 1px;
+  border-radius: 5px;
+  color: #779c95;
+  min-width: 36px;
+  text-align: center;
+}
+.icon-btn {
+  border: solid 1px;
+  padding: 6px;
 }
 .navbar-brand {
   padding-top: 0;
@@ -204,19 +214,62 @@ form .criteria input {
   text-align: right;
   width: 8em;
 }
-.omny-bar-left li span:not(.active):not(:active):not(:hover),
-.omny-bar li span:not(.active) {
-  border-bottom-color: #ec9300;
+.toolbar {
+  background-color: #eee;
+  color: #da72ae;
+  position: fixed;
 }
+.menu-burger .glyphicon,
+.toolbar .glyphicon {
+  font-size: 20px;
+  padding: 6px;
+}
+.toolbar .icon-btn {
+  border-width: 0 0 1px 0;
+  border-radius: 0;
+}
+.toolbar-left {
+  border-bottom-style: none;
+  border-right-style: double;
+  border-top-style: none;
+  bottom: 0;
+  display: none;
+  left: 0px;
+  top: 0;
+  width: 50px;
+  z-index: 300;
+}
+.toolbar-left .page {
+  position: relative;
+  top: 20px;
+}
+.toolbar-left .powered-by-icon img {
+  position: fixed;
+  bottom: 10px;
+  width: 40px;
+}
+.toolbar li {
+  list-style: none;
+  margin-left: -36px;
+}
+.toolbar li span.glyphicon:hover,
+.toolbar li span.glyphicon:active,
+.toolbar li span.glyphicon.active,
 .omny-bar li span.glyphicon:hover,
 .omny-bar li span.glyphicon:active,
 .omny-bar li span.glyphicon.active {
   color: #fcf8e3;
   background-color: #ec9300;
+  border-radius: 5px;
+  border-width: 0;
 }
 .menu-burger,
 .omny-burger {
   margin: 4px 5px;
+  left: 0px;
+  position: fixed;
+  top: 0px;
+  z-index: 300;
 }
 .save-indicator-animation {
   animation: blinker 1s linear infinite;

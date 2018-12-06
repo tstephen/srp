@@ -13,8 +13,6 @@
   <section id="container" class="container"></section>
 
   <script id='template' type='text/ractive'>
-    {{>loginSect}}
-
     <section id="currentSect">
     {{#if surveyReturn}}
       <section id="introSect">
@@ -217,6 +215,8 @@
         <button on-click="fetch()">Load it now</button>
       </section>
     {{/if}}
+
+    {{>sidebar { active: 'treasury2.html' } }}
     </section>
   </script>
 

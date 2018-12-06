@@ -15,8 +15,6 @@
   <section id="container" class="container"></section>
 
   <script id='template' type='text/ractive'>
-    {{>loginSect}}
-
     <section id="currentSect">
     {{#if surveyReturn}}
       <section id="introSect">
@@ -598,6 +596,7 @@
       </section>
     {{/if}}
     </section>
+    {{>sidebar { active: 'report2.html' }}}
   </script>
 
   <script src="//code.jquery.com/jquery-1.11.0.min.js"></script>

@@ -497,6 +497,15 @@ var ractive = new BaseRactive({
     isEClassUser: function() {
       return ractive.isEClassUser();
     },
+    matchRole: function(role) {
+      console.info('matchRole: '+role)
+      if (role==undefined || ractive.hasRole(role)) {
+        $('.'+role).show();
+        return true;
+      } else {
+        return false;
+      }
+    },
     matchSearch: function(obj) {
       var searchTerm = ractive.get('searchTerm');
       //console.info('matchSearch: '+searchTerm);
@@ -541,6 +550,7 @@ var ractive = new BaseRactive({
     },
     stdPartials: [
       { "name": "loginSect", "url": $env.server+"/webjars/auth/1.1.0/partials/login-sect.html"},
+      { "name": "sidebar", "url": $env.server+"/partials/sidebar.html"},
       { "name": "statusSect", "url": "/srp/2.1.0/partials/status-sect.html"}
     ],
   },
