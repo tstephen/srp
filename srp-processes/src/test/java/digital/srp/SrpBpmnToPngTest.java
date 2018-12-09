@@ -29,7 +29,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
-import com.knowprocess.bpm.impl.Bpmn2Image;
+import com.knowprocess.bpm.bpmn.Bpmn2Image;
 
 @RunWith(Parameterized.class)
 public class SrpBpmnToPngTest {

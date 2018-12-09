@@ -10,7 +10,7 @@
     <version>2.4.0-SNAPSHOT</version>
     <relativePath>..</relativePath>
   </parent>
-  
+
   <dependencies>
     <dependency>
       <groupId>junit</groupId>
@@ -55,13 +55,12 @@
     </dependency>
     <!-- required by integration tests, look for another way... -->
     <dependency>
-      <groupId>com.knowprocess.bpm</groupId>
-      <artifactId>work-mgmt</artifactId>
+      <groupId>com.knowprocess.bpaas</groupId>
+      <artifactId>kp-processes</artifactId>
       <version>${work-mgmt.version}</version>
     </dependency>
-    
   </dependencies>
-  
+
   <build>
       <plugins>
           <plugin>
