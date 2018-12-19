@@ -562,6 +562,7 @@ var $r = (function ($, ractive, $auth) {
       { "name": "questionnaire", "url": "/questionnaire/partials/questionnaire.html"},
       { "name": "questionnaireContact", "url": "/questionnaire/partials/questionnaire-contact.html"},
       { "name": "sidebar", "url": $env.server+"/partials/sidebar.html"},
+      { "name": "toolbar", "url": $env.server+"/partials/toolbar.html"}
     ])
   ractive.loadStandardPartials(ractive.get('stdPartials'));
 
@@ -579,6 +580,10 @@ var $r = (function ($, ractive, $auth) {
   ractive.toggleSidebar = function() {
     console.info('toggleSidebar');
     $('.toolbar-left').toggle(EASING_DURATION);
+  }
+  ractive.toggleSubMenu = function(entry) {
+    console.info('toggleSubMenu');
+    $(entry.nextElementSibling).toggle(EASING_DURATION);
   }
 
   try { _isIE = navigator.userAgent.match(/trident/i)!=null; } catch (e) {

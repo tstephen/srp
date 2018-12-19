@@ -38,6 +38,7 @@ var ractive = new BaseRactive({
       { "name": "loginSect", "url": $env.server+"/webjars/auth/1.1.0/partials/login-sect.html"},
       { "name": "profileArea", "url": $env.server+"/partials/profile-area.html"},
       { "name": "sidebar", "url": $env.server+"/partials/sidebar.html"},
+      { "name": "toolbar", "url": $env.server+"/partials/toolbar.html"},
       { "name": "supportBar", "url": $env.server+"/webjars/supportservices/3.0.0/partials/support-bar.html"},
       { "name": "titleArea", "url": $env.server+"/partials/title-area.html"},
     ],

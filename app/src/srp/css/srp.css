@@ -60,6 +60,10 @@ small {
   border: solid 1px;
   padding: 6px;
 }
+.txt-btn {
+  font-family: Ubuntu, sans-serif;
+  padding: 6px;
+}
 .navbar-brand {
   padding-top: 0;
   position: relative;
@@ -224,9 +228,11 @@ form .criteria input {
   font-size: 20px;
   padding: 6px;
 }
-.toolbar .icon-btn {
+.toolbar .icon-btn,
+.toolbar .txt-btn {
   border-width: 0 0 1px 0;
   border-radius: 0;
+  border-style: solid;
 }
 .toolbar-left {
   border-bottom-style: none;
@@ -239,9 +245,22 @@ form .criteria input {
   width: 50px;
   z-index: 300;
 }
-.toolbar-left .page {
+.toolbar-left>ul>.page,
+.toolbar-left .submenu {
   position: relative;
   top: 20px;
+}
+.toolbar-left .submenu ul {
+  background-color: #eee;
+  border-right-style: double;
+  display: none;
+  margin-left: 40px;
+}
+.toolbar-left .submenu ul li {
+  display: inherit;
+}
+.toolbar-left .submenu ul li:nth-child(1) {
+  border-top: 1px solid;
 }
 .toolbar-left .powered-by-icon img {
   position: fixed;

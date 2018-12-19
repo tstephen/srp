@@ -152,6 +152,7 @@ var ractive = new BaseRactive({
       { "name": "navbar", "url": "./vsn/partials/question-navbar.html"},
       { "name": "profileArea", "url": $env.server+"/partials/profile-area.html"},
       { "name": "sidebar", "url": $env.server+"/partials/sidebar.html"},
+      { "name": "toolbar", "url": $env.server+"/partials/toolbar.html"},
       { "name": "titleArea", "url": $env.server+"/partials/title-area.html"},
       { "name": "questionListSect", "url": "./vsn/partials/question-list-sect.html"},
       { "name": "questionCurrentSect", "url": "./vsn/partials/question-current-sect.html"}

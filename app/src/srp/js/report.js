@@ -551,6 +551,7 @@ var ractive = new BaseRactive({
     stdPartials: [
       { "name": "loginSect", "url": $env.server+"/webjars/auth/1.1.0/partials/login-sect.html"},
       { "name": "sidebar", "url": $env.server+"/partials/sidebar.html"},
+      { "name": "toolbar", "url": $env.server+"/partials/toolbar.html"},
       { "name": "statusSect", "url": "/srp/2.1.0/partials/status-sect.html"}
     ],
   },

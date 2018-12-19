@@ -546,6 +546,10 @@ var BaseRactive = Ractive.extend({
     console.info('toggleSidebar');
     $('.toolbar-left').toggle(EASING_DURATION);
   },
+  toggleSubMenu: function(entry) {
+    console.info('toggleSubMenu');
+    $(entry.nextElementSibling).toggle(EASING_DURATION);
+  },
   upload: function(formId) {
     console.log('upload, id: '+formId);
     var formElement = document.getElementById(formId);

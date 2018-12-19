@@ -144,6 +144,7 @@ var ractive = new BaseRactive({
       { "name": "navbar", "url": "./vsn/partials/intervention-type-navbar.html"},
       { "name": "profileArea", "url": $env.server+"/partials/profile-area.html"},
       { "name": "sidebar", "url": $env.server+"/partials/sidebar.html"},
+      { "name": "toolbar", "url": $env.server+"/partials/toolbar.html"},
       { "name": "titleArea", "url": $env.server+"/partials/title-area.html"},
       { "name": "interventionTypeListSect", "url": "./vsn/partials/intervention-type-list-sect.html"},
       { "name": "interventionTypeCurrentSect", "url": "./vsn/partials/intervention-type-current-sect.html"}

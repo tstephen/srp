@@ -89,6 +89,7 @@ var ractive = new BaseRactive({
       { "name": "navbar", "url": "/srp/vsn/partials/answer-navbar.html"},
       { "name": "profileArea", "url": $env.server+"/partials/profile-area.html"},
       { "name": "sidebar", "url": $env.server+"/partials/sidebar.html"},
+      { "name": "toolbar", "url": $env.server+"/partials/toolbar.html"},
       { "name": "titleArea", "url": $env.server+"/partials/title-area.html"},
       { "name": "answerCriteriaSect", "url": "/srp/vsn/partials/answer-criteria-sect.html"},
       { "name": "answerListSect", "url": "/srp/vsn/partials/answer-list-sect.html"}

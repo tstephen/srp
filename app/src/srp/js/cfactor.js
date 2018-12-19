@@ -134,6 +134,7 @@ var ractive = new BaseRactive({
       { "name": "navbar", "url": "./vsn/partials/cfactor-navbar.html"},
       { "name": "profileArea", "url": $env.server+"/partials/profile-area.html"},
       { "name": "sidebar", "url": $env.server+"/partials/sidebar.html"},
+      { "name": "toolbar", "url": $env.server+"/partials/toolbar.html"},
       { "name": "titleArea", "url": $env.server+"/partials/title-area.html"},
       { "name": "cfactorListSect", "url": "./vsn/partials/cfactor-list-sect.html"},
       { "name": "cfactorCurrentSect", "url": "./vsn/partials/cfactor-current-sect.html"}
