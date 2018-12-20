@@ -1,0 +1,8 @@
+# Get report of issues
+kp -v https://api.knowprocess.com/admin/health/SDU-2017-18/RW5
+
+# Now attempt to fix (e.g. remove dups); some errors will require manual resolution
+kp -v -X POST https://api.knowprocess.com/admin/health/SDU-2017-18/RW5
+
+# Re-run calculations
+kp -v -X POST https://api.knowprocess.com/calculations/SDU-2017-18/RW5

@@ -18,6 +18,9 @@ import digital.srp.sreport.model.SurveyReturn;
 @RepositoryRestResource(exported = false)
 public interface SurveyReturnRepository extends CrudRepository<SurveyReturn, Long> {
 
+    @Query("SELECT o FROM SurveyReturn o WHERE o.name = :name")
+    SurveyReturn findByName(@Param("name") String name);
+
     @Query("SELECT o FROM SurveyReturn o WHERE o.status != 'Superseded' "
             + "ORDER BY o.name ASC")
     List<SurveyReturn> findAll();
@@ -33,6 +36,10 @@ public interface SurveyReturnRepository extends CrudRepository<SurveyReturn, Lon
     @Query("SELECT o FROM SurveyReturn o WHERE o.status != 'Superseded' "
             + "AND o.survey.id = :surveyId ORDER BY o.applicablePeriod DESC, o.name ASC")
     List<SurveyReturn> findBySurvey(@Param("surveyId") Long surveyId);
+
+    @Query("SELECT COUNT(o) FROM SurveyReturn o WHERE o.status != 'Superseded' "
+            + "AND o.survey.name = :surveyName ORDER BY o.applicablePeriod DESC, o.name ASC")
+    Long countBySurveyName(@Param("surveyName") String surveyName);
 
     @Query("SELECT o FROM SurveyReturn o WHERE o.status != 'Superseded' "
             + "AND o.survey.name = :surveyName ORDER BY o.applicablePeriod DESC, o.name ASC")
@@ -58,4 +65,5 @@ public interface SurveyReturnRepository extends CrudRepository<SurveyReturn, Lon
             + "AND a.id NOT IN (SELECT answer_id FROM SR_RETURN_ANSWER WHERE survey_return_id = :id)", nativeQuery = true)
     @Modifying(clearAutomatically = true)
     void importAnswers(@Param("id") Long id, @Param("org") String org, @Param("surveyToImport") String surveyToImport);
+
 }

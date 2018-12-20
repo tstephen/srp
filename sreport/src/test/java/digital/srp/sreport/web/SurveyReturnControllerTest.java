@@ -147,5 +147,17 @@ public class SurveyReturnControllerTest {
         public void importAnswers(Long id, String org, String surveyToImport) {
         }
 
+        @Override
+        public Long countBySurveyName(String surveyName) {
+            // TODO Auto-generated method stub
+            return null;
+        }
+
+        @Override
+        public SurveyReturn findByName(String name) {
+            // TODO Auto-generated method stub
+            return null;
+        }
+
     }
 }

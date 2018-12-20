@@ -197,7 +197,9 @@ public class SurveyReturnController {
             for (Q q : cat.questionEnums()) {
                 if (!rtn.answer(rtn.applicablePeriod(), q).isPresent()) {
                     Optional<Question> question = findQuestion(q.name());
-                    Answer answer = new Answer().question(question.get()).addSurveyReturn(rtn)
+                    Answer answer = new Answer()
+                            .question(question.orElseThrow(() -> new ObjectNotFoundException(Q.class, q)))
+                            .addSurveyReturn(rtn)
                             .applicablePeriod(requested.applicablePeriod());
                     if (q.equals(Q.ORG_CODE)) {
                         answer.response(rtn.org());
@@ -246,15 +248,41 @@ public class SurveyReturnController {
             @PathVariable("org") String org) {
         long count = 0;
         long start = System.currentTimeMillis();
-        SurveyReturn rtn  = findCurrentBySurveyNameAndOrg(surveyName, org);
+        SurveyReturn trgtRtn  = findCurrentBySurveyNameAndOrg(surveyName, org);
+
         List<Survey> surveys = surveyRepo.findEricSurveys();
         for (Survey survey : surveys) {
-            Set<Answer> answersToImport = answerRepo.findAnswersToImport(rtn.id(), rtn.org(), survey.name());
-            LOGGER.info("Found {} answers to import from {} to {}", answersToImport.size(), survey.name(), rtn.id());
-            count += historicDataMerger.merge(answersToImport, rtn);
+            count += importFromOtherReturn(survey.name(), trgtRtn);
         }
         LOGGER.info("Importing ERIC data added {} records and took {}ms", count, (System.currentTimeMillis()-start));
+
         return findCurrentBySurveyNameAndOrg(surveyName, org);
+    }
+
+    @RequestMapping(value = "/import/{sourceReturnName}/{targetReturnName}", method = RequestMethod.POST)
+    @ResponseStatus(HttpStatus.OK)
+    @Transactional
+    public void importFromOtherReturn(
+            @PathVariable("sourceReturnName") String srcRtnName,
+            @PathVariable("targetReturnName") String trgtRtnName) {
+        SurveyReturn trgtRtn = returnRepo.findByName(trgtRtnName);
+        importFromOtherReturn(srcRtnName, trgtRtn);
+    }
+
+    @Transactional
+    protected long importFromOtherReturn(String srcRtnName, SurveyReturn trgtRtn) {
+        long count = 0;
+        long start = System.currentTimeMillis();
+        Optional<SurveyReturn> srcRtn = Optional.ofNullable(returnRepo.findByName(srcRtnName));
+        if (srcRtn.isPresent()) {
+            Set<Answer> answersToImport = answerRepo.findAnswersToImport(trgtRtn.id(), srcRtn.get().id());
+            LOGGER.info("Found {} answers to import from {} to {}", answersToImport.size(), srcRtnName, trgtRtn.id());
+            count += historicDataMerger.merge(answersToImport, trgtRtn);
+            LOGGER.info("Importing from {} added {} records and took {}ms", srcRtnName, count, (System.currentTimeMillis()-start));
+        } else {
+            LOGGER.warn("No return {} found to import from for {} ({})", srcRtnName, trgtRtn.name(), trgtRtn.id());
+        }
+        return count;
     }
 
     /**

@@ -24,4 +24,18 @@ public interface QuestionRepository extends CrudRepository<Question, Long> {
 
     @Query("SELECT o FROM Question o ORDER BY o.name ASC")
     List<Question> findPage(Pageable pageable);
+
+    @Query("SELECT COUNT(o) FROM Question o, SurveyCategory sc, Survey s "
+            + "WHERE sc.questionNames LIKE CONCAT('%',o.name,'%') "
+            + "AND sc.survey.id = s.id "
+            + "AND s.name = :surveyName "
+            + "ORDER BY o.name ASC")
+    Long countBySurveyName(@Param("surveyName") String surveyName);
+
+    @Query("SELECT o FROM Question o, SurveyCategory sc, Survey s "
+            + "WHERE sc.questionNames LIKE CONCAT('%',o.name,'%') "
+            + "AND sc.survey.id = s.id "
+            + "AND s.name = :surveyName "
+            + "ORDER BY o.name ASC")
+    List<Question> findBySurveyName(@Param("surveyName") String surveyName);
 }

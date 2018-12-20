@@ -1,2 +1,28 @@
+# NOTE a restart is required after importing the new questions because they're
+# cached in SurveyReturnController and there is no way to refresh
+# Should consider using Spring cache but need to take measurements to ensure
+# no degradation of service (for example by being RAM-bound)
+# https://www.baeldung.com/spring-cache-tutorial
+
+# Report on existing questions
 kp -v http://localhost:8083/admin/data-mgmt/questions
+# Report on existing surveys
 kp -v http://localhost:8083/admin/data-mgmt/surveys/SDU-2018-19
+
+# Load any new questions
+kp -v -X POST http://localhost:8083/admin/data-mgmt/questions
+# Load the new survey
+kp -v -X POST http://localhost:8083/admin/data-mgmt/surveys/SDU-2018-19
+
+#
+# RESTART TO GET NEW QUESTIONS LOADED
+#
+
+# Fetch the new years report, implicitly creating it and importing ERIC data
+kp -v http://localhost:8083/returns/findCurrentBySurveyNameAndOrg/SDU-2018-19/RDR
+
+# import previous year data (if exists)
+kp -v -X POST http://localhost:8083/returns/import/SDU-2017-18-RDR/SDU-2018-19-RDR
+
+# REPEAT FOR ALL ORGS THAT HAVE PREVIOUS YEAR RPT
+

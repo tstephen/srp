@@ -27,6 +27,28 @@ public interface AnswerRepository extends CrudRepository<Answer, Long> {
             + "ORDER BY a.applicablePeriod DESC")
     List<Answer> findByQuestion(@Param("qNames") String... qNames);
 
+    // Unfortunately, and despite the method name, have to pre-find question
+    // names to make this join
+    @Query("SELECT COUNT(a) FROM Answer a LEFT JOIN a.surveyReturns r "
+            + "JOIN r.survey s "
+            + "WHERE a.revision = (SELECT MAX(o.revision) "
+                    + "FROM Answer o LEFT JOIN o.surveyReturns r "
+                    + "WHERE o.question.name IN :qNames) "
+            + "AND s.name = :surveyName "
+            + "ORDER BY a.applicablePeriod DESC")
+    Long countBySurveyName(@Param("surveyName") String surveyName, @Param("qNames") String[] qNames);
+
+    // Unfortunately, and despite the method name, have to pre-find question
+    // names to make this join
+    @Query("SELECT a FROM Answer a LEFT JOIN a.surveyReturns r "
+            + "JOIN r.survey s "
+            + "WHERE a.revision = (SELECT MAX(o.revision) "
+                    + "FROM Answer o LEFT JOIN o.surveyReturns r "
+                    + "WHERE o.question.name IN :qNames) "
+            + "AND s.name = :surveyName "
+            + "ORDER BY a.applicablePeriod DESC")
+    List<Answer> findBySurveyName(@Param("surveyName") String surveyName, @Param("qNames") String[] qNames);
+
     @Query("SELECT a FROM Answer a LEFT JOIN a.surveyReturns r "
             + "WHERE a.revision = (SELECT MAX(o.revision) FROM SurveyReturn o WHERE o.applicablePeriod = :rtnPeriod AND o.org = :org) "
             + "AND a.applicablePeriod IN :periods "
@@ -55,11 +77,10 @@ public interface AnswerRepository extends CrudRepository<Answer, Long> {
     @Query(value = "SELECT a.* from SR_ANSWER a "
             + "INNER JOIN SR_RETURN_ANSWER ra ON a.id = ra.answer_id "
             + "INNER JOIN SR_RETURN r ON ra.survey_return_id = r.id "
-            + "INNER JOIN SR_SURVEY s ON r.survey_id = s.id "
-            + "WHERE r.org = :org "
-            + "AND s.name = :surveyToImport "
+            + "WHERE r.id = :sourceReturnId "
+            + "AND a.derived = false "
             + "AND a.id NOT IN (SELECT answer_id FROM SR_RETURN_ANSWER WHERE survey_return_id = :targetReturnId)", nativeQuery = true)
-    Set<Answer> findAnswersToImport(@Param("targetReturnId") Long targetReturnId, @Param("org") String org, @Param("surveyToImport") String surveyToImport);
+    Set<Answer> findAnswersToImport(@Param("targetReturnId") Long targetReturnId, @Param("sourceReturnId") Long sourceReturnId);
 
     @Query("SELECT o FROM Answer o ORDER BY o.lastUpdated DESC")
     List<Answer> findAll();

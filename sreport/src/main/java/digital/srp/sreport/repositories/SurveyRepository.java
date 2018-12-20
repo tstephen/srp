@@ -29,7 +29,10 @@ public interface SurveyRepository extends CrudRepository<Survey, Long> {
 
     @Query("SELECT o FROM Survey o WHERE o.status != 'deleted' AND o.name LIKE 'ERIC%' ORDER BY o.name ASC")
     List<Survey> findEricSurveys();
-    
+
+    @Query("SELECT o FROM Survey o WHERE o.status != 'deleted' AND o.name LIKE 'SDU%' ORDER BY o.name ASC")
+    List<Survey> findSduSurveys();
+
     @Override
     @Query("UPDATE #{#entityName} x set x.status = 'deleted' where x.id = :id")
     @Modifying(clearAutomatically = true)
