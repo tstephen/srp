@@ -160,8 +160,10 @@ public class AnswerController {
                 SurveyCategory category = catRepo.findByName(
                         criterion.getValue());
 
-                predicate = questions.get("name").in(
-                        ((Object[]) category.questionNames().split(",")));
+                predicate = builder.and(
+                        predicate,
+                        questions.get("name").in(
+                                    ((Object[]) category.questionNames().split(","))));
                 break;
             case "org":
             case "organisation":
@@ -173,8 +175,10 @@ public class AnswerController {
                 break;
             case "orgType":
             case "organisation type":
-                predicate = surveyReturns.get("org")
-                        .in(getOrgsMatching(Q.ORG_TYPE).toArray());
+                predicate = builder.and(
+                        predicate,
+                        surveyReturns.get("org")
+                                .in(getOrgsMatching(Q.ORG_TYPE).toArray()));
                 break;
             case "period":
                 predicate = builder.and(
@@ -191,8 +195,10 @@ public class AnswerController {
                                 criterion.getValue().toString()));
                 break;
             case "region":
-                predicate = surveyReturns.get("org")
-                        .in(getOrgsMatching(Q.COMMISSIONING_REGION).toArray());
+                predicate = builder.and(
+                        predicate,
+                        surveyReturns.get("org")
+                                .in(getOrgsMatching(Q.COMMISSIONING_REGION).toArray()));
                 break;
             default:
                 // e.g. status
