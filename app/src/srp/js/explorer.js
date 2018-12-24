@@ -97,12 +97,13 @@ var ractive = new BaseRactive({
     title: "SDU Return Explorer"
   },
   partials: {
-    'loginSect':'',
-    'answerCriteriaSect':'',
-    'answerListSect':'',
-    'profileArea':'',
-    'sidebar':'',
-    'titleArea':''
+    loginSect:'',
+    answerCriteriaSect:'',
+    answerListSect:'',
+    profileArea:'',
+    sidebar:'',
+    titleArea:'',
+    toolbar:''
   },
   addCriterion: function() {
     ractive.push('criteria', { field: "", operator: " = ", value: "" });
@@ -128,7 +129,7 @@ var ractive = new BaseRactive({
     if (data == undefined || data.length==0) {
       return ractive.showMessage('No results to export yet, please perform a search first');
     }
-    ractive.toCsv(data, "SDU Return Data", 'id,source,applicablePeriod,question.categories,question.name,question.label,response,status,revision,submittedDate,submittedBy,created,createdBy,lastUpdated,updatedBy');
+    ractive.toCsv(data, "SDU Return Data", 'id,surveyReturns.0.org,source,applicablePeriod,question.categories.0,question.name,question.label,response,status,revision,submittedDate,submittedBy,created,createdBy,lastUpdated,updatedBy');
   },
   fetch: function() {
     console.info('fetch...');

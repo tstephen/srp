@@ -497,7 +497,11 @@ var BaseRactive = Ractive.extend({
 
         for (var j = 0 ; j < propNames.length ; j++) {
           try {
-            var val = eval('arr['+i+'].'+propNames[j]);
+            var getNestedObject = (nestedObj, pathArr) => {
+              return pathArr.reduce((obj, key) =>
+                  (obj && obj[key] !== 'undefined') ? obj[key] : undefined, nestedObj);
+            }
+            var val = getNestedObject(arr[i], propNames[j].split('.'));
             row += '"' + (val == undefined ? '' : val) + '",';
           } catch (err) {
             console.error('Fail to extract property '+propNames[j]+'from row '+i);
