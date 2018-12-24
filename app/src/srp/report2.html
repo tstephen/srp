@@ -218,16 +218,6 @@
           {{/if}}
         </p>
 
-        <span class="glyphicon glyphicon-question-sign no-print pull-right" onclick="ractive.toggleFieldHint('SOCIAL_VALUE')" title="{{formatHint('SOCIAL_VALUE')}}"></span>
-        <p class="help-block no-print hidden" id="SOCIAL_VALUEHint">{{{formatHint('SOCIAL_VALUE')}}}</p>
-        <p>
-          {{#if formatAnswer('SOCIAL_VALUE')}}
-            Our statement on Public Services (Social Value) Act is: {{formatAnswer('SOCIAL_VALUE')}}
-          {{else}}
-            We have not currently issued a statement on meeting the requirements
-            of the Public Services (Social Value) Act.
-          {{/if}}
-        </p>
       </section>
 
       <section id="partnershipsSect">
@@ -563,12 +553,24 @@
       <section id="socialValueSect">
         <h2>Social Value</h2>
 
-	<p></p>
+	<p>Collectively as an organisation we recognise the contribution that commissioning, procurement and commercial can have in delivering sustainability and social value, and our duty under the Public Services Value Act.</p>
 
-	<p></p>
+        <span class="glyphicon glyphicon-question-sign no-print pull-right" onclick="ractive.toggleFieldHint('SOCIAL_VALUE')" title="{{formatHint('SOCIAL_VALUE')}}"></span>
+        <p class="help-block no-print hidden" id="SOCIAL_VALUEHint">{{{formatHint('SOCIAL_VALUE')}}}</p>
+        <p>
+          {{#if formatAnswer('SOCIAL_VALUE')}}
+            Our statement on Public Services (Social Value) Act is: {{formatAnswer('SOCIAL_VALUE')}}
+          {{else}}
+            We have not currently issued a statement on meeting the requirements
+            of the Public Services (Social Value) Act.
+          {{/if}}
+        </p>
+
+        <p>Using the Social Value Calculator we have been to calculate the social value created from some specific activities:</p>
 
         <div class="rpt table2" id="socialValueRptTable2" data-qs="SV_TOTAL,SI_TOTAL" data-periods="4"></div>
 
+        <p class="narrative context {{#if !haveAnswer('SV_CTXT')}}hidden-print{{/if}}" contenteditable data-q="SV_CTXT">{{formatAnswer('SV_CTXT')}}</p>
       </section>
 
       <section id="adaptationSect">

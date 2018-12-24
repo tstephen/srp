@@ -230,7 +230,8 @@ public enum Q implements QuestionEnum {
     SV_ENVIRONMENT,
     SI_ENVIRONMENT,
     SV_INNOVATION,
-    SI_INNOVATION, SV_TOTAL, SI_TOTAL;
+    SI_INNOVATION, SV_TOTAL, SI_TOTAL,
+    SV_CTXT;
 
     private String code;
 

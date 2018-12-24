@@ -343,3 +343,4 @@ SV_INNOVATION$Social Value arising from innovation$£$SDU$$number$$$$
 SI_INNOVATION$Reported investment to stimulate innovation$£$SDU$$number$$$$
 SV_TOTAL$Total Social Value$£$SDU$$number$$$$
 SI_TOTAL$Total reported investment$£$SDU$$number$$$$
+SV_CTXT$Explanation and context for Social Value responses$$SDU$$$$$$

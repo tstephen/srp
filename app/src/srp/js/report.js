@@ -429,9 +429,9 @@ var ractive = new BaseRactive({
         'PROVIDER7_COMMISSIONED','PROVIDER8_COMMISSIONED','CCG1_SERVED',
         'CCG2_SERVED','CCG3_SERVED','CCG4_SERVED','CCG5_SERVED','CCG6_SERVED','CCG7_SERVED','CCG8_SERVED'],
     requiredAnswers: ['ORG_CODE', 'ORG_NAME', 'ORG_TYPE', 'SDMP_CRMP', 'HEALTHY_TRANSPORT_PLAN', 'PROMOTE_HEALTHY_TRAVEL'],
-    period: '2017-18',
+    period: '2018-19',
     server: $env.server,
-    survey: 'SDU-2017-18',
+    survey: 'SDU-2018-19',
     tenant: { id: 'sdu' },
     username: localStorage['username'],
     formatAnswer: function(qName) {
@@ -1126,6 +1126,7 @@ var ractive = new BaseRactive({
 
 $(document).ready(function() {
   $('head').append('<link href="'+ractive.getServer()+'/css/sdu-1.0.0.css" rel="stylesheet">');
+  $('.menu-burger, .toolbar').addClass('no-print');
 
   if (Object.keys(getSearchParameters()).indexOf('error')!=-1) {
     ractive.showError('The username and password provided do not match a valid account');

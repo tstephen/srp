@@ -10,7 +10,7 @@ var $r = (function ($, ractive, $auth) {
   var _server = $env.server;
   //var _server = 'http://localhost:8083';
   var _survey;
-  var _surveyPeriod = '2017-18'; // TODO read system param
+  var _surveyPeriod = '2018-19'; // TODO read system param
   var _now = new Date();
   var _period = getSearchParameters()['p'] == undefined
       ? _surveyPeriod

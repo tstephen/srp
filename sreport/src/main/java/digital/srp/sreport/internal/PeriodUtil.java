@@ -31,7 +31,7 @@ public class PeriodUtil {
     public static String previous(String period) {
         return previous(startYear(period));
     }
-    
+
     protected static String previous(int startYear) {
         return String.format("%1$d-%2$s", startYear - 1,
                 String.valueOf(startYear).substring(2));
@@ -40,7 +40,7 @@ public class PeriodUtil {
     protected static String next(String period) {
         return next(startYear(period));
     }
-    
+
     public static String next(int startYear) {
         return String.format("%1$d-%2$s", startYear + 1,
                 String.valueOf(startYear + 2).substring(2));
@@ -48,5 +48,17 @@ public class PeriodUtil {
 
     public static int periodsSinceInc(String now, String since) {
         return startYear(now) - startYear(since) + 1;
+    }
+
+    public static boolean after(String periodToTest, String period) {
+        return startYear(periodToTest) > startYear(period) ;
+    }
+
+    public static boolean before(String periodToTest, String period) {
+        return startYear(periodToTest) < startYear(period) ;
+    }
+
+    public static boolean equals(String periodToTest, String period) {
+        return startYear(periodToTest) == startYear(period) ;
     }
 }

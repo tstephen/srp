@@ -297,6 +297,7 @@ public class Sdu1819 {
         list.addAll(Arrays.asList(SduQuestions.QUALITATIVE_QS));
         list.add(Q.SV_TOTAL);
         list.add(Q.SI_TOTAL);
+        list.add(Q.SV_CTXT);
         return list.toArray(new Q[list.size()]);
     }
 }

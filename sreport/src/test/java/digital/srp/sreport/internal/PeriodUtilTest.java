@@ -1,6 +1,7 @@
 package digital.srp.sreport.internal;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.util.Arrays;
 
@@ -21,12 +22,27 @@ public class PeriodUtilTest {
     @Test
     public void testFillBackwards() {
         String[] expected = { "2016-17", "2015-16" };
-        assertEquals(Arrays.asList(expected), 
+        assertEquals(Arrays.asList(expected),
                 PeriodUtil.fillBackwards("2016-17", 2));
     }
 
     @Test
     public void testPeriodsSince2007Inclusive() {
         assertEquals(11, PeriodUtil.periodsSinceInc("2017-18", "2007-08"));
+    }
+
+    @Test
+    public void test2017Before2018() {
+        assertTrue(PeriodUtil.before("2017-18", "2018-19"));
+    }
+
+    @Test
+    public void test2017Equals2017() {
+        assertTrue(PeriodUtil.equals("2017-18", "2017-18"));
+    }
+
+    @Test
+    public void test2018After2017() {
+        assertTrue(PeriodUtil.after("2018-19", "2017-18"));
     }
 }

@@ -24,6 +24,8 @@ import digital.srp.sreport.model.SurveyReturn;
 import digital.srp.sreport.model.WeightingFactor;
 import digital.srp.sreport.model.WeightingFactors;
 import digital.srp.sreport.model.surveys.Sdu1617;
+import digital.srp.sreport.model.surveys.Sdu1718;
+import digital.srp.sreport.model.surveys.Sdu1819;
 import digital.srp.sreport.model.surveys.SduQuestions;
 
 @Component
@@ -88,6 +90,9 @@ public class Cruncher implements digital.srp.sreport.model.surveys.SduQuestions,
             sumAnswers(period, rtn, Q.SCOPE_ALL, Q.SCOPE_1, Q.SCOPE_2,
                     Q.SCOPE_3);
 
+            crunchSocialValue(period, rtn);
+            crunchSocialInvestmentRecorded(period, rtn);
+
             calcBenchmarking(period, rtn);
         }
         rtn.setLastUpdated(new Date());
@@ -109,9 +114,20 @@ public class Cruncher implements digital.srp.sreport.model.surveys.SduQuestions,
     protected void ensureInitialised(SurveyReturn rtn, int yearsToCalc, AnswerFactory answerFactory) {
         List<String> periods = PeriodUtil.fillBackwards(rtn.applicablePeriod(),
                 yearsToCalc);
+        Q[] requiredQs;
+        switch (rtn.applicablePeriod()) {
+        case "2017-18":
+            requiredQs = Sdu1718.getDerivedQs();
+            break;
+        case "2018-19":
+            requiredQs = Sdu1819.getDerivedQs();
+            break;
+        default:
+            requiredQs = Sdu1617.getDerivedQs();
+        }
+
         for (String period : periods) {
-            // TODO getDerivedQs depends on this class really
-            for (Q q : Sdu1617.getDerivedQs()) {
+            for (Q q : requiredQs) {
                 Optional<Answer> optional = rtn.answer(period, q);
                 if (!optional.isPresent()) {
                     answerFactory.addAnswer(rtn, period, q);
@@ -1173,6 +1189,31 @@ public class Cruncher implements digital.srp.sreport.model.surveys.SduQuestions,
         sumAnswers(period, rtn, Q.ANAESTHETIC_GASES_CO2E, Q.DESFLURANE_CO2E, Q.ISOFLURANE_CO2E, Q.SEVOFLURANE_CO2E, Q.NITROUS_OXIDE_CO2E, Q.PORTABLE_NITROUS_OXIDE_MIX_CO2E, Q.PORTABLE_NITROUS_OXIDE_MIX_MATERNITY_CO2E);
     }
 
+    public void crunchSocialValue(String period, SurveyReturn rtn) {
+        try {
+            sumAnswers(period, rtn, Q.SV_TOTAL, Q.SV_ENVIRONMENT, Q.SV_GROWTH,
+                    Q.SV_INNOVATION, Q.SV_JOBS, Q.SV_SOCIAL);
+        } catch (IllegalStateException e) {
+            if (PeriodUtil.before(period, "2018-19")) {
+                LOGGER.debug("Ignoring question not expected in {}: {}", period, e.getMessage());
+            } else {
+                throw e;
+            }
+        }
+    }
+
+    public void crunchSocialInvestmentRecorded(String period, SurveyReturn rtn) {
+        try {
+            sumAnswers(period, rtn, Q.SI_TOTAL, Q.SI_ENVIRONMENT, Q.SI_GROWTH,
+                    Q.SI_INNOVATION, Q.SI_JOBS, Q.SI_SOCIAL);
+        } catch (IllegalStateException e) {
+            if (PeriodUtil.before(period, "2018-19")) {
+                LOGGER.debug("Ignoring question not expected in {}: {}", period, e.getMessage());
+            } else {
+                throw e;
+            }
+        }
+    }
 
     private Answer sumAnswers(String period, SurveyReturn rtn, Q trgtQName,
             Q... srcQs) {
@@ -1296,4 +1337,5 @@ public class Cruncher implements digital.srp.sreport.model.surveys.SduQuestions,
                 wName, period, orgType);
         throw new ObjectNotFoundException(WeightingFactor.class, wName.name());
     }
+
 }
