@@ -446,11 +446,12 @@ var ractive = new BaseRactive({
     survey: 'SDU-2018-19',
     tenant: { id: 'sdu' },
     username: localStorage['username'],
-    formatAnswer: function(qName) {
+    formatAnswer: function(qName, period) {
       if (qName==undefined || ractive.get('surveyReturn')==undefined) return '';
       else {
+        if (period == undefined) period = ractive.get('surveyReturn.applicablePeriod');
         try {
-          var answer = ractive.getAnswer(qName);
+          var answer = ractive.getAnswer(qName, period);
           return answer == undefined ? '' : answer;
         } catch (e) {
           return '';

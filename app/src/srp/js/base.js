@@ -141,12 +141,8 @@ var BaseRactive = Ractive.extend({
   },
   hasRole: function(role) {
     var ractive = this;
-    if (this && this.get('profile')) {
-      var hasRole;
-      if (ractive.get('profile.groups')!= undefined) {
-        hasRole = ractive.get('profile.groups').filter(function(g) {return g.id==role});
-      }
-      return hasRole!=undefined && hasRole.length>0;
+    if ($auth) {
+      return $auth.getClaim('scopes').indexOf(role)!=-1;
     }
     return false;
   },

@@ -112,10 +112,6 @@ public class SurveyReturnController {
         SurveyReturn rtn = returnRepo.findOne(returnId);
         if (rtn == null) {
             throw new ObjectNotFoundException(SurveyReturn.class, returnId);
-        } else if (!StatusType.Draft.name().equals(rtn.status())) {
-            throw new IllegalStateException(String.format(
-                    "The return %1$d:%2$s has been submitted, you may no longer update. If you've recognised a mistake please re-state the return.",
-                    rtn.id(), rtn.name()));
         }
         // use logger for force child load
         LOGGER.info(String.format("Found return with id %1$d with status %2$s and containing %3$d answers", rtn.id(), rtn.status(), rtn.answers().size()));
