@@ -38,7 +38,6 @@ import com.fasterxml.jackson.annotation.JsonView;
 
 import digital.srp.sreport.api.Calculator;
 import digital.srp.sreport.api.exceptions.ObjectNotFoundException;
-import digital.srp.sreport.internal.NullAwareBeanUtils;
 import digital.srp.sreport.model.Answer;
 import digital.srp.sreport.model.Q;
 import digital.srp.sreport.model.Question;
@@ -346,30 +345,6 @@ public class SurveyReturnController {
     }
 
     /**
-     * Update an existing return.
-     */
-    @ResponseStatus(value = HttpStatus.NO_CONTENT)
-    @RequestMapping(value = "/{id}", method = RequestMethod.PUT, consumes = { "application/json" })
-    public synchronized @ResponseBody void update(
-            @PathVariable("id") Long returnId,
-            @RequestBody SurveyReturn updatedReturn) {
-        SurveyReturn existing = returnRepo.findOne(returnId);
-        if (!StatusType.Draft.name().equals(existing.status())) {
-            throw new IllegalStateException(String.format(
-                    "The return %1$d:%2$s has been submitted, you may no longer update. If you've recognised a mistake please re-state the return.",
-                    returnId, existing.name()));
-        }
-        int changeCount = createOrMergeAnswers(updatedReturn, existing);
-        NullAwareBeanUtils.copyNonNullProperties(updatedReturn, existing, "answers");
-        if (changeCount > 0) {
-            existing.setLastUpdated(new Date());
-        }
-        DefaultCompletenessValidator validator = new DefaultCompletenessValidator() ;
-        validator.validate(existing);
-        returnRepo.save(existing);
-    }
-
-    /**
      * Update an existing return with a single answer.
      *
      * <p>The period of the return is assumed.
@@ -433,30 +408,6 @@ public class SurveyReturnController {
             }
         }
         return Optional.empty();
-    }
-
-    private int createOrMergeAnswers(SurveyReturn updatedReturn,
-            SurveyReturn existing) {
-        int changeCount = 0;
-        for (Answer answer : updatedReturn.answers()) {
-            Answer existingAnswer = existing.answer(answer.applicablePeriod(), answer.question().q())
-                    .orElse(existing.createEmptyAnswer(answer.applicablePeriod(), answer.question()));
-            if (existingAnswer.question().id() == null) {
-                Optional<Question> q = findQuestion(answer.question().name());
-                existingAnswer = answerRepo.save(answer.question(q.get()).addSurveyReturn(existing));
-                existing.answers().add(existingAnswer);
-                changeCount++;
-            } else if (answer.response() != null && !answer.response().equals(existingAnswer.response())) {
-                // note that Hibernate / Spring Data will skip any update if not actually needed
-                changeCount++;
-                answerRepo.save(existingAnswer.response(answer.response()).addSurveyReturn(existing));
-            } else if (answer.response() == null && existingAnswer.response() != null) {
-                // note that Hibernate / Spring Data will skip any update if not actually needed
-                changeCount++;
-                answerRepo.save(existingAnswer.response((String) null).addSurveyReturn(existing));
-            }
-        }
-        return changeCount;
     }
 
     /**
