@@ -467,6 +467,7 @@ text.inverse {
 /************* START PRINT MEDIA *******************/
 @media print {
   .controls,
+  .menu-burger,
   .no-print, .no-print * {
     display: none !important;
   }
