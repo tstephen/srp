@@ -154,7 +154,7 @@ public class SurveyReturnControllerTest {
         }
 
         @Override
-        public SurveyReturn findByName(String name) {
+        public List<SurveyReturn> findByName(String name) {
             // TODO Auto-generated method stub
             return null;
         }

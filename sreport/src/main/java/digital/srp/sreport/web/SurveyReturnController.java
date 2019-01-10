@@ -218,13 +218,18 @@ public class SurveyReturnController {
         }
 
         List<SurveyReturn> returns = findBySurveyAndOrg(surveyName, org);
-        returns.sort((r1,r2) -> r1.revision().compareTo(r2.revision()));
-        SurveyReturn rtn = returns.get(returns.size()-1);
-        LOGGER.info("Found {} returns for {},{} returning revision {} (id:{})",
-                returns.size(), surveyName, org, rtn.revision(), rtn.id());
+        SurveyReturn rtn = getLatestRevision(returns);
 
         validator.validate(rtn);
         return addLinks(rtn);
+    }
+
+    private SurveyReturn getLatestRevision(List<SurveyReturn> returns) {
+        returns.sort((r1,r2) -> r1.revision().compareTo(r2.revision()));
+        SurveyReturn rtn = returns.get(returns.size()-1);
+        LOGGER.info("Found {} returns for {},{} returning revision {} (id:{})",
+                returns.size(), rtn.survey().name(), rtn.org(), rtn.revision(), rtn.id());
+        return rtn;
     }
 
     private String lookupOrgCode(String orgName) {
@@ -260,7 +265,7 @@ public class SurveyReturnController {
     public void importFromOtherReturn(
             @PathVariable("sourceReturnName") String srcRtnName,
             @PathVariable("targetReturnName") String trgtRtnName) {
-        SurveyReturn trgtRtn = returnRepo.findByName(trgtRtnName);
+        SurveyReturn trgtRtn = getLatestRevision(returnRepo.findByName(trgtRtnName));
         importFromOtherReturn(srcRtnName, trgtRtn);
     }
 
@@ -268,7 +273,8 @@ public class SurveyReturnController {
     protected long importFromOtherReturn(String srcRtnName, SurveyReturn trgtRtn) {
         long count = 0;
         long start = System.currentTimeMillis();
-        Optional<SurveyReturn> srcRtn = Optional.ofNullable(returnRepo.findByName(srcRtnName));
+        SurveyReturn rtn = getLatestRevision(returnRepo.findByName(srcRtnName));
+        Optional<SurveyReturn> srcRtn = Optional.ofNullable(rtn);
         if (srcRtn.isPresent()) {
             Set<Answer> answersToImport = answerRepo.findAnswersToImport(trgtRtn.id(), srcRtn.get().id());
             LOGGER.info("Found {} answers to import from {} to {}", answersToImport.size(), srcRtnName, trgtRtn.id());

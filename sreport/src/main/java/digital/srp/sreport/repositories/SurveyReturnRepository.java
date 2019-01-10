@@ -18,8 +18,8 @@ import digital.srp.sreport.model.SurveyReturn;
 @RepositoryRestResource(exported = false)
 public interface SurveyReturnRepository extends CrudRepository<SurveyReturn, Long> {
 
-    @Query("SELECT o FROM SurveyReturn o WHERE o.name = :name")
-    SurveyReturn findByName(@Param("name") String name);
+    @Query("SELECT o FROM SurveyReturn o WHERE o.name = :name AND o.status != 'Superseded'")
+    List<SurveyReturn> findByName(@Param("name") String name);
 
     @Query("SELECT o FROM SurveyReturn o WHERE o.status != 'Superseded' "
             + "ORDER BY o.name ASC")
