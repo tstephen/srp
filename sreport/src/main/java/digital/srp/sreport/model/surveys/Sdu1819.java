@@ -49,7 +49,6 @@ public class Sdu1819 {
                         Q.SDG_STARTING,
                         Q.SDG_CLEAR,
                         Q.PROMOTE_SUSTAINABILITY_TO_STAFF,
-                        Q.ECLASS_USER,
                         Q.QUANT_ES_IMPACTS,
                         Q.QUANT_TRAVEL_IMPACTS,
                         Q.MOD_SLAVERY,
@@ -195,11 +194,12 @@ public class Sdu1819 {
 
         SurveyCategory catSpendProfile = new SurveyCategory()
                 .name("Spend Profile")
-                .questionEnums(SduQuestions.SPEND_HDRS);
+                .questionEnums(SduQuestions.SDU_PROFILE_HDRS);
 
         SurveyCategory catEClassProfile = new SurveyCategory()
-                .name("E-Class Profile")
+                .name("Procurement")
                 .questionEnums(
+                        Q.ECLASS_USER,
                         Q.PROVISIONS, Q.STAFF_CLOTHING,
                         Q.PATIENTS_CLOTHING_AND_FOOTWEAR,
                         Q.PHARMA_BLOOD_PROD_AND_MED_GASES, Q.DRESSINGS,
