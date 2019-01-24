@@ -493,9 +493,9 @@ var BaseRactive = Ractive.extend({
 
         for (var j = 0 ; j < propNames.length ; j++) {
           try {
-            var getNestedObject = (nestedObj, pathArr) => {
-              return pathArr.reduce((obj, key) =>
-                  (obj && obj[key] !== 'undefined') ? obj[key] : undefined, nestedObj);
+            var getNestedObject = function(nestedObj, pathArr) {
+              return pathArr.reduce(function(obj, key) {
+                  (obj && obj[key] !== 'undefined') ? obj[key] : undefined, nestedObj});
             }
             var val = getNestedObject(arr[i], propNames[j].split('.'));
             row += '"' + (val == undefined ? '' : val) + '",';
