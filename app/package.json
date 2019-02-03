@@ -1,6 +1,6 @@
 {
   "name": "srp-digital",
-  "version": "2.0.0",
+  "version": "2.3.0",
   "description": "Sustainable Resource Planning",
   "main": "index.js",
   "scripts": {
@@ -18,14 +18,15 @@
   "homepage": "https://github.com/tstephen/srp-digital#readme",
   "devDependencies": {
     "del": "^3.0.0",
-    "gulp": "github:gulpjs/gulp#4.0",
+    "gulp": "github:gulpjs/gulp#4.0.0",
     "gulp-clean-css": "^3.10.0",
-    "gulp-jshint": "^2.0.4",
+    "gulp-jshint": "^2.1.0",
     "gulp-replace": "^0.6.1",
     "gulp-scp2": "^0.2.0",
     "gulp-uglify": "^3.0.0",
     "gulp-zip": "^4.1.0",
-    "jshint": "^2.9.6",
+    "jshint": "^2.9.7",
+    "minimatch": "^3.0.4",
     "minimist": "^1.2.0",
     "through2": "^2.0.3"
   }
