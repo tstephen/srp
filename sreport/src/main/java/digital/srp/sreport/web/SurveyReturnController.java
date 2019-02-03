@@ -38,6 +38,7 @@ import com.fasterxml.jackson.annotation.JsonView;
 
 import digital.srp.sreport.api.Calculator;
 import digital.srp.sreport.api.exceptions.ObjectNotFoundException;
+import digital.srp.sreport.internal.PeriodUtil;
 import digital.srp.sreport.model.Answer;
 import digital.srp.sreport.model.Q;
 import digital.srp.sreport.model.Question;
@@ -172,6 +173,7 @@ public class SurveyReturnController {
                     .answers(new HashSet<Answer>());
             ensureInitialized(requested, rtn);
             importEricAnswers(surveyName, org);
+            importLastYearIfExists(rtn);
 
             return addLinks(rtn);
         } catch (NullPointerException e) {
@@ -185,6 +187,12 @@ public class SurveyReturnController {
             }
             throw new IllegalStateException(msg);
         }
+    }
+
+    private void importLastYearIfExists(SurveyReturn rtn) {
+        String srcPeriod = PeriodUtil.previous(rtn.survey().applicablePeriod());
+        String srcRtnName = String.format("SDU-%1$s-%2$s", srcPeriod, rtn.org());
+        importFromOtherReturn(srcRtnName, rtn);
     }
 
     protected void ensureInitialized(Survey requested, SurveyReturn rtn) {
@@ -225,6 +233,9 @@ public class SurveyReturnController {
     }
 
     private SurveyReturn getLatestRevision(List<SurveyReturn> returns) {
+        if (returns.size() == 0) {
+            return null;
+        }
         returns.sort((r1,r2) -> r1.revision().compareTo(r2.revision()));
         SurveyReturn rtn = returns.get(returns.size()-1);
         LOGGER.info("Found {} returns for {},{} returning revision {} (id:{})",
