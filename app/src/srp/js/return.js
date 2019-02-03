@@ -130,10 +130,9 @@ var $r = (function ($, ractive, $auth) {
               }
               $('#ORG_TYPE').attr('list','orgTypes');
               _orgType = me.rtn.answers[k].response;
-              if ('Submitted'==me.rtn.answers[k].status || 'Published'==me.rtn.answers[k].status) {
+              if ('Submitted'==me.rtn.answers[k].status || 'Published'==me.rtn.answers[k].status
+		      || me.rtn.answers[k].response != undefined) {
                 $('#'+me.rtn.answers[k].question.name).attr('readonly','readonly').attr('disabled','disabled');
-              } else {
-                $('#'+me.rtn.answers[k].question.name).removeAttr('readonly').removeAttr('disabled');
               }
               break;
             case 'PROC_SUPPLIER_SUSTAINABILITY':
@@ -177,11 +176,9 @@ var $r = (function ($, ractive, $auth) {
                 ractive.set('q.categories.'+i+'.questions.'+j+'.response', '');
               }
             }
-            // Set status for all questions based on return status (above is selective for ERIC answers)
+            // Set status for all questions based on return status
             if ($r.rtn.status != 'Draft') {
               $('#questionnaireForm input').attr('readonly','readonly').attr('disabled','disabled');
-            } else {
-              $('#questionnaireForm input').removeAttr('readonly').removeAttr('disabled');
             }
 
             // store answer that needs to receive updates
