@@ -585,6 +585,7 @@ var $r = (function ($, ractive, $auth) {
   }
 
   try { _isIE = navigator.userAgent.match(/trident/i)!=null; } catch (e) {
+    document.write('<script src="ie-polyfill.js"><\/script>');
   }
 
   return me;
