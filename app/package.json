@@ -18,7 +18,7 @@
   "homepage": "https://github.com/tstephen/srp-digital#readme",
   "devDependencies": {
     "del": "^3.0.0",
-    "gulp": "github:gulpjs/gulp#4.0.0",
+    "gulp": "github:gulpjs/gulp#v4.0.0",
     "gulp-clean-css": "^3.10.0",
     "gulp-jshint": "^2.1.0",
     "gulp-replace": "^0.6.1",
