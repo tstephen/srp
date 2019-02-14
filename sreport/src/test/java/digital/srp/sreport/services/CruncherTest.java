@@ -60,19 +60,19 @@ public class CruncherTest {
     private  static final String[] BIZ_SVCS_CO2E = { "4,070", "4,470",
             "4,870", "5,010", "0", "0", "0", "0", "0", "0" };
 
-    private  static final String[] WASTE_AND_WATER_CO2E = { "88.3", "96.7",
-            "105", "118", "0", "0", "0", "0", "0", "0" };
+    private  static final String[] WASTE_AND_WATER_CO2E = { "88.2", "96.8",
+            "106", "119", "0", "0", "0", "0", "0", "0" };
 
     private  static final String[] SCOPE_3_WASTE = { "23.3", "25.7", "28.2", "33.3",
             "0", "0", "0", "0", "0", "0" };
 
-    private  static final String[] SCOPE_3_WATER = { "65", "71", "77", "85",
+    private  static final String[] SCOPE_3_WATER = { "64.8", "71.2", "77.5", "85.2",
             "0", "0", "0", "0", "0", "0" };
 
-    private  static final String[] WATER_TREATMENT_CO2E = { "43", "47",
-            "51", "57", "0", "0", "0", "0", "0", "0" };
+    private  static final String[] WATER_TREATMENT_CO2E = { "42.9", "47.2",
+            "51.4", "57.1", "0", "0", "0", "0", "0", "0" };
 
-    private  static final String[] WATER_CO2E = { "22", "24", "26", "28",
+    private  static final String[] WATER_CO2E = { "21.9", "24", "26.1", "28.1",
             "0", "0", "0", "0", "0", "0" };
 
     private  static final String[] SCOPE_2 = { "668", "794", "781", "880",

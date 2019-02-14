@@ -62,7 +62,7 @@ public class BizTravelTest {
         rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD).question(Q.OWNED_FLEET_TRAVEL_CO2E));
 
         svc.crunchBizTravel(PERIOD, rtn);
-        assertEquals(new BigDecimal("1185"), rtn.answer(PERIOD, Q.BIZ_MILEAGE_ROAD_CO2E).get().responseAsBigDecimal());
+        assertEquals(new BigDecimal("1185"), rtn.answer(PERIOD, Q.BIZ_MILEAGE_ROAD_CO2E).get().responseAsBigDecimal().setScale(0, RoundingMode.HALF_UP));
         assertEquals(new BigDecimal(BIZ_MILEAGE_ROAD_ONLY), rtn.answer(PERIOD, Q.BIZ_MILEAGE).get().responseAsBigDecimal().setScale(0, RoundingMode.HALF_UP));
         
         // check inputs unchanged
@@ -90,10 +90,10 @@ public class BizTravelTest {
         rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD).question(Q.BIZ_MILEAGE_TAXI_CO2E));
 
         svc.crunchBizTravel(PERIOD, rtn);
-        assertEquals(new BigDecimal("1185"), rtn.answer(PERIOD, Q.BIZ_MILEAGE_ROAD_CO2E).get().responseAsBigDecimal());
-        assertEquals(new BigDecimal("2"), rtn.answer(PERIOD, Q.BIZ_MILEAGE_BUS_CO2E).get().responseAsBigDecimal());
-        assertEquals(new BigDecimal("166"), rtn.answer(PERIOD, Q.BIZ_MILEAGE_RAIL_CO2E).get().responseAsBigDecimal());
-        assertEquals(new BigDecimal("7"), rtn.answer(PERIOD, Q.BIZ_MILEAGE_TAXI_CO2E).get().responseAsBigDecimal());
+        assertEquals(new BigDecimal("1185"), rtn.answer(PERIOD, Q.BIZ_MILEAGE_ROAD_CO2E).get().responseAsBigDecimal().setScale(0, RoundingMode.HALF_UP));
+        assertEquals(new BigDecimal("2.04"), rtn.answer(PERIOD, Q.BIZ_MILEAGE_BUS_CO2E).get().responseAsBigDecimal());
+        assertEquals(new BigDecimal("166"), rtn.answer(PERIOD, Q.BIZ_MILEAGE_RAIL_CO2E).get().responseAsBigDecimal().setScale(0, RoundingMode.HALF_UP));
+        assertEquals(new BigDecimal("6.70"), rtn.answer(PERIOD, Q.BIZ_MILEAGE_TAXI_CO2E).get().responseAsBigDecimal());
         assertEquals(new BigDecimal(BIZ_MILEAGE), rtn.answer(PERIOD, Q.BIZ_MILEAGE).get().responseAsBigDecimal().setScale(0, RoundingMode.HALF_UP));
         
         // check inputs unchanged
@@ -126,9 +126,9 @@ public class BizTravelTest {
         assertEquals(new BigDecimal(RAIL_MILES), rtn.answer(PERIOD, Q.RAIL_MILES).get().responseAsBigDecimal());
         assertEquals(new BigDecimal(TAXI_MILES), rtn.answer(PERIOD, Q.TAXI_MILES).get().responseAsBigDecimal());
 
-        assertEquals(new BigDecimal("2"), rtn.answer(PERIOD, Q.BIZ_MILEAGE_BUS_CO2E).get().responseAsBigDecimal());
-        assertEquals(new BigDecimal("166"), rtn.answer(PERIOD, Q.BIZ_MILEAGE_RAIL_CO2E).get().responseAsBigDecimal());
-        assertEquals(new BigDecimal("7"), rtn.answer(PERIOD, Q.BIZ_MILEAGE_TAXI_CO2E).get().responseAsBigDecimal());
+        assertEquals(new BigDecimal("2.04"), rtn.answer(PERIOD, Q.BIZ_MILEAGE_BUS_CO2E).get().responseAsBigDecimal());
+        assertEquals(new BigDecimal("166"), rtn.answer(PERIOD, Q.BIZ_MILEAGE_RAIL_CO2E).get().responseAsBigDecimal().setScale(0, RoundingMode.HALF_UP));
+        assertEquals(new BigDecimal("6.70"), rtn.answer(PERIOD, Q.BIZ_MILEAGE_TAXI_CO2E).get().responseAsBigDecimal());
 
         assertEquals(new BigDecimal(BUS_MILES).add(new BigDecimal(RAIL_MILES)).add(new BigDecimal(TAXI_MILES)),
                 rtn.answer(PERIOD, Q.BIZ_MILEAGE).get().responseAsBigDecimal().setScale(0, RoundingMode.HALF_UP));

@@ -44,7 +44,7 @@ public class WasteTest {
     }
 
     @Test
-    public void testCalcWasteCo2e() {
+    public void testCalcTrustWasteCo2e() {
         SurveyReturn rtn = new SurveyReturn().applicablePeriod(PERIOD).org("ZZ1");
         rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD).question(Q.INCINERATION_WEIGHT).response(INCINERATION_WEIGHT));
         rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD).question(Q.LANDFILL_WEIGHT).response(LANDFILL_WEIGHT));
@@ -66,6 +66,22 @@ public class WasteTest {
         // check inputs unchanged
         assertEquals(INCINERATION_WEIGHT, rtn.answer(PERIOD, Q.INCINERATION_WEIGHT).get().response());
         assertEquals(LANDFILL_WEIGHT, rtn.answer(PERIOD, Q.LANDFILL_WEIGHT).get().response());
+    }
+
+    @Test
+    public void testCalcCcgWasteCo2e() {
+        SurveyReturn rtn = new SurveyReturn().applicablePeriod(PERIOD).org("ZZ2");
+        final String RECYCLING_WEIGHT = "5";
+        rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD).question(Q.RECYCLING_WEIGHT).response(RECYCLING_WEIGHT));
+
+        rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD).question(Q.RECYCLING_CO2E));
+        rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD).question(Q.SCOPE_3_WASTE));
+
+        svc.crunchScope3Waste(PERIOD, rtn);
+        assertEquals(new BigDecimal("0.11"), rtn.answer(PERIOD, Q.RECYCLING_CO2E).get().responseAsBigDecimal().setScale(2, RoundingMode.HALF_UP));
+
+        // check inputs unchanged
+        assertEquals(RECYCLING_WEIGHT, rtn.answer(PERIOD, Q.RECYCLING_WEIGHT).get().response());
     }
 
 }

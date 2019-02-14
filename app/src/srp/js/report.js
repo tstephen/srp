@@ -869,6 +869,8 @@ var ractive = new BaseRactive({
         var x = a.response == undefined ? 0 : parseFloat(a.response);
         if (isNaN(x)) return 0;
         else return x;
+      } else if (a.question.name == qName && a.applicablePeriod == period && a.question.type == 'number' && parseFloat(a.response)<100) {
+        return parseFloat(a.response).sigFigs(3);
       } else if (a.question.name == qName && a.applicablePeriod == period && a.question.type == 'number') {
         return parseFloat(a.response).formatDecimal(0);
       } else if (a.question.name == qName && a.applicablePeriod == period) {
@@ -1140,7 +1142,8 @@ var ractive = new BaseRactive({
       var val = ractive.getAnswerFromArray(qs[i], period, answers, true);
       if (!isNaN(val)) total += parseFloat(val);
     }
-    return total.formatDecimal(0);
+    if (total < 100) return total.sigFigs(3);
+    else return total.formatDecimal(0);
   }
 });
 

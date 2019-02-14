@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.List;
 
 import org.junit.BeforeClass;
@@ -49,7 +50,7 @@ public class PatientTransportTest {
         svc.crunchPatientVisitorMileageCo2e(PERIOD, rtn);
         assertEquals("77085139.92", rtn.answer(PERIOD, Q.VISITOR_MILEAGE).get().response());
         assertEquals(new BigDecimal("78027094.92"), rtn.answer(PERIOD, Q.PATIENT_AND_VISITOR_MILEAGE).get().responseAsBigDecimal());
-        assertEquals(new BigDecimal("27803"), rtn.answer(PERIOD, Q.PATIENT_AND_VISITOR_MILEAGE_CO2E).get().responseAsBigDecimal());
+        assertEquals(new BigDecimal("27803"), rtn.answer(PERIOD, Q.PATIENT_AND_VISITOR_MILEAGE_CO2E).get().responseAsBigDecimal().setScale(0, RoundingMode.HALF_UP));
     }
 
     @Test
@@ -64,6 +65,6 @@ public class PatientTransportTest {
         assertEquals(VISITOR_MILEAGE, rtn.answer(PERIOD, Q.VISITOR_MILEAGE).get().response());
         svc.crunchPatientVisitorMileageCo2e(PERIOD, rtn);
         assertEquals(new BigDecimal("123950165"), rtn.answer(PERIOD, Q.PATIENT_AND_VISITOR_MILEAGE).get().responseAsBigDecimal());
-        assertEquals(new BigDecimal("44166"), rtn.answer(PERIOD, Q.PATIENT_AND_VISITOR_MILEAGE_CO2E).get().responseAsBigDecimal());
+        assertEquals(new BigDecimal("44166"), rtn.answer(PERIOD, Q.PATIENT_AND_VISITOR_MILEAGE_CO2E).get().responseAsBigDecimal().setScale(0, RoundingMode.HALF_UP));
     }
 }

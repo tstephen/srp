@@ -20,11 +20,11 @@ import digital.srp.sreport.model.WeightingFactor;
 
 public class WaterTest {
 
-    private static final String WATER_CO2E = "191.0";
-    private static final String WATER_TREATMENT_CO2E = "314.0";
-    private static final String TOTAL_WATER_CO2E = "505.0";
-    private static final String WATER_TREATMENT_CO2E2 = "283.0";
-    private static final String TOTAL_WATER_CO2E2 = "474.0";
+    private static final String WATER_CO2E = "191";
+    private static final String WATER_TREATMENT_CO2E = "314";
+    private static final String TOTAL_WATER_CO2E = "504";
+    private static final String WATER_TREATMENT_CO2E2 = "283";
+    private static final String TOTAL_WATER_CO2E2 = "474";
     private static final String WATER_VOL = "554091";
     private static final String WASTE_WATER_INPUT = "400000";
 
@@ -55,13 +55,13 @@ public class WaterTest {
         svc.crunchScope3Water(PERIOD, rtn);
         assertEquals(WATER_VOL, rtn.answer(PERIOD, Q.WATER_VOL).get().response());
         assertEquals(WASTE_WATER_CALC, rtn.answer(PERIOD, Q.WASTE_WATER).get().response());
-        assertEquals(new BigDecimal(WATER_CO2E), rtn.answer(PERIOD, Q.WATER_CO2E).get().responseAsBigDecimal().setScale(1, RoundingMode.HALF_UP));
-        assertEquals(new BigDecimal(WATER_TREATMENT_CO2E), rtn.answer(PERIOD, Q.WATER_TREATMENT_CO2E).get().responseAsBigDecimal().setScale(1, RoundingMode.HALF_UP));
-        assertEquals(new BigDecimal(TOTAL_WATER_CO2E), rtn.answer(PERIOD, Q.SCOPE_3_WATER).get().responseAsBigDecimal().setScale(1, RoundingMode.HALF_UP));
+        assertEquals(new BigDecimal(WATER_CO2E), rtn.answer(PERIOD, Q.WATER_CO2E).get().responseAsBigDecimal().setScale(0, RoundingMode.HALF_UP));
+        assertEquals(new BigDecimal(WATER_TREATMENT_CO2E), rtn.answer(PERIOD, Q.WATER_TREATMENT_CO2E).get().responseAsBigDecimal().setScale(0, RoundingMode.HALF_UP));
+        assertEquals(new BigDecimal(TOTAL_WATER_CO2E), rtn.answer(PERIOD, Q.SCOPE_3_WATER).get().responseAsBigDecimal().setScale(0, RoundingMode.HALF_UP));
     }
 
     @Test
-    public void testCalcWaterCo2eFromSupplyAndWaste() {
+    public void testCalcTrustWaterCo2eFromSupplyAndWaste() {
         SurveyReturn rtn = new SurveyReturn().applicablePeriod(PERIOD).org("ZZ1");
         rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD).question(Q.WATER_VOL).response(WATER_VOL));
 
@@ -73,8 +73,30 @@ public class WaterTest {
         svc.crunchScope3Water(PERIOD, rtn);
         assertEquals(WATER_VOL, rtn.answer(PERIOD, Q.WATER_VOL).get().response());
         assertEquals(WASTE_WATER_INPUT, rtn.answer(PERIOD, Q.WASTE_WATER).get().response());
-        assertEquals(new BigDecimal(WATER_CO2E), rtn.answer(PERIOD, Q.WATER_CO2E).get().responseAsBigDecimal().setScale(1, RoundingMode.HALF_UP));
-        assertEquals(new BigDecimal(WATER_TREATMENT_CO2E2), rtn.answer(PERIOD, Q.WATER_TREATMENT_CO2E).get().responseAsBigDecimal().setScale(1, RoundingMode.HALF_UP));
-        assertEquals(new BigDecimal(TOTAL_WATER_CO2E2), rtn.answer(PERIOD, Q.SCOPE_3_WATER).get().responseAsBigDecimal().setScale(1, RoundingMode.HALF_UP));
+        assertEquals(new BigDecimal(WATER_CO2E), rtn.answer(PERIOD, Q.WATER_CO2E).get().responseAsBigDecimal().setScale(0, RoundingMode.HALF_UP));
+        assertEquals(new BigDecimal(WATER_TREATMENT_CO2E2), rtn.answer(PERIOD, Q.WATER_TREATMENT_CO2E).get().responseAsBigDecimal().setScale(0, RoundingMode.HALF_UP));
+        assertEquals(new BigDecimal(TOTAL_WATER_CO2E2), rtn.answer(PERIOD, Q.SCOPE_3_WATER).get().responseAsBigDecimal().setScale(0, RoundingMode.HALF_UP));
+    }
+
+    @Test
+    public void testCalcCcgWaterCo2eFromSupplyAndWaste() {
+        SurveyReturn rtn = new SurveyReturn().applicablePeriod(PERIOD).org("ZZ2");
+        final String WATER_VOL = "559";
+        final String WASTE_WATER_INPUT = "524";
+
+        rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD).question(Q.WATER_VOL).response(WATER_VOL));
+        rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD).question(Q.WASTE_WATER).response(WASTE_WATER_INPUT));
+
+        rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD).question(Q.WATER_CO2E));
+        rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD).question(Q.WATER_TREATMENT_CO2E));
+        rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD).question(Q.SCOPE_3_WATER));
+
+        svc.crunchScope3Water(PERIOD, rtn);
+        assertEquals(WATER_VOL, rtn.answer(PERIOD, Q.WATER_VOL).get().response());
+        assertEquals(WASTE_WATER_INPUT, rtn.answer(PERIOD, Q.WASTE_WATER).get().response());
+
+        assertEquals(new BigDecimal("0.19"), rtn.answer(PERIOD, Q.WATER_CO2E).get().responseAsBigDecimal().setScale(2, RoundingMode.HALF_UP));
+        assertEquals(new BigDecimal("0.37"), rtn.answer(PERIOD, Q.WATER_TREATMENT_CO2E).get().responseAsBigDecimal().setScale(2, RoundingMode.HALF_UP));
+        assertEquals(new BigDecimal("0.56"), rtn.answer(PERIOD, Q.SCOPE_3_WATER).get().responseAsBigDecimal().setScale(2, RoundingMode.HALF_UP));
     }
 }
