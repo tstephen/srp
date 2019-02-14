@@ -90,6 +90,8 @@ public class Cruncher implements digital.srp.sreport.model.surveys.SduQuestions,
             sumAnswers(period, rtn, Q.SCOPE_ALL, Q.SCOPE_1, Q.SCOPE_2,
                     Q.SCOPE_3);
 
+            crunchEnergyCostChange(period, rtn);
+
             crunchSocialValue(period, rtn);
             crunchSocialInvestmentRecorded(period, rtn);
 
@@ -1069,7 +1071,7 @@ public class Cruncher implements digital.srp.sreport.model.surveys.SduQuestions,
 
             BigDecimal change = currentEnergyCost.divide(previousEnergyCost, 5, RoundingMode.HALF_UP).multiply(ONE_HUNDRED).subtract(ONE_HUNDRED);
             getAnswer(period, rtn, Q.ENERGY_COST_CHANGE_PCT).response(change);
-        } catch (IllegalStateException | NullPointerException e) {
+        } catch (IllegalStateException | NullPointerException | ArithmeticException e) {
             LOGGER.warn("Insufficient data to calculate change of energy costs in {}", period);
         }
     }

@@ -377,7 +377,7 @@
             <p>{{formatAnswer('ORG_NAME')}} has spent &pound;{{formatAnswer('TOTAL_ENERGY_COST')}} on energy in {{surveyReturn.applicablePeriod}}
 {{#if isNaN(formatAnswer('ENERGY_COST_CHANGE_PCT'))}}.
 {{else}}, which is a
-            {{formatAnswer('ENERGY_COST_CHANGE_PCT')}}%
+            {{formatAbsAnswer('ENERGY_COST_CHANGE_PCT')}}%
             {{#if isNaN(formatAnswer('ENERGY_COST_CHANGE_PCT')) || formatAnswer('ENERGY_COST_CHANGE_PCT').indexOf('-')==-1}} increase {{else}} decrease {{/if}}
             on energy spend from last year.
 {{/if}}

@@ -446,10 +446,17 @@ var ractive = new BaseRactive({
     survey: 'SDU-2018-19',
     tenant: { id: 'sdu' },
     username: localStorage['username'],
+    formatAbsAnswer: function(qName, period) {
+      try {
+        var answer = ractive.getAnswer(qName, period);
+        return answer == undefined ? '' : Math.abs(answer);
+      } catch (e) {
+        return '';
+      }
+    },
     formatAnswer: function(qName, period) {
       if (qName==undefined || ractive.get('surveyReturn')==undefined) return '';
       else {
-        if (period == undefined) period = ractive.get('surveyReturn.applicablePeriod');
         try {
           var answer = ractive.getAnswer(qName, period);
           return answer == undefined ? '' : answer;
@@ -847,7 +854,7 @@ var ractive = new BaseRactive({
     });
   },
   getAnswer: function(qName, period) {
-    if (period == undefined) period = ractive.get('period');
+    if (period == undefined) period = ractive.get('surveyReturn.applicablePeriod');
     var answers = ractive.get('surveyReturn.answers');
     return ractive.getAnswerFromArray(qName, period, answers);
   },
