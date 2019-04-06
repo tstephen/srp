@@ -131,13 +131,13 @@ var ractive = new BaseRactive({
     stdPartials: [
       { "name": "helpModal", "url": $env.server+"/partials/help-modal.html"},
       { "name": "loginSect", "url": $env.server+"/webjars/auth/1.1.0/partials/login-sect.html"},
-      { "name": "navbar", "url": "./vsn/partials/cfactor-navbar.html"},
+      { "name": "navbar", "url": "/srp/vsn/partials/cfactor-navbar.html"},
       { "name": "profileArea", "url": $env.server+"/partials/profile-area.html"},
       { "name": "sidebar", "url": $env.server+"/partials/sidebar.html"},
       { "name": "toolbar", "url": $env.server+"/partials/toolbar.html"},
       { "name": "titleArea", "url": $env.server+"/partials/title-area.html"},
-      { "name": "cfactorListSect", "url": "./vsn/partials/cfactor-list-sect.html"},
-      { "name": "cfactorCurrentSect", "url": "./vsn/partials/cfactor-current-sect.html"}
+      { "name": "cfactorListSect", "url": "/srp/vsn/partials/cfactor-list-sect.html"},
+      { "name": "cfactorCurrentSect", "url": "/srp/vsn/partials/cfactor-current-sect.html"}
     ],
     title: "Carbon Factors"
   },
