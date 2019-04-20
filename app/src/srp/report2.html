@@ -34,8 +34,10 @@
           Public Services (Social Value) Act (2012) are met.</p>
 
         {{#if formatAnswer('SDMP_CRMP')}}
-	  <span class="glyphicon glyphicon-question-sign no-print pull-right" onclick="ractive.toggleFieldHint('SDMP_CRMP')" title="{{formatHint('SDMP_CRMP')}}"></span>
+          <span class="glyphicon glyphicon-question-sign no-print pull-right" onclick="ractive.toggleFieldHint('SDMP_CRMP')" title="{{formatHint('SDMP_CRMP')}}"></span>
           <p class="help-block no-print hidden" id="SDMP_CRMPHint">{{{formatHint('SDMP_CRMP')}}}</p>
+          <span class="glyphicon glyphicon-question-sign no-print pull-right" onclick="ractive.toggleFieldHint('SDMP_BOARD_REVIEW_WITHIN_12_MONTHS')" title="{{formatHint('SDMP_BOARD_REVIEW_WITHIN_12_MONTHS')}}"></span>
+          <p class="help-block no-print hidden" id="SDMP_BOARD_REVIEW_WITHIN_12_MONTHSHint">{{{formatHint('SDMP_BOARD_REVIEW_WITHIN_12_MONTHS')}}}</p>
           <p>
             In order to fulfil our responsibilities for the role we play,
             {{#if formatAnswer('ORG_NICKNAME')}}
@@ -43,7 +45,8 @@
             {{else}}
               {{formatAnswer('ORG_NAME')}}
             {{/if}}
-            has created a sustainable development management plan (SDMP).
+            has created a sustainable development management plan (SDMP)
+	    {{#if formatAnswer('SDMP_BOARD_REVIEW_WITHIN_12_MONTHS')}} and it has been reviewed by our Board within the last 12 months{{/if}}.
           </p>
         {{else}}
 	  <span class="glyphicon glyphicon-question-sign no-print pull-right" onclick="ractive.toggleFieldHint('SDMP_CRMP')" title="{{formatHint('SDMP_CRMP')}}"></span>
