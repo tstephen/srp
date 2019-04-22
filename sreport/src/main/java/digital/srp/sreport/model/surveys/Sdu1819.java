@@ -263,13 +263,14 @@ public class Sdu1819 {
         list.addAll(Arrays.asList(SduQuestions.SDU_PROFILE_CO2E_HDRS));
         // #203 not displayed but still calculated
         list.add(Q.OTHER_PROCUREMENT_CO2E);
+        list.add(Q.ECLASS_USER);
         list.addAll(Arrays.asList(SduQuestions.ECLASS_PROFILE_HDRS));
         list.addAll(Arrays.asList(SduQuestions.CORE_CO2E_HDRS));
-        list.addAll(Arrays.asList(SduQuestions.ECLASS_PROFILE_HDRS));
         list.addAll(Arrays.asList(SduQuestions.BIZ_MILEAGE_ACTIVE_PUBLIC_HDRS));
         list.addAll(Arrays.asList(SduQuestions.BIZ_MILEAGE_HDRS));
         list.add(Q.BIZ_MILEAGE);
         list.addAll(Arrays.asList(SduQuestions.TRAVEL_HDRS));
+        list.add(Q.TRAVEL_CO2E);
         list.addAll(Arrays.asList(SduQuestions.CITIZEN_CO2E_HDRS));
         list.add(Q.TOTAL_CO2E);
         list.add(Q.TOTAL_CO2E_BY_POP);

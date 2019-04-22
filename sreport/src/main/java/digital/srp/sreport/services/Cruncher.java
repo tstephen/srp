@@ -113,6 +113,8 @@ public class Cruncher implements digital.srp.sreport.model.surveys.SduQuestions,
     }
 
     protected void ensureInitialised(SurveyReturn rtn, int yearsToCalc, AnswerFactory answerFactory) {
+        LOGGER.info("Ensuring questions initialised for {} in {} and {} years prior", rtn.org(), rtn.applicablePeriod(),
+                yearsToCalc - 1);
         List<String> periods = PeriodUtil.fillBackwards(rtn.applicablePeriod(),
                 yearsToCalc);
         Q[] requiredQs;
@@ -142,9 +144,12 @@ public class Cruncher implements digital.srp.sreport.model.surveys.SduQuestions,
         // calculate all years on that basis
         Optional<Answer> answer = rtn.answer(rtn.applicablePeriod(), Q.ECLASS_USER);
         if (answer.isPresent()) {
+            LOGGER.info("Checking {} to see if {} is E-Class user in {}",
+                    answer.get().response(), rtn.org(), rtn.applicablePeriod());
             return Boolean.parseBoolean(answer.get().response())
                     || SduQuestions.ANALYSE_BY_E_CLASS.equals(answer.get().response());
         } else {
+            LOGGER.info("{} NOT E-Class user in {}", rtn.org(), rtn.applicablePeriod());
             return false;
         }
     }
@@ -846,6 +851,7 @@ public class Cruncher implements digital.srp.sreport.model.surveys.SduQuestions,
     }
 
     protected void calcCarbonProfileSduMethod(String period, SurveyReturn rtn) {
+        LOGGER.info("calcCarbonProfileSduMethod for {} in {}", rtn.getOrg(), rtn.applicablePeriod());
         sumAnswers(period, rtn, Q.WASTE_AND_WATER_CO2E, Q.SCOPE_3_WASTE, Q.SCOPE_3_WATER);
 
         // Intentional use of return period for org type
@@ -910,9 +916,9 @@ public class Cruncher implements digital.srp.sreport.model.surveys.SduQuestions,
         BigDecimal calcVal;
         try {
             if (BigDecimal.ZERO.equals(getAnswer(period, rtn, Q.CAPITAL_SPEND).responseAsBigDecimal())) {
-                LOGGER.info("No directly entered spend {}, estimate from non pay spend", Q.CAPITAL_SPEND);
+                LOGGER.info("No directly entered capital spend, estimate from non-pay spend");
                 calcVal = nonPaySpend.multiply(wFactor.proportionOfTotal());
-                LOGGER.info("Estimated {} from non pay spend as {}", Q.CAPITAL_SPEND, calcVal);
+                LOGGER.info("Estimated capital spend from non-pay spend as {}", calcVal);
                 getAnswer(period, rtn, Q.CAPITAL_SPEND).derived(true).response(calcVal.toPlainString());
             } else {
                 calcVal = getAnswer(period, rtn, Q.CAPITAL_SPEND).responseAsBigDecimal();
@@ -962,6 +968,7 @@ public class Cruncher implements digital.srp.sreport.model.surveys.SduQuestions,
     }
 
     protected void calcCarbonProfileEClassMethod(String period, SurveyReturn rtn) {
+        LOGGER.info("calcCarbonProfileEClassMethod for {} in {}", rtn.getOrg(), rtn.applicablePeriod());
         // Logic here is that *1000 for thousands of pounds to pounds the
         // /1000 to convert factor from kg to tonnes, i.e. cancel each other out
         CarbonFactor cFactor = cFactor(CarbonFactors.PROVISIONS, period);
@@ -1261,11 +1268,12 @@ public class Cruncher implements digital.srp.sreport.model.surveys.SduQuestions,
         BigDecimal calcVal = new BigDecimal("0.00");
         try {
             if (BigDecimal.ZERO.equals(getAnswer(period, rtn, srcQ).responseAsBigDecimal())) {
-                LOGGER.info("No directly entered spend {}, estimate from non pay spend", srcQ);
+                LOGGER.info("No directly entered spend {}, estimate from non-pay spend", srcQ);
                 calcVal = nonPaySpend.multiply(wFactor.proportionOfTotal());
-                LOGGER.info("Estimated {} from non pay spend as {}", srcQ, calcVal);
+                LOGGER.info("Estimated {} from non-pay spend as {}", srcQ, calcVal);
                 getAnswer(period, rtn, srcQ).derived(true).response(calcVal.toPlainString());
             } else {
+                LOGGER.info("Have directly entered spend {}, no need to estimate", srcQ);
                 calcVal = getAnswer(period, rtn, srcQ).responseAsBigDecimal();
             }
             calcVal = calcVal.multiply(wFactor.intensityValue());
