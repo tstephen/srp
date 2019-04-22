@@ -17,7 +17,7 @@
   <script id='template' type='text/ractive'>
     <section id="currentSect">
     {{#if surveyReturn}}
-      <section id="introSect">
+      <section id="introSect" class="rpt section">
         <h1>Sustainability Report for {{formatAnswer('ORG_NAME')}} ({{formatAnswer('ORG_CODE')}})</h1>
         {{>statusSect}}
         <h2>Introduction</h2>
@@ -46,10 +46,10 @@
               {{formatAnswer('ORG_NAME')}}
             {{/if}}
             has created a sustainable development management plan (SDMP)
-	    {{#if formatAnswer('SDMP_BOARD_REVIEW_WITHIN_12_MONTHS')}} and it has been reviewed by our Board within the last 12 months{{/if}}.
+            {{#if formatAnswer('SDMP_BOARD_REVIEW_WITHIN_12_MONTHS')}} and it has been reviewed by our Board within the last 12 months{{/if}}.
           </p>
         {{else}}
-	  <span class="glyphicon glyphicon-question-sign no-print pull-right" onclick="ractive.toggleFieldHint('SDMP_CRMP')" title="{{formatHint('SDMP_CRMP')}}"></span>
+          <span class="glyphicon glyphicon-question-sign no-print pull-right" onclick="ractive.toggleFieldHint('SDMP_CRMP')" title="{{formatHint('SDMP_CRMP')}}"></span>
           <p class="help-block no-print hidden" id="SDMP_CRMPHint">{{{formatHint('SDMP_CRMP')}}}</p>
           <p>
             We acknowledge this responsibility to our patients, local
@@ -57,12 +57,12 @@
         {{/if}}
 
         {{#if formatAnswer('SDMP_MISSION_STATEMENT')}}
-	  <span class="glyphicon glyphicon-question-sign no-print pull-right" onclick="ractive.toggleFieldHint('SDMP_MISSION_STATEMENT')" title="{{formatHint('SDMP_MISSION_STATEMENT')}}"></span>
+          <span class="glyphicon glyphicon-question-sign no-print pull-right" onclick="ractive.toggleFieldHint('SDMP_MISSION_STATEMENT')" title="{{formatHint('SDMP_MISSION_STATEMENT')}}"></span>
           <p class="help-block no-print hidden" id="SDMP_MISSION_STATEMENTHint">{{{formatHint('SDMP_MISSION_STATEMENT')}}}</p>
           <p>Our sustainability mission statement is: {{formatAnswer('SDMP_MISSION_STATEMENT')}}</p>
         {{/if}}
 
-	<span class="glyphicon glyphicon-question-sign no-print pull-right" onclick="ractive.toggleFieldHint('CARBON_REDUCTION_TARGET')" title="{{formatHint('CARBON_REDUCTION_TARGET')}}"></span>
+        <span class="glyphicon glyphicon-question-sign no-print pull-right" onclick="ractive.toggleFieldHint('CARBON_REDUCTION_TARGET')" title="{{formatHint('CARBON_REDUCTION_TARGET')}}"></span>
         <p class="help-block no-print hidden" id="CARBON_REDUCTION_TARGETHint">{{{formatHint('CARBON_REDUCTION_TARGET')}}}</p>
         <p>
           As a part of the NHS, public health and social care system, it is our
@@ -78,7 +78,7 @@
           as the baseline year.</p>
       </section>
 
-      <section id="policiesSect">
+      <section id="policiesSect" class="rpt section">
         <h2>Policies</h2>
         <p>In order to embed sustainability within our business it is important to explain where in our process and procedures sustainability features.</p>
         <p>One of the ways in which an organisation can embed sustainability is
@@ -130,7 +130,7 @@
           {{else}}
             We do not currently use the <a href="https://www.sduhealth.org.uk/sdat/">Sustainable Development Assessment Tool</a> (SDAT) tool.
           {{/if}}
-	</p>
+        </p>
         <span class="glyphicon glyphicon-question-sign no-print pull-right" onclick="ractive.toggleFieldHint('PROMOTE_SUSTAINABILITY_TO_STAFF')" title="{{formatHint('PROMOTE_SUSTAINABILITY_TO_STAFF')}}"></span>
         <p class="help-block no-print hidden" id="PROMOTE_SUSTAINABILITY_TO_STAFFHint">{{{formatHint('PROMOTE_SUSTAINABILITY_TO_STAFF')}}}</p>
         <p>
@@ -223,7 +223,7 @@
 
       </section>
 
-      <section id="partnershipsSect">
+      <section id="partnershipsSect" class="rpt section">
         <h2>Partnerships</h2>
         {{#if isCcg()}}
           <p>As a commissioning and contracting organisation, we will need effective contract mechanisms to deliver our ambitions for sustainable healthcare delivery. The NHS policy framework already sets the scene for commissioners and providers to operate in a sustainable manner. Crucially for us as a CCG, evidence of this commitment will need to be provided in part through contracting mechanisms.</p>
@@ -299,10 +299,10 @@
         </p>
       </section>
 
-      <section id="performanceSect">
+      <section id="performanceSect" class="rpt section">
         <h2>Performance</h2>
 
-        <section id="orgPerformanceSect">
+        <section id="orgPerformanceSect" class="rpt section">
           <h3>Organisation</h3>
           <span class="glyphicon glyphicon-question-sign no-print pull-right" onclick="ractive.toggleFieldHint('CARBON_REDUCTION_TARGET')" title="{{formatHint('CARBON_REDUCTION_TARGET')}}"></span>
           <p class="help-block no-print hidden" id="CARBON_REDUCTION_TARGETHint">{{{formatHint('CARBON_REDUCTION_TARGET')}}}</p>
@@ -327,7 +327,8 @@
             help explain how both the organisation and its performance on
             sustainability has changed over time.</p>
 
-            <div class="rpt table2" id="orgRptTable2" data-qs="FLOOR_AREA,NO_STAFF" data-periods="4"></div>
+            <div class="rpt table2" id="orgRptTable2" data-qs="FLOOR_AREA,NO_STAFF" data-periods="4"
+                 data-share="https://api.knowprocess.com/reports/{{formatAnswer('ORG_CODE')}}/{{surveyReturn.applicablePeriod}}/org.html"></div>
 
             <p>
               The 2014-2020 Sustainable Development Strategy outlined an ambition to
@@ -337,7 +338,7 @@
         </section>
 
         {{#if isCcg()}}
-          <section id="commissionedActivitySect">
+          <section id="commissionedActivitySect" class="rpt section">
             <h3>Commissioned Activity</h3>
 
             <table class="table table-striped">
@@ -372,7 +373,7 @@
           </section>
         {{/if}}
 
-        <section id="energySect">
+        <section id="energySect" class="rpt section">
           <h3>Energy</h3>
           <span class="glyphicon glyphicon-question-sign no-print pull-right" onclick="ractive.toggleFieldHint('TOTAL_ENERGY_COST')" title="{{formatHint('TOTAL_ENERGY_COST')}}"></span>
           <p class="help-block no-print hidden" id="TOTAL_ENERGY_COSTHint">{{{formatHint('TOTAL_ENERGY_COST')}}}</p>
@@ -391,7 +392,8 @@
             <p class="help-block no-print hidden" id="ENERGYHint">{{{formatHint('ENERGY')}}}</p>
           <p>Energy consumption in kWh</p>
           <div class="rpt table2" id="energyRptTable2" data-periods="4" data-total="true"
-               data-qs="ELEC_USED,GAS_USED,OIL_USED,COAL_USED,STEAM_USED,HOT_WATER_USED,ELEC_TOTAL_RENEWABLE_USED"></div>
+               data-qs="ELEC_USED,GAS_USED,OIL_USED,COAL_USED,STEAM_USED,HOT_WATER_USED,ELEC_TOTAL_RENEWABLE_USED"
+               data-share="https://api.knowprocess.com/reports/{{formatAnswer('ORG_CODE')}}/{{surveyReturn.applicablePeriod}}/energy.html"></div>
           <h4>Carbon emissions resulting</h4>
           <p>
             <svg data-qs="ELEC_CO2E,OWNED_BUILDINGS_GAS,OWNED_BUILDINGS_OIL,OWNED_BUILDINGS_COAL,STEAM_CO2E,HOT_WATER_CO2E,ELEC_RENEWABLE_CO2E,EXPORTED_THERMAL_ENERGY_CO2E"
@@ -400,7 +402,8 @@
           </p>
           <p>CO<sub>2</sub> Emissions (tCO<sub>2</sub>e)</p>
           <div class="rpt table2" id="energyCo2eRptTable2" data-total="true"
-               data-qs="ELEC_CO2E,OWNED_BUILDINGS_GAS,OWNED_BUILDINGS_OIL,OWNED_BUILDINGS_COAL,STEAM_CO2E,HOT_WATER_CO2E,ELEC_RENEWABLE_CO2E,EXPORTED_THERMAL_ENERGY_CO2E" data-periods="4"></div>
+               data-qs="ELEC_CO2E,OWNED_BUILDINGS_GAS,OWNED_BUILDINGS_OIL,OWNED_BUILDINGS_COAL,STEAM_CO2E,HOT_WATER_CO2E,ELEC_RENEWABLE_CO2E,EXPORTED_THERMAL_ENERGY_CO2E" data-periods="4"
+               data-share="https://api.knowprocess.com/reports/{{formatAnswer('ORG_CODE')}}/{{surveyReturn.applicablePeriod}}/energy-c2oe.html"></div>
 
           <p class="narrative performance {{#if !haveAnswer('ENERGY_PERF')}}hidden-print{{/if}}" data-q="ENERGY_PERF">{{formatAnswer('ENERGY_PERF')}}</p>
           <!-- TODO span class="glyphicon glyphicon-question-sign no-print pull-right" onclick="ractive.toggleFieldHint('ELEC_USED_3RD_PTY_PCT')" title="{{formatHint('ELEC_USED_3RD_PTY_PCT')}}"></span>
@@ -417,7 +420,7 @@
           <p class="narrative context {{#if !haveAnswer('ENERGY_CTXT')}}hidden-print{{/if}}" contenteditable data-q="ENERGY_CTXT">{{formatAnswer('ENERGY_CTXT')}}</p>
         </section>
 
-        <section id="paperSect">
+        <section id="paperSect" class="rpt section">
           <h3>Paper</h3>
           <p>The movement to a Paperless NHS can be supported by staff reducing the use of paper at all levels, this reduces the environmental impact of paper, reducing cost of paper to the NHS and can help improve information security.</p>
 
@@ -425,16 +428,17 @@
           <span class="glyphicon glyphicon-question-sign no-print pull-right" onclick="ractive.toggleFieldHint('PAPER')" title="{{formatHint('PAPER')}}"></span>
           <p class="help-block no-print hidden" id="PAPERHint">{{{formatHint('PAPER')}}}</p>
           <p>Cost is in pounds and weight in tonnes.</p>
-          <div class="rpt table2" id="paperRptTable2" data-qs="PAPER_SPEND,PAPER_USED" data-periods="4"></div>
+          <div class="rpt table2" id="paperRptTable2" data-qs="PAPER_SPEND,PAPER_USED" data-periods="4"
+               data-share="https://api.knowprocess.com/reports/{{formatAnswer('ORG_CODE')}}/{{surveyReturn.applicablePeriod}}/paper.html"></div>
         </section>
 
-        <section id="travelSect">
+        <section id="travelSect" class="rpt section">
           <h3>Travel</h3>
-	  {{#formatAnswer('HEALTHY_TRANSPORT_PLAN')==false || formatAnswer('HEALTHY_TRANSPORT_PLAN').indexOf('0')==-1}}
-	    <p>We recognise that a Healthy Transport Plan is a foundational part of our Travel Policy and we will be putting that in place as soon as possible.</p>
-	  {{else}}
-	    <p>We recognise that a Healthy Transport Plan is a foundational part of our Travel Policy and we have completed that and keep it under review.</p>
-	  {{/}}
+          {{#formatAnswer('HEALTHY_TRANSPORT_PLAN')==false || formatAnswer('HEALTHY_TRANSPORT_PLAN').indexOf('0')==-1}}
+            <p>We recognise that a Healthy Transport Plan is a foundational part of our Travel Policy and we will be putting that in place as soon as possible.</p>
+          {{else}}
+            <p>We recognise that a Healthy Transport Plan is a foundational part of our Travel Policy and we have completed that and keep it under review.</p>
+          {{/}}
           <p>We can improve local air quality and improve the health of our community by promoting active travel to our staff and to the patients and public that use our services.
           <p>Every action counts and we are a lean organisation trying to realise efficiencies across the board for cost and carbon (CO<sub>2</sub>e) reductions. We support a culture for active travel to improve staff wellbeing and reduce sickness. Air pollution, accidents and noise all cause health problems for our local population, patients, staff and visitors and are caused by cars, as well as other forms of transport.</p>
           {{#if formatAnswer('QUANT_TRAVEL_IMPACTS')==true}}
@@ -452,7 +456,8 @@
             <span class="glyphicon glyphicon-question-sign no-print pull-right" onclick="ractive.toggleFieldHint('TRAVEL')" title="{{formatHint('TRAVEL')}}"></span>
             <p class="help-block no-print hidden" id="TRAVELHint">{{{formatHint('TRAVEL')}}}</p>
           <p>All travel is shown in miles.</p>
-          <div class="rpt table2" id="travelRptTable2" data-total="true" data-qs="PATIENT_AND_VISITOR_MILEAGE,BIZ_MILEAGE,STAFF_COMMUTE_MILES_TOTAL" data-periods="4"></div>
+          <div class="rpt table2" id="travelRptTable2" data-total="true" data-qs="PATIENT_AND_VISITOR_MILEAGE,BIZ_MILEAGE,STAFF_COMMUTE_MILES_TOTAL" data-periods="4"
+               data-share="https://api.knowprocess.com/reports/{{formatAnswer('ORG_CODE')}}/{{surveyReturn.applicablePeriod}}/travel.html"></div>
           <h4>Carbon emissions resulting</h4>
           <p>
             <svg data-qs="BIZ_MILEAGE_ROAD_CO2E,BIZ_MILEAGE_RAIL_CO2E,BIZ_MILEAGE_AIR_CO2E,PATIENT_AND_VISITOR_MILEAGE_CO2E,STAFF_COMMUTE_MILES_CO2E"
@@ -460,17 +465,19 @@
                  class="rpt stacked2" id="travelGraph2" width="600" height="400"></svg>
           </p>
           <p>CO<sub>2</sub> Emissions (tCO<sub>2</sub>e)</p>
-          <div class="rpt table2" id="travelCo2eRptTable2" data-total="true" data-qs="BIZ_MILEAGE_ROAD_CO2E,BIZ_MILEAGE_RAIL_CO2E,BIZ_MILEAGE_AIR_CO2E,PATIENT_AND_VISITOR_MILEAGE_CO2E,STAFF_COMMUTE_MILES_CO2E" data-periods="4"></div>
+          <div class="rpt table2" id="travelCo2eRptTable2" data-total="true" data-qs="BIZ_MILEAGE_ROAD_CO2E,BIZ_MILEAGE_RAIL_CO2E,BIZ_MILEAGE_AIR_CO2E,PATIENT_AND_VISITOR_MILEAGE_CO2E,STAFF_COMMUTE_MILES_CO2E" data-periods="4"
+               data-share="https://api.knowprocess.com/reports/{{formatAnswer('ORG_CODE')}}/{{surveyReturn.applicablePeriod}}/travel-c2oe.html"></div>
           <p class="narrative performance {{#if !haveAnswer('TRAVEL_PERF')}}hidden-print{{/if}}" data-q="TRAVEL_PERF">{{formatAnswer('TRAVEL_PERF')}}</p>
         </section>
 
-        <section id="wasteSect">
+        <section id="wasteSect" class="rpt section">
           <h3>Waste</h3>
           <h4>Waste produced</h4>
           <span class="glyphicon glyphicon-question-sign no-print pull-right" onclick="ractive.toggleFieldHint('WASTE')" title="{{formatHint('WASTE')}}"></span>
           <p class="help-block no-print hidden" id="WASTEHint">{{{formatHint('WASTE')}}}</p>
           <p>Waste in tonnes</p>
-          <div class="rpt table2" id="wasteRptTable2" data-total="true" data-qs="RECYCLING_WEIGHT,OTHER_RECOVERY_WEIGHT,INCINERATION_WEIGHT,LANDFILL_WEIGHT" data-periods="4"></div>
+          <div class="rpt table2" id="wasteRptTable2" data-total="true" data-qs="RECYCLING_WEIGHT,OTHER_RECOVERY_WEIGHT,INCINERATION_WEIGHT,LANDFILL_WEIGHT" data-periods="4"
+               data-share="https://api.knowprocess.com/reports/{{formatAnswer('ORG_CODE')}}/{{surveyReturn.applicablePeriod}}/waste.html"></div>
           <h4>Carbon emissions resulting</h4>
           <p>
             <svg data-qs="RECYCLING_CO2E,OTHER_RECOVERY_CO2E,INCINERATION_CO2E,LANDFILL_CO2E"
@@ -479,16 +486,18 @@
           </p>
           <p>CO<sub>2</sub> Emissions (tCO<sub>2</sub>e)</p>
 
-          <div class="rpt table2" id="wasteCo2eRptTable2" data-total="true" data-qs="RECYCLING_CO2E,OTHER_RECOVERY_CO2E,INCINERATION_CO2E,LANDFILL_CO2E" data-periods="4"></div>
+          <div class="rpt table2" id="wasteCo2eRptTable2" data-total="true" data-qs="RECYCLING_CO2E,OTHER_RECOVERY_CO2E,INCINERATION_CO2E,LANDFILL_CO2E" data-periods="4"
+               data-share="https://api.knowprocess.com/reports/{{formatAnswer('ORG_CODE')}}/{{surveyReturn.applicablePeriod}}/waste-c2oe.html"></div>
           <p class="narrative performance {{#if !haveAnswer('WASTE_PERF')}}hidden-print{{/if}}" data-q="WASTE_PERF">{{formatAnswer('WASTE_PERF')}}</p>
           <p class="narrative context {{#if !haveAnswer('WASTE_CONTEXT')}}hidden-print{{/if}}" data-q="WASTE_CONTEXT">{{formatAnswer('WASTE_CONTEXT')}}</p>
         </section>
 
-        <section id="waterSect">
+        <section id="waterSect" class="rpt section">
           <h3>Finite resource use - Water</h3>
           <span class="glyphicon glyphicon-question-sign no-print pull-right" onclick="ractive.toggleFieldHint('WATER')" title="{{formatHint('WATER')}}"></span>
           <p class="help-block no-print hidden" id="WATERHint">{{{formatHint('WATER')}}}</p>
-          <div class="rpt table2" id="waterRptTable2" data-qs="WATER_VOL,WASTE_WATER,WATER_AND_SEWAGE_COST" data-periods="4"></div>
+          <div class="rpt table2" id="waterRptTable2" data-qs="WATER_VOL,WASTE_WATER,WATER_AND_SEWAGE_COST" data-periods="4"
+               data-share="https://api.knowprocess.com/reports/{{formatAnswer('ORG_CODE')}}/{{surveyReturn.applicablePeriod}}/water.html"></div>
           <h4>Carbon emissions resulting</h4>
           <p>
             <svg data-qs="WATER_CO2E,WATER_TREATMENT_CO2E"
@@ -497,12 +506,13 @@
           </p>
           <p>CO<sub>2</sub> Emissions (tCO<sub>2</sub>e)</p>
 
-          <div class="rpt table2" id="waterCo2eRptTable2" data-total="true" data-qs="WATER_CO2E,WATER_TREATMENT_CO2E" data-periods="4"></div>
+          <div class="rpt table2" id="waterCo2eRptTable2" data-total="true" data-qs="WATER_CO2E,WATER_TREATMENT_CO2E" data-periods="4"
+               data-share="https://api.knowprocess.com/reports/{{formatAnswer('ORG_CODE')}}/{{surveyReturn.applicablePeriod}}/water-c2oe.html"></div>
           <p class="narrative performance {{#if !haveAnswer('WATER_PERF')}}hidden-print{{/if}}" data-q="WATER_PERF">{{formatAnswer('WATER_PERF')}}</p>
           <p class="narrative context {{#if !haveAnswer('WATER_CONTEXT')}}hidden-print{{/if}}" data-q="WATER_CONTEXT">{{formatAnswer('WATER_CONTEXT')}}</p>
         </section>
 
-        <section id="carbonFootprintSect">
+        <section id="carbonFootprintSect" class="rpt section">
           <h3>Modelled Carbon Footprint</h3>
           <p>
             The information provided in the previous sections of this sustainability report uses the ERIC returns as its data source. However, we are aware that this does not reflect our entire carbon footprint. Therefore, the following information estimates the impact of our supply chain from our spend. More information available here: <a href="http://www.sduhealth.org.uk/policy-strategy/reporting/nhs-carbon-footprint.aspx">http://www.sduhealth.org.uk/policy-strategy/reporting/nhs-carbon-footprint.aspx</a>
@@ -519,7 +529,8 @@
           </section>
           <section class="col-md-6 col-xs-12">
             <p>The values in the table below are percentages.</p>
-            <div class="rpt table2" id="icarbonFootprintRptTable2" data-total="true" data-qs="CORE_CO2E_PCT,COMMISSIONING_CO2E_PCT,PROCUREMENT_2017_CO2E_PCT,COMMUNITY_CO2E_PCT" data-periods="1"></div>
+            <div class="rpt table2" id="carbonFootprintRptTable2" data-total="true" data-qs="CORE_CO2E_PCT,COMMISSIONING_CO2E_PCT,PROCUREMENT_2017_CO2E_PCT,COMMUNITY_CO2E_PCT" data-periods="1"
+                 data-share="https://api.knowprocess.com/reports/{{formatAnswer('ORG_CODE')}}/{{surveyReturn.applicablePeriod}}/carbon-footprint.html"></div>
           </section>
           {{#if isEClassUser()}}
             <section id="eclassCarbonProfileSect" style="clear:both">
@@ -527,19 +538,21 @@
               <p>Calculated from operating expenditure of <em>&pound;{{formatAnswer('OP_EX')}},000</em>
                 {{# formatAnswer('ECLASS_SPEND')}} of which <em>&pound;{{formatAnswer('ECLASS_SPEND')}},000</em> is E-Class classified spend.{{/}}
               </p>
-              <div class="rpt table2" id="eclassRptTable2" data-total="true" data-qs="PATIENT_AND_VISITOR_MILEAGE_CO2E,STAFF_COMMUTE_MILES_CO2E,PROVISIONS_CO2E,STAFF_CLOTHING_CO2E,PATIENTS_CLOTHING_AND_FOOTWEAR_CO2E,PHARMA_BLOOD_PROD_AND_MED_GASES_CO2E,DRESSINGS_CO2E,MEDICAL_AND_SURGICAL_EQUIPT_CO2E,PATIENTS_APPLIANCES_CO2E,CHEMICALS_AND_REAGENTS_CO2E,DENTAL_AND_OPTICAL_EQUIPT_CO2E,IMAGING_AND_RADIOTHERAPY_EQUIPT_AND_SVCS_CO2E,LAB_EQUIPT_AND_SVCS_CO2E,HOTEL_EQUIPT_MATERIALS_AND_SVCS_CO2E,BLDG_AND_ENG_PROD_AND_SVCS_CO2E,PURCHASED_HEALTHCARE_CO2E,GARDENING_AND_FARMING_CO2E,FURNITURE_FITTINGS_CO2E,HARDWARE_CROCKERY_CO2E,BEDDING_LINEN_AND_TEXTILES_CO2E,OFFICE_EQUIPT_TELCO_COMPUTERS_AND_STATIONERY_CO2E,REC_EQUIPT_AND_SOUVENIRS_CO2E,CONSULTING_SVCS_AND_EXPENSES_CO2E,OWNED_BUILDINGS_COAL,NET_ELEC_CO2E,OWNED_BUILDINGS_GAS,OWNED_BUILDINGS_OIL,NET_THERMAL_ENERGY_CO2E,LEASED_ASSETS_ENERGY_USE,BIZ_MILEAGE_CO2E,ANAESTHETIC_GASES_CO2E,WASTE_AND_WATER_CO2E,TOTAL_COMMISSIONING_CO2E" data-periods="4"></div>
+              <div class="rpt table2" id="eclassRptTable2" data-total="true" data-qs="PATIENT_AND_VISITOR_MILEAGE_CO2E,STAFF_COMMUTE_MILES_CO2E,PROVISIONS_CO2E,STAFF_CLOTHING_CO2E,PATIENTS_CLOTHING_AND_FOOTWEAR_CO2E,PHARMA_BLOOD_PROD_AND_MED_GASES_CO2E,DRESSINGS_CO2E,MEDICAL_AND_SURGICAL_EQUIPT_CO2E,PATIENTS_APPLIANCES_CO2E,CHEMICALS_AND_REAGENTS_CO2E,DENTAL_AND_OPTICAL_EQUIPT_CO2E,IMAGING_AND_RADIOTHERAPY_EQUIPT_AND_SVCS_CO2E,LAB_EQUIPT_AND_SVCS_CO2E,HOTEL_EQUIPT_MATERIALS_AND_SVCS_CO2E,BLDG_AND_ENG_PROD_AND_SVCS_CO2E,PURCHASED_HEALTHCARE_CO2E,GARDENING_AND_FARMING_CO2E,FURNITURE_FITTINGS_CO2E,HARDWARE_CROCKERY_CO2E,BEDDING_LINEN_AND_TEXTILES_CO2E,OFFICE_EQUIPT_TELCO_COMPUTERS_AND_STATIONERY_CO2E,REC_EQUIPT_AND_SOUVENIRS_CO2E,CONSULTING_SVCS_AND_EXPENSES_CO2E,OWNED_BUILDINGS_COAL,NET_ELEC_CO2E,OWNED_BUILDINGS_GAS,OWNED_BUILDINGS_OIL,NET_THERMAL_ENERGY_CO2E,LEASED_ASSETS_ENERGY_USE,BIZ_MILEAGE_CO2E,ANAESTHETIC_GASES_CO2E,WASTE_AND_WATER_CO2E,TOTAL_COMMISSIONING_CO2E" data-periods="4"
+                   data-share="https://api.knowprocess.com/reports/{{formatAnswer('ORG_CODE')}}/{{surveyReturn.applicablePeriod}}/eclass-carbon-profile.html"></div>
             </section>
           {{else}}
             <section id="sduCarbonProfileSect" style="clear:both">
               <h2>SDU whole organisation carbon profile</h2>
               <p>Calculated from operating expenditure of <em>&pound;{{formatAnswer('OP_EX')}},000</em> of which <em>&pound;{{formatAnswer('NON_PAY_SPEND')}},000</em> is non-pay spend based on typical values for an {{formatAnswer('ORG_TYPE')}} organisation.</p>
               <p>CO<sub>2</sub> Emissions (tCO<sub>2</sub>e)</p>
-          <div class="rpt table2" id="sduProfileRptTable2" data-total="true" data-qs="PATIENT_AND_VISITOR_MILEAGE_CO2E,STAFF_COMMUTE_MILES_CO2E,BIZ_SVCS_CO2E,CAPITAL_CO2E,CONSTRUCTION_CO2E,CATERING_CO2E,FREIGHT_CO2E,ICT_CO2E,CHEM_AND_GAS_CO2E,MED_INSTR_CO2E,OTHER_MANUFACTURED_CO2E,PAPER_AND_CARD_CO2E,PHARMA_CO2E,OWNED_BUILDINGS_COAL,NET_ELEC_CO2E,OWNED_BUILDINGS_GAS,OWNED_BUILDINGS_OIL,NET_THERMAL_ENERGY_CO2E,LEASED_ASSETS_ENERGY_USE,BIZ_MILEAGE_CO2E,ANAESTHETIC_GASES_CO2E,WASTE_AND_WATER_CO2E,TOTAL_COMMISSIONING_CO2E" data-periods="4"></div>
+          <div class="rpt table2" id="sduProfileRptTable2" data-total="true" data-qs="PATIENT_AND_VISITOR_MILEAGE_CO2E,STAFF_COMMUTE_MILES_CO2E,BIZ_SVCS_CO2E,CAPITAL_CO2E,CONSTRUCTION_CO2E,CATERING_CO2E,FREIGHT_CO2E,ICT_CO2E,CHEM_AND_GAS_CO2E,MED_INSTR_CO2E,OTHER_MANUFACTURED_CO2E,PAPER_AND_CARD_CO2E,PHARMA_CO2E,OWNED_BUILDINGS_COAL,NET_ELEC_CO2E,OWNED_BUILDINGS_GAS,OWNED_BUILDINGS_OIL,NET_THERMAL_ENERGY_CO2E,LEASED_ASSETS_ENERGY_USE,BIZ_MILEAGE_CO2E,ANAESTHETIC_GASES_CO2E,WASTE_AND_WATER_CO2E,TOTAL_COMMISSIONING_CO2E" data-periods="4"
+               data-share="https://api.knowprocess.com/reports/{{formatAnswer('ORG_CODE')}}/{{surveyReturn.applicablePeriod}}/sdu-carbon-profile.html"></div>
             </section>
           {{/if}}
         </section>
 
-        <section id="trajectorySect">
+        <section id="trajectorySect" class="rpt section">
           <h3>Carbon emissions progress</h3>
           <p class="narrative performance {{#if !haveAnswer('TRAJECTORY_PERF')}}hidden-print{{/if}}" data-q="TRAJECTORY_PERF">{{formatAnswer('TRAJECTORY_PERF')}}</p>
           <p>
@@ -548,15 +561,15 @@
                 data-y-axis-label="Emissions (tCO&#x2082;e)"
                 class="rpt stacked2" id="carbonTrajectoryGraph2" width="600" height="400"></svg>
           </p>
-          <div class="rpt table2" id="trajectoryRptTable2" data-total="true" data-qs="TOTAL_CORE_CO2E,TOTAL_COMMISSIONING_CO2E,TOTAL_PROCUREMENT_2017_CO2E,TOTAL_COMMUNITY_CO2E" data-periods="11"></div>
+          <div class="rpt table2" id="trajectoryRptTable2" data-total="true" data-qs="TOTAL_CORE_CO2E,TOTAL_COMMISSIONING_CO2E,TOTAL_PROCUREMENT_2017_CO2E,TOTAL_COMMUNITY_CO2E" data-periods="11"
+               data-share="https://api.knowprocess.com/reports/{{formatAnswer('ORG_CODE')}}/{{surveyReturn.applicablePeriod}}/carbon-trajectory.html"></div>
         </section>
-
       </section>
 
-      <section id="socialValueSect">
+      <section id="socialValueSect" class="rpt section">
         <h2>Social Value</h2>
 
-	<p>Collectively as an organisation we recognise the contribution that commissioning, procurement and commercial can have in delivering sustainability and social value, and our duty under the Public Services Value Act.</p>
+        <p>Collectively as an organisation we recognise the contribution that commissioning, procurement and commercial can have in delivering sustainability and social value, and our duty under the Public Services Value Act.</p>
 
         <span class="glyphicon glyphicon-question-sign no-print pull-right" onclick="ractive.toggleFieldHint('SOCIAL_VALUE')" title="{{formatHint('SOCIAL_VALUE')}}"></span>
         <p class="help-block no-print hidden" id="SOCIAL_VALUEHint">{{{formatHint('SOCIAL_VALUE')}}}</p>
@@ -571,17 +584,20 @@
 
         <p>Using the Social Value Calculator we have been to calculate the social value created from some specific activities:</p>
 
-        <div class="rpt table2" id="socialValueRptTable2" data-qs="SV_TOTAL,SI_TOTAL" data-periods="4"></div>
+       <!-- TODO data-share="https://api.knowprocess.com/reports/{{formatAnswer('ORG_CODE')}}/{{surveyReturn.applicablePeriod}}/social-value.html"-->
+        <div class="rpt table2" id="socialValueRptTable2" data-qs="SV_TOTAL,SI_TOTAL" data-periods="4"
+  ></div>
 
         <p class="narrative context {{#if !haveAnswer('SV_CTXT')}}hidden-print{{/if}}" contenteditable data-q="SV_CTXT">{{formatAnswer('SV_CTXT')}}</p>
       </section>
 
-      <section id="adaptationSect">
+      <section id="adaptationSect" class="rpt section">
         <h2>Adaptation</h2>
         <p>Events such as heatwaves, cold snaps and flooding are expected to increase as a result of climate change. To ensure that our services continue to meet the needs of our local population during such events we have developed and implemented a number of policies and protocols in partnership with other local agencies these include:</p>
         <p class="narrative performance {{#if !haveAnswer('ADAPTATION_PERF')}}hidden-print{{/if}}" data-q="ADAPTATION_PERF">{{formatAnswer('ADAPTATION_PERF')}}</p>
       </section>
-      <section id="biodversitySect">
+
+      <section id="biodiversitySect" class="rpt section">
         <h2>Biodiversity Action Plan</h2>
         <span class="glyphicon glyphicon-question-sign no-print pull-right" onclick="ractive.toggleFieldHint('BIODIVERSITY')" title="{{formatHint('BIODIVERSITY')}}"></span>
         <p class="help-block no-print hidden" id="BIODIVERSITYHint">{{{formatHint('BIODIVERSITY')}}}</p>
@@ -625,5 +641,6 @@
 
   <script src="./vsn/js/stacked.js"></script>
   <script src="./vsn/js/pie.js"></script>
+  <script src="./vsn/js/toast.js"></script>
 </body>
 </html>

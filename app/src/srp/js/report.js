@@ -600,6 +600,20 @@ var ractive = new BaseRactive({
       success: ractive.fetchSuccessHandler
     });
   },
+  copyLink: function(ev) {
+    if (navigator['clipboard'] == undefined) {
+      alert('Please upgrade your browser to be able to copy links');
+    } else {
+      navigator.clipboard.writeText(ev.target.getAttribute('data-share'));
+      console.info('copied link');
+      var toast = new iqwerty.toast.Toast('Copied!', { style: { main: {
+	  background: '#0078c1',
+	  color: 'white',
+	  'box-shadow': '0 0 50px rgba(0, 120, 193, .7)'
+	}}});
+    }
+    return false;
+  },
   enter: function () {
     console.info('enter...');
   },
@@ -1023,8 +1037,16 @@ var ractive = new BaseRactive({
         table += '<td class="number">'+ractive.total(qs, ractive.getPeriod(i-periods))+'</td>';
       }
     }
+    if (d.hasAttribute('data-share')) {
+      table += '<tr><td colspan="'+(periods+2)+'">'
+            +'<a href="#" title="Copy link to this table" data-share="'+d.getAttribute('data-share')
+            +'" onclick="return ractive.copyLink(event);" '
+            +'class="pull-right no-print"><span class="glyphicon glyphicon-copy"></span>Copy</a>'
+            +'<a href="'+d.getAttribute('data-share')+'" target="_blank" title="Open the table in a new window" '
+            +'class="pull-right no-print"><span class="glyphicon glyphicon-share-alt"></span>Share</a>'
+            +'</td></tr>';
+    }
     table += '</tfoot></table>';
-    //d.innerText = table;
     $(d).empty().append(table);
   },
   reset: function() {

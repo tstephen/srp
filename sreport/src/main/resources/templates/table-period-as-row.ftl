@@ -1,3 +1,6 @@
+<link rel="stylesheet" type="text/css" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"/>
+<link href="//srp.digital/srp/2.3.0/css/srp.css" rel="stylesheet">
+<link rel="icon" type="image/png" href="//srp.digital/srp/images/icon/srp-icon-32x32.png" />
 <table class="table table-striped">
   <thead>
     <tr>
