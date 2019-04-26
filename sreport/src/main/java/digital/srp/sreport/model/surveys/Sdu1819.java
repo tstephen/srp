@@ -38,12 +38,13 @@ public class Sdu1819 {
                         Q.SDMP_CRMP,
                         Q.SDMP_BOARD_REVIEW_WITHIN_12_MONTHS,
                         Q.SDMP_MISSION_STATEMENT,
+                        Q.SDMP_INC_PROCUREMENT,
                         Q.HEALTHY_TRANSPORT_PLAN,
                         Q.PROMOTE_HEALTHY_TRAVEL,
-                        Q.PROC_ENV_ASSESSMENT,
-                        Q.PROC_SOC_ASSESSMENT,
+                        Q.QUANT_TRAVEL_IMPACTS,
+                        Q.PROC_SUPPLIER_SUSTAINABILITY,
+                        Q.PROC_SUPPLIER_ENGAGEMENT,
                         Q.STRATEGIC_SUSTAINABILITY_PARTNERS,
-                        Q.GCC_USER,
                         Q.LAST_GCC_DATE,
                         Q.LAST_GCC_SCORE,
                         Q.SDG_STARTING,
@@ -52,7 +53,9 @@ public class Sdu1819 {
                         Q.QUANT_ES_IMPACTS,
                         Q.QUANT_TRAVEL_IMPACTS,
                         Q.MOD_SLAVERY,
-                        Q.SIA
+                        Q.SIA,
+                        Q.SOCIAL_VALUE,
+                        Q.BIODIVERSITY
                 );
 
         SurveyCategory catPerf = new SurveyCategory()
@@ -295,6 +298,8 @@ public class Sdu1819 {
         list.add(Q.TOTAL_ENERGY_BY_WTE);
         list.add(Q.WATER_VOL_BY_WTE);
         list.add(Q.NO_STAFF);
+        list.add(Q.SDG_STARTING);
+        list.add(Q.SDG_CLEAR);
         list.addAll(Arrays.asList(SduQuestions.QUALITATIVE_QS));
         list.add(Q.SV_TOTAL);
         list.add(Q.SI_TOTAL);

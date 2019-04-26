@@ -227,6 +227,12 @@ var $r = (function ($, ractive, $auth) {
     });
     $('[data-id="PROC_SUPPLIER_SUSTAINABILITY"]').off().on('change', function(ev) {
       var answer = $r.getAnswer('PROC_SUPPLIER_SUSTAINABILITY', _period);
+      if (answer == undefined) answer = {
+        revision: 1,
+        question: { id: 340, name: 'PROC_SUPPLIER_SUSTAINABILITY' },
+        applicablePeriod: _period,
+        status: 'Draft'
+      };
       if (answer.response == null) answer.response = [];
       if (ev.target.checked) answer.response.push(ev.target.value);
       else answer.response.splice(answer.response.indexOf(ev.target.value), 1);
