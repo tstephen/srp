@@ -1054,6 +1054,7 @@ public class Cruncher implements digital.srp.sreport.model.surveys.SduQuestions,
         crunchCO2e(period, rtn, Q.CONSULTING_SVCS_AND_EXPENSES, cFactor.value(),
                 Q.CONSULTING_SVCS_AND_EXPENSES_CO2E);
 
+        sumAnswers(period, rtn, Q.WASTE_AND_WATER_CO2E, Q.SCOPE_3_WASTE, Q.SCOPE_3_WATER);
         sumAnswers(period, rtn, Q.PROCUREMENT_CO2E, Q.PROVISIONS_CO2E,
                 Q.STAFF_CLOTHING_CO2E, Q.PATIENTS_CLOTHING_AND_FOOTWEAR_CO2E,
                 Q.PHARMA_BLOOD_PROD_AND_MED_GASES_CO2E,
