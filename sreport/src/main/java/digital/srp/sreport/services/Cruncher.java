@@ -384,9 +384,12 @@ public class Cruncher implements digital.srp.sreport.model.surveys.SduQuestions,
                     .response(totalProcurementCo2e // change tonnes to kgs
                             .multiply(ONE_THOUSAND)
                             .divide(metric, RoundingMode.HALF_UP));
-        } catch (ArithmeticException | IllegalStateException e) {
-            LOGGER.warn("unable to calculate CO2E by {} as it is not specified",
-                    metricName);
+        } catch (ArithmeticException e) {
+            LOGGER.warn("Unable to calculate CO2e by {} due to insuffient data. Cause: {}",
+                    metricName, e.getMessage());
+        } catch (IllegalStateException e) {
+            LOGGER.error("Unable to calculate CO2e by {}. Cause: {}",
+                    metricName, e.getMessage());
         }
     }
 

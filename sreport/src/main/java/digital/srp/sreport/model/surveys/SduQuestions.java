@@ -237,7 +237,7 @@ public interface SduQuestions {
     };
 
     Q[] BENCHMARK_BY_FLOOR_AREA_HDRS = new Q[] {
-            Q.TOTAL_CORE_CO2E_BY_POP,
+            Q.TOTAL_CORE_CO2E_BY_FLOOR,
             Q.TOTAL_COMMISSIONING_CO2E_BY_FLOOR,
             Q.TOTAL_PROCUREMENT_2017_CO2E_BY_FLOOR,
             Q.TOTAL_COMMUNITY_CO2E_BY_FLOOR

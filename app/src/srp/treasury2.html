@@ -177,7 +177,7 @@
 
         <section id="totalEmissionsByPatientContactsSect">
           <h3>Benchmarking by total patient contacts (kgCO<sub>2</sub>e/patient contact)</h3>
-          {{#if formatAnswer('NO_PATIENT_CONTACTS') == ''}}
+          {{#if !haveAnswer('NO_PATIENT_CONTACTS') || formatAnswer('NO_PATIENT_CONTACTS') == 0}}
             <p>No patient contact data available</p>
           {{else}}
             <p>
