@@ -918,13 +918,15 @@ public class Cruncher implements digital.srp.sreport.model.surveys.SduQuestions,
         WeightingFactor wFactor = wFactor(WeightingFactors.CAPITAL, period, orgType);
         BigDecimal calcVal;
         try {
-            if (BigDecimal.ZERO.equals(getAnswer(period, rtn, Q.CAPITAL_SPEND).responseAsBigDecimal())) {
+            Answer capEx = getAnswer(period, rtn, Q.CAPITAL_SPEND);
+            if (capEx.derived() || capEx.response() == null
+                    || capEx.response().trim().length() == 0) {
                 LOGGER.info("No directly entered capital spend, estimate from non-pay spend");
                 calcVal = nonPaySpend.multiply(wFactor.proportionOfTotal());
                 LOGGER.info("Estimated capital spend from non-pay spend as {}", calcVal);
-                getAnswer(period, rtn, Q.CAPITAL_SPEND).derived(true).response(calcVal.toPlainString());
+                capEx.derived(true).response(calcVal.toPlainString());
             } else {
-                calcVal = getAnswer(period, rtn, Q.CAPITAL_SPEND).responseAsBigDecimal();
+                calcVal = capEx.responseAsBigDecimal();
             }
             // This intentionally uses proportion of total not intensity
             // because as explained above it is a special combined factor
