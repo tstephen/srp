@@ -6,12 +6,13 @@
   <option value="question"/>
   <!--option value="question"/ QUARTILES-->
   <option value="region"/>
-  <option value="status"/>
+  <option value="answerStatus">answer status</option>
 </datalist>
 <datalist id="operators">
   <option value="="> = </option>
 </datalist>
 <datalist id="periods">
+  <option value="2018-19"> 2018-19 </option>
   <option value="2017-18"> 2017-18 </option>
   <option value="2016-17"> 2016-17 </option>
   <option value="2015-16"> 2015-16 </option>
@@ -25,9 +26,10 @@
   <option value="North"> North </option>
   <option value="South"> South </option>
 </datalist>
-<datalist id="status">
+<datalist id="answerStatus">
   <option value="Draft"> Draft </option>
   <option value="Published"> Published </option>
+  <option value="Superseded"> Superseded </option>
 </datalist>
 <section id="criteriaSect">
   <form class="form-inline" id="criteriaForm">
@@ -45,7 +47,7 @@
           <li class="form-group criteria">
             <input class="col-md-4 form-control criteria-field" list="fields" placeholder="Start typing to filter options" id="field{{idx}}" required value="{{field}}">
             <input class="col-md-1 form-control criteria-operator" list="operators" placeholder="Start typing to filter options" id="operator{{idx}}" required value="{{operator}}">
-            <input class="col-md-5 form-control criteria-value" id="value{{idx}}" required value="{{value}}">
+            <input class="col-md-6 form-control criteria-value" id="value{{idx}}" required style="min-width:50%" value="{{value}}">
             <span class="col-md-1">
               <a class="glyphicon icon-btn kp-icon-remove" aria-hidden="true" on-click="deleteCriterion(i)" title="Remove this criterion"></a>
             </span>

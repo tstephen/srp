@@ -63,6 +63,7 @@ var ractive = new BaseRactive({
       }
     },
     sort: function (array, column, asc) {
+      if (array == undefined) return;
       console.info('sort '+(asc ? 'ascending' : 'descending')+' on: '+column);
       array = array.slice(); // clone, so we don't modify the underlying data
 
@@ -164,13 +165,13 @@ var ractive = new BaseRactive({
   },
   fetchQuestions: function() {
     console.info('fetchQuestions...');
-    $.getJSON(ractive.getServer()+'/questions/', function(data) {
+    $.getJSON(ractive.getServer()+'/sdu/questions/', function(data) {
       ractive.set('questions', data);
       // doesn't fit the standard pattern of addDataList
       $('datalist#questions').remove();
       $('body').append('<datalist id="questions">');
       for (var idx = 0 ; idx < data.length ; idx++) {
-        $('datalist#questions').append('<option value="'+data[idx].label+'">'+data[idx].label+'</option>');
+        $('datalist#questions').append('<option value="'+data[idx].name+'">'+data[idx].label+'</option>');
       };
     });
   },
@@ -179,15 +180,18 @@ var ractive = new BaseRactive({
     if (ractive.get('criteria').length==1
         && (ractive.get('criteria.0.field')=='organisation type'
             || ractive.get('criteria.0.field')=='region'
-            || ractive.get('criteria.0.field')=='status')) {
+            || ractive.get('criteria.0.field')=='answerStatus')) {
       return ractive.showMessage('Please specify more criteria to narrow down your search');
     }
+    var crit = ractive.get('criteria');
+    // status is overloaded list so had to use answerStatus on this page
+    if ('answerStatus'===crit) crit = 'status';
     $.ajax({
       dataType: "json",
       type: 'POST',
       contentType: 'application/json',
       url: ractive.getServer()+'/answers/findByCriteria',
-      data: JSON.stringify(ractive.get('criteria')),
+      data: JSON.stringify(crit),
       crossDomain: true,
       headers: {
         "X-Requested-With": "XMLHttpRequest",
@@ -292,8 +296,8 @@ $(document).ready(function() {
       case 'region':
         $('.criteria:nth-child('+(idx+1)+') .criteria-value').attr('list', 'regions');
         break;
-      case 'status':
-        $('.criteria:nth-child('+(idx+1)+') .criteria-value').attr('list', 'status');
+      case 'answerStatus':
+        $('.criteria:nth-child('+(idx+1)+') .criteria-value').attr('list', 'answerStatus');
         break;
       case '':
         break;
