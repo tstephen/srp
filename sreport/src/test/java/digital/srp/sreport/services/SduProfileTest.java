@@ -44,8 +44,10 @@ public class SduProfileTest {
         rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD).question(Q.ORG_TYPE).response("Acute Trust"));
         rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD).question(Q.OP_EX).response(OP_EX));
 
-        rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD).question(Q.NON_PAY_SPEND));
-        rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD).question(Q.CAPITAL_SPEND));
+        rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD)
+                .question(Q.NON_PAY_SPEND).derived(true));
+        rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD)
+                .question(Q.CAPITAL_SPEND).derived(true));
 
         initAnswers(rtn);
 
@@ -60,7 +62,8 @@ public class SduProfileTest {
     public void testCalcCo2eProfileFromOpexTolerateEmptyStrings() {
         SurveyReturn rtn = new SurveyReturn().applicablePeriod(PERIOD).org("ZZ1");
         rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD).question(Q.ORG_TYPE).response("Acute Trust"));
-        rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD).question(Q.OP_EX).response(OP_EX));
+        rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD)
+                .question(Q.OP_EX).response(OP_EX));
 
         rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD).question(Q.NON_PAY_SPEND).response(""));
         rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD).question(Q.CAPITAL_SPEND).response(""));
