@@ -45,7 +45,7 @@
               {{formatAnswer('ORG_NAME')}}
             {{/if}}
             has created a sustainable development management plan (SDMP)
-            {{#if formatAnswer('SDMP_BOARD_REVIEW_WITHIN_12_MONTHS')}} and it has been reviewed by our Board within the last 12 months{{/if}}.
+            {{#if formatAnswer('SDMP_BOARD_REVIEW_WITHIN_12_MONTHS')==true}} and it has been reviewed by our Board within the last 12 months{{/if}}.
           </p>
         {{else}}
           <span class="glyphicon glyphicon-question-sign no-print pull-right" onclick="ractive.toggleFieldHint('SDMP_CRMP')" title="{{formatHint('SDMP_CRMP')}}"></span>
@@ -85,7 +85,7 @@
           {{#if formatAnswer('SDMP_CRMP')}}
             <span class="glyphicon glyphicon-question-sign no-print pull-right" onclick="ractive.toggleFieldHint('SDMP_BOARD_REVIEW_WITHIN_12_MONTHS')" title="{{formatHint('SDMP_BOARD_REVIEW_WITHIN_12_MONTHS')}}"></span>
             <p class="help-block no-print hidden" id="SDMP_BOARD_REVIEW_WITHIN_12_MONTHSHint">{{{formatHint('SDMP_BOARD_REVIEW_WITHIN_12_MONTHS')}}}</p>
-            {{#if formatAnswer('')}}
+            {{#if formatAnswer('SDMP_BOARD_REVIEW_WITHIN_12_MONTHS')==true}}
               an SDMP. The board approved our SDMP in the last 12 months so our plans for a sustainable future are well known within the organisation and clearly laid out.
             {{else}}
               an SDMP. An update to our SDMP is required because it has not been approved by the board in the last 12 months.
@@ -327,7 +327,7 @@
             sustainability has changed over time.</p>
 
             <div class="rpt table2" id="orgRptTable2" data-qs="FLOOR_AREA,NO_STAFF" data-periods="4"
-                 data-share="https://api.knowprocess.com/reports/{{formatAnswer('ORG_CODE')}}/{{surveyReturn.applicablePeriod}}/org.html"></div>
+                 data-share="http://localhost:8083/reports/{{formatAnswer('ORG_CODE')}}/{{surveyReturn.applicablePeriod}}/org.html"></div>
 
             <p>
               The 2014-2020 Sustainable Development Strategy outlined an ambition to
@@ -392,7 +392,7 @@
           <p>Energy consumption in kWh</p>
           <div class="rpt table2" id="energyRptTable2" data-periods="4" data-total="true"
                data-qs="ELEC_USED,GAS_USED,OIL_USED,COAL_USED,STEAM_USED,HOT_WATER_USED,ELEC_TOTAL_RENEWABLE_USED"
-               data-share="https://api.knowprocess.com/reports/{{formatAnswer('ORG_CODE')}}/{{surveyReturn.applicablePeriod}}/energy.html"></div>
+               data-share="http://localhost:8083/reports/{{formatAnswer('ORG_CODE')}}/{{surveyReturn.applicablePeriod}}/energy.html"></div>
           <h4>Carbon emissions resulting</h4>
           <p>
             <svg data-qs="ELEC_CO2E,OWNED_BUILDINGS_GAS,OWNED_BUILDINGS_OIL,OWNED_BUILDINGS_COAL,STEAM_CO2E,HOT_WATER_CO2E,ELEC_RENEWABLE_CO2E,EXPORTED_THERMAL_ENERGY_CO2E"
@@ -402,7 +402,7 @@
           <p>CO<sub>2</sub> Emissions (tCO<sub>2</sub>e)</p>
           <div class="rpt table2" id="energyCo2eRptTable2" data-total="true"
                data-qs="ELEC_CO2E,OWNED_BUILDINGS_GAS,OWNED_BUILDINGS_OIL,OWNED_BUILDINGS_COAL,STEAM_CO2E,HOT_WATER_CO2E,ELEC_RENEWABLE_CO2E,EXPORTED_THERMAL_ENERGY_CO2E" data-periods="4"
-               data-share="https://api.knowprocess.com/reports/{{formatAnswer('ORG_CODE')}}/{{surveyReturn.applicablePeriod}}/energy-c2oe.html"></div>
+               data-share="http://localhost:8083/reports/{{formatAnswer('ORG_CODE')}}/{{surveyReturn.applicablePeriod}}/energy-c2oe.html"></div>
 
           <p class="narrative performance {{#if !haveAnswer('ENERGY_PERF')}}hidden-print{{/if}}" data-q="ENERGY_PERF">{{formatAnswer('ENERGY_PERF')}}</p>
           <!-- TODO span class="glyphicon glyphicon-question-sign no-print pull-right" onclick="ractive.toggleFieldHint('ELEC_USED_3RD_PTY_PCT')" title="{{formatHint('ELEC_USED_3RD_PTY_PCT')}}"></span>
@@ -428,7 +428,7 @@
           <p class="help-block no-print hidden" id="PAPERHint">{{{formatHint('PAPER')}}}</p>
           <p>Cost is in pounds and weight in tonnes.</p>
           <div class="rpt table2" id="paperRptTable2" data-qs="PAPER_SPEND,PAPER_USED" data-periods="4"
-               data-share="https://api.knowprocess.com/reports/{{formatAnswer('ORG_CODE')}}/{{surveyReturn.applicablePeriod}}/paper.html"></div>
+               data-share="http://localhost:8083/reports/{{formatAnswer('ORG_CODE')}}/{{surveyReturn.applicablePeriod}}/paper.html"></div>
         </section>
 
         <section id="travelSect" class="rpt section">
@@ -456,7 +456,7 @@
             <p class="help-block no-print hidden" id="TRAVELHint">{{{formatHint('TRAVEL')}}}</p>
           <p>All travel is shown in miles.</p>
           <div class="rpt table2" id="travelRptTable2" data-total="true" data-qs="PATIENT_AND_VISITOR_MILEAGE,BIZ_MILEAGE,STAFF_COMMUTE_MILES_TOTAL" data-periods="4"
-               data-share="https://api.knowprocess.com/reports/{{formatAnswer('ORG_CODE')}}/{{surveyReturn.applicablePeriod}}/travel.html"></div>
+               data-share="http://localhost:8083/reports/{{formatAnswer('ORG_CODE')}}/{{surveyReturn.applicablePeriod}}/travel.html"></div>
           <h4>Carbon emissions resulting</h4>
           <p>
             <svg data-qs="BIZ_MILEAGE_ROAD_CO2E,BIZ_MILEAGE_RAIL_CO2E,BIZ_MILEAGE_AIR_CO2E,PATIENT_AND_VISITOR_MILEAGE_CO2E,STAFF_COMMUTE_MILES_CO2E"
@@ -465,7 +465,7 @@
           </p>
           <p>CO<sub>2</sub> Emissions (tCO<sub>2</sub>e)</p>
           <div class="rpt table2" id="travelCo2eRptTable2" data-total="true" data-qs="BIZ_MILEAGE_ROAD_CO2E,BIZ_MILEAGE_RAIL_CO2E,BIZ_MILEAGE_AIR_CO2E,PATIENT_AND_VISITOR_MILEAGE_CO2E,STAFF_COMMUTE_MILES_CO2E" data-periods="4"
-               data-share="https://api.knowprocess.com/reports/{{formatAnswer('ORG_CODE')}}/{{surveyReturn.applicablePeriod}}/travel-c2oe.html"></div>
+               data-share="http://localhost:8083/reports/{{formatAnswer('ORG_CODE')}}/{{surveyReturn.applicablePeriod}}/travel-c2oe.html"></div>
           <p class="narrative performance {{#if !haveAnswer('TRAVEL_PERF')}}hidden-print{{/if}}" data-q="TRAVEL_PERF">{{formatAnswer('TRAVEL_PERF')}}</p>
         </section>
 
@@ -476,7 +476,7 @@
           <p class="help-block no-print hidden" id="WASTEHint">{{{formatHint('WASTE')}}}</p>
           <p>Waste in tonnes</p>
           <div class="rpt table2" id="wasteRptTable2" data-total="true" data-qs="RECYCLING_WEIGHT,OTHER_RECOVERY_WEIGHT,INCINERATION_WEIGHT,LANDFILL_WEIGHT" data-periods="4"
-               data-share="https://api.knowprocess.com/reports/{{formatAnswer('ORG_CODE')}}/{{surveyReturn.applicablePeriod}}/waste.html"></div>
+               data-share="http://localhost:8083/reports/{{formatAnswer('ORG_CODE')}}/{{surveyReturn.applicablePeriod}}/waste.html"></div>
           <h4>Carbon emissions resulting</h4>
           <p>
             <svg data-qs="RECYCLING_CO2E,OTHER_RECOVERY_CO2E,INCINERATION_CO2E,LANDFILL_CO2E"
@@ -486,7 +486,7 @@
           <p>CO<sub>2</sub> Emissions (tCO<sub>2</sub>e)</p>
 
           <div class="rpt table2" id="wasteCo2eRptTable2" data-total="true" data-qs="RECYCLING_CO2E,OTHER_RECOVERY_CO2E,INCINERATION_CO2E,LANDFILL_CO2E" data-periods="4"
-               data-share="https://api.knowprocess.com/reports/{{formatAnswer('ORG_CODE')}}/{{surveyReturn.applicablePeriod}}/waste-c2oe.html"></div>
+               data-share="http://localhost:8083/reports/{{formatAnswer('ORG_CODE')}}/{{surveyReturn.applicablePeriod}}/waste-c2oe.html"></div>
           <p class="narrative performance {{#if !haveAnswer('WASTE_PERF')}}hidden-print{{/if}}" data-q="WASTE_PERF">{{formatAnswer('WASTE_PERF')}}</p>
           <p class="narrative context {{#if !haveAnswer('WASTE_CONTEXT')}}hidden-print{{/if}}" data-q="WASTE_CONTEXT">{{formatAnswer('WASTE_CONTEXT')}}</p>
         </section>
@@ -496,7 +496,7 @@
           <span class="glyphicon glyphicon-question-sign no-print pull-right" onclick="ractive.toggleFieldHint('WATER')" title="{{formatHint('WATER')}}"></span>
           <p class="help-block no-print hidden" id="WATERHint">{{{formatHint('WATER')}}}</p>
           <div class="rpt table2" id="waterRptTable2" data-qs="WATER_VOL,WASTE_WATER,WATER_AND_SEWAGE_COST" data-periods="4"
-               data-share="https://api.knowprocess.com/reports/{{formatAnswer('ORG_CODE')}}/{{surveyReturn.applicablePeriod}}/water.html"></div>
+               data-share="http://localhost:8083/reports/{{formatAnswer('ORG_CODE')}}/{{surveyReturn.applicablePeriod}}/water.html"></div>
           <h4>Carbon emissions resulting</h4>
           <p>
             <svg data-qs="WATER_CO2E,WATER_TREATMENT_CO2E"
@@ -506,7 +506,7 @@
           <p>CO<sub>2</sub> Emissions (tCO<sub>2</sub>e)</p>
 
           <div class="rpt table2" id="waterCo2eRptTable2" data-total="true" data-qs="WATER_CO2E,WATER_TREATMENT_CO2E" data-periods="4"
-               data-share="https://api.knowprocess.com/reports/{{formatAnswer('ORG_CODE')}}/{{surveyReturn.applicablePeriod}}/water-c2oe.html"></div>
+               data-share="http://localhost:8083/reports/{{formatAnswer('ORG_CODE')}}/{{surveyReturn.applicablePeriod}}/water-c2oe.html"></div>
           <p class="narrative performance {{#if !haveAnswer('WATER_PERF')}}hidden-print{{/if}}" data-q="WATER_PERF">{{formatAnswer('WATER_PERF')}}</p>
           <p class="narrative context {{#if !haveAnswer('WATER_CONTEXT')}}hidden-print{{/if}}" data-q="WATER_CONTEXT">{{formatAnswer('WATER_CONTEXT')}}</p>
         </section>
@@ -529,7 +529,7 @@
           <section class="col-md-6 col-xs-12">
             <p>The values in the table below are percentages.</p>
             <div class="rpt table2" id="carbonFootprintRptTable2" data-total="true" data-qs="CORE_CO2E_PCT,COMMISSIONING_CO2E_PCT,PROCUREMENT_2017_CO2E_PCT,COMMUNITY_CO2E_PCT" data-periods="1"
-                 data-share="https://api.knowprocess.com/reports/{{formatAnswer('ORG_CODE')}}/{{surveyReturn.applicablePeriod}}/carbon-footprint.html"></div>
+                 data-share="http://localhost:8083/reports/{{formatAnswer('ORG_CODE')}}/{{surveyReturn.applicablePeriod}}/carbon-footprint.html"></div>
           </section>
           {{#if isEClassUser()}}
             <section id="eclassCarbonProfileSect" style="clear:both">
@@ -538,7 +538,7 @@
                 {{# formatAnswer('ECLASS_SPEND')}} of which <em>&pound;{{formatAnswer('ECLASS_SPEND')}},000</em> is E-Class classified spend.{{/}}
               </p>
               <div class="rpt table2" id="eclassRptTable2" data-total="true" data-qs="PATIENT_AND_VISITOR_MILEAGE_CO2E,STAFF_COMMUTE_MILES_CO2E,PROVISIONS_CO2E,STAFF_CLOTHING_CO2E,PATIENTS_CLOTHING_AND_FOOTWEAR_CO2E,PHARMA_BLOOD_PROD_AND_MED_GASES_CO2E,DRESSINGS_CO2E,MEDICAL_AND_SURGICAL_EQUIPT_CO2E,PATIENTS_APPLIANCES_CO2E,CHEMICALS_AND_REAGENTS_CO2E,DENTAL_AND_OPTICAL_EQUIPT_CO2E,IMAGING_AND_RADIOTHERAPY_EQUIPT_AND_SVCS_CO2E,LAB_EQUIPT_AND_SVCS_CO2E,HOTEL_EQUIPT_MATERIALS_AND_SVCS_CO2E,BLDG_AND_ENG_PROD_AND_SVCS_CO2E,PURCHASED_HEALTHCARE_CO2E,GARDENING_AND_FARMING_CO2E,FURNITURE_FITTINGS_CO2E,HARDWARE_CROCKERY_CO2E,BEDDING_LINEN_AND_TEXTILES_CO2E,OFFICE_EQUIPT_TELCO_COMPUTERS_AND_STATIONERY_CO2E,REC_EQUIPT_AND_SOUVENIRS_CO2E,CONSULTING_SVCS_AND_EXPENSES_CO2E,OWNED_BUILDINGS_COAL,NET_ELEC_CO2E,OWNED_BUILDINGS_GAS,OWNED_BUILDINGS_OIL,NET_THERMAL_ENERGY_CO2E,LEASED_ASSETS_ENERGY_USE,BIZ_MILEAGE_CO2E,ANAESTHETIC_GASES_CO2E,WASTE_AND_WATER_CO2E,TOTAL_COMMISSIONING_CO2E" data-periods="4"
-                   data-share="https://api.knowprocess.com/reports/{{formatAnswer('ORG_CODE')}}/{{surveyReturn.applicablePeriod}}/eclass-carbon-profile.html"></div>
+                   data-share="http://localhost:8083/reports/{{formatAnswer('ORG_CODE')}}/{{surveyReturn.applicablePeriod}}/eclass-carbon-profile.html"></div>
             </section>
           {{else}}
             <section id="sduCarbonProfileSect" style="clear:both">
@@ -546,7 +546,7 @@
               <p>Calculated from operating expenditure of <em>&pound;{{formatAnswer('OP_EX')}},000</em> of which <em>&pound;{{formatAnswer('NON_PAY_SPEND')}},000</em> is non-pay spend based on typical values for an {{formatAnswer('ORG_TYPE')}} organisation.</p>
               <p>CO<sub>2</sub> Emissions (tCO<sub>2</sub>e)</p>
           <div class="rpt table2" id="sduProfileRptTable2" data-total="true" data-qs="PATIENT_AND_VISITOR_MILEAGE_CO2E,STAFF_COMMUTE_MILES_CO2E,BIZ_SVCS_CO2E,CAPITAL_CO2E,CONSTRUCTION_CO2E,CATERING_CO2E,FREIGHT_CO2E,ICT_CO2E,CHEM_AND_GAS_CO2E,MED_INSTR_CO2E,OTHER_MANUFACTURED_CO2E,PAPER_AND_CARD_CO2E,PHARMA_CO2E,OWNED_BUILDINGS_COAL,NET_ELEC_CO2E,OWNED_BUILDINGS_GAS,OWNED_BUILDINGS_OIL,NET_THERMAL_ENERGY_CO2E,LEASED_ASSETS_ENERGY_USE,BIZ_MILEAGE_CO2E,ANAESTHETIC_GASES_CO2E,WASTE_AND_WATER_CO2E,TOTAL_COMMISSIONING_CO2E" data-periods="4"
-               data-share="https://api.knowprocess.com/reports/{{formatAnswer('ORG_CODE')}}/{{surveyReturn.applicablePeriod}}/sdu-carbon-profile.html"></div>
+               data-share="http://localhost:8083/reports/{{formatAnswer('ORG_CODE')}}/{{surveyReturn.applicablePeriod}}/sdu-carbon-profile.html"></div>
             </section>
           {{/if}}
         </section>
@@ -561,7 +561,7 @@
                 class="rpt stacked2" id="carbonTrajectoryGraph2" width="600" height="400"></svg>
           </p>
           <div class="rpt table2" id="trajectoryRptTable2" data-total="true" data-qs="TOTAL_CORE_CO2E,TOTAL_COMMISSIONING_CO2E,TOTAL_PROCUREMENT_2017_CO2E,TOTAL_COMMUNITY_CO2E" data-periods="11"
-               data-share="https://api.knowprocess.com/reports/{{formatAnswer('ORG_CODE')}}/{{surveyReturn.applicablePeriod}}/carbon-trajectory.html"></div>
+               data-share="http://localhost:8083/reports/{{formatAnswer('ORG_CODE')}}/{{surveyReturn.applicablePeriod}}/carbon-trajectory.html"></div>
         </section>
       </section>
 
@@ -583,7 +583,7 @@
 
         <p>Using the Social Value Calculator we have been to calculate the social value created from some specific activities:</p>
 
-       <!-- TODO data-share="https://api.knowprocess.com/reports/{{formatAnswer('ORG_CODE')}}/{{surveyReturn.applicablePeriod}}/social-value.html"-->
+       <!-- TODO data-share="http://localhost:8083/reports/{{formatAnswer('ORG_CODE')}}/{{surveyReturn.applicablePeriod}}/social-value.html"-->
         <div class="rpt table2" id="socialValueRptTable2" data-qs="SV_TOTAL,SI_TOTAL" data-periods="4"
   ></div>
 
