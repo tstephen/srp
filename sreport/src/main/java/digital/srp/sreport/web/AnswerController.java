@@ -144,7 +144,7 @@ public class AnswerController {
             @RequestParam(value = "page", required = false) Integer page,
             @RequestParam(value = "limit", required = false) Integer limit)
     throws Exception {
-        LOGGER.info(String.format("List answers by criteria %1$s", criteria));
+        LOGGER.info("List answers by criteria {}", criteria);
 
         CriteriaBuilder builder = entityManager.getCriteriaBuilder();
         CriteriaQuery<Answer> cq = builder.createQuery(Answer.class);
@@ -210,8 +210,9 @@ public class AnswerController {
             }
         }
         cq.where(predicate);
+        LOGGER.debug("... built query: {}", predicate);
 
-        List<Answer> list = entityManager.createQuery(cq).getResultList();
+        List<Answer> list = entityManager.createQuery(cq).setMaxResults(maxAnswers).getResultList();
         LOGGER.info("... found {} answers", list.size());
 
         if (list.size() > maxAnswers) {
