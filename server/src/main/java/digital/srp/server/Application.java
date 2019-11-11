@@ -39,15 +39,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import digital.srp.macc.MaccConfig;
 import digital.srp.server.model.mixins.SrpLinkMixIn;
 import digital.srp.sreport.internal.SReportConfiguration;
-import io.onedecision.engine.OneDecisionConfig;
-import io.onedecision.engine.domain.OneDecisionDomainConfig;
 
 // See https://github.com/spring-projects/spring-boot/issues/6529 for alternative if JMX needed
 //@EnableAutoConfiguration(exclude = { EndpointMBeanExportAutoConfiguration.class })
 @Configuration
-@Import({ SrpConfig.class,
-        OneDecisionConfig.class, OneDecisionDomainConfig.class,
-        MaccConfig.class, SReportConfiguration.class })
+@Import({ SrpConfig.class, MaccConfig.class, SReportConfiguration.class })
 public class Application extends WebMvcConfigurerAdapter {
 
     protected static final Logger LOGGER = LoggerFactory

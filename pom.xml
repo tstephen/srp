@@ -18,7 +18,6 @@
     <activiti.bdd.version>5.19.0.20161207</activiti.bdd.version>
     <kp-auth.version>2.0.0</kp-auth.version>
     <kp-icons.version>3.1.0</kp-icons.version>
-    <onedecision.version>3.0.0-beta-1</onedecision.version>
     <ractive.version>0.7.3</ractive.version>
     <spring.boot.version>1.4.0.RELEASE</spring.boot.version>
     <springfox.version>2.8.0</springfox.version>
@@ -81,6 +80,14 @@
     <module>sreport</module>
     <!--module>integration-tests</module-->
   </modules>
+
+  <dependencies>
+    <dependency>
+      <groupId>javax.xml.bind</groupId>
+      <artifactId>jaxb-api</artifactId>
+      <version>2.1</version>
+    </dependency>
+  </dependencies>
 
   <build>
     <plugins>

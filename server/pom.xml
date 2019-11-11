@@ -34,7 +34,9 @@
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <start-class>digital.srp.server.Application</start-class>
-    <jasmine-boot.version>1.0.0.20180830</jasmine-boot.version>
+    <jasmine-boot.version>1.0.0.20181021</jasmine-boot.version>
+    <skip.unit.tests>false</skip.unit.tests>
+    <skip.integration.tests>true</skip.integration.tests>
   </properties>
 
   <dependencies>
@@ -55,6 +57,20 @@
       <artifactId>lombok</artifactId>
       <scope>provided</scope>
     </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-data-jpa</artifactId>
+      <exclusions>
+        <exclusion>
+          <artifactId>tomcat-jdbc</artifactId>
+          <groupId>org.apache.tomcat</groupId>
+        </exclusion>
+        <exclusion>
+          <groupId>ch.qos.logback</groupId>
+          <artifactId>logback-classic</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
     <!-- Compiles against SLF4J but this is the implementation of choice -->
     <dependency>
       <groupId>org.springframework.boot</groupId>
@@ -64,6 +80,16 @@
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-test</artifactId>
       <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-configuration-processor</artifactId>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>com.zaxxer</groupId>
+      <!-- drop -java6 suffix for Java 8 compiled version -->
+      <artifactId>HikariCP-java6</artifactId>
     </dependency>
     <!-- Generates REST documentation -->
     <dependency>
@@ -98,24 +124,6 @@
       </exclusions>
     </dependency>
     <dependency>
-      <groupId>io.onedecision</groupId>
-      <artifactId>onedecision-engine</artifactId>
-      <version>${onedecision.version}</version>
-      <optional>true</optional>
-    </dependency>
-    <dependency>
-      <groupId>io.onedecision</groupId>
-      <artifactId>onedecision-domain</artifactId>
-      <version>${onedecision.version}</version>
-      <optional>true</optional>
-    </dependency>
-    <dependency>
-      <groupId>io.onedecision</groupId>
-      <artifactId>onedecision-ui</artifactId>
-      <version>${onedecision.version}</version>
-      <optional>true</optional>
-    </dependency>
-    <dependency>
       <groupId>com.knowprocess.bpaas</groupId>
       <artifactId>kp-processes</artifactId>
       <version>${work-mgmt.version}</version>
@@ -136,6 +144,10 @@
       <artifactId>jasmine-boot</artifactId>
       <version>${jasmine-boot.version}</version>
     </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-devtools</artifactId>
+    </dependency>
   </dependencies>
 
   <build>
@@ -146,6 +158,7 @@
         <configuration>
           <!-- See: https://issues.apache.org/jira/browse/SUREFIRE-1588 -->
           <useSystemClassLoader>false</useSystemClassLoader>
+          <skipTests>${skip.integration.tests}</skipTests>
         </configuration>
         <executions>
           <execution>
@@ -159,30 +172,27 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
-      </plugin>
-      <plugin>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-maven-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>pre-integration-test</id>
-	    <configuration>
-              <wait>10000</wait>
-	      <maxAttempts>6</maxAttempts>
-	    </configuration>
-            <goals>
-              <goal>start</goal>
-            </goals>
-          </execution>
-          <execution>
-            <id>post-integration-test</id>
-            <goals>
-              <goal>stop</goal>
-            </goals>
-          </execution>
-        </executions>
+        <configuration>
+          <skipTests>${skip.unit.tests}</skipTests>
+        </configuration>
       </plugin>
     </plugins>
   </build>
+
+  <profiles>
+    <profile>
+      <id>dev</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+    </profile>
+    <profile>
+      <id>integration-test</id>
+      <properties>
+        <skip.integration.tests>false</skip.integration.tests>
+        <skip.unit.tests>false</skip.unit.tests>
+      </properties>
+    </profile>
+  </profiles>
 
 </project>

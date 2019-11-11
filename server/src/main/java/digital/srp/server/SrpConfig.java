@@ -2,6 +2,7 @@ package digital.srp.server;
 
 import java.util.List;
 
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.rest.webmvc.config.RepositoryRestMvcConfiguration;
@@ -15,6 +16,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import digital.srp.server.model.mixins.SrpLinkMixIn;
 
 @Configuration
+@EnableAutoConfiguration
 @ComponentScan(basePackages = { "digital.srp.server" })
 public class SrpConfig extends RepositoryRestMvcConfiguration {
     // DO NOT put this in a reusable configuration to avoid clashes
