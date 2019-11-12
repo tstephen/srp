@@ -344,3 +344,24 @@ SI_INNOVATION$Reported investment to stimulate innovation$£$SDU$$number$$$$
 SV_TOTAL$Total Social Value$£$SDU$$number$$$$
 SI_TOTAL$Total reported investment$£$SDU$$number$$$$
 SV_CTXT$Explanation and context for Social Value responses$$SDU$$$$$$
+PLASTICS_PLEDGE$Pledge on plastic reduction$$SDU$$$$$$
+CATERING_PLASTICS_VOL$Volume of catering plastic$$SDU$$$$$$
+DISPLACED_PLASTICS_VOL$Volume of plastic replaced$$SDU$$$$$$
+NOX_PPM$NOx gas parts per million$$SDU$$$$$$
+PARTICULATES_PPM$Particulate parts per million$$SDU$$$$$$
+AMB_NO$No. of ambulances$$SDU$$$$$$
+AMB_LEV_ULEV_PCT$Pct Ambulances LEV or ULEV$$SDU$$$$$$
+AMB_MILEAGE$Mileage by ambulance$$SDU$$$$$$
+MCYCLE_NO$No. of motorcycles$$SDU$$$$$$
+MCYCLE_LEV_ULEV_PCT$Pct motorcycles LEV or ULEV$$SDU$$$$$$
+MCYCLE_MILEAGE$Mileage by motorcycle$$SDU$$$$$$
+CARS_NO$No. of cars$$SDU$$$$$$
+CARS_LEV_ULEV_PCT$Pct cars LEV or ULEV$$SDU$$$$$$
+CARS_MILEAGE$Mileage by car$$SDU$$$$$$
+VANS_NO$No.of vans$$SDU$$$$$$
+VANS_LEV_ULEV_PCT$Pct vans LEV or ULEV$$SDU$$$$$$
+VANS_MILEAGE$Mileage by van$$SDU$$$$$$
+LORRIES_NO$No. lorries$$SDU$$$$$$
+LORRIES_LEV_ULEV_PCT$Pct lorries LEV or ULEV$$SDU$$$$$$
+LORRIES_MILEAGE$Mileage by lorry$$SDU$$$$$$
+NO_EV_CHARGE_POINTS$No. of EV charge points$$SDU$$$$$$

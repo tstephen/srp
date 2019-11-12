@@ -11,9 +11,9 @@ import digital.srp.sreport.model.SurveyCategory;
  *
  * @author Tim Stephenson
  */
-public class Sdu1819 {
+public class Sdu1920 {
 
-    public static final String PERIOD = "2018-19";
+    public static final String PERIOD = "2019-20";
     public static final String ID = "SDU-"+PERIOD;
 
     public static Survey getSurvey() {
@@ -135,6 +135,14 @@ public class Sdu1819 {
                         Q.RECYCLING_WEIGHT
                 );
 
+        SurveyCategory catPlastics = new SurveyCategory()
+                .name("Plastics")
+                .questionEnums(
+                        Q.PLASTICS_PLEDGE,
+                        Q.CATERING_PLASTICS_VOL,
+                        Q.DISPLACED_PLASTICS_VOL
+                );
+
         SurveyCategory catWater = new SurveyCategory()
                 .name("Water")
                 .questionEnums(
@@ -170,6 +178,29 @@ public class Sdu1819 {
                         Q.STAFF_COMMUTE_MILES_PP,
                         Q.STAFF_COMMUTE_MILES_TOTAL,
                         Q.HEALTH_IMPACT_OF_TRAVEL
+                );
+
+        SurveyCategory catAirPollution = new SurveyCategory()
+                .name("Air pollution")
+                .questionEnums(
+                        Q.NOX_PPM,
+                        Q.PARTICULATES_PPM,
+                        Q.AMB_NO,
+                        Q.AMB_LEV_ULEV_PCT,
+                        Q.AMB_MILEAGE,
+                        Q.MCYCLE_NO,
+                        Q.MCYCLE_LEV_ULEV_PCT,
+                        Q.MCYCLE_MILEAGE,
+                        Q.CARS_NO,
+                        Q.CARS_LEV_ULEV_PCT,
+                        Q.CARS_MILEAGE,
+                        Q.VANS_NO,
+                        Q.VANS_LEV_ULEV_PCT,
+                        Q.VANS_MILEAGE,
+                        Q.LORRIES_NO,
+                        Q.LORRIES_LEV_ULEV_PCT,
+                        Q.LORRIES_MILEAGE,
+                        Q.NO_EV_CHARGE_POINTS
                 );
 
         SurveyCategory catSocialValue = new SurveyCategory()
@@ -226,8 +257,10 @@ public class Sdu1819 {
         Survey survey = new Survey().name(ID).status("Draft")
                 .applicablePeriod(PERIOD)
                 .categories(catOrg, catPolicy, catPerf, catSize,
-                        catFinancial, catElec, catThermal, catWaste, catWater,
-                        catBizTravel, catOtherTravel, catSocialValue, catGases,
+                        catFinancial, catElec, catThermal,
+                        catPlastics, catWaste, catWater,
+                        catBizTravel, catOtherTravel, catAirPollution,
+                        catSocialValue, catGases,
                         catEClassProfile, catSpendProfile, catQual);
         return survey;
     }
@@ -307,6 +340,9 @@ public class Sdu1819 {
         list.add(Q.SV_TOTAL);
         list.add(Q.SI_TOTAL);
         list.add(Q.SV_CTXT);
+        list.add(Q.PLASTICS_PLEDGE);
+        list.add(Q.PLASTICS_CTXT);
+        list.add(Q.AIR_POLLUTION_CTXT);
         return list.toArray(new Q[list.size()]);
     }
 }

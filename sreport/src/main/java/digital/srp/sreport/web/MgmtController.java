@@ -32,6 +32,7 @@ import digital.srp.sreport.model.surveys.Eric1516;
 import digital.srp.sreport.model.surveys.Sdu1617;
 import digital.srp.sreport.model.surveys.Sdu1718;
 import digital.srp.sreport.model.surveys.Sdu1819;
+import digital.srp.sreport.model.surveys.Sdu1920;
 import digital.srp.sreport.repositories.AnswerRepository;
 import digital.srp.sreport.repositories.QuestionRepository;
 import digital.srp.sreport.repositories.SurveyCategoryRepository;
@@ -159,7 +160,7 @@ public class MgmtController {
     @RequestMapping(value = "/surveys", method = RequestMethod.POST, headers = "Accept=application/json")
     public String initSurveys(Model model) throws IOException {
         Survey[] expectedSurveys = { Eric1516.getSurvey(), Sdu1617.getSurvey(),
-                Sdu1718.getSurvey(), Sdu1819.getSurvey() };
+                Sdu1718.getSurvey(), Sdu1819.getSurvey(), Sdu1920.getSurvey() };
         for (Survey expected : expectedSurveys) {
             initSurvey(expected);
         }
