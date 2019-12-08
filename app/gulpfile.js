@@ -47,7 +47,7 @@ gulp.task('scripts', function() {
   //gulp.src([ 'src/sw.js' ])
   //    .pipe(gulp.dest('dist'));
   return gulp.src([
-    'src/srp/js/**/*.js'
+    'src/srp/js/**/*.js', '!src/srp/js/**/toast.js'
   ])
   .pipe(config.js.uglify ? uglify({ mangle: true }) : through2.obj())
   .pipe(replace('/vsn/', '/'+vsn+'/'))
@@ -75,6 +75,31 @@ gulp.task('styles', function() {
 gulp.task('compile',
   gulp.series(/*'test',*/ 'scripts', 'styles')
 );
+
+gulp.task('server', function(done) {
+  bSync({
+    server: {
+      baseDir: ['dist']
+    }
+  });
+  gulp.watch(
+    [ 'src/manifest.json', 'src/**/*.html' ],
+    gulp.parallel('assets')
+  );
+  gulp.watch(
+    ['src/**/*.js'],
+    gulp.parallel('scripts')
+  );
+  gulp.watch(
+    'src/css/**/*.css',
+    gulp.parallel('styles')
+  );
+  gulp.watch(
+    'dist/**/*',
+    bSync.reload
+  );
+  done();
+});
 
 gulp.task('fix-paths', function() {
   gulp.src([
