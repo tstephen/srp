@@ -18,7 +18,7 @@ public class QuestionCsvImporterTest {
             List<Question> questions = new QuestionCsvImporter().readQuestions();
             System.out.println(
                     String.format(" found %1$d returns", questions.size()));
-            assertEquals(366, questions.size());
+            assertEquals(377, questions.size());
 
             // assert expected values of record (first currently complete)
             //TOTAL_ENERGY_COST$Total Energy Cost (all energy supplies)$£$ERIC S08_01$The total cost of electricity, gas, oil, and coal from all sources (including utility supplier, local source, renewable source), net of any costs that are charged to other organisations for which the trust provides energy (see apportionment rules). $

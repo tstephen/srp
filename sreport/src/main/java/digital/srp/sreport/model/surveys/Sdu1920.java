@@ -139,8 +139,13 @@ public class Sdu1920 {
                 .name("Plastics")
                 .questionEnums(
                         Q.PLASTICS_PLEDGE,
-                        Q.CATERING_PLASTICS_VOL,
-                        Q.DISPLACED_PLASTICS_VOL
+                        Q.NO_PLASTICS_CUPS,
+                        Q.NO_PLASTIC_LINED_COFFEE_CUPS,
+                        Q.NO_PLASTIC_PLATES,
+                        Q.NO_PLASTIC_CUTLERY,
+                        Q.NO_PLASTIC_STIRRERS,
+                        Q.NO_PLASTIC_STRAWS,
+                        Q.NO_PLASTIC_FOOD_CONTAINERS
                 );
 
         SurveyCategory catWater = new SurveyCategory()
@@ -185,21 +190,10 @@ public class Sdu1920 {
                 .questionEnums(
                         Q.NOX_PPM,
                         Q.PARTICULATES_PPM,
-                        Q.AMB_NO,
-                        Q.AMB_LEV_ULEV_PCT,
-                        Q.AMB_MILEAGE,
-                        Q.MCYCLE_NO,
-                        Q.MCYCLE_LEV_ULEV_PCT,
-                        Q.MCYCLE_MILEAGE,
-                        Q.CARS_NO,
-                        Q.CARS_LEV_ULEV_PCT,
-                        Q.CARS_MILEAGE,
-                        Q.VANS_NO,
-                        Q.VANS_LEV_ULEV_PCT,
-                        Q.VANS_MILEAGE,
-                        Q.LORRIES_NO,
-                        Q.LORRIES_LEV_ULEV_PCT,
-                        Q.LORRIES_MILEAGE,
+                        Q.VEHICLES_NO,
+                        Q.VEHICLES_COUNT_DATE,
+                        Q.VEHICLES_LEV_PCT,
+                        Q.VEHICLES_ULEV_PCT,
                         Q.NO_EV_CHARGE_POINTS
                 );
 
