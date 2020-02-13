@@ -6,6 +6,7 @@ import static org.junit.Assert.assertTrue;
 import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.Date;
+import java.util.List;
 
 import org.junit.Test;
 
@@ -34,7 +35,16 @@ public class CarbonFactorTest {
                 .scope("2");
         
         assertEquals(factor1, factor2);
-        assertTrue(Collections.singletonList(factor1).contains(factor2));
+        List<CarbonFactor> existingFactors = Collections.singletonList(factor1);
+        assertTrue(existingFactors.contains(factor2));
+
+        CarbonFactor factor3 = new CarbonFactor()
+                .category("Electricity generated")
+                .name("Electricity: UK")
+                .unit("kWh")
+                .applicablePeriod("2019-20")
+                .scope("2");
+        assertTrue(!existingFactors.contains(factor3));
     }
 
 }
