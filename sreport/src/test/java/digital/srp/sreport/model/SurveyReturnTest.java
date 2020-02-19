@@ -126,7 +126,7 @@ public class SurveyReturnTest implements EricQuestions{
     
     @Test
     public void testDuplicateDetection() {
-        SurveyReturn rtn = helper.readSurveyReturn("RDR2").survey(Sdu1718.getSurvey());
+        SurveyReturn rtn = helper.readSurveyReturn("RDR2").survey(Sdu1718.getInstance().getSurvey());
         
         assertEquals(4, rtn.getIncludedPeriods().size());
 

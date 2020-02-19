@@ -1,5 +1,5 @@
 {
-  "id":247,"name":"Sdu-201516 RDR","org":"RDR","status":"Draft","applicablePeriod":"2015-16",
+  "id":247,"name":"SDU-2015-16-RDR","org":"RDR","status":"Draft","applicablePeriod":"2015-16",
   "revision":1,"submittedDate":null,"submittedBy":null,"answers":[
     {"id":10746,"applicablePeriod":"2015-16","response":"RDR","question":{"id":242,"name":"ORG_CODE"}},
     {"id":10747,"applicablePeriod":"2015-16","response":"SCFT","question":{"id":243,"name":"ORG_NICKNAME"}},

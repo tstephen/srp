@@ -1,5 +1,5 @@
 {
-  "name":"Sdu-201516 RJ1","org":"RJ1","status":"Draft","applicablePeriod":"2015-16",
+  "name":"SDU-2015-16-RJ1","org":"RJ1","status":"Draft","applicablePeriod":"2015-16",
   "revision":1,"submittedDate":null,"submittedBy":null,"answers":[
     {"applicablePeriod":"2015-16","response":"RJ1","question":{"name":"ORG_CODE"}},
     {"applicablePeriod":"2015-16","response":"SCFT","question":{"name":"ORG_NICKNAME"}},

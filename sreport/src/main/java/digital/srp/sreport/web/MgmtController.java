@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import digital.srp.sreport.api.exceptions.ObjectNotFoundException;
 import digital.srp.sreport.api.exceptions.SReportException;
 import digital.srp.sreport.importers.EricCsvImporter;
 import digital.srp.sreport.importers.QuestionCsvImporter;
@@ -33,6 +32,7 @@ import digital.srp.sreport.model.surveys.Sdu1617;
 import digital.srp.sreport.model.surveys.Sdu1718;
 import digital.srp.sreport.model.surveys.Sdu1819;
 import digital.srp.sreport.model.surveys.Sdu1920;
+import digital.srp.sreport.model.surveys.SurveyFactory;
 import digital.srp.sreport.repositories.AnswerRepository;
 import digital.srp.sreport.repositories.QuestionRepository;
 import digital.srp.sreport.repositories.SurveyCategoryRepository;
@@ -159,8 +159,13 @@ public class MgmtController {
 
     @RequestMapping(value = "/surveys", method = RequestMethod.POST, headers = "Accept=application/json")
     public String initSurveys(Model model) throws IOException {
-        Survey[] expectedSurveys = { Eric1516.getSurvey(), Sdu1617.getSurvey(),
-                Sdu1718.getSurvey(), Sdu1819.getSurvey(), Sdu1920.getSurvey() };
+        Survey[] expectedSurveys = {
+                Eric1516.getInstance().getSurvey(),
+                Sdu1617.getInstance().getSurvey(),
+                Sdu1718.getInstance().getSurvey(),
+                Sdu1819.getInstance().getSurvey(),
+                Sdu1920.getInstance().getSurvey()
+        };
         for (Survey expected : expectedSurveys) {
             initSurvey(expected);
         }
@@ -208,24 +213,8 @@ public class MgmtController {
 
     @RequestMapping(value = "/surveys/{surveyName}", method = RequestMethod.POST, headers = "Accept=application/json")
     public String initSurveyAndShowStatus(@PathVariable("surveyName") String surveyName, Model model) throws IOException, Exception {
-        initSurvey(lookupSurvey(surveyName));
+        initSurvey(SurveyFactory.getInstance(surveyName).getSurvey());
         return showSurveyStatus(surveyName, model);
-    }
-
-    private Survey lookupSurvey(String surveyName) throws ObjectNotFoundException {
-        switch (surveyName) {
-        case "ERIC-2015-16":
-            return Eric1516.getSurvey();
-        case "SDU-2016-17":
-            return Sdu1617.getSurvey();
-        case "SDU-2017-18":
-            return Sdu1718.getSurvey();
-        case "SDU-2018-19":
-            return Sdu1819.getSurvey();
-        default:
-            throw new ObjectNotFoundException(Survey.class,
-                    String.format("No survey named %1$s is known", surveyName));
-        }
     }
 
     @RequestMapping(value = "/answers/{ericDataSet}", method = RequestMethod.GET, headers = "Accept=application/json")

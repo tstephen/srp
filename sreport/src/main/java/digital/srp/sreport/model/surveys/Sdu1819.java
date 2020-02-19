@@ -11,12 +11,23 @@ import digital.srp.sreport.model.SurveyCategory;
  *
  * @author Tim Stephenson
  */
-public class Sdu1819 {
+public class Sdu1819 implements SurveyFactory {
 
     public static final String PERIOD = "2018-19";
     public static final String ID = "SDU-"+PERIOD;
+    private static final Sdu1819 sdu1819 = new Sdu1819();
 
-    public static Survey getSurvey() {
+    /**
+     * Private constructor to prevent instantiation.
+     */
+    private Sdu1819() {
+    }
+
+    public static SurveyFactory getInstance() {
+        return sdu1819;
+    }
+
+    public Survey getSurvey() {
         SurveyCategory catOrg = new SurveyCategory()
                 .name("Organisation")
                 .questionEnums(
@@ -233,9 +244,14 @@ public class Sdu1819 {
     }
 
     // NOTE some of those below are not actually derived but if not supplied
-    // with at least a default (e.g. ) will cause cruncher to fail
+    // with at least a default (e.g. empty string) will cause cruncher to fail
+    public Q[] getDerivedQs() {
+        return getQs();
+    }
+
     @SuppressWarnings("deprecation")
-    public static Q[] getDerivedQs() {
+    @Override
+    public Q[] getQs() {
         ArrayList<Q> list = new ArrayList<Q>();
         list.addAll(Arrays.asList(SduQuestions.SDU_PROFILE_HDRS));
         list.addAll(Arrays.asList(SduQuestions.FOOTPRINT_PCT_HDRS));

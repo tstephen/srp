@@ -11,20 +11,20 @@ import digital.srp.sreport.model.SurveyCategory;
  *
  * @author Tim Stephenson
  */
-public class Sdu1617 implements SurveyFactory {
+public class Sdu1516 implements SurveyFactory {
 
-    public static final String PERIOD = "2016-17";
+    public static final String PERIOD = "2015-16";
     public static final String ID = "SDU-"+PERIOD;
-    private static final Sdu1617 sdu1617 = new Sdu1617();
+    private static final Sdu1516 sdu1516 = new Sdu1516();
 
     /**
      * Private constructor to prevent instantiation.
      */
-    private Sdu1617() {
+    private Sdu1516() {
     }
 
     public static SurveyFactory getInstance() {
-        return sdu1617;
+        return sdu1516;
     }
 
     public Survey getSurvey() {
