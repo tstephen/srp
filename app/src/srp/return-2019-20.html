@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html class="no-js" lang="en">
+<head>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="utf-8">
+  <title>Sustainability Return</title>
+  <link rel="stylesheet" type="text/css" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"/>
+  <link rel="stylesheet" type="text/css" href="/questionnaire/0.4.0/css/questionnaire.css"/>
+  <link rel="stylesheet" href="/srp/vsn/css/srp.css">
+  <link rel="icon" type="image/png" href="/sdu/images/icon/sdu-icon-16x16.png">
+</head>
+<body>
+
+  <!--[if lt IE 8]>
+  <div class="alert alert-warning">
+    You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.
+  </div>
+  <![endif]-->
+  <div class="container">
+    <div class="clearfix" id="messages"></div>
+    <div class="row" id="containerSect">
+    </div><!-- /.row -->
+  </div><!-- /.container -->
+
+  <div class="save-indicator">
+    <span class="save-indicator-animation glyphicon glyphicon-save"></span>
+  </div>
+
+  <script id="template" type="text/html">
+    {{>questionnaire}}
+    {{>sidebar { active: 'return.html' } }}
+  </script>
+
+  <script type="text/javascript">
+    if(/MSIE \d|Trident.*rv:/.test(navigator.userAgent))
+        document.write('<script src="/srp/vsn/js/ie-polyfill.js"><\/script>');
+  </script>
+  <script src="//code.jquery.com/jquery-1.11.0.min.js"></script>
+  <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pace/1.0.2/pace.js"></script>
+  <script src='/questionnaire/js/0.7.3/ractive.min.js'></script>
+
+  <script src="http://localhost:8083/js/md5.min.js"></script>
+  <script src="http://localhost:8083/js/env.js"></script>
+  <script src="/questionnaire/0.4.0/js/questionnaire.js"></script>
+
+  <script src="./vsn/js/string-functions-0.1.0.js"></script>
+  <script src="http://localhost:8083/workmgmt/3.0.0/js/i18n.js"></script>
+
+  <script src="http://localhost:8083/webjars/auth/2.0.0/js/auth.js"></script>
+  <script src="./vsn/js/return-2019-20.js"></script>
+</body>
+</html>

@@ -21,7 +21,7 @@
   <name>Server</name>
   <inceptionYear>2014</inceptionYear>
   
-  <artifactId>srp-server</artifactId>
+  <artifactId>srp</artifactId>
   <packaging>jar</packaging>
 
   <parent>
@@ -37,6 +37,8 @@
     <jasmine-boot.version>1.0.0.20181021</jasmine-boot.version>
     <skip.unit.tests>false</skip.unit.tests>
     <skip.integration.tests>true</skip.integration.tests>
+    <docker.repo>docker.io</docker.repo>
+    <docker.image.prefix>knowprocess</docker.image.prefix>
   </properties>
 
   <dependencies>
@@ -152,6 +154,28 @@
 
   <build>
     <plugins>
+      <plugin>
+        <groupId>com.spotify</groupId>
+        <artifactId>dockerfile-maven-plugin</artifactId>
+        <version>1.4.9</version>
+        <executions>
+          <execution>
+            <id>default</id>
+            <goals>
+              <goal>build</goal>
+              <goal>push</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <repository>${docker.repo}/${docker.image.prefix}/srp</repository>
+          <useMavenSettingsForAuth>true</useMavenSettingsForAuth>
+	  <tag>latest</tag>
+          <buildArgs>
+            <JAR_FILE>target/${project.build.finalName}.jar</JAR_FILE>
+          </buildArgs>
+        </configuration>
+      </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-failsafe-plugin</artifactId>

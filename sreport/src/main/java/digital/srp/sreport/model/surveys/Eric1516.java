@@ -1,5 +1,7 @@
 package digital.srp.sreport.model.surveys;
 
+import java.util.ArrayList;
+
 import digital.srp.sreport.model.Q;
 import digital.srp.sreport.model.StatusType;
 import digital.srp.sreport.model.Survey;
@@ -10,12 +12,22 @@ import digital.srp.sreport.model.returns.EricQuestions;
  * 
  * @author Tim Stephenson
  */
-public class Eric1516 implements EricQuestions {
-    
+public class Eric1516 implements EricQuestions, SurveyFactory {
     public static final String PERIOD = "2015-16";
     public static final String ID = "ERIC-"+PERIOD;
+    private static final Eric1516 eric1516 = new Eric1516();
 
-    public static Survey getSurvey() {
+    /**
+     * Private constructor to prevent instantiation.
+     */
+    private Eric1516() {
+    }
+
+    public static SurveyFactory getInstance() {
+        return eric1516;
+    }
+
+    public Survey getSurvey() {
         SurveyCategory catOrg = new SurveyCategory()
                 .name("Organisation")
                 .questionEnums(
@@ -97,5 +109,13 @@ public class Eric1516 implements EricQuestions {
                 .applicablePeriod("2015-16")
                 .categories(catOrg, catProfile, catStrategy, catContractingOut, catFinance, catSafety, catFireSafety);
         return survey;
+    }
+
+    public Q[] getQs() {
+        ArrayList<Q> list = new ArrayList<Q>();
+        for (SurveyCategory category : getSurvey().categories()) {
+            list.addAll(category.questionEnums());
+        }
+        return list.toArray(new Q[list.size()]);
     }
 }

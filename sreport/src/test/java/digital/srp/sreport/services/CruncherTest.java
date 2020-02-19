@@ -19,6 +19,7 @@ import digital.srp.sreport.internal.PeriodUtil;
 import digital.srp.sreport.model.CarbonFactor;
 import digital.srp.sreport.model.CarbonFactors;
 import digital.srp.sreport.model.Q;
+import digital.srp.sreport.model.Survey;
 import digital.srp.sreport.model.SurveyReturn;
 import digital.srp.sreport.model.WeightingFactor;
 import digital.srp.sreport.model.surveys.SduQuestions;
@@ -194,6 +195,10 @@ public class CruncherTest {
     @Test
     public void testCrunchRDR() {
         SurveyReturn rdr = helper.readSurveyReturn("RDR");
+        Survey survey = new Survey()
+                .applicablePeriod(rdr.applicablePeriod())
+                .name(rdr.getName().substring(0, rdr.getName().length()-4));
+        rdr.survey(survey);
         SurveyReturn rtn = cruncher.calculate(rdr, YEARS_TO_CALC, answerFactory);
 
         assertNotNull(rtn);
@@ -322,6 +327,10 @@ public class CruncherTest {
     @Test
     public void testCrunchRJ1() {
         SurveyReturn rj1 = helper.readSurveyReturn("RJ1");
+        Survey survey = new Survey()
+                .applicablePeriod(rj1.applicablePeriod())
+                .name(rj1.getName().substring(0, rj1.getName().length()-4));
+        rj1.survey(survey);
         SurveyReturn rtn = cruncher.calculate(rj1, YEARS_TO_CALC, answerFactory);
 
         assertNotNull(rtn);

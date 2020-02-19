@@ -11,20 +11,20 @@ import digital.srp.sreport.model.SurveyCategory;
  *
  * @author Tim Stephenson
  */
-public class Sdu1617 implements SurveyFactory {
+public class Sdu1920 implements SurveyFactory {
 
-    public static final String PERIOD = "2016-17";
+    public static final String PERIOD = "2019-20";
     public static final String ID = "SDU-"+PERIOD;
-    private static final Sdu1617 sdu1617 = new Sdu1617();
+    private static final Sdu1920 sdu1920 = new Sdu1920();
 
     /**
      * Private constructor to prevent instantiation.
      */
-    private Sdu1617() {
+    private Sdu1920() {
     }
 
     public static SurveyFactory getInstance() {
-        return sdu1617;
+        return sdu1920;
     }
 
     public Survey getSurvey() {
@@ -34,13 +34,7 @@ public class Sdu1617 implements SurveyFactory {
                         Q.ORG_NAME,
                         Q.ORG_CODE,
                         Q.ORG_NICKNAME,
-                        Q.ORG_TYPE,
-                        Q.FLOOR_AREA,
-                        Q.POPULATION,
-                        Q.NO_STAFF,
-                        Q.OCCUPIED_BEDS,
-                        Q.NO_PATIENT_CONTACTS,
-                        Q.PATIENT_CONTACT_MEASURE
+                        Q.ORG_TYPE
                 );
 
         SurveyCategory catPolicy = new SurveyCategory()
@@ -49,14 +43,13 @@ public class Sdu1617 implements SurveyFactory {
                         Q.SDMP_CRMP,
                         Q.SDMP_BOARD_REVIEW_WITHIN_12_MONTHS,
                         Q.SDMP_MISSION_STATEMENT,
+                        Q.SDMP_INC_PROCUREMENT,
                         Q.HEALTHY_TRANSPORT_PLAN,
                         Q.PROMOTE_HEALTHY_TRAVEL,
-                        Q.PROC_ENV_ASSESSMENT,
-                        Q.PROC_SOC_ASSESSMENT,
+                        Q.QUANT_TRAVEL_IMPACTS,
                         Q.PROC_SUPPLIER_SUSTAINABILITY,
-                        Q.STRATEGIC_SUSTAINABILITY_PARTNERSHIPS,
+                        Q.PROC_SUPPLIER_ENGAGEMENT,
                         Q.STRATEGIC_SUSTAINABILITY_PARTNERS,
-                        Q.GCC_USER,
                         Q.LAST_GCC_DATE,
                         Q.LAST_GCC_SCORE,
                         Q.SDG_STARTING,
@@ -65,7 +58,9 @@ public class Sdu1617 implements SurveyFactory {
                         Q.QUANT_ES_IMPACTS,
                         Q.QUANT_TRAVEL_IMPACTS,
                         Q.MOD_SLAVERY,
-                        Q.SIA
+                        Q.SIA,
+                        Q.SOCIAL_VALUE,
+                        Q.BIODIVERSITY
                 );
 
         SurveyCategory catPerf = new SurveyCategory()
@@ -81,10 +76,22 @@ public class Sdu1617 implements SurveyFactory {
                         Q.ADAPTATION_PLAN_INC,
                         Q.CCG1_SERVED, Q.CCG2_SERVED, Q.CCG3_SERVED,
                         Q.CCG4_SERVED, Q.CCG5_SERVED, Q.CCG6_SERVED,
+                        Q.CCG7_SERVED, Q.CCG8_SERVED,
                         Q.PROVIDER1_COMMISSIONED, Q.PROVIDER2_COMMISSIONED,
                         Q.PROVIDER3_COMMISSIONED, Q.PROVIDER4_COMMISSIONED,
                         Q.PROVIDER5_COMMISSIONED, Q.PROVIDER6_COMMISSIONED,
                         Q.PROVIDER7_COMMISSIONED, Q.PROVIDER8_COMMISSIONED
+                );
+
+        SurveyCategory catSize = new SurveyCategory()
+                .name("Size")
+                .questionEnums(
+                        Q.FLOOR_AREA,
+                        Q.POPULATION,
+                        Q.NO_STAFF,
+                        Q.OCCUPIED_BEDS,
+                        Q.NO_PATIENT_CONTACTS,
+                        Q.PATIENT_CONTACT_MEASURE
                 );
 
         SurveyCategory catFinancial = new SurveyCategory()
@@ -100,19 +107,31 @@ public class Sdu1617 implements SurveyFactory {
                         Q.CAPITAL_SPEND
                 );
 
-        SurveyCategory catEnergy = new SurveyCategory()
-                .name("Energy")
+        SurveyCategory catElec = new SurveyCategory()
+                .name("Electricity")
                 .questionEnums(
                         Q.ELEC_USED,
+                        Q.ELEC_USED_GREEN_TARIFF,
+                        Q.ELEC_3RD_PTY_RENEWABLE_USED,
+                        Q.ELEC_RENEWABLE_USED,
+                        Q.ELEC_EXPORTED,
+                        Q.THIRD_PARTY_ADDITIONAL_PCT,
+                        Q.GREEN_TARIFF_ADDITIONAL_PCT
+                );
+
+        SurveyCategory catThermal = new SurveyCategory()
+                .name("Thermal")
+                .questionEnums(
                         Q.GAS_USED,
                         Q.OIL_USED,
                         Q.COAL_USED,
                         Q.STEAM_USED,
                         Q.HOT_WATER_USED,
-                        Q.ELEC_USED_GREEN_TARIFF,
-                        Q.ELEC_3RD_PTY_RENEWABLE_USED,
-                        Q.ELEC_RENEWABLE_USED,
-                        Q.ELEC_EXPORTED
+                        Q.EXPORTED_THERMAL_ENERGY,
+                        Q.WOOD_LOGS_USED,
+                        Q.WOOD_CHIPS_USED,
+                        Q.WOOD_PELLETS_USED,
+                        Q.LEASED_ASSETS_ENERGY_USE
                 );
 
         SurveyCategory catWaste = new SurveyCategory()
@@ -125,6 +144,19 @@ public class Sdu1617 implements SurveyFactory {
                         Q.INCINERATION_WEIGHT,
                         Q.LANDFILL_WEIGHT,
                         Q.RECYCLING_WEIGHT
+                );
+
+        SurveyCategory catPlastics = new SurveyCategory()
+                .name("Plastics")
+                .questionEnums(
+                        Q.PLASTICS_PLEDGE,
+                        Q.NO_PLASTICS_CUPS,
+                        Q.NO_PLASTIC_LINED_COFFEE_CUPS,
+                        Q.NO_PLASTIC_PLATES,
+                        Q.NO_PLASTIC_CUTLERY,
+                        Q.NO_PLASTIC_STIRRERS,
+                        Q.NO_PLASTIC_STRAWS,
+                        Q.NO_PLASTIC_FOOD_CONTAINERS
                 );
 
         SurveyCategory catWater = new SurveyCategory()
@@ -164,6 +196,33 @@ public class Sdu1617 implements SurveyFactory {
                         Q.HEALTH_IMPACT_OF_TRAVEL
                 );
 
+        SurveyCategory catAirPollution = new SurveyCategory()
+                .name("Air pollution")
+                .questionEnums(
+                        Q.NOX_PPM,
+                        Q.PARTICULATES_PPM,
+                        Q.VEHICLES_NO,
+                        Q.VEHICLES_COUNT_DATE,
+                        Q.VEHICLES_LEV_PCT,
+                        Q.VEHICLES_ULEV_PCT,
+                        Q.NO_EV_CHARGE_POINTS
+                );
+
+        SurveyCategory catSocialValue = new SurveyCategory()
+                .name("Social Value")
+                .questionEnums(
+                        Q.SV_SOCIAL,
+                        Q.SI_SOCIAL,
+                        Q.SV_JOBS,
+                        Q.SI_JOBS,
+                        Q.SV_GROWTH,
+                        Q.SI_GROWTH,
+                        Q.SV_ENVIRONMENT,
+                        Q.SI_ENVIRONMENT,
+                        Q.SV_INNOVATION,
+                        Q.SI_INNOVATION
+                );
+
         SurveyCategory catGases = new SurveyCategory()
                 .name("Gases")
                 .questionEnums(
@@ -173,20 +232,6 @@ public class Sdu1617 implements SurveyFactory {
                         Q.NITROUS_OXIDE,
                         Q.PORTABLE_NITROUS_OXIDE_MIX,
                         Q.PORTABLE_NITROUS_OXIDE_MIX_MATERNITY
-                );
-
-        SurveyCategory catAdditional = new SurveyCategory()
-                .name("Additional")
-                .questionEnums(
-                        Q.CHP_ELECTRICAL_OUTPUT,
-                        Q.EXPORTED_THERMAL_ENERGY,
-                        Q.WOOD_LOGS_USED,
-                        Q.WOOD_CHIPS_USED,
-                        Q.WOOD_PELLETS_USED,
-                        Q.ELEC_OWNED_RENEWABLE_USED_SDU,
-                        Q.LEASED_ASSETS_ENERGY_USE,
-                        Q.GREEN_TARIFF_ADDITIONAL_PCT,
-                        Q.THIRD_PARTY_ADDITIONAL_PCT
                 );
 
         SurveyCategory catSpendProfile = new SurveyCategory()
@@ -212,14 +257,16 @@ public class Sdu1617 implements SurveyFactory {
                         Q.CONSULTING_SVCS_AND_EXPENSES
                 );
         SurveyCategory catQual = new SurveyCategory()
-                .name("Qualitative questions")
+                .name("Qualitative")
                 .questionEnums(SduQuestions.QUALITATIVE_QS);
         Survey survey = new Survey().name(ID).status("Draft")
-                .applicablePeriod("2016-17")
-                .categories(catOrg, catPolicy, catPerf,
-                        catFinancial, catEnergy, catWaste,
-                        catWater, catBizTravel, catOtherTravel, catGases,
-                        catAdditional, catEClassProfile, catSpendProfile, catQual);
+                .applicablePeriod(PERIOD)
+                .categories(catOrg, catPolicy, catPerf, catSize,
+                        catFinancial, catElec, catThermal,
+                        catPlastics, catWaste, catWater,
+                        catBizTravel, catOtherTravel, catAirPollution,
+                        catSocialValue, catGases,
+                        catEClassProfile, catSpendProfile, catQual);
         return survey;
     }
 
@@ -265,13 +312,14 @@ public class Sdu1617 implements SurveyFactory {
         list.addAll(Arrays.asList(SduQuestions.SDU_PROFILE_CO2E_HDRS));
         // #203 not displayed but still calculated
         list.add(Q.OTHER_PROCUREMENT_CO2E);
+        list.add(Q.ECLASS_USER);
         list.addAll(Arrays.asList(SduQuestions.ECLASS_PROFILE_HDRS));
         list.addAll(Arrays.asList(SduQuestions.CORE_CO2E_HDRS));
-        list.addAll(Arrays.asList(SduQuestions.ECLASS_PROFILE_HDRS));
         list.addAll(Arrays.asList(SduQuestions.BIZ_MILEAGE_ACTIVE_PUBLIC_HDRS));
         list.addAll(Arrays.asList(SduQuestions.BIZ_MILEAGE_HDRS));
         list.add(Q.BIZ_MILEAGE);
         list.addAll(Arrays.asList(SduQuestions.TRAVEL_HDRS));
+        list.add(Q.TRAVEL_CO2E);
         list.addAll(Arrays.asList(SduQuestions.CITIZEN_CO2E_HDRS));
         list.add(Q.TOTAL_CO2E);
         list.add(Q.TOTAL_CO2E_BY_POP);
@@ -296,7 +344,16 @@ public class Sdu1617 implements SurveyFactory {
         list.add(Q.TOTAL_ENERGY_BY_WTE);
         list.add(Q.WATER_VOL_BY_WTE);
         list.add(Q.NO_STAFF);
+        list.add(Q.SDG_STARTING);
+        list.add(Q.SDG_CLEAR);
         list.addAll(Arrays.asList(SduQuestions.QUALITATIVE_QS));
+        list.add(Q.SV_TOTAL);
+        list.add(Q.SI_TOTAL);
+        list.add(Q.SV_CTXT);
+        list.add(Q.PLASTICS_PLEDGE);
+        list.add(Q.PLASTICS_CTXT);
+        list.add(Q.AIR_POLLUTION_CTXT);
         return list.toArray(new Q[list.size()]);
     }
+
 }

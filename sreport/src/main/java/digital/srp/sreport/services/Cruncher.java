@@ -23,10 +23,8 @@ import digital.srp.sreport.model.Q;
 import digital.srp.sreport.model.SurveyReturn;
 import digital.srp.sreport.model.WeightingFactor;
 import digital.srp.sreport.model.WeightingFactors;
-import digital.srp.sreport.model.surveys.Sdu1617;
-import digital.srp.sreport.model.surveys.Sdu1718;
-import digital.srp.sreport.model.surveys.Sdu1819;
 import digital.srp.sreport.model.surveys.SduQuestions;
+import digital.srp.sreport.model.surveys.SurveyFactory;
 
 @Component
 public class Cruncher implements digital.srp.sreport.model.surveys.SduQuestions, Calculator {
@@ -112,27 +110,21 @@ public class Cruncher implements digital.srp.sreport.model.surveys.SduQuestions,
         }
     }
 
+    // TODO replace with validator and/or health checker
     protected void ensureInitialised(SurveyReturn rtn, int yearsToCalc, AnswerFactory answerFactory) {
         LOGGER.info("Ensuring questions initialised for {} in {} and {} years prior", rtn.org(), rtn.applicablePeriod(),
                 yearsToCalc - 1);
         List<String> periods = PeriodUtil.fillBackwards(rtn.applicablePeriod(),
                 yearsToCalc);
-        Q[] requiredQs;
-        switch (rtn.applicablePeriod()) {
-        case "2017-18":
-            requiredQs = Sdu1718.getDerivedQs();
-            break;
-        case "2018-19":
-            requiredQs = Sdu1819.getDerivedQs();
-            break;
-        default:
-            requiredQs = Sdu1617.getDerivedQs();
-        }
+
+        SurveyFactory fact = SurveyFactory.getInstance(rtn.survey().name());
+        Q[] requiredQs = fact.getQs();
 
         for (String period : periods) {
             for (Q q : requiredQs) {
                 Optional<Answer> optional = rtn.answer(period, q);
                 if (!optional.isPresent()) {
+                    LOGGER.warn("Correcting missing answer: {} in {} for {}", q, period, rtn.org());
                     answerFactory.addAnswer(rtn, period, q);
                 }
             }

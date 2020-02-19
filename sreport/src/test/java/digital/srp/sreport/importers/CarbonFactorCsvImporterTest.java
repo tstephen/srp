@@ -14,7 +14,7 @@ import digital.srp.sreport.model.CarbonFactor;
 
 public class CarbonFactorCsvImporterTest {
 
-    private static final int NO_OF_YEARS_INCLUDED = 12;
+    private static final int NO_OF_YEARS_INCLUDED = 13;
 
     @Test
     public void testImport() {
@@ -54,6 +54,15 @@ public class CarbonFactorCsvImporterTest {
             assertEquals("2018-19", elecFactor1819.applicablePeriod());
             assertTrue(new BigDecimal("0.28307").compareTo(elecFactor1819.value()) == 0);
             assertEquals("", elecFactor1819.comments());
+
+            CarbonFactor elecFactor1920 = factors.get(12);
+            assertEquals("Electricity generated", elecFactor1920.category());
+            assertEquals("ELECTRICITY_UK", elecFactor1920.name());
+            assertEquals("kWh", elecFactor1920.unit());
+            assertEquals("2", elecFactor1920.scope());
+            assertEquals("2019-20", elecFactor1920.applicablePeriod());
+            assertTrue(new BigDecimal("0.2556").compareTo(elecFactor1920.value()) == 0);
+            assertEquals("", elecFactor1920.comments());
         } catch (IOException e) {
             e.printStackTrace();
             fail("Unexpected IO exception: " + e.getMessage());

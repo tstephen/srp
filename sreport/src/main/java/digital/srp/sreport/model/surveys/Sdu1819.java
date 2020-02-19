@@ -11,25 +11,30 @@ import digital.srp.sreport.model.SurveyCategory;
  *
  * @author Tim Stephenson
  */
-public class Sdu1819 {
+public class Sdu1819 implements SurveyFactory {
 
     public static final String PERIOD = "2018-19";
     public static final String ID = "SDU-"+PERIOD;
+    private static final Sdu1819 sdu1819 = new Sdu1819();
 
-    public static Survey getSurvey() {
+    /**
+     * Private constructor to prevent instantiation.
+     */
+    private Sdu1819() {
+    }
+
+    public static SurveyFactory getInstance() {
+        return sdu1819;
+    }
+
+    public Survey getSurvey() {
         SurveyCategory catOrg = new SurveyCategory()
                 .name("Organisation")
                 .questionEnums(
                         Q.ORG_NAME,
                         Q.ORG_CODE,
                         Q.ORG_NICKNAME,
-                        Q.ORG_TYPE,
-                        Q.FLOOR_AREA,
-                        Q.POPULATION,
-                        Q.NO_STAFF,
-                        Q.OCCUPIED_BEDS,
-                        Q.NO_PATIENT_CONTACTS,
-                        Q.PATIENT_CONTACT_MEASURE
+                        Q.ORG_TYPE
                 );
 
         SurveyCategory catPolicy = new SurveyCategory()
@@ -78,6 +83,17 @@ public class Sdu1819 {
                         Q.PROVIDER7_COMMISSIONED, Q.PROVIDER8_COMMISSIONED
                 );
 
+        SurveyCategory catSize = new SurveyCategory()
+                .name("Size")
+                .questionEnums(
+                        Q.FLOOR_AREA,
+                        Q.POPULATION,
+                        Q.NO_STAFF,
+                        Q.OCCUPIED_BEDS,
+                        Q.NO_PATIENT_CONTACTS,
+                        Q.PATIENT_CONTACT_MEASURE
+                );
+
         SurveyCategory catFinancial = new SurveyCategory()
                 .name("Spend")
                 .questionEnums(
@@ -91,19 +107,31 @@ public class Sdu1819 {
                         Q.CAPITAL_SPEND
                 );
 
-        SurveyCategory catEnergy = new SurveyCategory()
-                .name("Energy")
+        SurveyCategory catElec = new SurveyCategory()
+                .name("Electricity")
                 .questionEnums(
                         Q.ELEC_USED,
+                        Q.ELEC_USED_GREEN_TARIFF,
+                        Q.ELEC_3RD_PTY_RENEWABLE_USED,
+                        Q.ELEC_RENEWABLE_USED,
+                        Q.ELEC_EXPORTED,
+                        Q.THIRD_PARTY_ADDITIONAL_PCT,
+                        Q.GREEN_TARIFF_ADDITIONAL_PCT
+                );
+
+        SurveyCategory catThermal = new SurveyCategory()
+                .name("Thermal")
+                .questionEnums(
                         Q.GAS_USED,
                         Q.OIL_USED,
                         Q.COAL_USED,
                         Q.STEAM_USED,
                         Q.HOT_WATER_USED,
-                        Q.ELEC_USED_GREEN_TARIFF,
-                        Q.ELEC_3RD_PTY_RENEWABLE_USED,
-                        Q.ELEC_RENEWABLE_USED,
-                        Q.ELEC_EXPORTED
+                        Q.EXPORTED_THERMAL_ENERGY,
+                        Q.WOOD_LOGS_USED,
+                        Q.WOOD_CHIPS_USED,
+                        Q.WOOD_PELLETS_USED,
+                        Q.LEASED_ASSETS_ENERGY_USE
                 );
 
         SurveyCategory catWaste = new SurveyCategory()
@@ -181,20 +209,6 @@ public class Sdu1819 {
                         Q.PORTABLE_NITROUS_OXIDE_MIX_MATERNITY
                 );
 
-        SurveyCategory catAdditional = new SurveyCategory()
-                .name("Additional")
-                .questionEnums(
-                        Q.CHP_ELECTRICAL_OUTPUT,
-                        Q.EXPORTED_THERMAL_ENERGY,
-                        Q.WOOD_LOGS_USED,
-                        Q.WOOD_CHIPS_USED,
-                        Q.WOOD_PELLETS_USED,
-                        Q.ELEC_OWNED_RENEWABLE_USED_SDU,
-                        Q.LEASED_ASSETS_ENERGY_USE,
-                        Q.GREEN_TARIFF_ADDITIONAL_PCT,
-                        Q.THIRD_PARTY_ADDITIONAL_PCT
-                );
-
         SurveyCategory catSpendProfile = new SurveyCategory()
                 .name("Spend Profile")
                 .questionEnums(SduQuestions.SDU_PROFILE_HDRS);
@@ -218,21 +232,26 @@ public class Sdu1819 {
                         Q.CONSULTING_SVCS_AND_EXPENSES
                 );
         SurveyCategory catQual = new SurveyCategory()
-                .name("Qualitative questions")
+                .name("Qualitative")
                 .questionEnums(SduQuestions.QUALITATIVE_QS);
         Survey survey = new Survey().name(ID).status("Draft")
                 .applicablePeriod(PERIOD)
-                .categories(catOrg, catPolicy, catPerf,
-                        catFinancial, catEnergy, catWaste, catWater,
+                .categories(catOrg, catPolicy, catPerf, catSize,
+                        catFinancial, catElec, catThermal, catWaste, catWater,
                         catBizTravel, catOtherTravel, catSocialValue, catGases,
-                        catAdditional, catEClassProfile, catSpendProfile, catQual);
+                        catEClassProfile, catSpendProfile, catQual);
         return survey;
     }
 
     // NOTE some of those below are not actually derived but if not supplied
-    // with at least a default (e.g. ) will cause cruncher to fail
+    // with at least a default (e.g. empty string) will cause cruncher to fail
+    public Q[] getDerivedQs() {
+        return getQs();
+    }
+
     @SuppressWarnings("deprecation")
-    public static Q[] getDerivedQs() {
+    @Override
+    public Q[] getQs() {
         ArrayList<Q> list = new ArrayList<Q>();
         list.addAll(Arrays.asList(SduQuestions.SDU_PROFILE_HDRS));
         list.addAll(Arrays.asList(SduQuestions.FOOTPRINT_PCT_HDRS));

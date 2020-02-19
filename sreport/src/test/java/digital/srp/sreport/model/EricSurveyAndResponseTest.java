@@ -43,7 +43,7 @@ public class EricSurveyAndResponseTest {
      */
     @Test
     public void create1516EricReturn() {
-        Survey survey = Eric1516.getSurvey();
+        Survey survey = Eric1516.getInstance().getSurvey();
         assertSurvey(survey);
         
         assertQuestionJsonFileOk(survey);

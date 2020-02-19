@@ -57,10 +57,13 @@ public class CarbonFactorController {
 
     @PostConstruct
     protected void init() throws IOException {
+        LOGGER.info("init");
         List<CarbonFactor> existingFactors = cfactorRepo.findAll();
         List<CarbonFactor> factors = new CarbonFactorCsvImporter().readCarbonFactors();
         
+        int added = 0;
         for (CarbonFactor factor : factors) {
+            // TODO this will not update with new values but only create non-existent factors
             if (existingFactors.contains(factor)) {
                 LOGGER.info(String.format(
                         "Skip import of existing factor: %1$s for: %2$s",
@@ -68,8 +71,10 @@ public class CarbonFactorController {
             } else {
                 factor.createdBy("Installer");
                 createInternal(factor);
+                added++;
             }
         }
+        LOGGER.info("init complete: Carbon factors added {}", added);
     }
     
     /**

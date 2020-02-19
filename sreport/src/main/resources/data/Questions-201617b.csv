@@ -344,3 +344,35 @@ SI_INNOVATION$Reported investment to stimulate innovation$£$SDU$$number$$$$
 SV_TOTAL$Total Social Value$£$SDU$$number$$$$
 SI_TOTAL$Total reported investment$£$SDU$$number$$$$
 SV_CTXT$Explanation and context for Social Value responses$$SDU$$$$$$
+PLASTICS_PLEDGE$Pledge on plastic reduction$$SDU$Further information on and signup to the plastics pledge are available on the NHS England website$yesno$$$$
+NO_PLASTICS_CUPS$Number of plastic drinking cups purchased$$SDU$Please put the total number your organisation purchased, e.g. if each pack of plastic drinking cups contain 100 cups and your organisation bought 10 packs, the total number purchased would be 1,000 cups$number$$$$
+NO_PLASTIC_LINED_COFFEE_CUPS$Number of coffee cups with plastic lining purchased$$SDU$Please put the total number your organisation purchased, e.g. if each pack of plastic drinking cups contain 100 cups and your organisation bought 10 packs, the total number purchased would be 1,000 cups$number$$$$
+NO_PLASTIC_PLATES$Number of plastic plates purchased$$SDU$Please put the total number your organisation purchased, e.g. if each pack of plastic drinking cups contain 100 cups and your organisation bought 10 packs, the total number purchased would be 1,000 cups$number$$$$
+NO_PLASTIC_CUTLERY$Number of plastic cutlery items purchased$$SDU$Please put the total number your organisation purchased, e.g. if each pack of plastic drinking cups contain 100 cups and your organisation bought 10 packs, the total number purchased would be 1,000 cups$number$$$$
+NO_PLASTIC_STRAWS$Number of plastic straws purchased$$SDU$Please put the total number your organisation purchased, e.g. if each pack of plastic drinking cups contain 100 cups and your organisation bought 10 packs, the total number purchased would be 1,000 cups$number$$$$
+NO_PLASTIC_STIRRERS$Number of plastic stirrers purchased$$SDU$Please put the total number your organisation purchased, e.g. if each pack of plastic drinking cups contain 100 cups and your organisation bought 10 packs, the total number purchased would be 1,000 cups$number$$$$
+NO_PLASTIC_FOOD_CONTAINERS$Number of plastic food containers (including polystyrene and microwave containers) purchased$$SDU$Please put the total number your organisation purchased, e.g. if each pack of plastic drinking cups contain 100 cups and your organisation bought 10 packs, the total number purchased would be 1,000 cups$number$$$$
+CATERING_PLASTICS_VOL$Volume of catering plastic$$SDU$$number$$$$
+DISPLACED_PLASTICS_VOL$Volume of plastic replaced$$SDU$$number$$$$
+NOX_PPM$NOx emissions$The amount of NOx emissions produced by your organisation’s fleet. Please use the <a href="https://www.sduhealth.org.uk/delivery/measure/health-outcomes-travel-tool.aspx">Health Outcomes Travel Tool (HOTT)</a> to calculate this.$SDU$$tonnes$$$$
+PARTICULATES_PPM$Particulate PPM&#8322;&#8325; emissions$The amount of PM2.5 emissions produced by your organisation’s fleet. Please use the <a href="https://www.sduhealth.org.uk/delivery/measure/health-outcomes-travel-tool.aspx">Health Outcomes Travel Tool (HOTT)</a> to calculate this.$$SDU$$tonnes$$$$
+VEHICLES_NO$Number of vehicles$$SDU$Please provide the number of current road motor vehicles used by your organisation as of the date you have provided. Includes: All Trust lease and pool vehicles (including medical transport/tri service, logistics, maintenance, driver training, patient support vehicle, etc.). It also includes dedicated car club vehicles (i.e. where the Trust has not secured preferential access to the vehicle, so they have the same rights to hire the car as other members of the public) or vehicles hired for < 5 days. Excludes: Personal lease vehicles (grey fleet), short term hire cars (other travel), disposed vehicles (N/A), boats and helicopters (N/A).$number$$$$
+VEHICLES_COUNT_DATE$Date number of vehicles counted$$SDU$$The date at which you have counted the number of current road motor vehicles$date$$$$
+VEHICLES_LEV_PCT$Percentage of vehicles that are low emission vehicles (LEV)$%$SDU$The % of the vehicles counted in your answer to number of vehicles that are low emission (LEV). The specification can be found <a href="https://www.sduhealth.org.uk/nhs%20long%20term%20plan/improving-air-quality/fleet-requirements.aspx">here</a>.$number$$$$
+VEHICLES_ULEV_PCT$Percent of vehicles that are ultra-low emission vehicles (ULEV)$%SDU$The % of the vehicles counted in your answer to number of vehicles that are ultra-low emission (ULEV). The specification can be found <a href="https://www.sduhealth.org.uk/nhs%20long%20term%20plan/improving-air-quality/fleet-requirements.aspx">here</a>.$number$$$$
+AMB_NO$No. of ambulances$$SDU$$$$$$
+AMB_LEV_ULEV_PCT$Pct Ambulances LEV or ULEV$$SDU$$$$$$
+AMB_MILEAGE$Mileage by ambulance$$SDU$$$$$$
+MCYCLE_NO$No. of motorcycles$$SDU$$$$$$
+MCYCLE_LEV_ULEV_PCT$Pct motorcycles LEV or ULEV$$SDU$$$$$$
+MCYCLE_MILEAGE$Mileage by motorcycle$$SDU$$$$$$
+CARS_NO$No. of cars$$SDU$$$$$$
+CARS_LEV_ULEV_PCT$Pct cars LEV or ULEV$$SDU$$$$$$
+CARS_MILEAGE$Mileage by car$$SDU$$$$$$
+VANS_NO$No.of vans$$SDU$$$$$$
+VANS_LEV_ULEV_PCT$Pct vans LEV or ULEV$$SDU$$$$$$
+VANS_MILEAGE$Mileage by van$$SDU$$$$$$
+LORRIES_NO$No. lorries$$SDU$$$$$$
+LORRIES_LEV_ULEV_PCT$Pct lorries LEV or ULEV$$SDU$$$$$$
+LORRIES_MILEAGE$Mileage by lorry$$SDU$$$$$$
+NO_EV_CHARGE_POINTS$Number of EV charging points$The total number of electric vehicles charging points available on site including those for use by the trust's own internal fleet and available for patients, visitors and staff irrespective of any fees charged. cf. ERIC S09_04$SDU$$$$$$
