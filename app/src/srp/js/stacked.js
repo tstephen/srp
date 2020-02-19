@@ -1,8 +1,8 @@
 function renderStacked(selector, csvString, options) {
   var defaultOptions = {
     colors: ["#0B4BE5", "#0072CE", "#0BBDE5", "#0BDBC9", "#00F299", "#A2FC00", "#FFEB00", "#FFAD00"],
-    legendWidth: 200,
-    margin: {top: 20, right: 100, bottom: 50, left: 40},
+    legendWidth: 300,
+    margin: {top: 20, right: 10, bottom: 50, left: 40},
     xAxisLabel: "Financial Years",
     yAxisLabel: "Tonnes CO\u2082e"
   }
@@ -60,12 +60,12 @@ function renderStacked(selector, csvString, options) {
       .attr("transform", "translate(0," + height + ")")
       .call(d3.axisBottom(x))
     .append("text")
-      .attr("x", width)
+      .attr("x", width-options.legendWidth)
       .attr("y", y(y.ticks().pop()) + 0.5)
-      .attr("dy", "-0.2em")
+      .attr("dy", "2em")
       .attr("fill", "#000")
       .attr("font-weight", "bold")
-      .attr("text-anchor", "end")
+      .attr("text-anchor", "start")
       .text(options.xAxisLabel);
 
   g.selectAll(".tick>text")
@@ -80,7 +80,7 @@ function renderStacked(selector, csvString, options) {
     .append("text")
       .attr("x", 2)
       .attr("y", y(y.ticks().pop()) + 0.5)
-      .attr("dy", "0.32em")
+      .attr("dy", "-0.5em")
       .attr("fill", "#000")
       .attr("font-weight", "bold")
       .attr("text-anchor", "start")

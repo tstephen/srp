@@ -25,7 +25,7 @@
           obligation to work in a way that has a positive effect on the
           communities we serve. Sustainability means spending public money well,
           the smart and efficient use of natural resources and building healthy,
-          resilient communities.  By making the most of by making the most of
+          resilient communities.  By making the most of
           social, environmental and economic assets we can improve health both
           in the immediate and long term even in the context of rising cost of
           natural resources. Demonstrating that we consider the social and
@@ -511,11 +511,16 @@
 	    clinical practice and its supply chain. In recognition of this, we have a plan
 	    to reduce our use of single-use plastics.</p>
           <p class="narrative performance {{#if !haveAnswer('PLASTICS_PLEDGE')}}hidden-print{{/if}}" data-q="PLASTICS_PLEDGE">{{formatAnswer('PLASTICS_PLEDGE')}}</p>
-          <div class="rpt table2" id="plasticsRptTable2" data-qs="NO_PLASTICS_CUPS,NO_PLASTIC_LINED_COFFEE_CUP,NO_PLASTIC_PLATES,NO_PLASTIC_CUTLERY,NO_PLASTIC_STRAWS,NO_PLASTIC_STIRRERS,NO_PLASTIC_FOOD_CONTAINER" data-periods="4"
-               data-share="http://localhost:8083/reports/{{formatAnswer('ORG_CODE')}}/{{surveyReturn.applicablePeriod}}/plastics.html"></div>
+          <div class="rpt table2" id="plasticsRptTable2"
+               data-qs="NO_PLASTICS_CUPS,NO_PLASTIC_LINED_COFFEE_CUP,NO_PLASTIC_PLATES,NO_PLASTIC_CUTLERY,NO_PLASTIC_STRAWS,NO_PLASTIC_STIRRERS,NO_PLASTIC_FOOD_CONTAINER"
+	       data-periods="4"
+               data-share="http://localhost:8083/reports/{{formatAnswer('ORG_CODE')}}/{{surveyReturn.applicablePeriod}}/plastics.html"
+	       data-total="true"></div>
           <p>
-            <svg data-qs="NO_PLASTICS_CUPS,NO_PLASTIC_LINED_COFFEE_CUP,NO_PLASTIC_PLATES,NO_PLASTIC_CUTLERY,NO_PLASTIC_STRAWS,NO_PLASTIC_STIRRERS,NO_PLASTIC_FOOD_CONTAINER"
-                 data-colors="#0B4BE5,#0BBDE5,#00F299,#A2FC00,#FFEB00,#FFAD00" data-periods="4"
+            <svg data-qs="NO_PLASTICS_CUPS,NO_PLASTIC_LINED_COFFEE_CUPS,NO_PLASTIC_PLATES,NO_PLASTIC_CUTLERY,NO_PLASTIC_STRAWS,NO_PLASTIC_STIRRERS,NO_PLASTIC_FOOD_CONTAINERS"
+                 data-colors="#0B4BE5,#0BBDE5,#00F299,#A2FC00,#FFEB00,#FFAD00"
+                 data-periods="4"
+                 data-y-axis-label="Number of items purchased"
                  class="rpt stacked2" id="plasticsGraph2" width="600" height="400"></svg>
           </p>
         </section>
