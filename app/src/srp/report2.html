@@ -25,7 +25,7 @@
           obligation to work in a way that has a positive effect on the
           communities we serve. Sustainability means spending public money well,
           the smart and efficient use of natural resources and building healthy,
-          resilient communities.  By making the most of by making the most of
+          resilient communities.  By making the most of
           social, environmental and economic assets we can improve health both
           in the immediate and long term even in the context of rising cost of
           natural resources. Demonstrating that we consider the social and
@@ -44,7 +44,7 @@
             {{else}}
               {{formatAnswer('ORG_NAME')}}
             {{/if}}
-            has created a sustainable development management plan (SDMP)
+            has created a Green Plan (formerly known as a Sustainable Development Management Plan or SDMP)
             {{#if formatAnswer('SDMP_BOARD_REVIEW_WITHIN_12_MONTHS')==true}} and it has been reviewed by our Board within the last 12 months{{/if}}.
           </p>
         {{else}}
@@ -81,17 +81,17 @@
         <h2>Policies</h2>
         <p>In order to embed sustainability within our business it is important to explain where in our process and procedures sustainability features.</p>
         <p>One of the ways in which an organisation can embed sustainability is
-          through the use of
+          through the use of a Green Plan (formerly known as Sustainable Development Management Plan or SDMP).
           {{#if formatAnswer('SDMP_CRMP')}}
             <span class="glyphicon glyphicon-question-sign no-print pull-right" onclick="ractive.toggleFieldHint('SDMP_BOARD_REVIEW_WITHIN_12_MONTHS')" title="{{formatHint('SDMP_BOARD_REVIEW_WITHIN_12_MONTHS')}}"></span>
             <p class="help-block no-print hidden" id="SDMP_BOARD_REVIEW_WITHIN_12_MONTHSHint">{{{formatHint('SDMP_BOARD_REVIEW_WITHIN_12_MONTHS')}}}</p>
             {{#if formatAnswer('SDMP_BOARD_REVIEW_WITHIN_12_MONTHS')==true}}
-              an SDMP. The board approved our SDMP in the last 12 months so our plans for a sustainable future are well known within the organisation and clearly laid out.
+              The board approved our Green Plan in the last 12 months so our plans for a sustainable future are well known within the organisation and clearly laid out.
             {{else}}
-              an SDMP. An update to our SDMP is required because it has not been approved by the board in the last 12 months.
+              An update to our Green Plan is required because it has not been approved by the board in the last 12 months.
             {{/if}}
           {{else}}
-            a Sustainable Development Management Plan (SDMP). We will be putting together an SDMP in the near future for consideration by the board.
+            We will be putting together a Green Plan in the near future for consideration by the board.
           {{/if}}
         </p>
         {{#if formatAnswer('PROC_SUPPLIER_ENGAGEMENT')}}
@@ -245,7 +245,7 @@
             <thead>
               <tr>
                 <th>Organisation Name</th>
-                <th>SDMP</th>
+                <th>Green Plan</th>
                 <th>Adaptation</th>
                 <th>on track for 34% reduction</th>
                 <th>SDAT</th><th>Healthy transport plan</th><th>SD Reporting score</th>
@@ -273,7 +273,7 @@
           <table class="table table-striped">
             <thead>
               <tr>
-                <th>Organisation Name</th><th>SDMP</th>
+                <th>Organisation Name</th><th>Green Plan</th>
                 <th>SDAT</th><th>SD Reporting score</th>
               </tr>
             </thead>
@@ -469,6 +469,20 @@
           <p class="narrative performance {{#if !haveAnswer('TRAVEL_PERF')}}hidden-print{{/if}}" data-q="TRAVEL_PERF">{{formatAnswer('TRAVEL_PERF')}}</p>
         </section>
 
+        <section id="airPollutionSect" class="rpt section">
+          <h3>Air pollution</h3>
+          <div class="rpt table2" id="airPollutionRptTable2" data-qs="NOX_PPM,PARTICULATES_PPM" data-periods="4"
+               data-share="http://localhost:8083/reports/{{formatAnswer('ORG_CODE')}}/{{surveyReturn.applicablePeriod}}/air-pollution.html"></div>
+          <p class="narrative performance {{#if !haveAnswer('ULEV_POLICY')}}hidden-print{{/if}}" data-q="ULEV_POLICY">{{formatAnswer('ULEV_POLICY')}}</p>
+          <p class="" data-q="ULEV_POLICY">To support this we have so far installed {{formatAnswer('NO_EV_CHARGE_POINTS')}} electric vehicle (EV) charging points.</p>
+          {{#if !haveAnswer('VEHICLES_COUNT_DATE')}}
+            <p><em>Data accurate as of {{formatAnswer('VEHICLES_COUNT_DATE')}}</em></p>
+          {{/if}}
+          <div class="rpt table2" id="airPollutionVehiclesRptTable2" data-qs="VEHICLES_NO,VEHICLES_LEV_PCT,VEHICLES_ULEV_PCT" data-periods="4"
+               data-share="http://localhost:8083/reports/{{formatAnswer('ORG_CODE')}}/{{surveyReturn.applicablePeriod}}/air-pollution-vehicles.html"></div>
+          <p class="narrative context {{#if !haveAnswer('AIR_POLLUTION_CTXT')}}hidden-print{{/if}}" data-q="AIR_POLLUTION_CTXT">{{formatAnswer('AIR_POLLUTION_CTXT')}}</p>
+        </section>
+
         <section id="wasteSect" class="rpt section">
           <h3>Waste</h3>
           <h4>Waste produced</h4>
@@ -491,6 +505,26 @@
           <p class="narrative context {{#if !haveAnswer('WASTE_CONTEXT')}}hidden-print{{/if}}" data-q="WASTE_CONTEXT">{{formatAnswer('WASTE_CONTEXT')}}</p>
         </section>
 
+        <section id="plasticsSect" class="rpt section">
+          <h3>Plastic use</h3>
+	  <p>The NHS produces many tonnes of plastic waste every year across catering
+	    clinical practice and its supply chain. In recognition of this, we have a plan
+	    to reduce our use of single-use plastics.</p>
+          <p class="narrative performance {{#if !haveAnswer('PLASTICS_PLEDGE')}}hidden-print{{/if}}" data-q="PLASTICS_PLEDGE">{{formatAnswer('PLASTICS_PLEDGE')}}</p>
+          <div class="rpt table2" id="plasticsRptTable2"
+               data-qs="NO_PLASTICS_CUPS,NO_PLASTIC_LINED_COFFEE_CUP,NO_PLASTIC_PLATES,NO_PLASTIC_CUTLERY,NO_PLASTIC_STRAWS,NO_PLASTIC_STIRRERS,NO_PLASTIC_FOOD_CONTAINER"
+	       data-periods="4"
+               data-share="http://localhost:8083/reports/{{formatAnswer('ORG_CODE')}}/{{surveyReturn.applicablePeriod}}/plastics.html"
+	       data-total="true"></div>
+          <p>
+            <svg data-qs="NO_PLASTICS_CUPS,NO_PLASTIC_LINED_COFFEE_CUPS,NO_PLASTIC_PLATES,NO_PLASTIC_CUTLERY,NO_PLASTIC_STRAWS,NO_PLASTIC_STIRRERS,NO_PLASTIC_FOOD_CONTAINERS"
+                 data-colors="#0B4BE5,#0BBDE5,#00F299,#A2FC00,#FFEB00,#FFAD00"
+                 data-periods="4"
+                 data-y-axis-label="Number of items purchased"
+                 class="rpt stacked2" id="plasticsGraph2" width="600" height="400"></svg>
+          </p>
+        </section>
+
         <section id="waterSect" class="rpt section">
           <h3>Finite resource use - Water</h3>
           <span class="glyphicon glyphicon-question-sign no-print pull-right" onclick="ractive.toggleFieldHint('WATER')" title="{{formatHint('WATER')}}"></span>
@@ -509,6 +543,24 @@
                data-share="http://localhost:8083/reports/{{formatAnswer('ORG_CODE')}}/{{surveyReturn.applicablePeriod}}/water-c2oe.html"></div>
           <p class="narrative performance {{#if !haveAnswer('WATER_PERF')}}hidden-print{{/if}}" data-q="WATER_PERF">{{formatAnswer('WATER_PERF')}}</p>
           <p class="narrative context {{#if !haveAnswer('WATER_CONTEXT')}}hidden-print{{/if}}" data-q="WATER_CONTEXT">{{formatAnswer('WATER_CONTEXT')}}</p>
+        </section>
+
+        <section id="anaestheticGasesSect" class="rpt section">
+          <h3>Anaesthetic gas use</h3>
+          <div class="rpt table2" id="gasesRptTable2" data-qs="DESFLURANE,ISOFLURANE,SEVOFLURANE,NITROUS_OXIDE,PORTABLE_NITROUS_OXIDE_MIX,PORTABLE_NITROUS_OXIDE_MIX_MATERNITY" data-periods="4"
+               data-share="http://localhost:8083/reports/{{formatAnswer('ORG_CODE')}}/{{surveyReturn.applicablePeriod}}/gases.html"></div>
+          <h4>Carbon emissions resulting</h4>
+          <p>
+            <svg data-qs="DESFLURANE_CO2E,ISOFLURANE_CO2E,SEVOFLURANE_CO2E,NITROUS_OXIDE_CO2E,PORTABLE_NITROUS_OXIDE_MIX_CO2E,PORTABLE_NITROUS_OXIDE_MIX_MATERNITY_CO2E"
+                 data-colors="#0B4BE5,#0BBDE5,#00F299,#A2FC00,#FFEB00,#FFAD00" data-periods="4"
+                 class="rpt stacked2" id="gasesGraph2" width="600" height="400"></svg>
+          </p>
+          <p>CO<sub>2</sub> Emissions (tCO<sub>2</sub>e)</p>
+
+          <div class="rpt table2" id="gasesCo2eRptTable2" data-total="true" data-qs="DESFLURANE_CO2E,ISOFLURANE_CO2E,SEVOFLURANE_CO2E,NITROUS_OXIDE_CO2E,PORTABLE_NITROUS_OXIDE_MIX_CO2E,PORTABLE_NITROUS_OXIDE_MIX_MATERNITY_CO2E" data-periods="4"
+               data-share="http://localhost:8083/reports/{{formatAnswer('ORG_CODE')}}/{{surveyReturn.applicablePeriod}}/water-c2oe.html"></div>
+          <p class="narrative performance {{#if !haveAnswer('ANAESTHETIC_GASES_PERF')}}hidden-print{{/if}}" data-q="ANAESTHETIC_GASES_PERF">{{formatAnswer('ANAESTHETIC_GASES_PERF')}}</p>
+          <p class="narrative context {{#if !haveAnswer('ANAESTHETIC_GASES_CTXT')}}hidden-print{{/if}}" data-q="ANAESTHETIC_GASES_CTXT">{{formatAnswer('ANAESTHETIC_GASES_CTXT')}}</p>
         </section>
 
         <section id="carbonFootprintSect" class="rpt section">
@@ -635,7 +687,7 @@
 
   <script src="http://localhost:8083/js/env.js"></script>
   <script src="./vsn/js/base.js"></script>
-  <script src="./vsn/js/report.js"></script>
+  <script src="./vsn/js/report-2019-20.js"></script>
   <script src="http://localhost:8083/webjars/auth/2.0.0/js/auth.js"></script>
 
   <script src="./vsn/js/stacked.js"></script>
