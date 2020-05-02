@@ -1330,14 +1330,13 @@ public class Cruncher implements digital.srp.sreport.model.surveys.SduQuestions,
                 return wfactor;
             }
         }
-        LOGGER.warn("Unable to find exact Weighting Factor, now looking for {} and org type {} alone",
+        LOGGER.info(
+                "Unable to find exact Weighting Factor, now looking for {} and org type {} alone",
                 wName, orgType);
         for (WeightingFactor wfactor : wfactors) {
             if (wName.name().equals(wfactor.category())
                     && orgType.equalsIgnoreCase(wfactor.orgType())) {
                 return wfactor;
-//            }else {
-//                LOGGER.debug("  no match with {} {} ", wfactor.category(), wfactor.orgType());
             }
         }
         LOGGER.error("Unable to find any Weighting Factor {} for period {} and org type {}",

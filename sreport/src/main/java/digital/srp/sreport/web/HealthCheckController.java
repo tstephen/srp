@@ -168,6 +168,12 @@ public class HealthCheckController {
                             duplicateAnswerCount++;
                         }
                         break;
+                    case "SurveyDefinedAnswersProvided":
+                        long start = System.currentTimeMillis();
+                        LOGGER.error("Missing answers detected by validator - Hurrah!");
+                        LOGGER.info("  took {}ms",
+                                (System.currentTimeMillis() - start));
+                        break;
                     }
                 }
                 LOGGER.info(
