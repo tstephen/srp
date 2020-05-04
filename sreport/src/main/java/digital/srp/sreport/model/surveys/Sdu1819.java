@@ -97,12 +97,12 @@ public class Sdu1819 implements SurveyFactory {
         SurveyCategory catFinancial = new SurveyCategory()
                 .name("Spend")
                 .questionEnums(
-                        // TODO could be calculated? Or used as check?
                         Q.TOTAL_ENERGY_COST,
                         Q.WATER_AND_SEWAGE_COST,
                         Q.WASTE_RECYLING_COST,
-                        Q.OP_EX,
                         Q.TOTAL_BIZ_TRAVEL_COST,
+                        Q.PAPER_SPEND,
+                        Q.OP_EX,
                         Q.NON_PAY_SPEND,
                         Q.CAPITAL_SPEND
                 );
