@@ -102,7 +102,7 @@
       <dependency>
         <groupId>digital.srp</groupId>
         <artifactId>macc</artifactId>
-        <version>${srp.version}</version>
+	<version>2.4.0</version>
       </dependency>
       <!-- Web jars -->
       <dependency>
