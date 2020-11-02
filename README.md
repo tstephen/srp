@@ -4,6 +4,15 @@ Sustainable Resource Planning
 Release History
 ---------------
 
+2.4.0 - 02 Nov 20 (belatedly build release for 2019-20)
+
+  - #10 Paper spend is referred to on the report as Spend Q5 but not captured
+      in the return at all (bug)
+  - #7  Minor cosmetic changes
+  - #5 Email should make clear it's from an unmonitored mailbox
+  - #4 Provide data exploration facility
+  - #3 Add air pollution and plastics questions
+
 2.3.0 - 23 Oct 18
 
   - #288 Implement 'health-check' for returns
