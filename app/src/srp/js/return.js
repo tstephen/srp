@@ -109,7 +109,6 @@ var $r = (function ($, ractive, $auth) {
             case 'ECLASS_USER':
               ractive.set('q.categories.'+i+'.questions.'+j+'.response', me.rtn.answers[k].response);
               $('[data-id="ECLASS_USER"][value="'+me.rtn.answers[k].response+'"]').attr('checked','checked');
-              _toggleEClass();
               break;
             case 'ORG_CODE':
               ractive.set('q.categories.'+i+'.questions.'+j+'.response', $auth.getClaim('org'));
@@ -223,7 +222,6 @@ var $r = (function ($, ractive, $auth) {
       answer.response = ev.target.value;
       $r.dirty = true;
       $r.saveAnswer(answer);
-      _toggleEClass();
     });
     $('[data-id="PROC_SUPPLIER_SUSTAINABILITY"]').off().on('change', function(ev) {
       var answer = $r.getAnswer('PROC_SUPPLIER_SUSTAINABILITY', _period);
@@ -305,17 +303,6 @@ var $r = (function ($, ractive, $auth) {
         //parent.alert(''+$('#containerSect').height());
         parent.notifyIFrameSize($('#containerSect').height());
       },400);
-    }
-  }
-
-  function _toggleEClass() {
-    var answer = $r.getAnswer('ECLASS_USER', _period);
-    if (answer.response=='0-E-Class') {
-      $('section#Procurement.category li:not(:first)').slideDown();
-      _notifyParent();
-    } else {
-      $('section#Procurement.category li:not(:first)').slideUp();
-      _notifyParent();
     }
   }
 
