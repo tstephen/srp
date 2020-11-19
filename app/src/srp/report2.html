@@ -474,8 +474,8 @@
           <div class="rpt table2" id="airPollutionRptTable2" data-qs="NOX_PPM,PARTICULATES_PPM" data-periods="4"
                data-share="http://localhost:8083/reports/{{formatAnswer('ORG_CODE')}}/{{surveyReturn.applicablePeriod}}/air-pollution.html"></div>
           <p class="narrative performance {{#if !haveAnswer('ULEV_POLICY')}}hidden-print{{/if}}" data-q="ULEV_POLICY">{{formatAnswer('ULEV_POLICY')}}</p>
-          <p class="" data-q="ULEV_POLICY">To support this we have so far installed {{formatAnswer('NO_EV_CHARGE_POINTS')}} electric vehicle (EV) charging points.</p>
-          {{#if !haveAnswer('VEHICLES_COUNT_DATE')}}
+          <p class="" data-q="ULEV_POLICY">To support our policy to reduce air pollution we have so far installed {{formatAnswer('NO_EV_CHARGE_POINTS')}} electric vehicle (EV) charging points.</p>
+          {{#if haveAnswer('VEHICLES_COUNT_DATE')}}
             <p><em>Data accurate as of {{formatAnswer('VEHICLES_COUNT_DATE')}}</em></p>
           {{/if}}
           <div class="rpt table2" id="airPollutionVehiclesRptTable2" data-qs="VEHICLES_NO,VEHICLES_LEV_PCT,VEHICLES_ULEV_PCT" data-periods="4"
@@ -506,13 +506,15 @@
         </section>
 
         <section id="plasticsSect" class="rpt section">
-          <h3>Plastic use</h3>
+          <h3>Plastics use</h3>
 	  <p>The NHS produces many tonnes of plastic waste every year across catering
-	    clinical practice and its supply chain. In recognition of this, we have a plan
+	    clinical practice and its supply chain.</p>
+          {{#if formatAnswer('PLASTICS_PLEDGE')==true}}
+	    <p>In recognition of this, we have a plan
 	    to reduce our use of single-use plastics.</p>
-          <p class="narrative performance {{#if !haveAnswer('PLASTICS_PLEDGE')}}hidden-print{{/if}}" data-q="PLASTICS_PLEDGE">{{formatAnswer('PLASTICS_PLEDGE')}}</p>
+          {{/if}}
           <div class="rpt table2" id="plasticsRptTable2"
-               data-qs="NO_PLASTICS_CUPS,NO_PLASTIC_LINED_COFFEE_CUP,NO_PLASTIC_PLATES,NO_PLASTIC_CUTLERY,NO_PLASTIC_STRAWS,NO_PLASTIC_STIRRERS,NO_PLASTIC_FOOD_CONTAINER"
+               data-qs="NO_PLASTICS_CUPS,NO_PLASTIC_LINED_COFFEE_CUPS,NO_PLASTIC_PLATES,NO_PLASTIC_CUTLERY,NO_PLASTIC_STRAWS,NO_PLASTIC_STIRRERS,NO_PLASTIC_FOOD_CONTAINERS"
 	       data-periods="4"
                data-share="http://localhost:8083/reports/{{formatAnswer('ORG_CODE')}}/{{surveyReturn.applicablePeriod}}/plastics.html"
 	       data-total="true"></div>
@@ -687,7 +689,7 @@
 
   <script src="http://localhost:8083/js/env.js"></script>
   <script src="./vsn/js/base.js"></script>
-  <script src="./vsn/js/report-2019-20.js"></script>
+  <script src="./vsn/js/report.js"></script>
   <script src="http://localhost:8083/webjars/auth/2.0.0/js/auth.js"></script>
 
   <script src="./vsn/js/stacked.js"></script>
