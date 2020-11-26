@@ -33,19 +33,27 @@ public interface SurveyReturnRepository extends CrudRepository<SurveyReturn, Lon
             + "AND o.org = :org ORDER BY o.name ASC")
     List<SurveyReturn> findByOrg(@Param("org") String org);
 
-    @Query("SELECT o FROM SurveyReturn o WHERE o.status != 'Superseded' "
+    @Query("SELECT o FROM SurveyReturn o "
+            + "JOIN o.survey s "
+            + "WHERE o.status != 'Superseded' "
             + "AND o.survey.id = :surveyId ORDER BY o.applicablePeriod DESC, o.name ASC")
     List<SurveyReturn> findBySurvey(@Param("surveyId") Long surveyId);
 
-    @Query("SELECT COUNT(o) FROM SurveyReturn o WHERE o.status != 'Superseded' "
-            + "AND o.survey.name = :surveyName ORDER BY o.applicablePeriod DESC, o.name ASC")
+    @Query("SELECT COUNT(o) FROM SurveyReturn o "
+            + "JOIN o.survey s "
+            + "WHERE o.status != 'Superseded' "
+            + "AND o.survey.name = :surveyName ")
     Long countBySurveyName(@Param("surveyName") String surveyName);
 
-    @Query("SELECT o FROM SurveyReturn o WHERE o.status != 'Superseded' "
+    @Query("SELECT o FROM SurveyReturn o "
+            + "JOIN o.survey s "
+            + "WHERE o.status != 'Superseded' "
             + "AND o.survey.name = :surveyName ORDER BY o.applicablePeriod DESC, o.name ASC")
     List<SurveyReturn> findBySurveyName(@Param("surveyName") String surveyName);
 
-    @Query("SELECT o FROM SurveyReturn o WHERE o.status != 'Superseded' "
+    @Query("SELECT o FROM SurveyReturn o "
+            + "JOIN o.survey s "
+            + "WHERE o.status != 'Superseded' "
             + "AND o.survey.name = :surveyName AND o.org = :org "
             + "ORDER BY o.applicablePeriod DESC, o.name ASC")
     List<SurveyReturn> findBySurveyAndOrg(@Param("surveyName") String surveyName,

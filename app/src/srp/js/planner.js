@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2015, 2017 Tim Stephenson and contributors
+ * Copyright 2015-2020 Tim Stephenson and contributors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,9 +26,6 @@ var ractive = new BaseRactive({
     commissioningOrganisationTypes: [],
     display000s: false,
     healthWarning:'This resource is intended to provide an overview of carbon and cost reduction opportunities, as well as a framework within which users can develop their own analysis. The figures are derived from specific case studies and as such will not be equally applicable for every organisation. Developing local business cases will require local technical and economic assessments. This tool identifies the potential opportunities, interventions to investigate and scale of savings and is not a substitute for the usual financial analysis required to assemble a case for investment.',
-    isLoggedIn: function() {
-      return !$auth.getClaim('sub')==undefined;
-    },
     organisationTypes: [],
     // TODO fetch dynamically
     parameters: { targetYear:2020 },
@@ -93,7 +90,6 @@ var ractive = new BaseRactive({
     },
     stdPartials: [
       { "name": "sustainabilityInterventionPlanner", "url": "../vsn/partials/planner.html"},
-      { "name": "loginSect", "url": $env.server+"/webjars/auth/1.1.0/partials/login-sect.html"},
       { "name": "maccOptionsSect", "url": "../vsn/partials/macc-options-sect.html"},
       { "name": "maccDisplaySect", "url": "../vsn/partials/macc-display-sect.html"},
       { "name": "macTableDisplaySect", "url": "../vsn/partials/mac-table-sect.html"},
@@ -147,11 +143,11 @@ var ractive = new BaseRactive({
     ractive.set('saveObserver', false);
     $.ajax({
       dataType: "json",
-      url: ractive.getServer() + '/' + ractive.get('tenant.id') + '/accounts/'+$auth.getClaim('org'),
+      url: ractive.getServer() + '/' + ractive.get('tenant.id') + '/accounts/'+ractive.getOrg(),
       crossDomain: true,
       success: function(data) {
         ractive.set('account', data);
-        ractive.set('current.abatementPlanBy',$auth.getClaim('sub'));
+        ractive.set('current.abatementPlanBy',ractive.getUsername());
         // ractive.set('current.existingInterventions',data.customFields.existingInterventions.split());
         // var fieldNames = Object.keys(data.customFields);
         // for (var idx in fieldNames) {
@@ -223,6 +219,12 @@ var ractive = new BaseRactive({
       }
     });
   },
+  getOrg: function() {
+    return ractive.keycloak.profile.attributes['org'];
+  },
+  getUsername: function() {
+    return ractive.keycloak.profile.username;
+  },
   initControls: function() {
     console.info('initControls');
 //    ractive.initAutoComplete();
@@ -238,11 +240,11 @@ var ractive = new BaseRactive({
   },
   recordPlan: function() {
     console.info('recordPlan');
-    if ($auth.getClaim('sub')!=undefined) {
+    if (ractive.getUsername()!=undefined) {
       var tmp = JSON.parse(JSON.stringify(ractive.get('current')));
-      tmp.abatementPlanBy = $auth.getClaim('sub');
+      tmp.abatementPlanBy = ractive.getUsername();
       tmp.tenantId = ractive.get('tenant.id');
-      tmp.orgCode = $auth.getClaim('org');
+      tmp.orgCode = ractive.getOrg();
       tmp.existingInterventions = (tmp.existingInterventions == undefined ? '' : tmp.existingInterventions.join());
       for (var idx in tmp.characteristics) {
         tmp[tmp.characteristics[idx].unit] = tmp.characteristics[idx].unitCount;

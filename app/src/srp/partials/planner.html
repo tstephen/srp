@@ -47,7 +47,6 @@
     <section role="tabpanel" class="tab-pane" id="tailor" style="margin-bottom:30px">
       <h3>Tailor to your organisation</h3>
       <p>Based on the organisation type you selected we have estimates for these values but if you provide actual data it will scale the interventions to your organisation.
-        {{#if !isLoggedIn()}}<em>To enter your own details you need to be logged in.</em>{{/if}}
       </p>
       <p>Further information on scale factors is available in each intervention.</p>
       <form class="form-horizontal">
@@ -56,7 +55,7 @@
           <div class="col-md-offset-1 col-md-3 col-sm-12">
             <div class="form-group">
               <label for="curUnitCount{{idx}}">{{name}} {{unit}}</label>
-              <input class="form-control" id="curUnitCount{{idx}}" on-blur="updatePlan('tailor')" placeholder="{{unit}}" {{#if isLoggedIn() }} readonly="on" disabled="on"{{/if}} title="{{unitDescription}}" step="any" type="number" value="{{unitCount}}">
+	      <input class="form-control" id="curUnitCount{{idx}}" on-blur="updatePlan('tailor')" placeholder="{{unit}}" readonly="{{getProfile()==undefined ? 'readonly' : ''}}" disabled="{{getProfile()==undefined ? 'disabled' : ''}}" title="{{unitDescription}}" step="any" type="number" value="{{unitCount}}">
               <p class="help-block help-block-lg">{{unitDescription}}</p>
             </div>
           </div>
@@ -78,14 +77,13 @@
 
     <section role="tabpanel" class="tab-pane" id="existingInterventions">
       <h3>Which of these interventions have you <em>already</em> implemented?
-        {{#if !isLoggedIn()}}<em>(Once again, to enter your own details you need to be logged in.</em>){{/if}}
       </h3>
       <form class="form-horizontal">
         {{#interventions:idx}}
           {{#if idx % 3 == 0}}<div class="row">{{/if}}
           <div class="col-md-4 col-sm-12">
             <label class="checkbox" for="option{{idx}}">{{name}}</label>
-            <input class="dataSet" data-idx="0" type="checkbox" id="option{{idx}}" {{#if isLoggedIn() }} readonly="on" disabled="on"{{/if}} onblur="ractive.updateExistingInterventions('{{name}}')" name="dataSet">
+	    <input class="dataSet" data-idx="0" type="checkbox" id="option{{idx}}" readonly="{{getProfile()==undefined ? 'readonly' : ''}}" disabled="{{getProfile()==undefined ? 'readonly' : ''}}" onblur="ractive.updateExistingInterventions('{{name}}')" name="dataSet">
           </div>
         {{/}}
         <div class="form-group" style="clear:both">

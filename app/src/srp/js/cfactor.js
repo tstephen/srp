@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2015, 2017 Tim Stephenson and contributors
+ * Copyright 2015-2020 Tim Stephenson and contributors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@ var ractive = new BaseRactive({
     entityPath: '/cfactors',
     filter: undefined,
     saveObserver:false,
+    tenant: { id: 'sdu' },
     age: function(timeString) {
       return i18n.getAgeString(new Date(timeString))
     },
@@ -69,13 +70,9 @@ var ractive = new BaseRactive({
     },
     help: '<p>This page allows the management of a list of Carbon intensity factors used in the Carbon accounting calculations</p>',
     matchRole: function(role) {
-      // console.info('matchRole: ' + role)
-      if (role == undefined || ractive.hasRole(role)) {
-        $('.' + role).show();
-        return true;
-      } else {
-        return false;
-      }
+      console.info('matchRole: ' + role);
+      $('.' + role).show();
+      return ractive.hasRole(role);
     },
     matchSearch: function(obj) {
       var searchTerm = ractive.get('searchTerm');
@@ -130,7 +127,6 @@ var ractive = new BaseRactive({
     },
     stdPartials: [
       { "name": "helpModal", "url": $env.server+"/partials/help-modal.html"},
-      { "name": "loginSect", "url": $env.server+"/webjars/auth/1.1.0/partials/login-sect.html"},
       { "name": "navbar", "url": "/srp/vsn/partials/cfactor-navbar.html"},
       { "name": "profileArea", "url": $env.server+"/partials/profile-area.html"},
       { "name": "sidebar", "url": $env.server+"/partials/sidebar.html"},
@@ -143,7 +139,6 @@ var ractive = new BaseRactive({
   },
   partials: {
     'helpModal': '',
-    'loginSect': '',
     'profileArea': '',
     'cfactorListSect': '',
     'cfactorCurrentSect': '',

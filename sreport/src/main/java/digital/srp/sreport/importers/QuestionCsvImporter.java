@@ -36,7 +36,7 @@ public class QuestionCsvImporter {
 
     public static final String[] HEADERS = { NAME, LABEL, UNIT, SOURCE, HINT, TYPE, PLACEHOLDER, REQD, VALIDATION };
 
-    public static final String DATA = "/data/Questions-201617b.csv";
+    public static final String DATA = "/data/Questions.csv";
 
     public static final String TENANT_ID = "sdu";
 

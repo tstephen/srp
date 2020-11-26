@@ -355,27 +355,49 @@ text.inverse {
 .legend {
   width: 2em;
 }
+.anaesthetic_gases_co2e,
+.biz_mileage,
+.biz_mileage_co2e,
+.biz_mileage_road,
+.biz_mileage_road_co2e,
+.biz_mileage_rail,
+.biz_mileage_rail_co2e,
+.biz_mileage_air,
+.biz_mileage_air_co2e,
+.car_miles_petrol,
+.car_miles_petrol_co2e,
+.car_miles_diesel,
+.car_miles_diesel_co2e,
+.car_miles_unknown_fuel,
+.car_miles_unknown_fuel_co2e,
+.coal_used,
+.coal_co2e,
 .core,
 .core_co2e_pct,
-.owned_buildings_coal,
+.elec_used,
 .elec_co2e,
+.elec_total_renewable_used,
 .elec_renewable_co2e,
 .exported_thermal_energy_co2e,
+.gas_used,
+.gas_co2e,
+.hot_water_used,
 .hot_water_co2e,
+.leased_assets_energy_use,
 .net_elec_co2e,
+.net_thermal_energy_co2e,
+.oil_used,
+.oil_co2e,
+.owned_buildings_coal,
 .owned_buildings_gas,
 .owned_buildings_oil,
+.owned_leased_carbon_miles,
+.owned_leased_carbon_miles_co2e,
 .owned_vehicles,
-.net_thermal_energy_co2e,
-.leased_assets_energy_use,
-.biz_mileage_co2e,
-.biz_mileage_road_co2e,
-.biz_mileage_rail_co2e,
-.biz_mileage_air_co2e,
-.anaesthetic_gases_co2e,
 .scope_3_energy_wtt,
 .scope_3_waste,
 .scope_3_water,
+.steam_used,
 .steam_co2e,
 .total_core_co2e,
 .waste_and_water_co2e {
@@ -391,7 +413,9 @@ text.inverse {
 }
 .community,
 .community_co2e_pct,
+.patient_and_visitor_mileage,
 .patient_and_visitor_mileage_co2e,
+.staff_commute_miles_total,
 .staff_commute_miles_co2e,
 .total_community_co2e {
   background-color: #fbde06;
@@ -407,6 +431,8 @@ text.inverse {
 .chem_and_gas_co2e,
 .med_instr_co2e,
 .other_manufactured_co2e,
+.paper_spend,
+.paper_used,
 .paper_and_card_co2e,
 .pharma_co2e,
 .procurement,
@@ -473,3 +499,7 @@ text.inverse {
   }
 }
 /************* END PRINT MEDIA *********************/
+.govuk-back-link {
+  float: right;
+  font-size: small;
+}

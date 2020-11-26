@@ -1,4 +1,4 @@
-var $r = (function ($, ractive, $auth) {
+var $r = (function ($, ractive) {
   var me = {
     dirty: false,
     rtn: undefined
@@ -10,7 +10,7 @@ var $r = (function ($, ractive, $auth) {
   var _server = $env.server;
   //var _server = 'http://localhost:8083';
   var _survey;
-  var _surveyPeriod = '2019-20'; // TODO read system param
+  var _surveyPeriod = '2020-21'; // TODO read system param
   var _now = new Date();
   var _period = getSearchParameters()['p'] == undefined
       ? _surveyPeriod
@@ -49,9 +49,8 @@ var $r = (function ($, ractive, $auth) {
   }
 
   function _fetchLists() {
-    if ($auth.loginInProgress || localStorage['token'] == undefined) {
+    if ($r.getProfile() == undefined) {
       console.info('skip fetch lists while logging in');
-      $auth.addLoginCallback(_fetchLists);
       return;
     }
     $.getJSON(_server+'/sdu/accounts/', function(data) {
@@ -68,19 +67,17 @@ var $r = (function ($, ractive, $auth) {
 
   // load return (fetching blank if needed)
   function _fetchReturn() {
-    if ($auth.loginInProgress || localStorage['token'] == undefined) {
+    if ($r.getProfile() == undefined) {
       console.info('skip fetch return while logging in');
-      $auth.addLoginCallback(_fetchReturn);
       return;
     } else {
       // #262 WORKAROUND for login sect visibility being driven off this ractive data
-      ractive.set('username', $auth.getClaim('sub'));
+      ractive.set('username', $r.getProfile().username);
     }
 
-    $.getJSON(_server+'/returns/findCurrentBySurveyNameAndOrg/'+_surveyName+'/'+$auth.getClaim('org'),function(data) {
+    $.getJSON(_server+'/returns/findCurrentBySurveyNameAndOrg/'+_surveyName+'/'+$r.getProfile().attributes['org'],function(data) {
       me.rtn = data;
       if (_survey!=undefined) _fill(_survey);
-      $('.questionnaire').slideDown();
     });
   }
 
@@ -112,7 +109,7 @@ var $r = (function ($, ractive, $auth) {
               $('[data-id="ECLASS_USER"][value="'+me.rtn.answers[k].response+'"]').attr('checked','checked');
               break;
             case 'ORG_CODE':
-              ractive.set('q.categories.'+i+'.questions.'+j+'.response', $auth.getClaim('org'));
+              ractive.set('q.categories.'+i+'.questions.'+j+'.response', $r.getProfile().attributes['org']);
               $('#ORG_CODE').attr('readonly','readonly').attr('disabled','disabled');
               break;
             case 'ORG_NAME':
@@ -322,25 +319,17 @@ var $r = (function ($, ractive, $auth) {
       window.location.href = '/srp/report.html';
     },5000);
   }
-  me.diag = function() {
-    _loginSuccessful();
-  }
-  function _loginSuccessful() {
-    console.debug('  username:'+$auth.getClaim('sub'));
-    console.debug('  tenant:'+ractive.get('tenant.id'));
-    console.debug('  survey:'+_survey);
-    console.debug('  return:'+me.rtn);
-    console.debug('  orgs:'+(ractive.get('orgs') == undefined ? 0 : ractive.get('orgs').length));
-    console.debug('  orgTypes:'+(ractive.get('orgTypes') == undefined ? 0 : ractive.get('orgTypes').length));
-    if (_survey == undefined) ractive.fetch();
+
+  me.loginSuccessful = function() {
     if (me.rtn == undefined) _fetchReturn();
     if (ractive.get('orgTypes') == undefined) _fetchLists();
-    if (ractive.get('profile') == undefined) me.getProfile();
+    _showQuestionnaire();
   }
 
   function _showQuestionnaire() {
     if (_survey == undefined) _fetchReturn();
     $('section.questionnaire').slideDown();
+    ractive.set('q.activeCategory',0);
   }
 
   me.fill = function(survey) {
@@ -362,32 +351,20 @@ var $r = (function ($, ractive, $auth) {
   }
 
   me.getProfile = function() {
-    if ($auth.loginInProgress) {
-      console.info('skip fetch profile while logging in');
+    var profile = localStorage['profile'];
+    if (profile == undefined) {
+      alert('Unable to authenticate you at the moment, please try later');
       return;
-    }
-    var username = $auth.getClaim('sub');
-    console.log('getProfile: '+username);
-    if (username) {
-      $.getJSON(ractive.getServer()+'/users/'+username, function(profile) {
-        ractive.set('saveObserver', false);
-        ractive.set('profile',profile);
-        $('.profile-img').empty().append('<img class="img-rounded" src="//www.gravatar.com/avatar/'+ractive.hash(ractive.get('profile.email'))+'?s=34" title="'+ractive.get('profile.email')+'"/>');
-        if ($auth.getClaim('scopes').indexOf('super_admin')!=-1) $('.super-admin').show();
-        me.loadTenantConfig(ractive.get('profile.tenant'));
-        ractive.set('saveObserver', true);
-      });
     } else {
-      $auth.showLogin();
+      return JSON.parse(profile);
     }
   }
 
-  me.loadTenantConfig = function(tenant) {
-    if ($auth.loginInProgress) {
+  /*me.loadTenantConfig = function(tenant) {
+    if ($r.getProfile() == undefined) {
       console.info('skip tenant load while logging in');
       return;
     }
-    if (tenant==undefined || tenant=='undefined') $auth.showLogin();
     console.info('loadTenantConfig:'+tenant);
     $.getJSON(ractive.getServer()+'/tenants/'+tenant+'.json', function(response) {
       //console.log('... response: '+JSON.stringify(response));
@@ -397,7 +374,7 @@ var $r = (function ($, ractive, $auth) {
       ractive.initAutoComplete();
       ractive.set('saveObserver', true);
     });
-  }
+  }*/
 
   me.moveNext = function() {
     console.info('_moveNext');
@@ -428,8 +405,8 @@ var $r = (function ($, ractive, $auth) {
   }
 
   me.saveAnswer = function(answer) {
-    if ($r.dirty == false || $r.rtn.status != 'Draft' || $auth.loginInProgress) {
-      console.info('skip save, dirty: '+$r.dirty+', loginInProgress: '+$auth.loginInProgress);
+    if ($r.dirty == false || $r.rtn.status != 'Draft' || $r.getProfile() == undefined) {
+      console.info('skip save, dirty: '+$r.dirty+', profile: '+$r.getProfile());
       return;
     } else if (me.rtn == undefined) {
       ractive.fetch();
@@ -464,8 +441,8 @@ var $r = (function ($, ractive, $auth) {
   }
 
   me.submit = function() {
-    if ($r.dirty == false || $r.rtn.status != 'Draft' || $auth.loginInProgress) {
-      console.info('skip save, dirty: '+$r.dirty+', loginInProgress: '+$auth.loginInProgress);
+    if ($r.dirty == false || $r.rtn.status != 'Draft' || $r.getProfile() == undefined) {
+      console.info('skip save, dirty: '+$r.dirty+', profile: '+$r.getProfile());
       return;
     } else if (me.rtn == undefined) {
       ractive.fetch();
@@ -562,7 +539,6 @@ var $r = (function ($, ractive, $auth) {
 
   // set and load questionnaire
   ractive.set('questionnaireDef',_server+'/surveys/findByName/'+_surveyName);
-  $auth.addLoginCallback(_loginSuccessful);
 
   if (ractive['fetchCallbacks']==undefined) ractive.fetchCallbacks = $.Callbacks();
   ractive.fetchCallbacks.add(_hideCalcs);
@@ -582,7 +558,7 @@ var $r = (function ($, ractive, $auth) {
   }
 
   return me;
-}($, ractive, $auth));
+}($, ractive));
 
 $( document ).bind('keypress', function(e) {
   switch (e.keyCode) {
@@ -598,4 +574,19 @@ $( document ).bind('keypress', function(e) {
 
 $(document).ready(function() {
   ractive.sendMessage = $r.complete;
+
+  $r.keycloak = Keycloak('/keycloak.json');
+  $r.keycloak.init({ onLoad: 'login-required' })
+      .success(function(authenticated) {
+    console.info(authenticated ? 'authenticated' : 'not authenticated');
+    $r.keycloak.loadUserProfile().success(function(profile) {
+      localStorage['profile'] = JSON.stringify(profile);
+      $r.loginSuccessful();
+    }).error(function() {
+      alert('Failed to load user profile');
+    });
+  }).error(function() {
+    console.error('failed to initialize');
+  });
+
 });

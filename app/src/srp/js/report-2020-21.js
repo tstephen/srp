@@ -27,6 +27,7 @@ var ractive = new BaseRactive({
       'ADAPTATION_PERF': 'Commentary on adaptation performance',
       'ADAPTATION_PLAN_INC': 'Board approved Adaptation Plan ()',
       'ADAPTATION_PLAN_INC': 'Do your board approved plans address the potential need to adapt the delivery of your organisation&apos;s activities and organisation&apos;s infrastructure as a result of climate change and adverse weather events?',
+      'AMI': 'Aqueous mist inhalers',
       'ANAESTHETIC_GASES_CO2E': 'Anaesthetic Gases',
       'BACKLOG_MAINTENANCE_VAL': 'Investment to reduce backlog maintenance (£)',
       'BEDDING_LINEN_AND_TEXTILES': 'Bedding Linen & Textiles',
@@ -86,6 +87,7 @@ var ractive = new BaseRactive({
       'DESFLURANE_CO2E': 'Desflurane - liquid',
       'DESFLURANE': 'Desflurane - liquid',
       'DOMESTIC_AIR_MILES': 'Air - Domestic',
+      'DPI': 'Dry powder inhalers',
       'DRESSINGS_CO2E': 'Dressings',
       'DRESSINGS': 'Dressings',
       'ECLASS_USER': 'Do you use eClass for procurement?',
@@ -153,6 +155,7 @@ var ractive = new BaseRactive({
       'LEASED_ASSETS_ENERGY_USE': 'Leased Assets Energy Use (Upstream - Gas, Coal & Electricity)',
       'LEASED_FLEET_TRAVEL': 'Non-organisation Owned Fleet/Pool Road Travel (Leased, hired etc.)',
       'LONG_HAUL_AIR_MILES': 'Air - Long Haul International Flights',
+      'MDI': 'Metered dose inhalers',
       'MEDICAL_AND_SURGICAL_EQUIPMENT': 'Medical & Surgical Equipment',
       'MEDICAL_AND_SURGICAL_EQUIPT_CO2E': 'Medical & Surgical Equipment',
       'MED_INSTR_CO2E': 'Medical instruments / equipment',
@@ -176,6 +179,9 @@ var ractive = new BaseRactive({
       'NO_MENTAL_HEALTH_LD_SITES': 'Number of sites - Mental Health and Learning Disabilities (No.)',
       'NO_MENTAL_HEALTH_SITES': 'Number of sites - Mental Health (including Specialist services) (No.)',
       'NO_MIXED_SITES': 'Number of sites - Mixed service hospital (No.)',
+      'NON_BURN_WEIGHT': 'Non Burn Treatment Disposal Waste',
+      'NON_EMERGENCY_TRANSPORT_VAL': 'Non-emergency patient transport (£)',
+      'NON_PAY_SPEND': 'Non-pay spend',
       'NO_OTHER_INPATIENT_SITES': 'Number of sites - Other in-patient (No.)',
       'NO_OTHER_SITES': 'Number of sites - Unreported sites (No.)',
       'NO_OUTPATIENT_SITES': 'Number of sites - Non inpatient (No.)',
@@ -449,13 +455,13 @@ var ractive = new BaseRactive({
     narrativeCtxtPrompt: 'Please insert a commentary on contextual information e.g. projects, initiatives etc. related to this area.',
     narrativePerfPrompt: 'Please click to insert a commentary on your performance in this area.',
     orgAnswerNames: ['PROVIDER1_COMMISSIONED','PROVIDER2_COMMISSIONED','PROVIDER3_COMMISSIONED',
-      'PROVIDER4_COMMISSIONED','PROVIDER5_COMMISSIONED','PROVIDER6_COMMISSIONED',
-      'PROVIDER7_COMMISSIONED','PROVIDER8_COMMISSIONED','CCG1_SERVED',
-      'CCG2_SERVED','CCG3_SERVED','CCG4_SERVED','CCG5_SERVED','CCG6_SERVED','CCG7_SERVED','CCG8_SERVED'],
+        'PROVIDER4_COMMISSIONED','PROVIDER5_COMMISSIONED','PROVIDER6_COMMISSIONED',
+        'PROVIDER7_COMMISSIONED','PROVIDER8_COMMISSIONED','CCG1_SERVED',
+        'CCG2_SERVED','CCG3_SERVED','CCG4_SERVED','CCG5_SERVED','CCG6_SERVED','CCG7_SERVED','CCG8_SERVED'],
     requiredAnswers: ['ORG_CODE', 'ORG_NAME', 'ORG_TYPE', 'SDMP_CRMP', 'HEALTHY_TRANSPORT_PLAN', 'PROMOTE_HEALTHY_TRAVEL'],
-    period: '2019-20',
+    period: '2020-21',
     server: $env.server,
-    survey: 'SDU-2019-20',
+    survey: 'SDU-2020-21',
     tenant: { id: 'sdu' },
     username: localStorage['username'],
     formatAbsAnswer: function(qName, period) {
@@ -648,8 +654,8 @@ var ractive = new BaseRactive({
     });
   },
   fetchImplicit: function() {
-    if ($auth.getClaim('org') == undefined) return;
-    ractive.set('org',$auth.getClaim('org'));
+    if (ractive.getProfile() == undefined) return; // still loading
+    ractive.set('org', ractive.getAttribute('org'));
     $.ajax({
       dataType: "json",
       url: ractive.getServer()+'/returns/findCurrentBySurveyNameAndOrg/'+ractive.get('survey')+'/'+ractive.get('org'),
@@ -905,11 +911,23 @@ var ractive = new BaseRactive({
     }
     return a.question.type == 'number' ? 0 : undefined;
   },
+  getAttribute: function(attr) {
+    return ractive.getProfile().attributes[attr];
+  },
   getPeriod: function(offset) {
     var currentYear = parseInt(ractive.get('period').substring(0,4));
     var yearEnd = (currentYear-1999+offset);
     var period = (currentYear+offset)+'-'+(yearEnd < 10 ? '0'+yearEnd : yearEnd);
     return period;
+  },
+  getProfile: function() {
+    var profile = localStorage['profile'];
+    if (profile == undefined) {
+      alert('Unable to authenticate you at the moment, please try later');
+      return;
+    } else {
+      return JSON.parse(profile);
+    }
   },
   initNarrative: function() {
     if (ractive.get('surveyReturn.status')!='Draft') {
@@ -1091,7 +1109,7 @@ var ractive = new BaseRactive({
       processDefinitionKey: 'RestateSustainabilityReturn',
       processVariables: {
         applicablePeriod: ractive.get('surveyReturn.applicablePeriod'),
-        initiator: $auth.getClaim('sub'),
+        initiator: ractive.getProfile('firstName'),
         org: ractive.get('surveyReturn.org'),
         returnId: ractive.get('surveyReturn.id'),
         tenantId: ractive.get('tenant.id')
@@ -1144,7 +1162,7 @@ var ractive = new BaseRactive({
       processDefinitionKey: 'SubmitSustainabilityReturn',
       processVariables: {
         applicablePeriod: ractive.get('surveyReturn.applicablePeriod'),
-        initiator: $auth.getClaim('sub'),
+        initiator: ractive.getProfile().username,
         org: ractive.get('surveyReturn.org'),
         returnId: ractive.get('surveyReturn.id'),
         tenantId: ractive.get('tenant.id')
@@ -1187,14 +1205,6 @@ var ractive = new BaseRactive({
 $(document).ready(function() {
   $('head').append('<link href="'+ractive.getServer()+'/css/sdu-1.0.0.css" rel="stylesheet">');
   $('.menu-burger, .toolbar').addClass('no-print');
-
-  if (Object.keys(getSearchParameters()).indexOf('error')!=-1) {
-    ractive.showError('The username and password provided do not match a valid account');
-  } else if (Object.keys(getSearchParameters()).indexOf('logout')!=-1) {
-    ractive.showMessage('You have been successfully logged out');
-  }
-  $auth.addLoginCallback(ractive.fetch);
-  $auth.addLoginCallback(ractive.getProfile);
 })
 
 ractive.observe('searchTerm', function(newValue, oldValue, keypath) {

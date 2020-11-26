@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2015, 2017 Tim Stephenson and contributors
+ * Copyright 2015-2020 Tim Stephenson and contributors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,6 +25,7 @@ var ractive = new BaseRactive({
     parameters: [],
     filter: undefined,
     //saveObserver:false,
+    tenant: { id: 'sdu' },
     username: localStorage['username'],
     age: function(timeString) {
       return i18n.getAgeString(new Date(timeString))
@@ -118,7 +119,6 @@ var ractive = new BaseRactive({
       else return 'hidden';
     },
     stdPartials: [
-      { "name": "loginSect", "url": $env.server+"/webjars/auth/1.1.0/partials/login-sect.html"},
       { "name": "navbar", "url": "./vsn/partials/parameter-navbar.html"},
       { "name": "profileArea", "url": $env.server+"/partials/profile-area.html"},
       { "name": "sidebar", "url": "./vsn/partials/sidebar.html"},

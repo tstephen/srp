@@ -1,0 +1,397 @@
+name$label$unit$source$hint$type$placeholder$required$validation$defaultValue
+ORG_CODE$Organisation code$$ERIC$$$$$$
+ORG_NAME$Organisation name$$ERIC$$$$$$
+COMMISSIONING_REGION$Commissioning Region$$ERIC$$$$$$
+ORG_TYPE$Primary organisation type$$ERIC$$select$Please select…$$$
+NO_ACUTE_SITES$Number of sites - General acute hospital ()$$ERIC$$number$$$$
+NO_SPECIALIST_SITES$Number of sites - Specialist hospital (acute only) ()$$ERIC$$number$$$$
+NO_MIXED_SITES$Number of sites - Mixed service hospital ()$$ERIC$$number$$$$
+NO_MENTAL_HEALTH_SITES$Number of sites - Mental Health (including Specialist services) ()$$ERIC$$number$$$$
+NO_LD_SITES$Number of sites - Learning Disabilities ()$$ERIC$$number$$$$
+NO_MENTAL_HEALTH_LD_SITES$Number of sites - Mental Health and Learning Disabilities ()$$ERIC$$number$$$$
+NO_COMMUNITY_HOSPITAL_SITES$Number of sites - Community hospital (with inpatient beds) ()$$ERIC$$number$$$$
+NO_OTHER_INPATIENT_SITES$Number of sites - Other inpatient ()$$ERIC$$number$$$$
+NO_OUTPATIENT_SITES$Number of sites - Non inpatient ()$$ERIC$$number$$$$
+NO_SUPPORT_SITES$Number of sites - Support facilities ()$$ERIC$$number$$$$
+NO_OTHER_SITES$Number of sites - Unreported sites ()$$ERIC$$number$$$$
+NO_NHS_PROPERTY_SVCS_SITES$Number of NHS Property Services sites ()$$ERIC$$number$$$$
+ESTATES_DEV_STRATEGY$Estates Development Strategy$$ERIC$$yesno$$$$
+HEALTHY_TRANSPORT_PLAN$Do you have a healthy transport plan?$$ERIC$$yesno$$$$
+BOARD_ADAPTATION_PLAN$Board approved Adaptation Plan$$ERIC$$yesno$$$$
+SDMP_CRMP$Do you have a Green Plan, formerly known as Sustainable Development Management Plan (SDMP)?$$ERIC$$yesno$$$$
+CARBON_REDUCTION_TARGET$Carbon reduction target$$ERIC$$yesno$$$$
+PFA_ASSESSMENT$NHS Premises and Facilities Assurance - Assessment/Approval$$ERIC$$select$$$$
+PFA_ACTION_PLAN$NHS Premises and Facilities Assurance - action plan$$ERIC$$select$$$$
+CONTRACTING_OUT_VAL$Value of contracted out services$$ERIC$$number$$$$
+CONTRACTING_OUT_PCT$Percentage of hard FM (estates) and soft FM (hotel services) contracted out$$ERIC$$number$$$$
+CAPITAL_NEW_BUILD$Capital investment for new build$$ERIC$$number$$$$
+CAPITAL_IMPROVING_EXISTING$Capital investment for improving existing buildings$$ERIC$$number$$$$
+CAPITAL_EQUIPMENT$Capital investment for equipment$$ERIC$$number$$$$
+PRIVATE_SECTOR$Private Sector investment$$ERIC$$number$$$$
+BACKLOG_MAINTENANCE_VAL$Investment to reduce backlog maintenance$$ERIC$$number$$$$
+PFA_ACTION_PLAN_VAL$Cost to meet NHS Premises and Facilities Assurance action plan$$ERIC$$number$$$$
+NON_EMERGENCY_TRANSPORT_VAL$Non-emergency patient transport$$ERIC$$number$$$$
+INCOME_CATERING$Income from services provided to other organisations - catering$$ERIC$$number$$$$
+INCOME_LAUNDRY$Income from services provided to other organisations - laundry and linen$$ERIC$$number$$$$
+INCOME_OTHER$Income from services provided to other organisations - other$$ERIC$$number$$$$
+NO_RIDDOR_INCIDENTS$RIDDOR incidents$$ERIC$$number$$$$
+NO_FM_INCIDENTS$Estates and facilities related incidents$$ERIC$$number$$$$
+NO_FM_CLINICAL_INCIDENTS$Clinical service incidents caused by estates and infrastructure failure$$ERIC$$number$$$$
+NO_FIRES$Fires recorded$$ERIC$$number$$$$
+NO_FALSE_ALARMS$False alarms$$ERIC$$number$$$$
+NO_FIRE_DEATHS$Number of deaths resulting from fire(s)$$ERIC$$number$$$$
+NO_FIRE_INJURIES$Number of people injured resulting from fire(s)$$ERIC$$number$$$$
+NO_EVAC_INJURIES$Number of patients sustaining injuries during evacuation$$SDU$$number$$$$
+ORG_NICKNAME$Abbreviation or nick name of organisation used$$SDU$$$$$$
+FLOOR_AREA$Total gross internal floor space$m2$SDU$$number$$$$
+POPULATION$Registered population or population served$people$SDU$$number$$$$
+NO_STAFF$Total number of staff employed$WTE$SDU$$number$$$$
+NO_PATIENT_CONTACTS$Total number of patient contacts$$SDU$$number$$$$
+SDMP_BOARD_REVIEW_WITHIN_12_MONTHS$Was the Green Plan reviewed or approved by the board in the last 12 months?$$SDU$$yesno$$$$
+SDMP_MISSION_STATEMENT$If your Green Plan has a sustainability mission statement, what is it?$$SDU$$$$$$
+PROMOTE_HEALTHY_TRAVEL$Does your organisation promote healthy travel?$$SDU$$yesno$$$$
+PROC_ENV_ASSESSMENT$Do your commissioning, tendering and procurement processes include an assessment of the environmental impacts?$$SDU$$yesno$$$$
+PROC_SOC_ASSESSMENT$Do your commissioning, tendering and procurement processes include an assessment of the social impacts?$$SDU$$yesno$$$$
+PROC_SUPPLIER_SUSTAINABILITY$Do your commissioning, tendering and procurement processes include a consideration of the suppliers' sustainability policies?$$SDU$$yesno$$$$
+STRATEGIC_SUSTAINABILITY_PARTNERSHIPS$Are you in a strategic partnership with other organisations on sustainability?$$SDU$$yesno$$$$
+STRATEGIC_SUSTAINABILITY_PARTNERS$Who are they?$$SDU$$$$$$
+GCC_USER$Does your organisation use the <a href=”http://www.sduhealth.org.uk/gcc/about.aspx”>Good Corporate Citizenship (GCC)</a> tool?$$SDU$$yesno$$$$
+LAST_GCC_DATE$If your organisation uses the <a href=”http://www.sduhealth.org.uk/sdat/”>Sustainable Development Assessment Tool (SDAT)</a> tool when was your last self assessment?$$SDU$$number$yyyy$$[\\d]{4}$
+LAST_GCC_SCORE$And what was your SDAT score?$%$SDU$$number$$$$
+PROMOTE_SUSTAINABILITY_TO_STAFF$Does your organisation promote sustainability to its employees?$$SDU$$yesno$$$$
+ECLASS_USER$Do you use e-class for procurement classification? If so, please provide a breakdown of spending by category; otherwise proceed to the next section$$SDU$$yesno$$$$
+QUANT_ES_IMPACTS$What are the qualitative or quantified social and environmental impacts?$$SDU$$$$$$
+QUANT_TRAVEL_IMPACTS$Does your organisation quantify the health impacts of travel and transport?$$SDU$$yesno$$$$
+MOD_SLAVERY$If your organisation has a Modern Slavery statement, what is it?$$SDU$$$$$$
+SIA$Does your business case process include a Sustainability Impact Assessment?$$SDU$$yesno$$$$
+CARBON_REDUCTION_BASE_YEAR$What is your organisation's baseline year?$$SDU$$number$yyyy$$[\\d]{4}$2007
+CARBON_REDUCTION_TARGET_PCT$What is the percentage reduction target?$%$SDU$$number$$$$34
+CARBON_REDUCTION_DEADLINE_YEAR$What is the deadline year for this target?$$SDU$$number$yyyy$$[\\d]{4}$2020
+PATIENT_CONTACT_MEASURE$Define the measure you have used for patient contacts$$SDU$$$$$$
+BOARD_LEAD_FOR_SUSTAINABILITY$If you have a Board Level lead for Sustainability, please enter their name and/or role here$$SDU$$$$$$
+BOARD_SUSTAINABILITY_AS_RISK$Does your board consider sustainability issues as part of its risk management process?$$SDU$$yesno$$$$
+ADAPTATION_PLAN_INC$Do your board approved plans address the potential need to adapt the delivery of your organisation's activities and organisation's infrastructure as a result of climate change and adverse weather events?$$SDU$$yesno$$$$
+CCG1_SERVED$We provide services to the following CCG$$SDU$$$$$$
+CCG2_SERVED$We provide services to the following CCG$$SDU$$$$$$
+CCG3_SERVED$We provide services to the following CCG$$SDU$$$$$$
+CCG4_SERVED$We provide services to the following CCG$$SDU$$$$$$
+CCG5_SERVED$We provide services to the following CCG$$SDU$$$$$$
+CCG6_SERVED$We provide services to the following CCG$$SDU$$$$$$
+CCG7_SERVED$We provide services to the following CCG$$SDU$$$$$$
+CCG8_SERVED$We provide services to the following CCG$$SDU$$$$$$
+PROVIDER1_COMMISSIONED$We commission services from the following provider$$SDU$$$$$$
+PROVIDER2_COMMISSIONED$We commission services from the following provider$$SDU$$$$$$
+PROVIDER3_COMMISSIONED$We commission services from the following provider$$SDU$$$$$$
+PROVIDER4_COMMISSIONED$We commission services from the following provider$$SDU$$$$$$
+PROVIDER5_COMMISSIONED$We commission services from the following provider$$SDU$$$$$$
+PROVIDER6_COMMISSIONED$We commission services from the following provider$$SDU$$$$$$
+PROVIDER7_COMMISSIONED$We commission services from the following provider$$SDU$$$$$$
+PROVIDER8_COMMISSIONED$We commission services from the following provider$$SDU$$$$$$
+TOTAL_ENERGY_COST$Total Energy Cost (all energy supplies)$£$ERIC S08_01$The total cost of electricity, gas, oil, and coal from all sources (including utility supplier, local source, renewable source), net of any costs that are charged to other organisations for which the trust provides energy (see apportionment rules).$number$$$$
+PAPER_SPEND$Paper cost$£$SDU$$number$$$$
+WATER_COST$Water Cost$£$ERIC S09_01$The total cost for water whether metred or not inclusive of bore hole, maintenance and operational costs together with billed amounts and water ratesWater and sewage costs associated with on-site central processing unit(s) (e.g. laundry) should be apportioned in accordance with the percentage output used by the trust for its own purposes. (E.g. if the trusts uses 30% of the processing unit output then the figure used should be 30% of the total cost of water supplied to the processing unit.) Where Water and Sewage costs are billed as a single amount, information on the method of calculating the separate charges should be sought from the supplier. If this is not available, trusts should provide an estimate of the split.$number$$$$
+SEWAGE_COST$Sewage Cost$£$ERIC S09_02$The total sewage cost whether metred or not, inclusive of maintenance and operational costs together with billed amounts and water rates. Water and sewage costs associated with on-site central processing unit(s) (e.g. laundry) should be apportioned in accordance with the percentage output used by the trust for its own purposes. (E.g. if the trusts uses 30% of the processing unit output then the figure used should be 30% of the total cost of water supplied to the processing unit.) Where Water and Sewage costs are billed as a single amount, information on the method of calculating the separate charges should be sought from the supplier. If this is not available, trusts should provide an estimate of the split.$number$$$$
+WATER_AND_SEWAGE_COST$Water & Sewage Cost$£$ERIC S09_01 + S09_02 merged$The total cost for water whether metred or not inclusive of bore hole, maintenance and operational costs together with billed amounts and water rates plus the total sewage cost whether metred or not, inclusive of maintenance and operational costs together with billed amounts and water rates. Water and sewage costs associated with on-site central processing unit(s) (e.g. laundry) should be apportioned in accordance with the percentage output used by the trust for its own purposes. (E.g. if the trusts uses 30% of the processing unit output then the figure used should be 30% of the total cost of water supplied to the processing unit.) Where Water and Sewage costs are billed as a single amount, information on the method of calculating the separate charges should be sought from the supplier. If this is not available, trusts should provide an estimate of the split.$number$$$$
+WASTE_RECYLING_COST$Waste recycling, recovery and preparing for re-use cost$£$ERIC S10_01 + S10_03 + S10_05 + S10_07$The total cost of disposing of waste by landfill, Incineration, recycling and other recovery . See ERIC definitions 2016/17 Annex G for further information. The cost should relate to the billed amount and include VAT. The cost should include the cost involved in any off site disposal including transport and disposal together with the cost of on-site destruction. The cost should not include on-site local collection and handling costs.$number$$$$
+TOTAL_BIZ_TRAVEL_COST$Total Business Travel Cost$£$SDU$Total cost all business travel including owned fleet, grey fleet, public transport, cycling, air travel and taxis  - finance department$number$$$$
+OP_EX$Operating Expenditure$£,000$SDU$The organisations total operating expenditure as reported in your annual accounts - finance department$number$$$$
+NON_PAY_SPEND$Non-pay spend$£,000$SDU$Non pay spend is calculated on average profiles depending on your organisation type please   - finance department$number$$$$
+CAPITAL_SPEND$Capital Spend$£,000$SDU$Capital spend within the financial year$number$$$$
+ELEC_USED$Electricity Consumed$kWh$ERIC S08_02$The total amount of electricity consumed from the national/regional/local electricity supplier. Exclude energy supplied to other sites. Include energy used to feed CHP plant associated with the site and energy used by the organisation site for processing purposes (e.g. laundry, CSD). In cases where the organisation site includes an on-site central processing unit(s) which serves more than one organisation site, the input energy to this unit should be apportioned in accordance with the percentage output used by the organisation for its own purposes (e.g. if the organisation uses 30% of the processing unit output then the figure included should be 30% of the total amount of energy supplied to the processing unit). Exclude energy derived from an eligible renewable energy source. The sum of the electricity consumed (S08_02) and green energy tariff (S08_08) will be the total 'intake' of electrical energy delivered to the site.$number$$$$
+GAS_USED$Gas Consumed$kWh$ERIC S08_03$The total amount of gas consumed from the national /regional gas supplier, including LPG, net of any energy that may have been supplied by the organisation to other sites. Include energy used to feed CHP plant associated with the site, and energy used by the organisation site for processing purposes (e.g. laundry, CSD). In cases where the organisation site includes an on-site central processing unit(s) which serves more than one organisation site, the input energy to this unit should be apportioned in accordance with the percentage output used by the organisation for its own purposes (e.g. if the organisation uses 30% of the processing unit output then the figure included should be 30% of the total amount of energy supplied to the processing unit). Exclude energy derived from an eligible renewable energy source.$number$$$$
+OIL_USED$Oil Consumed$kWh$ERIC S08_04$The total amount of oil consumed from the national /regional oil supplier, net of any energy that may have been supplied by the organisation to other sites. Include energy used to feed CHP plant associated with the site, and energy used by the organisation site for processing purposes (e.g. laundry, CSD). In cases where the organisation site includes an on-site central processing unit(s) which serves more than one organisation site, the input energy to this unit should be apportioned in accordance with the percentage output used by the organisation for its own purposes. (E.g. if the organisation uses 30% of the processing unit output then the figure included should be 30% of the total amount of energy supplied to the processing unit). Exclude energy derived from an eligible renewable energy source.$number$$$$
+COAL_USED$Coal Consumed$kWh$ERIC S08_05$The total amount of coal consumed from the national /regional coal supplier, net of any energy that may have been supplied by the organisation to other sites. Include energy used to feed CHP plant associated with the site, and energy used by the organisation site for processing purposes (e.g. laundry, CSD). In cases where the organisation site includes an on-site central processing unit(s) which serves more than one organisation site, the input energy to this unit should be apportioned in accordance with the percentage output used by the organisation for its own purposes (e.g. if the organisation uses 30% of the processing unit output then the figure included should be 30% of the total amount of energy supplied to the processing unit). Exclude energy derived from an eligible renewable energy source.$number$$$$
+STEAM_USED$Steam Consumed$kWh$ERIC S08_06$Total annual amount of steam consumed which has been supplied by an organisation other than Regional/National supplier sources (e.g. a neighbouring organisation supplying steam to the site from their incinerator or central boiler plant and distribution system). Exclude energy derived from an eligible renewable energy source.$number$$$$
+HOT_WATER_USED$Hot Water Consumed$kWh$ERIC S08_07$Total annual amount of hot water consumed which has been supplied by an organisation other than Regional/National supplier sources (e.g. a neighbouring organisation supplying hot water to the site from their main distribution system.) Exclude energy derived from an eligible renewable energy source.$number$$$$
+ELEC_USED_GREEN_TARIFF$Electricity Consumed - green energy tariff$kWh$ERIC S08_08$The total annual amount of electricity from renewable or green energy tariffs supplied by national / regional or local electricity supplier e.g. Crown Commercial Services “green energy”. If a proportion supplied electricity is from a green energy tariff then only the proportion which is a ‘green energy tariff’ should be reported here. The sum of the electricity consumed (S08_02), green energy tariff (S08_08) and Electricity consumed – third party owned renewable (S08_09) will be the total 'intake' of electrical energy delivered to the site.$number$$$$
+ELEC_OWNED_RENEWABLE_USED$Electricity consumed - owned onsite renewables$kWh$ERIC S08_11$The total annual amount of electricity output from owned onsite low or zero carbon renewable generation, inclusive of exported electricity. Excludes electrical energy output of CHP recorded separately. The sum of the electrical output of CHP (S07_06) and onsite renewable electrical energy (S08_11) will be the total 'generated' onsite electrical energy.$number$$$$
+ELEC_OWNED_RENEWABLE_USED_SDU$Electricity consumed - owned onsite renewables (SDU definition)$kWh$ERIC S08_11$Please state the amount of renewable electricity generated onsite by renewable technologies owned by your organisation (Solar, Wind, Bio CHP (not gas combustion CHP).\nPlease note this is note the same definition as the ERIC question on the subject.$number$$$$
+ELEC_3RD_PTY_RENEWABLE_USED$Electricity Consumed - third party owned renewable$kWh$ERIC S08_09$The total annual amount of electricity consumed from renewable sources owned and supplied by national / regional or local electricity supplier but not supplied through the national power grid e.g. onsite renewable rent-a-roof schemes, community owned/funded renewable energy projects or supplies bought via a private wire from a renewable supply. Exclude energy consumed via green energy tariffs (S08_08) and organisation owned renewable generation (S08_11). Exclude energy supplied to other sites. Include energy used by the organisation site for processing purposes (e.g. laundry, CSD). In cases where the organisation site includes an on-site central processing unit(s) which serves more than one organisation site, the input energy to this unit should be apportioned in accordance with the percentage output used by the organisation for its own purposes. (E.g. if the organisation uses 30% of the processing unit output then the figure included should be 30% of the total amount of energy supplied to the processing unit).$number$$$$
+ELEC_RENEWABLE_USED$Non-fossil fuel Consumed - renewable$kWh$ERIC S08_10$"The total annual amount of non-fossil fuel from renewable energy consumed for combustion (e.g. heating boilers) which has been supplied from an eligible renewable energy supply source as defined in Protocol A3 of DEFRA ""Guidelines for the Measurement and Reporting of Emissions by Direct Participants in the UK Emissions Trading Scheme"" (e.g. biomass, sewage gas, etc.) Such energy to be exempt from the Climate Change Levy (CCL),  which is evidenced by a Levy Exemption Certificate that confirms that electricity generated from qualifying renewable sources are exempt from the Levy. The sum of the utility, local and renewable fossil and non-fossil energy figures reported will be the total 'intake' of fossil and non-fossil energy delivered to the site. - Assumed to be an average of biomass supplies"$number$$$$
+ELEC_EXPORTED$Total exported electricity$kWh$SDU$Total amount of electricity exported from renewable sources only, please report energy exported and generate through combustion CHP below in additional breakdown information$number$$$$
+DURABLES_INTERNAL_REUSE$Internal re-use of durables goods and community equipment as a financial value of avoided cost$£$SDU$Please provide a quantified financial value figure for all savings and avoided cost of any durable goods or community equipment  reused internally  -  this may include information from third party service provider i.e. reuse providers or community equipment partners$number$$$$
+DURABLES_EXTERNAL_REUSE$External re-use of durables goods and community equipment as a financial value of avoided cost$£$SDU$Please provide a quantified financial value figure for all savings and avoided cost of any durable goods or community equipment  reused externally  -  this may include information from third party service provider i.e. reuse providers or community equipment partners and the financial value of avoided disposal costs of durable goods or community equipment donated to the third sector.$number$$$$
+PAPER_USED$Paper consumed$tonnes$SDU$The tonnes of all paper used by the organisation - finance or procurement department$number$$$$
+OTHER_RECOVERY_WEIGHT$Other recovery weight$tonnes$ERIC S10_08$The amount of waste disposed of by other forms of recovery includes anaerobic digestion, incineration with energy recovery, gasification and pyrolysis which produce energy (fuels, heat and power) and materials from waste, some backfilling. See ERIC definitions 2016/17 Annex G for further information. The weight should relate to the billed amount.$number$$$$
+LANDFILL_WEIGHT$Domestic waste (landfill) volume$tonnes$ERIC$<p>Amount of waste including adjustments for accrued liabilities of all domestic waste sent to landfill in the first instance.</p><ul><li>20-03-01: Mixed municipal waste (black bag)</li></ul><p>Detailed information can be found on the Government website for waste classification; <a href="https://www.gov.uk/how-to-classify-different-types-of-waste/healthcare-and-related-wastes">https://www.gov.uk/how-to-classify-different-types-of-waste/healthcare-and-related-wastes</a></p><p>This is equivalent to the ‘Landfill disposal weight (tonnes)’ question from the previous versions of SRP.</p>$number$$$$
+RECYCLING_WEIGHT$Domestic waste (recycling) volume$tonnes$ERIC$<p>Amount of waste including adjustments for accrued liabilities of all domestic waste which is segregated from general waste and sent for recycling e.g. plastics, paper, aluminium, card etc.</p><p>Detailed information can be found on the Government website for waste classification; <a href="https://www.gov.uk/how-to-classify-different-types-of-waste/healthcare-and-related-wastes">https://www.gov.uk/how-to-classify-different-types-of-waste/healthcare-and-related-wastes</a><p> This is equivalent to the ‘Recycling disposal weight (tonnes)’ question from the previous versions of SRP.</p>$number$$$$
+WATER_VOL$Water Volume$m3$ERIC S09_03$Annual amount of water consumed, supplied either by the national/regional supplier or locally from another organisation (e.g. trust). Include water supplied from a ‘borehole’. Water to on-site central processing unit(s) (e.g. laundry) should be apportioned in accordance with the percentage output used by the organisation for its own purposes (e.g. if the trust uses 30% of the processing unit output then the figure used should be 30% of the total amount of water supplied to the processing unit.)$number$$$$
+WASTE_WATER$Waste water$m3$SDU$Waste water that enters the mains drainage system, calculated from water volume as 80% of incoming water - please overwrite if sewage is metered and more accurate figures are known$number$$$$
+BIZ_MILEAGE_ROAD$Business Mileage - Road / Grey Fleet$miles$SDU$Personal vehicles used for business travel$number$$$$
+FLEET_ROAD_MILES$Business mileage - Owned, pool, leased and managed vehicles$miles$SDU$Vehicles owned by the organisation$number$$$$
+FLEET_COST$Business mileage - Owned, pool, leased and managed vehicles Cost$£$SDU$Vehicles owned by the organisation$number$$$$
+BIZ_MILEAGE_ROAD_COST$Cost of Non-organisation Owned Fleet/Pool/Third party provided used by the organisation (excluding leased vehicles) Road Travel (Hire etc.)$£$SDU$Vehicles not owned but used by the organisation$number$$$$
+OWNED_LEASED_LOW_CARBON_MILES$Business Mileage - Owned, pool, leased or managed vehicles that are electric or plug in hybrid (on Go Ultra Low approved list)$miles$SDU$GoUltraLow approved list$number$$$$
+OWNED_LEASED_LOW_CARBON_COST$Business Mileage - Owned, pool, leased or managed vehicles that are electric or plug in hybrid (on Go Ultra Low approved list) Cost$£$SDU$GoUltraLow approved list$number$$$$
+RAIL_MILES$Rail/Underground/Tram cost$£$SDU$Provide the cost figure for expense claims and directly purchased rail/underground/tram journeys$number$$$$
+RAIL_COST$Rail/Underground/Tram business mileage$miles$SDU$Calculation takes into account an estimated average cost per mile of 30p/mile for rail travel, Please note that if the majority of travel is in London/Underground then the average fare per mile will be higher even with the use of an oyster card. Please override if local information is accessible and accurate$number$$$$
+BUS_COST$Bus/Coach cost$£$SDU$Provide the cost figure for expense claims and directly purchased bus/coach journeys$number$$$$
+BUS_MILES$Bus/Coach business miles$miles$SDU$Calculation takes into account an estimated average cost per mile of 12p/mile for bus travel Please override if local information is accessible and accurate$number$$$$
+TAXI_COST$Taxi cost$£$SDU$Provide the cost figure for expense claims and directly purchased taxi journeys$number$$$$
+TAXI_MILES$Taxi business miles$miles$SDU$Calculation takes into account an estimated average cost per mile of 283p/mile for taxi travel, please note the fare in London may be as high as 520p/mile Please override if local information is accessible and accurate$number$$$$
+CYCLE_MILES$Cycle business mileage$miles$SDU$Agenda for change mileage rate for cycling is 20p/mile therefore costs can be converted if miles isn't known$number$$$$
+DOMESTIC_AIR_MILES$Air - Domestic$miles$SDU$Within UK$number$$$$
+SHORT_HAUL_AIR_MILES$Air - Short Haul International Flights$miles$SDU$Europe / Under 3700km$number$$$$
+LONG_HAUL_AIR_MILES$Air - Long Haul International Flights$miles$SDU$Outside Europe / Greater than 3700km$number$$$$
+PATIENT_MILEAGE$Patient Transport Mileage$miles$SDU$The miles attributable to non-urgent patient transport provided by the  organisation and/or third parties$number$$$$
+VISITOR_MILEAGE$Patient and Visitor Travel$miles$SDU$Use average travel distance of 9.4 miles (15km) and 3.7 patient and visitor journeys per patient contact$number$$$$
+TOTAL_EMPLOYEES$Total Employees in Organisation$$SDU$WTE used unless overwritten$number$$$$
+STAFF_COMMUTE_MILES_PP$Staff commute - Average annual distance travelled by road to work$miles$SDU$National Travel survey figures supplied 2007 - 2014, should you have more appropriate figures please over-write$number$$$$
+STAFF_COMMUTE_MILES_TOTAL$Total Employee Commute for Organisation by road$miles$SDU$Calculated using the two rows above$number$$$$
+HEALTH_IMPACT_OF_TRAVEL$Health impacts of travel and transport associated with provider activities$QALY$SDU$Enter figures from travel and transport tool on SDU website www.sduhealth.org.uk$number$$$$
+DESFLURANE$Desflurane - liquid$litres$SDU$Used in theatres$number$$$$
+ISOFLURANE$Isoflurane - liquid$litres$SDU$Used in theatres$number$$$$
+SEVOFLURANE$Sevoflurane - liquid$litres$SDU$Used in theatres$number$$$$
+NITROUS_OXIDE$Nitrous oxide - gas$litres$SDU$Used in theatres - see www.sduhealth.org.uk/areas-of-focus/carbon-hotspots/anaesthetic-gases.aspx$number$$$$
+PORTABLE_NITROUS_OXIDE_MIX$Portable nitrous oxide and oxygen 50/50 split - gas$litres$SDU$Ambulance and A&E use$number$$$$
+PORTABLE_NITROUS_OXIDE_MIX_MATERNITY$Maternity Manifold nitrous oxide and oxygen 50/50 split - gas$litres$SDU$Maternity use$number$$$$
+PORTABLE_NITROUS_OXIDE_MIX_TOTAL$Total: Nitrous oxide with oxygen 50/50 split - gas$litres$SDU / ERIC 2017/18 definition$Total volume of nitrous oxide gas at atmospheric pressure and 15°c purchased by the trust during the year. Cylinder volumes conversion into volume of nitrous oxide gas is available here: http://www.sduhealth.org.uk/areas-of-focus/carbon-hotspots/anaesthetic-gases.aspx. Nitrous oxide supplied in cylinders mixed with oxygen “gas and air” should be converted to litres of nitrous oxide and reported.$number$$$$
+PORTABLE_NITROUS_OXIDE_TOTAL$Total: Converted to nitrous oxide only - gas$litres$SDU$ERIC - Total theatres, ambulance, A&E and maternity all converted to nitrous oxide volume only.$number$$$$
+CHP_ELECTRICAL_OUTPUT$Total electrical energy output of the CHP system/s$kWh$ERIC S07_06$The total electrical energy output, inclusive of exported electricity.$number$$$$
+EXPORTED_THERMAL_ENERGY$Total exported thermal energy$kWh$ERIC S07_08$The amount of surplus thermal energy in kWh produced by the organisation site from CHP plant which is supplied to a utility supplier or another organisation/site. Please note that the imported energy provided to other trusts completing an ERIC return should include this in the relevant energy field.$number$$$$
+WOOD_LOGS_USED$Non-fossil fuel Consumed - renewable (wood logs)$kWh$SDU$Part of ERIC Non-fossil fuel Consumed - renewable categorisation$number$$$$
+WOOD_CHIPS_USED$Non-fossil fuel Consumed - renewable (wood chips)$kWh$SDU$Part of ERIC Non-fossil fuel Consumed - renewable categorisation$number$$$$
+WOOD_PELLETS_USED$Non-fossil fuel Consumed - renewable (wood pellets)$kWh$SDU$Part of ERIC Non-fossil fuel Consumed - renewable categorisation$number$$$$
+LEASED_ASSETS_ENERGY_USE$Leased Assets Energy Use(Upstream - Gas, Coal & Electricity)$tCO2e$SDU$Please provide an emissions figure where known.$number$$$
+GREEN_TARIFF_ADDITIONAL_PCT$Percentage of green tariff supply proven as additional$%$SDU$Where green tariff supplies are proven as additional please record the %, by default this figure should be 0% unless known otherwise, as per the DEFRA guidelines all green tariff supplies  will be treated as grid average conversion factor exclusive of Well to Tank emissions and Transmission and distribution.$number$$$$
+THIRD_PARTY_ADDITIONAL_PCT$Percentage of third party owned supply proven as additional$%$SDU$Where third party owned supplies are proven as additional please record the %, by default this figure should be 0% unless known otherwise, as per the DEFRA guidelines all third party owned energy will be treated as grid average conversion factor inclusive of all scopes$number$$$$
+BIZ_SVCS_SPEND$Business services$£,000$SDU$$number$$$$
+CONSTRUCTION_SPEND$Construction$£,000$SDU$$number$$$$
+CATERING_SPEND$Food and catering$£,000$SDU$$number$$$$
+FREIGHT_SPEND$Freight transport$£,000$SDU$$number$$$$
+ICT_SPEND$Information and communication technologies$£,000$SDU$$number$$$$
+CHEM_AND_GAS_SPEND$Manufactured fuels chemicals and gases$£,000$SDU$$number$$$$
+MED_INSTR_SPEND$Medical Instruments /equipment$£,000$SDU$$number$$$$
+OTHER_MANUFACTURED_SPEND$Other manufactured products$£,000$SDU$$number$$$$
+OTHER_SPEND$Other procurement$£,000$SDU$$number$$$$
+PAPER_AND_CARD_SPEND$Paper products$£,000$SDU$$number$$$$
+PHARMA_SPEND$Pharmaceuticals$£,000$SDU$$number$$$$
+TRAVEL_SPEND$Travel$£,000$SDU$$number$$$$
+COMMISSIONING_SPEND$Commissioning$£,000$SDU$$number$$$$
+HARD_FM_COSTS$Hard FM (Estates) costs$£$ERIC$$number$$$$
+SOFT_FM_COSTS$Soft FM (Hotel services) costs$£$ERIC$$number$$$$
+FM_FINANCE_COSTS$Estates and facilities finance costs$£$ERIC$$number$$$$
+MAINT_COSTS$Maintenance service costs$£$ERIC$$number$$$$
+INCOME_RETAIL$Income received for area leased out for retail sales$£$ERIC$$number$$$$
+AREA_RETAIL$Area leased out for retail sales ()$m²$ERIC$$number$$$$
+OCCUPIED_FLOOR_AREA$Occupied floor area$m²$ERIC$$number$$$$
+NHS_OCCUPIED_FLOOR_AREA$NHS estate occupied floor area$%$ERIC$$number$$$$
+HEATED_VOL$Site heated volume$m³$ERIC$$number$$$$
+BLDG_FOOTPRINT$Building footprint$m²$ERIC$$number$$$$
+SITE_FOOTPRINT$Site land area$Hectare$ERIC$$number$$$$
+CLINICAL_FLOOR_AREA$Clinical space$m²$ERIC$$number$$$$
+NON_CLINICAL_FLOOR_AREA$Non-clinical space$m²$ERIC$$number$$$$
+UNSUITABLE_OCCUPIED_FLOOR_AREA$Not functionally suitable - occupied floor area$%$ERIC$$number$$$$
+UNSUITABLE_PATIENT_OCCUPIED_FLOOR_AREA$Not functionally suitable - patient occupied floor area$%$ERIC$$number$$$$
+EMPTY_FLOOR_AREA$Floor area - empty$%$ERIC$$number$$$$
+UNDER_USED_FLOOR_AREA$Floor area - under used$%$ERIC$$number$$$$
+SINGLE_BED_WITH_EN_SUITE$Single bedrooms for patients with en-suite facilities$$ERIC$$number$$$$
+SINGLE_BED_WITHOUT_EN_SUITE$Single bedrooms for patients without en-suite facilities$$ERIC$$number$$$$
+AGE_PROFILE_1948_1954$Age profile - 2015 to 2024$%$ERIC$$number$$$$
+AGE_PROFILE_1955_1964$Age profile - 2005 to 2014$%$ERIC$$number$$$$
+AGE_PROFILE_1965_1974$Age profile - 1995 to 2004$%$ERIC$$number$$$$
+AGE_PROFILE_1975_1984$Age profile - 1985 to 1994$%$ERIC$$number$$$$
+AGE_PROFILE_1985_1994$Age profile - 1975 to 1984$%$ERIC$$number$$$$
+AGE_PROFILE_1995_2004$Age profile - 1965 to 1974$%$ERIC$$number$$$$
+AGE_PROFILE_2005_2014$Age profile - 1955 to 1964$%$ERIC$$number$$$$
+AGE_PROFILE_2015_2024$Age profile - 1948 to 1954$%$ERIC$$number$$$$
+AGE_PROFILE_PRE_1948$Age profile - pre 1948$%$ERIC$$number$$$$
+AGE_PROFILE_TOTAL$Age profile - total (must equal 100%)$%$ERIC$$number$$$$
+ERADICATE_HIGH_RISK_BACKLOG_COST$Cost to eradicate high risk backlog$£$ERIC$$number$$$$
+ERADICATE_SIG_RISK_BACKLOG_COST$Cost to eradicate significant risk backlog$£$ERIC$$number$$$$
+ERADICATE_MOD_RISK_BACKLOG_COST$Cost to eradicate moderate risk backlog$£$ERIC$$number$$$$
+ERADICATE_LOW_RISK_BACKLOG_COST$Cost to eradicate low risk backlog$£$ERIC$$number$$$$
+RISK_ADJUSTED_BACKLOG_COST$Risk adjusted backlog cost$£$ERIC$$number$$$$
+ERADICATE_BACKLOG_COST$Cost to eradicate backlog$£$ERIC$$number$$$$
+FOSSIL_USED_IN_CHP$Fossil energy input to CHP system/s (kWh)$kWh$ERIC$$number$$$$
+CHP_THERMAL_OUTPUT$Thermal energy output of CHP system/s (kWh)$kWh$ERIC$$number$$$$
+CLINICAL_WASTE_COST$Clinical waste cost$£$ERIC$$number$$$$
+CLINICAL_WASTE_WEIGHT$Clinical waste volume$tonnes$ERIC$$number$$$$
+SPECIAL_WASTE_COST$Special waste cost$£$ERIC$$number$$$$
+SPECIAL_WASTE_WEIGHT$Special waste volume$tonnes$ERIC$$number$$$$
+DOMESTIC_WASTE_COST$Domestic waste cost$£$ERIC$$number$$$$
+PARKING_SPACES$Parking spaces available$$ERIC$$number$$$$
+DISABLED_PARKING_SPACES$Designated disabled parking spaces$$ERIC$$number$$$$
+AVG_PARKING_FEE$Average fee charged per hour for patient/visitor parking$£$ERIC$$number$$$$
+AVG_STAFF_PARKING_FEE$Average fee charged per hour for staff parking$£$ERIC$$number$$$$
+CLEANING_COST$Cleaning service cost$£$ERIC$$number$$$$
+NO_CLEANING_STAFF$Cleaning staff (WTE)$WTE$ERIC$$number$$$$
+VH_RISK_CLEANING_COST$Cost of cleaning occupied floor area assessed as Red/Very High Risk$£$ERIC$$number$$$$
+VH_RISK_CLEANING_AREA$Occupied floor area assessed as Red/Very High Risk$%$ERIC$$number$$$$
+VH_RISK_CLEANING_AREA_ACTUAL_PCT$Required standard for occupied floor area assessed as Red/Very High Risk$%$ERIC$$number$$$$
+VH_RISK_CLEANING_AREA_REQD_PCT$Achieved standard for occupied floor area identified as Red/Very High Risk$%$ERIC$$number$$$$
+HS_RISK_CLEANING_COST$Cost of cleaning occupied floor area assessed as Amber/High and Significant Risk$£$ERIC$$number$$$$
+HS_RISK_CLEANING_AREA$Occupied floor area assessed as Amber/High and Significant Risk$%$ERIC$$number$$$$
+HS_RISK_CLEANING_AREA_ACTUAL_PCT$Required standard for occupied floor area assessed as Amber/High and Significant Risk$%$ERIC$$number$$$$
+HS_RISK_CLEANING_AREA_REQD_PCT$Achieved standard for occupied floor area identified as Amber/High and Significant Risk$%$ERIC$$number$$$$
+L_RISK_CLEANING_AREA$Cost of cleaning occupied floor area assessed as Green/Low Risk$%$ERIC$$number$$$$
+L_RISK_CLEANING_AREA_ACTUAL_PCT$Occupied floor area assessed as Green/Low Risk$%$ERIC$$number$$$$
+L_RISK_CLEANING_AREA_REQD_PCT$Required standard for occupied floor area assessed as Green/Low Risk$%$ERIC$$number$$$$
+L_RISK_CLEANING_COST$Achieved standard for occupied floor area identified as Green/Low Risk$%$ERIC$$number$$$$
+INFREQ_CLEANING_COST$Cost of cleaning the occupied floor area not requiring regular cleaning$%$ERIC$$number$$$$
+INFREQ_CLEANING_AREA$Occupied floor area not requiring regular cleaning$%$ERIC$$number$$$$
+NO_MEALS$Inpatient main meals requested$$ERIC$$number$$$$
+PER_PATIENT_DAY_MEAL_COST$Cost of feeding one inpatient per day (inpatient meal day)$£$ERIC$$number$$$$
+LAUNDRY_COST$Laundry and linen service cost$£$ERIC$$number$$$$
+NO_LAUNDRY_ITEMS$Pieces per annum$$ERIC$$number$$$$
+PORTERING_COST$Portering service cost$£$ERIC$$number$$$$
+NO_PORTERING_STAFF$Portering staff (WTE)$WTE$ERIC$$number$$$$
+PATIENT_OCCUPIED_FLOOR_AREA$Patient occupied floor area$m²$ERIC$$number$$$$
+NON_PATIENT_OCCUPIED_FLOOR_AREA$Non-patient occupied floor area$m²$ERIC$$number$$$$
+AVAIL_BEDS$Available beds$$ERIC$$number$$$$
+OCCUPIED_BEDS$Occupied beds$$ERIC$$number$$$$
+ELEC_USED_LOCAL$Electricity consumed – local$kWh$ERIC$$number$$$$
+NO_CHP_UNITS$Number of CHP units operated on the site$$ERIC$$number$$$$
+ELEC_GENERATION$Total full load rating of the electrical generator plant$kW$ERIC$$number$$$$
+HIGH_TEMP_DISPOSAL_WEIGHT$High temperature disposal waste weight$tonnes$ERIC$$number$$$$
+ALT_WASTE_DISPOSAL_WEIGHT$Alternative Treatment (clinical waste) volume$tonnes$ERIC$<p>Amount of all clinical waste including adjustments for accrued liabilities processed via alternative treatment e.g. autoclave, rotoclave</p><p>European Waste Codes:</p><ul><li>18-01-03*: Wastes whose collection and disposal is subject to special requirements in order to prevent infection.</li></ul><p>(*) An asterisk at the end of a code means the waste is hazardous.</p><p>Detailed information can be found on the Government website for waste classification; <a href="https://www.gov.uk/how-to-classify-different-types-of-waste/healthcare-and-related-wastes>https://www.gov.uk/how-to-classify-different-types-of-waste/healthcare-and-related-wastes</a></p>$number$$$$/a></p>$number$$$$
+WEEE_WEIGHT$Waste electrical and electronic equipment (WEEE) volume$tonnes$ERIC$<p>Amount of all electrical and electronic equipment covered by the WEEE waste directive.</p><p>Note: Where weight is not readily available, please see conversions factors in ERIC 2018-19 – Data Definitions document Appendix G.</p><p>Detailed information can be found on the Government website for waste classification; <a href="https://www.gov.uk/how-to-classify-different-types-of-waste/healthcare-and-related-wastes">https://www.gov.uk/how-to-classify-different-types-of-waste/healthcare-and-related-wastes</a></p>$number$$$$
+REUSE_WEIGHT$Preparing for re-use volume$tonnes$ERIC$$number$$$$
+TOTAL_WASTE_COST$Total waste cost$£$ERIC$$number$$$$
+PATIENT_AND_VISITOR_CONCESSION_SCHEME$Patient/visitor concession scheme provided (Yes/No/None)$$ERIC$$number$$$$
+DISABLED_STAFF_PARKING_SPACES$Designated parking spaces available for staff$$ERIC$$number$$$$
+WARD_FOOD_WASTE$Ward food waste - unserved meals$%$ERIC$$number$$$$
+INCOME_ALL$$$ERIC$$number$$$$
+PFI_CHARGES$PFI Unitary charges$£$ERIC$$number$$$$
+HIGH_TEMP_DISPOSAL_WITH_RECOVERY_WEIGHT$High temperature disposal waste weight involving combustion with energy recovery$tonnes$ERIC$$number$$$$
+GROUNDS_COSTS$$$ERIC$$number$$$$
+ELECTRO_BIO_MEDICAL_EQUIPT$$$ERIC$$number$$$$
+SITE_UNUSED_FOOTPRINT$$$ERIC$$number$$$$
+ISOLATION_ROOMS$$$ERIC$$number$$$$
+WASTE_RECYLING_WEIGHT$$$ERIC$$number$$$$
+WASTE_INCINERATION_COST$$$ERIC$$number$$$$
+INCINERATION_WEIGHT$Domestic waste (incineration) volume$tonnes$ERIC$$number$$$$
+WASTE_INCINERATION_WEIGHT$Domestic waste (incineration) volume$tonnes$ERIC$<p>Amount of all Domestic waste sent to waste to energy or municipal incineration. All domestic waste processed on Trusts' own sites.</p><ul><li>20-03-01: Mixed municipal waste (black bag)</li></ul><p>Detailed information can be found on the Government website for waste classification; <a href="https://www.gov.uk/how-to-classify-different-types-of-waste/healthcare-and-related-wastes">https://www.gov.uk/how-to-classify-different-types-of-waste/healthcare-and-related-wastes</a></p>$number$$$$
+OTHER_RECOVERY_COST$$$ERIC$$number$$$$
+COST_SAFETY_RISK$$$ERIC$$number$$$$
+COST_COMPLIANCE_RISK$$$ERIC$$number$$$$
+COST_CONTINUITY_RISK$$$ERIC$$number$$$$
+CHP_SIZE$$$ERIC$$number$$$$
+CHP_EFFICIENCY$$$ERIC$$number$$$$
+ELEC_PEAK_LOAD$$$ERIC$$number$$$$
+ELEC_MAX_LOAD$$$ERIC$$number$$$$
+RENEWABLE_USED$$$ERIC$$number$$$$
+LANDFILL_COST$$$ERIC$$number$$$$
+SDG_STARTING$$$SDU$$number$$$$
+SDG_CLEAR$$$SDU$$number$$$$
+PROVISIONS$Provisions$£,000$SDU$$number$$$$
+PATIENTS_CLOTHING_AND_FOOTWEAR$Patient clothing and footwear$£,000$SDU$$number$$$$
+STAFF_CLOTHING$Staff clothing$£,000$SDU$$number$$$$
+CARBON_REDUCTION_BASELINE_USED$$$SDU$$number$$$$
+PHARMA_BLOOD_PROD_AND_MED_GASES$Pharmaceuticals, blood products and medicines$£,000$SDU$$number$$$$
+DRESSINGS$Dressings$£,000$SDU$$number$$$$
+MEDICAL_AND_SURGICAL_EQUIPT$Medical and surgical equipment$£,000$SDU$$number$$$$
+PATIENTS_APPLIANCES$Patient appliances$£,000$SDU$$number$$$$
+CHEMICALS_AND_REAGENTS$Chemicals and reagents$£,000$SDU$$number$$$$
+DENTAL_AND_OPTICAL_EQUIPT$Dental and optical equipment$£,000$SDU$$number$$$$
+IMAGING_AND_RADIOTHERAPY_EQUIPT_AND_SVCS$Imaging and radiotherapy equipment and services$£,000$SDU$$number$$$$
+LAB_EQUIPT_AND_SVCS$Lab equipment and services$£,000$SDU$$number$$$$
+HOTEL_EQUIPT_MATERIALS_AND_SVCS$Hotel equipment and services$£,000$SDU$$number$$$$
+BLDG_AND_ENG_PROD_AND_SVCS$Building and engineering products and services$£,000$SDU$$number$$$$
+PURCHASED_HEALTHCARE$Purchased healthcare$£,000$SDU$$number$$$$
+GARDENING_AND_FARMING$Gardening and farming$£,000$SDU$$number$$$$
+FURNITURE_FITTINGS$Furniture and fittings$£,000$SDU$$number$$$$
+HARDWARE_CROCKERY$Hardware and crockery$£,000$SDU$$number$$$$
+BEDDING_LINEN_AND_TEXTILES$Bedding, linen and textiles$£,000$SDU$$number$$$$
+OFFICE_EQUIPT_TELCO_COMPUTERS_AND_STATIONERY$Office, telecom and computer equipment and stationary$£,000$SDU$$number$$$$
+REC_EQUIPT_AND_SOUVENIRS$Recreation equipment and souvenirs$£,000$SDU$$number$$$$
+CONSULTING_SVCS_AND_EXPENSES$Consulting services and expenses$£,000$SDU$$number$$$$
+ENERGY_CO2E_PER_POUND$$$SDU$$number$$$$
+COMMISSIONING_CO2E_PER_POUND$$$SDU$$number$$$$
+PROCUREMENT_CO2E_PER_POUND$$$SDU$$number$$$$
+TRAVEL_CO2E_PER_POUND$$$SDU$$number$$$$
+ADAPTATION_PERF$$$SDU$$$$$$
+ENERGY_PERF$$$SDU$$$$$$
+PAPER_PERF$$$SDU$$$$$$
+TRAJECTORY_PERF$$$SDU$$$$$$
+TRAVEL_PERF$$$SDU$$$$$$
+WASTE_PERF$$$SDU$$$$$$
+WATER_PERF$$$SDU$$$$$$
+ENERGY_CTXT$$$SDU$$$$$$
+WASTE_CTXT$$$SDU$$$$$$
+WATER_CTXT$$$SDU$$$$$$
+HEALTHCARE_TRAVEL_CLAIMS_COST$$$ERIC$$number$$$$
+OTHER_SITES_AREA$$$ERIC$$number$$$$
+NO_SITES_TOTAL$$$ERIC$$number$$$$
+NO_HARD_FM_STAFF$$$ERIC$$number$$$$
+NO_SOFT_FM_STAFF$$$ERIC$$number$$$$
+INCOME_PROPERTY$$$ERIC$$number$$$$
+PROPERTY_AREA_SOLD$$$ERIC$$number$$$$
+FORECAST_INCOME_PROPERTY$$$ERIC$$number$$$$
+FORECAST_PROPERTY_AREA_SOLD$$$ERIC$$number$$$$
+HEALTHCARE_TRAVEL_CLAIMS_COST$$$ERIC$$number$$$$
+NO_HEALTHCARE_TRAVEL_CLAIMS$$$ERIC$$number$$$$
+LAUNDRY_RETURN_PCT$$$ERIC$$number$$$$
+BIZ_MILEAGE$$$ERIC$$number$$$$
+NO_LONG_STAY_HOSPITAL_SITES$$$ERIC$$number$$$$
+NO_NON_HOSPITAL_PATIENT_SITES$$$ERIC$$number$$$$
+PCT_TEMP_MONITORED$$$ERIC$$number$$$$
+NO_FALSE_ALARMS_CALL_OUT$$$ERIC$$number$$$$
+NO_FALSE_ALARMS_NO_CALL_OUT$$$ERIC$$number$$$$
+OVERHEATING_EVENTS$$$ERIC$$number$$$$
+CIP_PLANNED_VAL$$$ERIC$$number$$$$
+CIP_ACTUAL_VAL$$$ERIC$$number$$$$
+SV_SOCIAL$Social Value due to social activities$£$SDU$$number$$$$
+SI_SOCIAL$Reported investment to provided additional social activities$£$SDU$$number$$$$
+SV_JOBS$Social Value arising from additional jobs$£$SDU$$number$$$$
+SI_JOBS$Reported investment to create additional jobs$£$SDU$$number$$$$
+SV_GROWTH$Social Value arising from additional growth$£$SDU$$number$$$$
+SI_GROWTH$Reported investment to create additional growth$£$SDU$$number$$$$
+SV_ENVIRONMENT$Social Value due to environmental measures$£$SDU$$number$$$$
+SI_ENVIRONMENT$Reported investment on environmental measures$£$SDU$$number$$$$
+SV_INNOVATION$Social Value arising from innovation$£$SDU$$number$$$$
+SI_INNOVATION$Reported investment to stimulate innovation$£$SDU$$number$$$$
+SV_TOTAL$Total Social Value$£$SDU$$number$$$$
+SI_TOTAL$Total reported investment$£$SDU$$number$$$$
+SV_CTXT$Explanation and context for Social Value responses$$SDU$$$$$$
+PLASTICS_PLEDGE$Pledge on plastic reduction$$SDU$Further information on and signup to the plastics pledge are available on the NHS England website$yesno$$$$
+NO_PLASTICS_CUPS$Number of plastic drinking cups purchased$$SDU$Please put the total number your organisation purchased, e.g. if each pack of plastic drinking cups contain 100 cups and your organisation bought 10 packs, the total number purchased would be 1,000 cups$number$$$$
+NO_PLASTIC_LINED_COFFEE_CUPS$Number of coffee cups with plastic lining purchased$$SDU$Please put the total number your organisation purchased, e.g. if each pack of plastic drinking cups contain 100 cups and your organisation bought 10 packs, the total number purchased would be 1,000 cups$number$$$$
+NO_PLASTIC_PLATES$Number of plastic plates purchased$$SDU$Please put the total number your organisation purchased, e.g. if each pack of plastic drinking cups contain 100 cups and your organisation bought 10 packs, the total number purchased would be 1,000 cups$number$$$$
+NO_PLASTIC_CUTLERY$Number of plastic cutlery items purchased$$SDU$Please put the total number your organisation purchased, e.g. if each pack of plastic drinking cups contain 100 cups and your organisation bought 10 packs, the total number purchased would be 1,000 cups$number$$$$
+NO_PLASTIC_STRAWS$Number of plastic straws purchased$$SDU$Please put the total number your organisation purchased, e.g. if each pack of plastic drinking cups contain 100 cups and your organisation bought 10 packs, the total number purchased would be 1,000 cups$number$$$$
+NO_PLASTIC_STIRRERS$Number of plastic stirrers purchased$$SDU$Please put the total number your organisation purchased, e.g. if each pack of plastic drinking cups contain 100 cups and your organisation bought 10 packs, the total number purchased would be 1,000 cups$number$$$$
+NO_PLASTIC_FOOD_CONTAINERS$Number of plastic food containers (including polystyrene and microwave containers) purchased$$SDU$Please put the total number your organisation purchased, e.g. if each pack of plastic drinking cups contain 100 cups and your organisation bought 10 packs, the total number purchased would be 1,000 cups$number$$$$
+CATERING_PLASTICS_VOL$Volume of catering plastic$$SDU$$number$$$$
+DISPLACED_PLASTICS_VOL$Volume of plastic replaced$$SDU$$number$$$$
+NOX_PPM$NOx emissions$tonnes$SDU$The amount of NOx emissions produced by your organisation’s fleet. Please use the <a href="https://www.sduhealth.org.uk/delivery/measure/health-outcomes-travel-tool.aspx">Health Outcomes Travel Tool (HOTT)</a> to calculate this.$number$$$$
+PARTICULATES_PPM$Particulate PM&#8322;&#8325; emissions$tonnes$SDU$The amount of PM2.5 emissions produced by your organisation’s fleet. Please use the <a href="https://www.sduhealth.org.uk/delivery/measure/health-outcomes-travel-tool.aspx">Health Outcomes Travel Tool (HOTT)</a> to calculate this.$number$$$$
+VEHICLES_NO$Number of vehicles$$SDU$Please provide the number of current road motor vehicles used by your organisation as of the date you have provided. Includes: All Trust lease and pool vehicles (including medical transport/tri service, logistics, maintenance, driver training, patient support vehicle, etc.). It also includes dedicated car club vehicles (i.e. where the Trust has not secured preferential access to the vehicle, so they have the same rights to hire the car as other members of the public) or vehicles hired for < 5 days. Excludes: Personal lease vehicles (grey fleet), short term hire cars (other travel), disposed vehicles (N/A), boats and helicopters (N/A).$number$$$$
+VEHICLES_COUNT_DATE$Date number of vehicles counted$$SDU$The date at which you have counted the number of current road motor vehicles$date$$$$
+VEHICLES_LEV_PCT$Percentage of vehicles that are low emission vehicles (LEV)$%$SDU$The % of the vehicles counted in your answer to number of vehicles that are low emission (LEV). The specification can be found <a href="https://www.sduhealth.org.uk/nhs%20long%20term%20plan/improving-air-quality/fleet-requirements.aspx">here</a>.$number$$$$
+VEHICLES_ULEV_PCT$Percent of vehicles that are ultra-low emission vehicles (ULEV)$%$SDU$The % of the vehicles counted in your answer to number of vehicles that are ultra-low emission (ULEV). The specification can be found <a href="https://www.sduhealth.org.uk/nhs%20long%20term%20plan/improving-air-quality/fleet-requirements.aspx">here</a>.$number$$$$
+AMB_NO$No. of ambulances$$SDU$$$$$$
+AMB_LEV_ULEV_PCT$Pct Ambulances LEV or ULEV$$SDU$$$$$$
+AMB_MILEAGE$Mileage by ambulance$$SDU$$$$$$
+MCYCLE_NO$No. of motorcycles$$SDU$$$$$$
+MCYCLE_LEV_ULEV_PCT$Pct motorcycles LEV or ULEV$$SDU$$$$$$
+MCYCLE_MILEAGE$Mileage by motorcycle$$SDU$$$$$$
+CARS_NO$No. of cars$$SDU$$$$$$
+CARS_LEV_ULEV_PCT$Pct cars LEV or ULEV$$SDU$$$$$$
+CARS_MILEAGE$Mileage by car$$SDU$$$$$$
+VANS_NO$No.of vans$$SDU$$$$$$
+VANS_LEV_ULEV_PCT$Pct vans LEV or ULEV$$SDU$$$$$$
+VANS_MILEAGE$Mileage by van$$SDU$$$$$$
+LORRIES_NO$No. lorries$$SDU$$$$$$
+LORRIES_LEV_ULEV_PCT$Pct lorries LEV or ULEV$$SDU$$$$$$
+LORRIES_MILEAGE$Mileage by lorry$$SDU$$$$$$
+NO_EV_CHARGE_POINTS$Number of EV charging points$$SDU$The total number of electric vehicles charging points available on site including those for use by the trust's own internal fleet and available for patients, visitors and staff irrespective of any fees charged. cf. ERIC S09_04$number$$$$
+SDMP_INC_PROCUREMENT$Does your Green Plan include procurement?$$SDU$$$$$$
+PROC_SUPPLIER_ENGAGEMENT$Procurement includes supplier engagement on sustainability$$SDU$$$$$$
+SOCIAL_VALUE$Social value$$SDU$$$$$$
+BIODIVERSITY$Biodiversity$$SDU$$$$$$
+CAR_MILES_PETROL$Fleet mileage (petrol)$miles$SDU$$number$$$$
+CAR_PETROL_USED$Petrol used by fleet$litres$SDU$$number$$$$
+CAR_MILES_DIESEL$Fleet mileage (diesel)$miles$SDU$$number$$$$
+CAR_DIESEL_USED$Diesel used by fleet$litres$SDU$$number$$$$
+CAR_HYBRID_FUEL_USED$Hybrid electricity used by fleet$kWh$SDU$$number$$$$
+CAR_MILES_UNKOWN_FUEL$Fleet mileage of unknown fuel$litres$SDU$$number$$$$
+PRIVATE_CAR_MILES_UNKOWN_FUEL$Private car miles of unknown fuel$litres$SDU$$number$$$$
+MDI$Measured dose inhalers$units$SDU$$number$$$$
+DPI$Dry powder inhalers$units$SDU$$number$$$$
+AMI$Aqueous mist inhalers$units$SDU$$number$$$$
+WASTE_CLINICAL_INCINERATED$Incineration (clinical waste) volume$tonnes$SDU$<p>Amount of all clinical waste sent to incineration as the primary treatment source.</p><ul><li>18-01-03*: Wastes whose collection and disposal is subject to special requirements in order to prevent infection</li><li>18-01-03*/09: Other medically contaminated</li><li>18-01-09: Non-hazardous pharma – blue lidded</li><li>18-01-03*/06: Infectious clinical waste - yellow bag</li><li>18-01-08*: Cytotoxic and cytostatic medicines</li><li>18-01-02*/03: Chemically preserved - infectious or non-infectious</li><li>Radioactive.</li></ul><p> (*) An asterisk at the end of a code means the waste is hazardous.</p><p>Detailed information can be found on the Government website for waste classification; <a href="https://www.gov.uk/how-to-classify-different-types-of-waste/healthcare-and-related-wastes">https://www.gov.uk/how-to-classify-different-types-of-waste/healthcare-and-related-wastes</a></p><p>This excludes secondary treatment e.g. AT flock which goes to waste to municipal incineration as waste to energy.</p><p>This is equivalent to the ‘Other recovery volume (tonnes)’ question from previous versions of SRP.</p>$number$$$$
+WASTE_OFFENSIVE$Offensive waste volume$tonnes$SDU$<p>Amount of waste including adjustments for accrued liabilities relating to EWC code(s):</p> • 18-01-04: Healthcare offensive waste, e.g. outer dressings and protective clothing like masks, gowns and gloves that aren’t contaminated with body fluids, and sterilised laboratory waste</li></ul><p>Detailed information can be found on the Government website for waste classification; <a href="https://www.gov.uk/how-to-classify-different-types-of-waste/healthcare-and-related-wastes">https://www.gov.uk/how-to-classify-different-types-of-waste/healthcare-and-related-wastes</a></p>$number$$$$
+WASTE_FOOD$Domestic waste (food) volume$tonnes$SDU$<p>Amount of waste including adjustments for accrued liabilities of all domestic waste sent to landfill in the first instance.<p><ul><li>20-03-01: Mixed municipal waste (black bag)</li></ul><p>Detailed information can be found on the Government website for waste classification; <a href="https://www.gov.uk/how-to-classify-different-types-of-waste/healthcare-and-related-wastes">https://www.gov.uk/how-to-classify-different-types-of-waste/healthcare-and-related-wastes</a><p>This is equivalent to the ‘Landfill disposal weight (tonnes)’ question from the previous versions of SRP.</p>$number$$$$
+WASTE_TEXTILES$Domestic waste (textiles) volume$tonnes$SDU$<p>Amount of all textile waste which is segregated and recycled or re-manufactured/reused.</p><ul><li>20-01-11: Textiles</li></ul>$number$$$$
+WASTE_PROCESSED_ON_SITE$Domestic waste processed on site volume$tonnes$SDU$<p>Amount of all domestic waste processed on Trusts' own sites.</p><ul><li>20-03-01: Mixed municipal waste (black bag)</li></ul><p>Detailed information can be found on the Government website for waste classification; <a href="https://www.gov.uk/how-to-classify-different-types-of-waste/healthcare-and-related-wastes">https://www.gov.uk/how-to-classify-different-types-of-waste/healthcare-and-related-wastes</a></p><p>This category is equivalent to the ‘Incineration disposal weight (tonnes)’ question from the previous versions of SRP.</p>$number$$$$

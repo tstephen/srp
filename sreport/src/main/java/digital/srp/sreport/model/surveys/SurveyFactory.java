@@ -30,6 +30,8 @@ public interface SurveyFactory {
             return Sdu1819.getInstance();
         case Sdu1920.ID:
             return Sdu1920.getInstance();
+        case Sdu2021.ID:
+            return Sdu2021.getInstance();
         default:
             throw new ObjectNotFoundException(Survey.class,
                     String.format("No survey named %1$s is known", name));

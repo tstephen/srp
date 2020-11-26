@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2015, 2017 Tim Stephenson and contributors
+ * Copyright 2015-2020 Tim Stephenson and contributors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -108,29 +108,32 @@ var BaseRactive = Ractive.extend({
     var parts = value.split("; " + name + "=");
     if (parts.length == 2) return parts.pop().split(";").shift();
   },
+  getAttribute: function(attr) {
+    return ractive.getProfile().attributes[attr];
+  },
   getProfile: function() {
-    if ($auth.loginInProgress) {
-      console.info('skip fetch profile while logging in');
+    var profile = localStorage['profile'];
+    if (profile == undefined) {
+      alert('Unable to authenticate you at the moment, please try later');
       return;
     }
-    var username = $auth.getClaim('sub');
+    profile = JSON.parse(profile);
+    var username = profile.username;
     console.log('getProfile: '+username);
     if (username) {
-      $.getJSON(ractive.getServer()+'/users/'+username, function(profile) {
-          ractive.set('saveObserver', false);
-          ractive.set('profile',profile);
-          $('.profile-img').empty().append('<img class="img-rounded" src="//www.gravatar.com/avatar/'+ractive.hash(ractive.get('profile.email'))+'?s=34" title="'+ractive.get('profile.email')+'"/>');
-          if (ractive.hasRole('super_admin')) $('.super-admin').show();
-          ractive.loadTenantConfig(ractive.get('profile.tenant'));
-          ractive.set('saveObserver', true);
-        });
-      } else if (ractive.get('tenant') && $auth.isPublic(window.location.href)) {
+      ractive.set('saveObserver', false);
+      ractive.set('profile',profile);
+      $('.profile-img').empty().append('<img class="img-rounded" src="//www.gravatar.com/avatar/'+ractive.hash(ractive.get('profile.email'))+'?s=34" title="'+ractive.get('profile.email')+'"/>');
+      if (ractive.hasRole('super_admin')) $('.super-admin').show();
+      ractive.loadTenantConfig(ractive.get('tenant.id'));
+      ractive.set('saveObserver', true);
+      /*} else if (ractive.get('tenant') && $auth.isPublic(window.location.href)) {
         var tenant = ractive.get('tenant.id');
         console.warn('... page supplied default tenant:'+tenant);
         ractive.loadTenantConfig(ractive.get('tenant.id'));
-      } else {
-        $auth.showLogin();
-      }
+      */
+      return profile;
+    }
   },
   getServer: function() {
     return ractive.get('server')==undefined ? '' : ractive.get('server');
@@ -140,6 +143,15 @@ var BaseRactive = Ractive.extend({
     return hex_md5(email.trim().toLowerCase());
   },
   hasRole: function(role) {
+    //console.info('hasRole: ' + role);
+    try {
+      return (ractive.keycloak.realm == 'srp' && ractive.keycloak.hasRealmRole(role));
+    } catch (e) {
+      console.warn('No keycloak, using legacy authentication');
+      return this.hasRoleLegacy(role);
+    }
+  },
+  hasRoleLegacy: function(role) {
     var ractive = this;
     if (this && this.get('profile')) {
       var hasRole;
@@ -296,7 +308,7 @@ var BaseRactive = Ractive.extend({
     });
   },
   loadTenantConfig: function(tenant) {
-    if ($auth.loginInProgress) {
+    if (this['keycloak']===undefined && $auth.loginInProgress) {
       console.info('skip tenant load while logging in');
       return;
     }
@@ -313,7 +325,12 @@ var BaseRactive = Ractive.extend({
     });
   },
   logout: function() {
-    $auth.logout();
+    try {
+      ractive.keycloak.logout();
+    } catch (e) {
+      console.warn('Logging out of legacy authentication');
+      $auth.logout();
+    }
   },
   oninit: function() {
     this.initShortKeys();
@@ -450,9 +467,10 @@ var BaseRactive = Ractive.extend({
       return false;
     }
     console.log('switchToTenant: '+tenant);
+    var username = this['keycloak'] == undefined ? $auth.getClaim('sub') : ractive.getProfile().username;
     $.ajax({
       method: 'PUT',
-      url: ractive.getServer()+"/admin/tenant/"+$auth.getClaim('sub')+'/'+tenant,
+      url: ractive.getServer()+"/admin/tenant/"+username+'/'+tenant,
       success: function() {
         window.location.reload();
       }
@@ -618,8 +636,27 @@ $( document ).bind('keypress', function(e) {
 });
 
 $(document).ready(function() {
+
+  try {
+    ractive.keycloak = Keycloak('/keycloak.json');
+    ractive.keycloak.init({ onLoad: 'login-required' })
+        .success(function(authenticated) {
+      console.info(authenticated ? 'authenticated' : 'not authenticated');
+      ractive.keycloak.loadUserProfile().success(function(profile) {
+        localStorage['profile'] = JSON.stringify(profile);
+        ractive.getProfile();
+        ractive.fetch();
+      }).error(function() {
+        console.error('Failed to load user profile');
+      });
+    }).error(function() {
+      console.error('failed to initialize');
+    });
+  } catch (e) {
+    console.warn('no Keycloak, use legacy authentication');
+  }
+
   ractive.set('saveObserver', false);
-  //ractive.set('context','/srp');
   if (document.location.href.indexOf('https://srp.digital/srp')!=-1) {
     (function() {
       (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
@@ -642,7 +679,6 @@ $(document).ready(function() {
   });
 
   ractive.loadStandardPartials(ractive.get('stdPartials'));
-  if (window['$auth'] != undefined) $auth.addLoginCallback(ractive.getProfile);
 
   $( document ).ajaxComplete(function( event, jqXHR, ajaxOptions ) {
     if (jqXHR.status > 0) ractive.showReconnected();

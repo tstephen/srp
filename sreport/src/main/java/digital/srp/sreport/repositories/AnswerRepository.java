@@ -35,6 +35,7 @@ public interface AnswerRepository extends CrudRepository<Answer, Long> {
                     + "FROM Answer o LEFT JOIN o.surveyReturns r "
                     + "WHERE o.question.name IN :qNames) "
             + "AND s.name = :surveyName "
+            + "GROUP BY a.applicablePeriod "
             + "ORDER BY a.applicablePeriod DESC")
     Long countBySurveyName(@Param("surveyName") String surveyName, @Param("qNames") String[] qNames);
 

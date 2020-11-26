@@ -19,7 +19,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import digital.srp.sreport.api.exceptions.SReportException;
 import digital.srp.sreport.importers.EricCsvImporter;
-import digital.srp.sreport.importers.QuestionCsvImporter;
 import digital.srp.sreport.model.Answer;
 import digital.srp.sreport.model.Question;
 import digital.srp.sreport.model.Survey;
@@ -32,6 +31,7 @@ import digital.srp.sreport.model.surveys.Sdu1617;
 import digital.srp.sreport.model.surveys.Sdu1718;
 import digital.srp.sreport.model.surveys.Sdu1819;
 import digital.srp.sreport.model.surveys.Sdu1920;
+import digital.srp.sreport.model.surveys.Sdu2021;
 import digital.srp.sreport.model.surveys.SurveyFactory;
 import digital.srp.sreport.repositories.AnswerRepository;
 import digital.srp.sreport.repositories.QuestionRepository;
@@ -39,6 +39,8 @@ import digital.srp.sreport.repositories.SurveyCategoryRepository;
 import digital.srp.sreport.repositories.SurveyRepository;
 import digital.srp.sreport.repositories.SurveyReturnRepository;
 import digital.srp.sreport.services.HistoricDataMerger;
+import digital.srp.sreport.services.QuestionService;
+import digital.srp.sreport.services.SurveyService;
 
 /**
  * REST web service for managing application data.
@@ -74,9 +76,15 @@ public class MgmtController {
 
     @Autowired
     protected SurveyReturnRepository returnRepo;
+    
+    @Autowired
+    protected QuestionService questionSvc;
+
+    @Autowired
+    protected SurveyService surveySvc;
 
     @RequestMapping(value = "/", method = RequestMethod.GET, headers = "Accept=application/json")
-    public String showStatus(Model model) throws IOException {
+    public String showStatus(final Model model) throws IOException {
         LOGGER.info("showStatus");
 
         model.addAttribute("answers", answerRepo.count());
@@ -90,15 +98,15 @@ public class MgmtController {
 //        model.addAttribute("orgs", orgs.length);
 
         addMetaData(model);
-        return "jsonStatus";
+        return "json-summary";
     }
 
-    private void addMetaData(Model model) {
+    private void addMetaData(final Model model) {
         model.addAttribute("now", isoFormatter.format(new Date()));
     }
 
     @RequestMapping(value = "/", method = RequestMethod.POST, headers = "Accept=application/json")
-    public String initAndShowStatus(Model model) throws IOException {
+    public String initAndShowStatus(final Model model) throws IOException {
         LOGGER.info(String.format("initAndShowStatus"));
 
         initQuestions(model);
@@ -113,107 +121,73 @@ public class MgmtController {
     }
 
     @RequestMapping(value = "/questions", method = RequestMethod.GET, headers = "Accept=application/json")
-    public String showQuestionStatus(Model model) throws IOException {
+    public String showQuestionStatus(final Model model) throws IOException {
         long questions = qRepo.count();
         LOGGER.info("showQuestionStatus: found: {}", questions);
         model.addAttribute("questions", questions);
         addMetaData(model);
-        return "jsonStatus";
+        return "json-status";
     }
 
     @RequestMapping(value = "/questions", method = RequestMethod.POST, headers = "Accept=application/json")
-    public String initQuestions(Model model) throws IOException {
-        LOGGER.info("initQuestions");
-        List<Question> questions = new QuestionCsvImporter().readQuestions();
-        LOGGER.info("questions to import found: {}", questions.size());
-        List<Question> existingQuestions = qRepo.findAll();
-        LOGGER.info("existing questions found: {}", existingQuestions.size());
-        for (Question question : questions) {
-            if (findMatchingQ(question, existingQuestions) == null) {
-                LOGGER.info("found new question: {}, attempting to save...", question.name());
-                try {
-                    qRepo.save(question);
-                } catch (Exception e) {
-                    LOGGER.error("unable to save new question: {}\n  ({})", question.name(), e.getMessage());
-                }
-            }
-        }
+    public String initQuestions(final Model model) throws IOException {
+        questionSvc.initQuestions();
         return showQuestionStatus(model);
     }
 
-    private Question findMatchingQ(Question question, List<Question> existingQuestions) {
-        for (Question q : existingQuestions) {
-            if (q.name().equals(question.name())) {
-                return q;
-            }
-        }
-        return null;
-    }
-
     @RequestMapping(value = "/surveys", method = RequestMethod.GET, headers = "Accept=application/json")
-    public String showSurveysStatus(Model model) throws IOException {
+    public String showSurveysStatus(final Model model) throws IOException {
         model.addAttribute("surveys", surveyRepo.count());
         addMetaData(model);
-        return "jsonStatus";
+        return "json-status";
     }
 
     @RequestMapping(value = "/surveys", method = RequestMethod.POST, headers = "Accept=application/json")
-    public String initSurveys(Model model) throws IOException {
+    public String initSurveys(final Model model) throws IOException {
         Survey[] expectedSurveys = {
                 Eric1516.getInstance().getSurvey(),
                 Sdu1617.getInstance().getSurvey(),
                 Sdu1718.getInstance().getSurvey(),
                 Sdu1819.getInstance().getSurvey(),
-                Sdu1920.getInstance().getSurvey()
+                Sdu1920.getInstance().getSurvey(),
+                Sdu2021.getInstance().getSurvey()
         };
         for (Survey expected : expectedSurveys) {
-            initSurvey(expected);
+            surveySvc.initSurvey(expected);
         }
 
         return showSurveysStatus(model);
     }
 
-    private void initSurvey(Survey expected) {
-        Survey survey = surveyRepo.findByName(expected.name());
-        if (survey == null) {
-            LOGGER.warn(String.format(
-                    "Could not find expected survey %1$s, attempt to create",
-                    expected));
-            surveyRepo.save(expected);
-        } else {
-            LOGGER.debug(String.format("Expected survey %1$s found, checking categories", expected));
-            for (SurveyCategory cat : expected.categories()) {
-                SurveyCategory existingCat = catRepo.findBySurveyAndCategory(expected.name(), cat.name());
-                if (existingCat == null) {
-                    catRepo.save(cat.survey(survey));
-                } else {
-                    catRepo.save(existingCat.questionEnums(cat.questionEnums()));
-                }
-            }
-        }
-    }
-
     @RequestMapping(value = "/surveys/{surveyName}", method = RequestMethod.GET, headers = "Accept=application/json")
-    public String showSurveyStatus(@PathVariable("surveyName") String surveyName, Model model) throws IOException, Exception {
+    public String showSurveyStatus(
+            @PathVariable("surveyName") final String surveyName,
+            Model model) throws IOException, Exception {
+        LOGGER.info("showSurveyStatus: {}", surveyName);
         Survey survey = surveyRepo.findByName(surveyName);
         model.addAttribute("surveys", survey == null ? 0 : 1);
 
-        // If not found will throw exception & be translated into 404 above
-        // so never get here
-        model.addAttribute("questions", qRepo.countBySurveyName(surveyName));
-        List<SurveyCategory> cats = surveyCategoryRepo.findBySurveyName(surveyName);
+        Long qCount = qRepo.countBySurveyName(surveyName);
+        model.addAttribute("questions", qCount == null ? 0 : qCount);
 
+        List<SurveyCategory> cats = surveyCategoryRepo.findBySurveyName(surveyName);
         String[] qNames = cats.stream().map(p -> p.questionNames()).collect(Collectors.joining(",")).split(",");
-        model.addAttribute("answers", answerRepo.countBySurveyName(surveyName, qNames));
-        model.addAttribute("returns", returnRepo.countBySurveyName(surveyName));
+        Long answerCount = answerRepo.countBySurveyName(surveyName, qNames);
+        model.addAttribute("answers", answerCount == null ? 0 : answerCount);
+
+        Long returnCount = returnRepo.countBySurveyName(surveyName);
+        model.addAttribute("returns", returnCount == null ? 0 : returnCount);
         addMetaData(model);
 
-        return "jsonStatus";
+        return "json-summary";
     }
 
     @RequestMapping(value = "/surveys/{surveyName}", method = RequestMethod.POST, headers = "Accept=application/json")
-    public String initSurveyAndShowStatus(@PathVariable("surveyName") String surveyName, Model model) throws IOException, Exception {
-        initSurvey(SurveyFactory.getInstance(surveyName).getSurvey());
+    public String initSurveyAndShowStatus(
+            @PathVariable("surveyName") final String surveyName,
+            Model model) throws IOException, Exception {
+        LOGGER.info("initSurveyAndShowStatus: {}", surveyName);
+        surveySvc.initSurvey(SurveyFactory.getInstance(surveyName).getSurvey());
         return showSurveyStatus(surveyName, model);
     }
 
@@ -237,7 +211,7 @@ public class MgmtController {
             LOGGER.error(msg, e);
             throw new SReportException(msg, e);
         }
-        return "jsonStatus";
+        return "json-status";
     }
 
     private void importReturns(Survey survey,

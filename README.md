@@ -1,6 +1,22 @@
 Sustainable Resource Planning
 =============================
 
+Useful commands
+---------------
+
+- Check health of a particular return
+  ```
+  curl -v -u usr:pwd https://api.srp.digital/admin/health/SDU-2020-21/ZZ1
+  ```
+- Import previous year's return into this years
+  ```
+  curl -v -X POST -u usr:pwd https://api.srp.digital/returns/import/SDU-2019-20-ZZ1/SDU-2020-21-ZZ1
+  ```
+- Create / update a survey with the latest definition
+  ```
+  curl -v -X POST -u usr:pwd https://api.srp.digital/admin/data-mgmt/surveys/SDU-2020-21
+  ```
+
 Release History
 ---------------
 
@@ -8,7 +24,7 @@ Release History
 
   - #10 Paper spend is referred to on the report as Spend Q5 but not captured
       in the return at all (bug)
-  - #7  Minor cosmetic changes
+  - #7 Minor cosmetic changes
   - #5 Email should make clear it's from an unmonitored mailbox
   - #4 Provide data exploration facility
   - #3 Add air pollution and plastics questions
