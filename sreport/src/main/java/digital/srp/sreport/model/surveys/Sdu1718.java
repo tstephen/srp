@@ -71,8 +71,6 @@ public class Sdu1718 implements SurveyFactory {
         SurveyCategory catPerf = new SurveyCategory()
                 .name("Performance")
                 .questionEnums(
-                        Q.CARBON_REDUCTION_TARGET,
-                        Q.CARBON_REDUCTION_BASELINE_USED,
                         Q.CARBON_REDUCTION_BASE_YEAR,
                         Q.CARBON_REDUCTION_TARGET_PCT,
                         Q.CARBON_REDUCTION_DEADLINE_YEAR,
