@@ -110,7 +110,7 @@ public class Sdu1718 implements SurveyFactory {
                         Q.HOT_WATER_USED,
                         Q.ELEC_USED_GREEN_TARIFF,
                         Q.ELEC_3RD_PTY_RENEWABLE_USED,
-                        Q.ELEC_RENEWABLE_USED,
+                        Q.ELEC_OWNED_RENEWABLE_USED_SDU,
                         Q.ELEC_EXPORTED
                 );
 
