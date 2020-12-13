@@ -17,8 +17,8 @@ import digital.srp.sreport.model.CarbonFactor;
 @RepositoryRestResource(exported = false)
 public interface CarbonFactorRepository extends CrudRepository<CarbonFactor, Long> {
 
-    @Query("SELECT o FROM CarbonFactor o WHERE o.name = :name ORDER BY o.name ASC")
-    CarbonFactor findByName(@Param("name") String name);
+    @Query("SELECT o FROM CarbonFactor o WHERE o.name = :name ORDER BY o.applicablePeriod ASC")
+    List<CarbonFactor> findByName(@Param("name") String name);
     
     @Query("SELECT o FROM CarbonFactor o ORDER BY o.name ASC")
     List<CarbonFactor> findAll();
