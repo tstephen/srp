@@ -1,5 +1,6 @@
 package digital.srp.sreport.importers;
 
+
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
@@ -24,10 +25,9 @@ public class CarbonFactorCsvImporter {
 
     public static final String DATA = "/data/CarbonFactors.csv";
     public static final String[] HEADERS = {
-            "category","name","unit","scope","2007-08","2008-09","2009-10","2010-11","2011-12","2012-13","2013-14","2014-15","2015-16","2016-17","2017-18","2018-19","2019-20","comments"};
+            "category","name","unit","scope","2007-08","2008-09","2009-10","2010-11","2011-12","2012-13","2013-14","2014-15","2015-16","2016-17","2017-18","2018-19","2019-20","2020-21","comments"};
 
-    public List<CarbonFactor> readCarbonFactors()
-            throws IOException {
+    public List<CarbonFactor> readCarbonFactors() throws IOException {
         try (InputStreamReader isr = new InputStreamReader(
                 getClass().getResourceAsStream(DATA))) {
             return readCarbonFactors(isr, HEADERS);
@@ -61,13 +61,20 @@ public class CarbonFactorCsvImporter {
                     cfactors.add(newCarbonFactor(record, "2017-18", 14));
                     cfactors.add(newCarbonFactor(record, "2018-19", 15));
                     cfactors.add(newCarbonFactor(record, "2019-20", 16));
+                    cfactors.add(newCarbonFactor(record, "2020-21", 17));
                 } catch (Exception e) {
-                    LOGGER.error(String.format("Problem with record: %1$d: %2$s", record.getRecordNumber(), e.getMessage()));
-                    e.printStackTrace();
+                    String msg = String.format("Problem with record: %1$s: %2$s", record.getRecordNumber(), e.getMessage());
+                    LOGGER.error(msg);
+                    if (e instanceof IOException) {
+                        throw e;
+                    } else {
+                        throw new IOException(msg);
+                    }
+                } finally {
+                    parser.close();
                 }
             }
         }
-        parser.close();
 
         return cfactors;
     }

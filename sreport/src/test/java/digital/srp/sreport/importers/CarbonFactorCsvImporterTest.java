@@ -6,7 +6,9 @@ import static org.junit.Assert.fail;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map.Entry;
 
 import org.junit.Test;
 
@@ -14,16 +16,17 @@ import digital.srp.sreport.model.CarbonFactor;
 
 public class CarbonFactorCsvImporterTest {
 
-    private static final int NO_OF_YEARS_INCLUDED = 13;
+    private static final int NO_OF_YEARS_INCLUDED = 14;
+    private static final int NO_OF_FACTORS = 170;
 
     @Test
-    public void testImport() {
+    public void testImportCoversExpectedPeriods() {
         try {
             List<CarbonFactor> factors = new CarbonFactorCsvImporter()
                     .readCarbonFactors();
             System.out.println(
                     String.format(" found %1$d factors", factors.size()));
-            assertEquals(117 * NO_OF_YEARS_INCLUDED, factors.size());
+            assertEquals(NO_OF_FACTORS * NO_OF_YEARS_INCLUDED, factors.size());
 
             // assert expected values of first record
             // Electricity generated,Electricity: UK,kWh,2,0.46673,0.49608,0.49381,0.48531,0.45205,0.46002,0.44548,0.49426,0.46219,0.41205,0.35156,0.28307
@@ -55,19 +58,43 @@ public class CarbonFactorCsvImporterTest {
             assertTrue(new BigDecimal("0.28307").compareTo(elecFactor1819.value()) == 0);
             assertEquals("", elecFactor1819.comments());
 
-            CarbonFactor elecFactor1920 = factors.get(12);
-            assertEquals("Electricity generated", elecFactor1920.category());
-            assertEquals("ELECTRICITY_UK", elecFactor1920.name());
-            assertEquals("kWh", elecFactor1920.unit());
-            assertEquals("2", elecFactor1920.scope());
-            assertEquals("2019-20", elecFactor1920.applicablePeriod());
-            assertTrue(new BigDecimal("0.2556").compareTo(elecFactor1920.value()) == 0);
-            assertEquals("", elecFactor1920.comments());
+            CarbonFactor elecFactor2021 = factors.get(12);
+            assertEquals("Electricity generated", elecFactor2021.category());
+            assertEquals("ELECTRICITY_UK", elecFactor2021.name());
+            assertEquals("kWh", elecFactor2021.unit());
+            assertEquals("2", elecFactor2021.scope());
+            assertEquals("2019-20", elecFactor2021.applicablePeriod());
+            assertTrue(new BigDecimal("0.2556").compareTo(elecFactor2021.value()) == 0);
+            assertEquals("", elecFactor2021.comments());
         } catch (IOException e) {
             e.printStackTrace();
             fail("Unexpected IO exception: " + e.getMessage());
         }
 
     }
+    @Test
+    public void testImportCoversExpectedFactors() {
+        try {
+            List<CarbonFactor> factors = new CarbonFactorCsvImporter()
+                    .readCarbonFactors();
+            System.out.println(
+                    String.format(" found %1$d factors", factors.size()));
+            assertEquals(NO_OF_FACTORS * NO_OF_YEARS_INCLUDED, factors.size());
 
+            HashMap<String, Boolean> expectedFactors = new HashMap<String, Boolean>();
+            expectedFactors.put("GAS_TOTAL", false);
+            for (Entry<String, Boolean> entry : expectedFactors.entrySet()) {
+                for (CarbonFactor factor : factors) {
+                    if (entry.getKey().equals(factor.name())) {
+                        entry.setValue(true);
+                        break;
+                    }
+                }
+                assertTrue(entry.getValue());
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            fail("Unexpected IO exception: " + e.getMessage());
+        }
+    }
 }

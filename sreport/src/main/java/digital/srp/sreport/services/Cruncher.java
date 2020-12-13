@@ -1257,16 +1257,7 @@ public class Cruncher implements digital.srp.sreport.model.surveys.SduQuestions,
                 return cfactor;
             }
         }
-        LOGGER.info(
-                "Unable to find exact Carbon Factor, now looking for {} alone",
-                cfName);
-        for (CarbonFactor cfactor : cfactors) {
-            if (cfName.name().equals(cfactor.category())) {
-                return cfactor;
-            }
-        }
-        LOGGER.error("Unable to find Carbon Factor {} for any period",
-                cfName, period);
+        LOGGER.error("Unable to find Carbon Factor {} for period {}", cfName, period);
         throw new ObjectNotFoundException(CarbonFactor.class, cfName.name());
     }
 
