@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 import javax.persistence.Column;
@@ -197,12 +198,16 @@ public class Answer {
     }
 
     public BigDecimal responseAsBigDecimal() {
+        return responseAsOptional().orElse(BigDecimal.ZERO);
+    }
+
+    public Optional<BigDecimal> responseAsOptional() {
         try {
             return response == null || response.trim().length() == 0
-                    ? BigDecimal.ZERO : new BigDecimal(response);
+                    ? Optional.empty() : Optional.of(new BigDecimal(response));
         } catch (NumberFormatException e) {
             LOGGER.warn("Cannot parse BigDecimal from {} for answer id {}", response, id);
-            return BigDecimal.ZERO;
+            return Optional.empty();
         }
     }
 

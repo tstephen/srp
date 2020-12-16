@@ -145,7 +145,7 @@ public class Sdu2021 implements SurveyFactory {
                         Q.RECYCLING_WEIGHT,
                         Q.WASTE_FOOD,
                         Q.WASTE_TEXTILES,
-                        Q.WASTE_INCINERATION_WEIGHT,
+                        Q.INCINERATION_WEIGHT,
                         Q.WASTE_PROCESSED_ON_SITE,
                         Q.WEEE_WEIGHT
                 );
@@ -309,8 +309,9 @@ public class Sdu2021 implements SurveyFactory {
         list.addAll(Arrays.asList(SduQuestions.WATER_CO2E_HDRS));
         list.add(Q.PAPER_USED);
         list.addAll(Arrays.asList(SduQuestions.WASTE_HDRS));
-        list.addAll(Arrays.asList(SduQuestions.WASTE_CO2E_HDRS));
-        list.addAll(Arrays.asList(SduQuestions.TRAVEL_CO2E_HDRS));
+        list.addAll(Arrays.asList(SduQuestions.WASTE_CO2E_HDRS_POST2020));
+        list.addAll(Arrays.asList(SduQuestions.TRAVEL_CO2E_HDRS_POST2020));
+        list.add(Q.BIZ_MILEAGE_ROAD_CO2E);
         list.addAll(Arrays.asList(SduQuestions.ENERGY_HDRS));
         list.add(Q.ELEC_USED_GREEN_TARIFF);
         list.add(Q.ELEC_3RD_PTY_RENEWABLE_USED);
