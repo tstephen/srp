@@ -477,47 +477,62 @@ public class Cruncher extends AbstractEmissionsService
                 getAnswer(period, rtn, Q.INCINERATION_WEIGHT).responseAsBigDecimal(),
                 cFactor(CarbonFactors.HIGH_TEMPERATURE_DISPOSAL_WASTE, period),
                 getAnswer(period, rtn, Q.INCINERATION_CO2E));
-        calcIncinerationCo2e(
-                getAnswer(period, rtn, Q.WASTE_CLINICAL_INCINERATED).responseAsBigDecimal(),
-                cFactor(CarbonFactors.HIGH_TEMPERATURE_DISPOSAL_WASTE, period),
-                getAnswer(period, rtn, Q.WASTE_CLINICAL_INCINERATED_CO2E));
-        calcOffensiveWasteCo2e(
-                getAnswer(period, rtn, Q.WASTE_OFFENSIVE).responseAsBigDecimal(),
-                cFactor(CarbonFactors.OFFENSIVE_WASTE, period),
-                getAnswer(period, rtn, Q.WASTE_OFFENSIVE_CO2E));
-        calcAltDisposalCo2e(
-                getAnswer(period, rtn, Q.ALT_WASTE_DISPOSAL_WEIGHT).responseAsBigDecimal(),
-                cFactor(CarbonFactors.ALT_DISPOSAL, period),
-                getAnswer(period, rtn, Q.ALT_WASTE_DISPOSAL_WEIGHT_CO2E));
-        calcFoodWasteCo2e(
-                getAnswer(period, rtn, Q.WASTE_FOOD).responseAsBigDecimal(),
-                cFactor(CarbonFactors.ORGANIC_FOOD_AND_DRINK_WASTE, period),
-                getAnswer(period, rtn, Q.WASTE_FOOD_CO2E));
-        calcTextilesCo2e(
-                getAnswer(period, rtn, Q.WASTE_TEXTILES).responseAsBigDecimal(),
-                cFactor(CarbonFactors.TEXTILES_WASTE, period),
-                getAnswer(period, rtn, Q.WASTE_TEXTILES_CO2E));
         calcRecylingCo2e(
                 rtn.answerResponseAsBigDecimal(period, Q.RECYCLING_WEIGHT),
                 cFactor(CarbonFactors.CLOSED_LOOP_OR_OPEN_LOOP, period),
                 getAnswer(period, rtn, Q.RECYCLING_CO2E));
-        calcOnsiteCo2e(
-                getAnswer(period, rtn, Q.WASTE_PROCESSED_ON_SITE).responseAsBigDecimal(),
-                cFactor(CarbonFactors.ONSITE_HEAT_AND_STEAM, period),
-                getAnswer(period, rtn, Q.WASTE_PROCESSED_ON_SITE_CO2E));
-        calcWeeeCo2e(
-                rtn.answerResponseAsBigDecimal(period, Q.WEEE_WEIGHT),
-                cFactor(CarbonFactors.WEEE_MIXED, period),
-                getAnswer(period, rtn, Q.WEEE_WEIGHT_CO2E));
-        calcOtherRecoveryCo2e(
-                rtn.answerResponseAsBigDecimal(period, Q.OTHER_RECOVERY_WEIGHT),
-                cFactor(CarbonFactors.HIGH_TEMPERATURE_DISPOSAL_WASTE_WITH_ENERGY_RECOVERY, period),
-                getAnswer(period, rtn, Q.OTHER_RECOVERY_CO2E));
         calcLandfillCo2e(
                 getAnswer(period, rtn, Q.LANDFILL_WEIGHT).responseAsBigDecimal(),
                 cFactor(CarbonFactors.LANDFILL_WEIGHTED_AVERAGE, period),
                 getAnswer(period, rtn, Q.LANDFILL_CO2E));
-
+        if (rtn.answer(period, Q.WASTE_CLINICAL_INCINERATED).isPresent()) {
+            calcIncinerationCo2e(
+                    getAnswer(period, rtn, Q.WASTE_CLINICAL_INCINERATED).responseAsBigDecimal(),
+                    cFactor(CarbonFactors.HIGH_TEMPERATURE_DISPOSAL_WASTE, period),
+                    getAnswer(period, rtn, Q.WASTE_CLINICAL_INCINERATED_CO2E));
+        }
+        if (rtn.answer(period, Q.WASTE_OFFENSIVE).isPresent()) {
+            calcOffensiveWasteCo2e(
+                    getAnswer(period, rtn, Q.WASTE_OFFENSIVE).responseAsBigDecimal(),
+                    cFactor(CarbonFactors.OFFENSIVE_WASTE, period),
+                    getAnswer(period, rtn, Q.WASTE_OFFENSIVE_CO2E));
+        }
+        if (rtn.answer(period, Q.ALT_WASTE_DISPOSAL_WEIGHT).isPresent()) {
+            calcAltDisposalCo2e(
+                    getAnswer(period, rtn, Q.ALT_WASTE_DISPOSAL_WEIGHT).responseAsBigDecimal(),
+                    cFactor(CarbonFactors.ALT_DISPOSAL, period),
+                    getAnswer(period, rtn, Q.ALT_WASTE_DISPOSAL_WEIGHT_CO2E));
+        }
+        if (rtn.answer(period, Q.WASTE_FOOD).isPresent()) {
+            calcFoodWasteCo2e(
+                    getAnswer(period, rtn, Q.WASTE_FOOD).responseAsBigDecimal(),
+                    cFactor(CarbonFactors.ORGANIC_FOOD_AND_DRINK_WASTE, period),
+                    getAnswer(period, rtn, Q.WASTE_FOOD_CO2E));
+        }
+        if (rtn.answer(period, Q.WASTE_TEXTILES).isPresent()) {
+            calcTextilesCo2e(
+                    getAnswer(period, rtn, Q.WASTE_TEXTILES).responseAsBigDecimal(),
+                    cFactor(CarbonFactors.TEXTILES_WASTE, period),
+                    getAnswer(period, rtn, Q.WASTE_TEXTILES_CO2E));
+        }
+        if (rtn.answer(period, Q.WASTE_PROCESSED_ON_SITE).isPresent()) {
+            calcOnsiteCo2e(
+                    getAnswer(period, rtn, Q.WASTE_PROCESSED_ON_SITE).responseAsBigDecimal(),
+                    cFactor(CarbonFactors.ONSITE_HEAT_AND_STEAM, period),
+                    getAnswer(period, rtn, Q.WASTE_PROCESSED_ON_SITE_CO2E));
+        }
+        if (rtn.answer(period, Q.WASTE_CLINICAL_INCINERATED).isPresent()) {
+            calcWeeeCo2e(
+                    rtn.answerResponseAsBigDecimal(period, Q.WEEE_WEIGHT),
+                    cFactor(CarbonFactors.WEEE_MIXED, period),
+                    getAnswer(period, rtn, Q.WEEE_WEIGHT_CO2E));
+        }
+        if (rtn.answer(period, Q.OTHER_RECOVERY_WEIGHT).isPresent()) {
+            calcOtherRecoveryCo2e(
+                    rtn.answerResponseAsBigDecimal(period, Q.OTHER_RECOVERY_WEIGHT),
+                    cFactor(CarbonFactors.HIGH_TEMPERATURE_DISPOSAL_WASTE_WITH_ENERGY_RECOVERY, period),
+                    getAnswer(period, rtn, Q.OTHER_RECOVERY_CO2E));
+        }
         sumAnswers(period, rtn, Q.SCOPE_3_WASTE, SduQuestions.WASTE_CO2E_HDRS_POST2020);
     }
 

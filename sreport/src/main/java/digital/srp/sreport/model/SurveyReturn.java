@@ -264,7 +264,7 @@ public class SurveyReturn {
         if (answer.isPresent()) {
             try {
                 return new BigDecimal(answer.get().response());
-            } catch (NumberFormatException e) {
+            } catch (NullPointerException | NumberFormatException e) {
                 LOGGER.warn("Requesting {}={} as number", q.name(), answer.get().response());
                 return BigDecimal.ZERO;
             }

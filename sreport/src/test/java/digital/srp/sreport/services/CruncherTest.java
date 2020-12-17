@@ -173,8 +173,9 @@ public class CruncherTest {
         cfactors = new CarbonFactorCsvImporter().readCarbonFactors();
         wfactors = new WeightingFactorCsvImporter().readWeightingFactors();
         cruncher = new Cruncher(cfactors, wfactors);
+        cruncher.roadEmissionsService = new RoadEmissionsService();
+        cruncher.wasteEmissionsService = new WasteEmissionsService();
         answerFactory = new MemoryAnswerFactory();
-
         helper = new ClasspathSurveyReturnHelper();
     }
 

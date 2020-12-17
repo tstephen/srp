@@ -14,7 +14,7 @@ import digital.srp.sreport.model.CarbonFactor;
 
 public class CarbonFactorCsvImporterTest {
 
-    private static final int NO_OF_QUESTIONS = 119;
+    private static final int NO_OF_FACTORS = 122;
     private static final int NO_OF_YEARS_INCLUDED = 13;
 
     @Test
@@ -24,7 +24,7 @@ public class CarbonFactorCsvImporterTest {
                     .readCarbonFactors();
             System.out.println(
                     String.format(" found %1$d factors", factors.size()));
-            assertEquals(NO_OF_QUESTIONS * NO_OF_YEARS_INCLUDED, factors.size());
+            assertEquals(NO_OF_FACTORS * NO_OF_YEARS_INCLUDED, factors.size());
 
             // assert expected values of first record
             // Electricity generated,Electricity: UK,kWh,2,0.46673,0.49608,0.49381,0.48531,0.45205,0.46002,0.44548,0.49426,0.46219,0.41205,0.35156,0.28307
