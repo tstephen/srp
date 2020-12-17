@@ -35,7 +35,7 @@ public class Sdu2021SurveyServiceIntegrationTest {
         try {
             Survey survey = SurveyFactory.getInstance(Sdu2021.ID).getSurvey();
             svc.initSurvey(survey);
-            assertThat(survey.applicablePeriod()).isEqualTo("2020-21");
+            assertThat(survey.applicablePeriod()).isEqualTo(Sdu2021.PERIOD);
             assertThat(survey.categories().size()).isEqualTo(20);
             assertThat(survey.created().getTime()).isGreaterThan(start);
             assertThat(survey.questionCodes().size()).isEqualTo(195);

@@ -384,9 +384,9 @@ CAR_MILES_PETROL$Fleet mileage (petrol)$miles$SDU$$number$$$$
 CAR_PETROL_USED$Petrol used by fleet$litres$SDU$$number$$$$
 CAR_MILES_DIESEL$Fleet mileage (diesel)$miles$SDU$$number$$$$
 CAR_DIESEL_USED$Diesel used by fleet$litres$SDU$$number$$$$
-CAR_HYBRID_FUEL_USED$Hybrid electricity used by fleet$kWh$SDU$$number$$$$
-CAR_MILES_UNKOWN_FUEL$Fleet mileage of unknown fuel$litres$SDU$$number$$$$
-PRIVATE_CAR_MILES_UNKOWN_FUEL$Private car miles of unknown fuel$litres$SDU$$number$$$$
+OWNED_LEASED_LOW_CARBON_FUEL_USED$Electricity used by low Carbon fleet$kWh$SDU$$number$$$$
+CAR_MILES_UNKOWN_FUEL$Fleet mileage of unknown fuel$miles$SDU$$number$$$$
+PRIVATE_CAR_MILES_UNKOWN_FUEL$Private car miles of unknown fuel$miles$SDU$$number$$$$
 MDI$Measured dose inhalers$units$SDU$$number$$$$
 DPI$Dry powder inhalers$units$SDU$$number$$$$
 AMI$Aqueous mist inhalers$units$SDU$$number$$$$

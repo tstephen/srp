@@ -14,6 +14,7 @@ public class StringUtilsTest {
         assertEquals("NITROUS_OXIDE_WITH_OXYGEN_50_50_SPLIT", StringUtils.toConst("Nitrous oxide with oxygen 50/50 split"));
         assertEquals("WEEE_LARGE", StringUtils.toConst("WEEE - large"));
         assertEquals("_5_LOSS", StringUtils.toConst("5% loss"));
+        assertEquals("HIGH_TEMPERATURE_DISPOSAL_WASTE", StringUtils.toConst("High Temperature Disposal Waste"));
     }
 
     @Test

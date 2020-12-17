@@ -11,6 +11,7 @@ import javax.transaction.Transactional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import digital.srp.sreport.api.Calculator;
@@ -27,15 +28,11 @@ import digital.srp.sreport.model.surveys.SduQuestions;
 import digital.srp.sreport.model.surveys.SurveyFactory;
 
 @Component
-public class Cruncher implements digital.srp.sreport.model.surveys.SduQuestions, Calculator {
-    private static final BigDecimal ONE_THOUSAND = new BigDecimal("1000.000000");
+public class Cruncher extends AbstractEmissionsService
+        implements digital.srp.sreport.model.surveys.SduQuestions, Calculator {
 
-    private static final Logger LOGGER = LoggerFactory
+    static final Logger LOGGER = LoggerFactory
             .getLogger(Cruncher.class);
-
-    protected static final BigDecimal ONE_HUNDRED = new BigDecimal("100.000000");
-
-    protected static final BigDecimal m2km = new BigDecimal("1.60934");
 
     protected static final BigDecimal BUS_PER_MILE = new BigDecimal("0.1200");
     protected static final BigDecimal RAIL_PER_MILE = new BigDecimal("0.3000");
@@ -45,7 +42,11 @@ public class Cruncher implements digital.srp.sreport.model.surveys.SduQuestions,
 
     protected final List<WeightingFactor> wfactors;
 
-    private int divisionScale = 2;
+    @Autowired
+    protected RoadEmissionsService roadEmissionsService;
+
+    @Autowired
+    protected WasteEmissionsService wasteEmissionsService;
 
     public Cruncher(final List<CarbonFactor> cfactors2,
             final List<WeightingFactor> wfactors2) {
@@ -463,49 +464,121 @@ public class Cruncher implements digital.srp.sreport.model.surveys.SduQuestions,
     }
 
     protected void crunchScope3Waste(String period, SurveyReturn rtn) {
-        try {
-            // Treasury row 62: Waste Recycling
-            CarbonFactor cFactor = cFactor(CarbonFactors.CLOSED_LOOP_OR_OPEN_LOOP, period);
-            BigDecimal recyclingCo2e = rtn.answerResponseAsBigDecimal(period, Q.RECYCLING_WEIGHT)
-                    .multiply(cFactor.value())
-                    .divide(ONE_THOUSAND, 2, RoundingMode.HALF_UP);
-            getAnswer(period,rtn, Q.RECYCLING_CO2E).response(recyclingCo2e);
-        } catch (IllegalStateException | NullPointerException e) {
-            LOGGER.warn("Insufficient data to calculate CO2e from recycling waste");
+//        calcReuseCo2e(
+//                rtn.answerResponseAsBigDecimal(period, Q.DURABLES_INTERNAL_REUSE),
+//                cFactor(CarbonFactors.DURABLES_REUSE, period),
+//                getAnswer(period, rtn, Q.DURABLES_INTERNAL_REUSE_CO2E));
+//        calcReuseCo2e(
+//                rtn.answerResponseAsBigDecimal(period, Q.DURABLES_EXTERNAL_REUSE),
+//                cFactor(CarbonFactors.DURABLES_REUSE, period),
+//                getAnswer(period, rtn, Q.DURABLES_EXTERNAL_REUSE_CO2E));
+        if (rtn.answer(period, Q.INCINERATION_WEIGHT).isPresent()) {
+            calcIncinerationCo2e(
+                    getAnswer(period, rtn, Q.INCINERATION_WEIGHT).responseAsBigDecimal(),
+                    cFactor(CarbonFactors.HIGH_TEMPERATURE_DISPOSAL_WASTE, period),
+                    getAnswer(period, rtn, Q.INCINERATION_CO2E));
         }
-        try {
-            // Treasury row 63: Other Recovery
-            CarbonFactor cFactor = cFactor(CarbonFactors.HIGH_TEMPERATURE_DISPOSAL_WASTE_WITH_ENERGY_RECOVERY, period);
-            BigDecimal recoveryCo2e = rtn.answerResponseAsBigDecimal(period, Q.OTHER_RECOVERY_WEIGHT)
-                    .multiply(cFactor.value())
-                    .divide(ONE_THOUSAND, 2, RoundingMode.HALF_UP);
-            getAnswer(period, rtn, Q.OTHER_RECOVERY_CO2E).derived(true).response(recoveryCo2e);
-        } catch (IllegalStateException | NullPointerException e) {
-            LOGGER.warn("Insufficient data to calculate CO2e from other waste recovery");
+        calcRecylingCo2e(
+                rtn.answerResponseAsBigDecimal(period, Q.RECYCLING_WEIGHT),
+                cFactor(CarbonFactors.CLOSED_LOOP_OR_OPEN_LOOP, period),
+                getAnswer(period, rtn, Q.RECYCLING_CO2E));
+        calcLandfillCo2e(
+                getAnswer(period, rtn, Q.LANDFILL_WEIGHT).responseAsBigDecimal(),
+                cFactor(CarbonFactors.LANDFILL_WEIGHTED_AVERAGE, period),
+                getAnswer(period, rtn, Q.LANDFILL_CO2E));
+        if (rtn.answer(period, Q.WASTE_CLINICAL_INCINERATED).isPresent()) {
+            calcIncinerationCo2e(
+                    getAnswer(period, rtn, Q.WASTE_CLINICAL_INCINERATED).responseAsBigDecimal(),
+                    cFactor(CarbonFactors.CLINICAL_WASTE, period),
+                    getAnswer(period, rtn, Q.WASTE_CLINICAL_INCINERATED_CO2E));
         }
-        try {
-            // Treasury row 64: Incineration waste
-            CarbonFactor cFactor = cFactor(CarbonFactors.HIGH_TEMPERATURE_DISPOSAL_WASTE, period);
-            BigDecimal incinerationCo2e = getAnswer(period, rtn, Q.INCINERATION_WEIGHT).responseAsBigDecimal()
-                    .multiply(cFactor.value())
-                    .divide(ONE_THOUSAND, 2, RoundingMode.HALF_UP);
-            getAnswer(period,rtn, Q.INCINERATION_CO2E).response(incinerationCo2e);
-        } catch (IllegalStateException | NullPointerException e) {
-            LOGGER.warn("Insufficient data to calculate CO2e from incinerating waste");
+        if (rtn.answer(period, Q.WASTE_OFFENSIVE).isPresent()) {
+            calcOffensiveWasteCo2e(
+                    getAnswer(period, rtn, Q.WASTE_OFFENSIVE).responseAsBigDecimal(),
+                    cFactor(CarbonFactors.CLINICAL_WASTE, period),
+                    getAnswer(period, rtn, Q.WASTE_OFFENSIVE_CO2E));
         }
-        try {
-            // Treasury row 65: Landfill disposal waste
-            CarbonFactor cFactor = cFactor(CarbonFactors.LANDFILL_WEIGHTED_AVERAGE, period);
-            BigDecimal landfillCo2e = getAnswer(period, rtn, Q.LANDFILL_WEIGHT).responseAsBigDecimal()
-                    .multiply(cFactor.value())
-                    .divide(ONE_THOUSAND, 2, RoundingMode.HALF_UP);
-            getAnswer(period,rtn, Q.LANDFILL_CO2E).response(landfillCo2e);
-        } catch (IllegalStateException | NullPointerException e) {
-            LOGGER.warn("Insufficient data to calculate CO2e from sending waste to landfill");
+        if (rtn.answer(period, Q.ALT_WASTE_DISPOSAL_WEIGHT).isPresent()) {
+            calcAltDisposalCo2e(
+                    getAnswer(period, rtn, Q.ALT_WASTE_DISPOSAL_WEIGHT).responseAsBigDecimal(),
+                    cFactor(CarbonFactors.CLINICAL_WASTE, period),
+                    getAnswer(period, rtn, Q.ALT_WASTE_DISPOSAL_WEIGHT_CO2E));
         }
+        if (rtn.answer(period, Q.WASTE_FOOD).isPresent()) {
+            calcFoodWasteCo2e(
+                    getAnswer(period, rtn, Q.WASTE_FOOD).responseAsBigDecimal(),
+                    cFactor(CarbonFactors.ORGANIC_FOOD_AND_DRINK_WASTE, period),
+                    getAnswer(period, rtn, Q.WASTE_FOOD_CO2E));
+        }
+        if (rtn.answer(period, Q.WASTE_TEXTILES).isPresent()) {
+            calcTextilesCo2e(
+                    getAnswer(period, rtn, Q.WASTE_TEXTILES).responseAsBigDecimal(),
+                    cFactor(CarbonFactors.NON_BURN_TREATMENT_DISPOSAL_WASTE, period),
+                    getAnswer(period, rtn, Q.WASTE_TEXTILES_CO2E));
+        }
+        if (rtn.answer(period, Q.WASTE_PROCESSED_ON_SITE).isPresent()) {
+            calcOnsiteCo2e(
+                    getAnswer(period, rtn, Q.WASTE_PROCESSED_ON_SITE).responseAsBigDecimal(),
+                    cFactor(CarbonFactors.ONSITE_HEAT_AND_STEAM, period),
+                    getAnswer(period, rtn, Q.WASTE_PROCESSED_ON_SITE_CO2E));
+        }
+        if (rtn.answer(period, Q.WEEE_WEIGHT).isPresent() && rtn.answer(period, Q.WEEE_WEIGHT_CO2E).isPresent()) {
+            calcWeeeCo2e(
+                    rtn.answerResponseAsBigDecimal(period, Q.WEEE_WEIGHT),
+                    cFactor(CarbonFactors.WEEE_MIXED, period),
+                    getAnswer(period, rtn, Q.WEEE_WEIGHT_CO2E));
+        }
+        if (rtn.answer(period, Q.OTHER_RECOVERY_WEIGHT).isPresent()) {
+            calcOtherRecoveryCo2e(
+                    rtn.answerResponseAsBigDecimal(period, Q.OTHER_RECOVERY_WEIGHT),
+                    cFactor(CarbonFactors.HIGH_TEMPERATURE_DISPOSAL_WASTE_WITH_ENERGY_RECOVERY, period),
+                    getAnswer(period, rtn, Q.OTHER_RECOVERY_CO2E));
+        }
+        sumAnswers(period, rtn, Q.SCOPE_3_WASTE, SduQuestions.WASTE_CO2E_HDRS_POST2020);
+    }
 
-        sumAnswers(period, rtn, Q.SCOPE_3_WASTE,
-                Q.RECYCLING_CO2E, Q.OTHER_RECOVERY_CO2E, Q.INCINERATION_CO2E, Q.LANDFILL_CO2E);
+//    private void calcReuseCo2e(BigDecimal waste, CarbonFactor cFactor, Answer co2e) {
+//        co2e.response(wasteEmissionsService.calculate(waste, cFactor).orElse(BigDecimal.ZERO));
+//    }
+
+    private void calcOffensiveWasteCo2e(BigDecimal waste, CarbonFactor cFactor, Answer co2e) {
+        co2e.response(wasteEmissionsService.calculate(waste, cFactor).orElse(BigDecimal.ZERO));
+    }
+
+    private void calcAltDisposalCo2e(BigDecimal waste, CarbonFactor cFactor, Answer co2e) {
+        co2e.response(wasteEmissionsService.calculate(waste, cFactor).orElse(BigDecimal.ZERO));
+    }
+
+    private void calcFoodWasteCo2e(BigDecimal waste, CarbonFactor cFactor, Answer co2e) {
+        co2e.response(wasteEmissionsService.calculate(waste, cFactor).orElse(BigDecimal.ZERO));
+    }
+
+    private void calcTextilesCo2e(BigDecimal waste, CarbonFactor cFactor, Answer co2e) {
+        co2e.response(wasteEmissionsService.calculate(waste, cFactor).orElse(BigDecimal.ZERO));
+    }
+
+    private void calcOnsiteCo2e(BigDecimal waste, CarbonFactor cFactor, Answer co2e) {
+        co2e.response(wasteEmissionsService.calculate(waste, cFactor).orElse(BigDecimal.ZERO));
+    }
+
+    private void calcWeeeCo2e(BigDecimal waste, CarbonFactor cFactor, Answer co2e) {
+        co2e.response(wasteEmissionsService.calculate(waste, cFactor).orElse(BigDecimal.ZERO));
+    }
+
+    private void calcLandfillCo2e(BigDecimal waste, CarbonFactor cFactor, Answer co2e) {
+        co2e.response(wasteEmissionsService.calculate(waste, cFactor).orElse(BigDecimal.ZERO));
+    }
+
+    private void calcIncinerationCo2e(BigDecimal waste, CarbonFactor cFactor, Answer co2e) {
+        co2e.response(wasteEmissionsService.calculate(waste, cFactor).orElse(BigDecimal.ZERO));
+    }
+
+    private void calcOtherRecoveryCo2e(BigDecimal waste, CarbonFactor cFactor, Answer co2e) {
+        co2e.response(wasteEmissionsService.calculate(waste, cFactor).orElse(BigDecimal.ZERO));
+    }
+
+    private void calcRecylingCo2e(BigDecimal waste, CarbonFactor cFactor, Answer co2e) {
+        co2e.response(wasteEmissionsService.calculate(waste, cFactor).orElse(BigDecimal.ZERO));
     }
 
     protected Answer getAnswerForPeriodWithFallback(String period,
@@ -649,7 +722,7 @@ public class Cruncher implements digital.srp.sreport.model.surveys.SduQuestions,
     protected void crunchScope3Travel(String period, SurveyReturn rtn) {
         crunchPatientVisitorMileageCo2e(period, rtn);
         crunchStaffCommuteCo2e(period, rtn);
-        crunchBizTravel(period, rtn);
+        crunchFleetAndBizTravelPre2020(period, rtn);
         try {
             sumAnswers(period, rtn, Q.SCOPE_3_TRAVEL,
                     SduQuestions.SCOPE_3_TRAVEL_HDRS);
@@ -658,43 +731,88 @@ public class Cruncher implements digital.srp.sreport.model.surveys.SduQuestions,
         }
     }
 
-    protected void crunchBizTravel(String period, SurveyReturn rtn) {
+    protected void crunchFleetAndBizTravelPre2020(String period, SurveyReturn rtn) {
+        crunchCarCo2ePre2020(period, rtn);
+        crunchRailCo2e(period, rtn);
+        crunchAirCo2e(period, rtn);
+        crunchBusCo2e(period, rtn);
+        crunchTaxiCo2e(period, rtn);
+        sumAnswers(period, rtn, Q.BIZ_MILEAGE, SduQuestions.BIZ_MILEAGE_HDRS);
+        sumAnswers(period, rtn, Q.BIZ_MILEAGE_CO2E, SduQuestions.BIZ_MILEAGE_CO2E_HDRS);
+    }
+
+    protected void crunchFleetAndBizTravel(String period, SurveyReturn rtn) {
+        crunchCarCo2e(period, rtn);
+        crunchRailCo2e(period, rtn);
+        crunchAirCo2e(period, rtn);
+        crunchBusCo2e(period, rtn);
+        crunchTaxiCo2e(period, rtn);
+        sumAnswers(period, rtn, Q.BIZ_MILEAGE, SduQuestions.BIZ_MILEAGE_HDRS);
+        sumAnswers(period, rtn, Q.BIZ_MILEAGE_CO2E, SduQuestions.BIZ_MILEAGE_CO2E_HDRS);
+    }
+
+    private void crunchCarCo2ePre2020(String period, SurveyReturn rtn) {
         // CAR_TOTAL means primary and WTT combined due to CAR
         CarbonFactor cFactor = cFactor(CarbonFactors.CAR_TOTAL, period);
         try {
-            BigDecimal fleetMileage = getAnswer(period, rtn, Q.OWNED_LEASED_LOW_CARBON_MILES).responseAsBigDecimal();
             getAnswer(period, rtn, Q.OWNED_LEASED_LOW_CARBON_CO2E)
                     .derived(true)
-                    .response(fleetMileage
+                    .response(getAnswer(period, rtn, Q.OWNED_LEASED_LOW_CARBON_MILES).responseAsBigDecimal()
                             .multiply(cFactor(CarbonFactors.AVERAGE_BATTERY_AND_PLUGIN_HYBRID_EV_TOTAL, period).value())
                             .multiply(m2km)
                             .divide(ONE_THOUSAND, 0, RoundingMode.HALF_UP));
         } catch (IllegalStateException | NullPointerException e) {
             LOGGER.warn("Insufficient data to calculate CO2e from low carbon fleet miles");
         }
+
         try {
-            BigDecimal fleetMileage = getAnswer(period, rtn, Q.FLEET_ROAD_MILES).responseAsBigDecimal();
             // Treasury row 51: Owned vehicles both direct and Well to Tank
             getAnswer(period, rtn, Q.OWNED_FLEET_TRAVEL_CO2E)
                     .derived(true)
-                    .response(fleetMileage
-                            .multiply(cFactor(CarbonFactors.CAR_TOTAL, period).value())
+                    .response(getAnswer(period, rtn, Q.FLEET_ROAD_MILES).responseAsBigDecimal()
+                            .multiply(cFactor.value())
                             .multiply(m2km)
                             .divide(ONE_THOUSAND, 0, RoundingMode.HALF_UP));
-            try {
-                BigDecimal bizTravelRoadCo2e
-                        = getAnswer(period, rtn, Q.BIZ_MILEAGE_ROAD).responseAsBigDecimal()
-                        .add(fleetMileage)
-                        .multiply(cFactor.value())
-                        .multiply(m2km)
-                        .divide(ONE_THOUSAND, divisionScale, RoundingMode.HALF_UP);
-                getAnswer(period,rtn, Q.BIZ_MILEAGE_ROAD_CO2E).response(bizTravelRoadCo2e);
-            } catch (IllegalStateException | NullPointerException e) {
-                LOGGER.warn("Insufficient data to calculate CO2e from personal road miles");
-            }
         } catch (IllegalStateException | NullPointerException e) {
             LOGGER.warn("Insufficient data to calculate CO2e from fleet miles");
         }
+
+        crunchBizTravelRoadCo2e(period, rtn, cFactor);
+
+        // It is probably a bug to have omitted Low EV here and certainly an
+        // abuse of BIZ_MILEAGE_ROAD_CO2E but preserve for backwards compatibility
+        sumAnswers(period, rtn, Q.BIZ_MILEAGE_ROAD_CO2E,
+                Q.OWNED_FLEET_TRAVEL_CO2E, Q.BIZ_MILEAGE_ROAD_CO2E);
+    }
+
+    protected void crunchBizTravelRoadCo2e(String period, SurveyReturn rtn,
+            CarbonFactor cFactor) {
+        try {
+            getAnswer(period,rtn, Q.BIZ_MILEAGE_ROAD_CO2E)
+                    .derived(true)
+                    .response(
+                            getAnswer(period, rtn, Q.BIZ_MILEAGE_ROAD).responseAsBigDecimal()
+                            .multiply(cFactor.value())
+                            .multiply(m2km)
+                            .divide(ONE_THOUSAND, divisionScale, RoundingMode.HALF_UP)
+                    );
+        } catch (IllegalStateException | NullPointerException e) {
+            LOGGER.warn("Insufficient data to calculate CO2e from personal road miles");
+        }
+    }
+
+    protected void crunchCarCo2e(String period, SurveyReturn rtn) {
+        // CAR_TOTAL means primary and WTT combined due to CAR
+        CarbonFactor cFactor = cFactor(CarbonFactors.CAR_TOTAL, period);
+        crunchFleetCo2e(period, rtn, cFactor);
+        crunchBizTravelRoadCo2e(period, rtn, cFactor);
+
+        sumAnswers(period, rtn, Q.FLEET_AND_BIZ_ROAD_CO2E,
+                Q.OWNED_FLEET_TRAVEL_CO2E, Q.OWNED_LEASED_LOW_CARBON_CO2E, Q.BIZ_MILEAGE_ROAD_CO2E);
+    }
+
+    protected void crunchRailCo2e(String period, SurveyReturn rtn) {
+        CarbonFactor cFactor;
         try {
             if (getAnswer(period, rtn, Q.RAIL_MILES).response() == null
                     && getAnswer(period, rtn, Q.RAIL_COST).response() != null) {
@@ -713,10 +831,13 @@ public class Cruncher implements digital.srp.sreport.model.surveys.SduQuestions,
         } catch (IllegalStateException | NullPointerException e) {
             LOGGER.warn("Insufficient data to calculate CO2e from rail travel");
         }
+    }
+
+    protected void crunchAirCo2e(String period, SurveyReturn rtn) {
         try {
             BigDecimal bizTravelDomesticAirCo2e
                     = getAnswer(period, rtn, Q.DOMESTIC_AIR_MILES).responseAsBigDecimal()
-                    .multiply(cFactor(CarbonFactors.DOMESTIC_TOTAL, period).value())
+                    .multiply(cFactor(CarbonFactors.DOMESTIC_FLIGHT_TOTAL, period).value())
                     .multiply(m2km)
                     .divide(ONE_THOUSAND, divisionScale, RoundingMode.HALF_UP);
             BigDecimal bizTravelShortHaulAirCo2e
@@ -734,6 +855,10 @@ public class Cruncher implements digital.srp.sreport.model.surveys.SduQuestions,
         } catch (IllegalStateException | NullPointerException e) {
             LOGGER.warn("Insufficient data to calculate CO2e from air travel");
         }
+    }
+
+    protected void crunchBusCo2e(String period, SurveyReturn rtn) {
+        CarbonFactor cFactor;
         try {
             if (getAnswer(period, rtn, Q.BUS_MILES).response() == null
                     && getAnswer(period, rtn, Q.BUS_COST).response() != null) {
@@ -742,7 +867,7 @@ public class Cruncher implements digital.srp.sreport.model.surveys.SduQuestions,
                 getAnswer(period, rtn, Q.BUS_MILES).derived(true).response(busMiles);
             }
 
-            cFactor = cFactor(CarbonFactors.BUS_TOTAL, period);
+            cFactor = cFactor(CarbonFactors.LOCAL_BUS_TOTAL, period);
             BigDecimal bizTravelBusCo2e
                     = getAnswer(period, rtn, Q.BUS_MILES).responseAsBigDecimal()
                     .multiply(cFactor.value())
@@ -752,6 +877,10 @@ public class Cruncher implements digital.srp.sreport.model.surveys.SduQuestions,
         } catch (IllegalStateException | NullPointerException e) {
             LOGGER.warn("Insufficient data to calculate CO2e from bus travel");
         }
+    }
+
+    protected void crunchTaxiCo2e(String period, SurveyReturn rtn) {
+        CarbonFactor cFactor;
         try {
             if (getAnswer(period, rtn, Q.TAXI_MILES).response() == null
                     && getAnswer(period, rtn, Q.TAXI_COST).response() != null) {
@@ -770,8 +899,39 @@ public class Cruncher implements digital.srp.sreport.model.surveys.SduQuestions,
         } catch (IllegalStateException | NullPointerException e) {
             LOGGER.warn("Insufficient data to calculate CO2e from taxi travel");
         }
-        sumAnswers(period, rtn, Q.BIZ_MILEAGE, SduQuestions.BIZ_MILEAGE_HDRS);
-        sumAnswers(period, rtn, Q.BIZ_MILEAGE_CO2E, SduQuestions.BIZ_MILEAGE_CO2E_HDRS);
+    }
+
+    // From 2020-21 FLEET_ROAD_MILES is sub-divided by fuel
+    protected void crunchFleetCo2e(String period, SurveyReturn rtn,
+            CarbonFactor cFactor) {
+        getAnswer(period, rtn, Q.OWNED_LEASED_LOW_CARBON_CO2E)
+                .derived(true)
+                .response(roadEmissionsService.calculate(
+                                cFactor(CarbonFactors.ELECTRICITY_FROM_GRID, period),
+                                getAnswer(period, rtn, Q.OWNED_LEASED_LOW_CARBON_FUEL_USED).responseAsOptional(),
+                                cFactor(CarbonFactors.AVERAGE_BATTERY_AND_PLUGIN_HYBRID_EV_TOTAL, period),
+                                getAnswer(period, rtn, Q.OWNED_LEASED_LOW_CARBON_MILES).responseAsOptional())
+                        .get());
+        getAnswer(period, rtn, Q.CAR_DIESEL_USED_CO2E)
+                .derived(true)
+                .response(roadEmissionsService.calculate(
+                        cFactor(CarbonFactors.DIESEL_TOTAL, period),
+                        getAnswer(period, rtn, Q.CAR_DIESEL_USED).responseAsOptional(),
+                        cFactor,
+                        getAnswer(period, rtn, Q.CAR_MILES_DIESEL).responseAsOptional())
+                .get());
+        getAnswer(period, rtn, Q.CAR_PETROL_USED_CO2E)
+                .derived(true)
+                .response(roadEmissionsService.calculate(
+                        cFactor(CarbonFactors.PETROL_TOTAL, period),
+                        getAnswer(period, rtn, Q.CAR_PETROL_USED).responseAsOptional(),
+                        cFactor,
+                        getAnswer(period, rtn, Q.CAR_MILES_PETROL).responseAsOptional())
+                .get());
+
+        sumAnswers(period, rtn, Q.OWNED_FLEET_TRAVEL_CO2E,
+                        Q.CAR_DIESEL_USED_CO2E, Q.CAR_PETROL_USED_CO2E,
+                        Q.OWNED_LEASED_LOW_CARBON_CO2E);
     }
 
     // Treasury row 53: Staff commute
@@ -857,13 +1017,7 @@ public class Cruncher implements digital.srp.sreport.model.surveys.SduQuestions,
                     rtn.org(), period);
             throw new IllegalStateException(msg);
         }
-        BigDecimal nonPaySpend = getAnswer(period, rtn, Q.NON_PAY_SPEND).responseAsBigDecimal();
-        if (nonPaySpend.equals(BigDecimal.ZERO)
-                || getAnswer(period, rtn, Q.NON_PAY_SPEND).derived()) {
-            nonPaySpend = calcNonPaySpendFromOpEx(period, rtn);
-            getAnswer(period, rtn, Q.NON_PAY_SPEND).derived(true).response(nonPaySpend);
-        }
-
+        BigDecimal nonPaySpend = getNonPaySpend(period, rtn);
         crunchCapitalSpend(period, rtn, orgType, nonPaySpend);
 
         WeightingFactor wFactor = wFactor(WeightingFactors.BIZ_SVCS, period, orgType);
@@ -899,6 +1053,16 @@ public class Cruncher implements digital.srp.sreport.model.surveys.SduQuestions,
                 Q.CATERING_CO2E, Q.FREIGHT_CO2E, Q.ICT_CO2E, Q.CHEM_AND_GAS_CO2E,
                 Q.MED_INSTR_CO2E, Q.OTHER_MANUFACTURED_CO2E,
                 Q.OTHER_PROCUREMENT_CO2E, Q.PAPER_AND_CARD_CO2E, Q.PHARMA_CO2E);
+    }
+
+    private BigDecimal getNonPaySpend(String period, SurveyReturn rtn) {
+        BigDecimal nonPaySpend = getAnswer(period, rtn, Q.NON_PAY_SPEND).responseAsBigDecimal();
+        if (nonPaySpend.equals(BigDecimal.ZERO)
+                || getAnswer(period, rtn, Q.NON_PAY_SPEND).derived()) {
+            nonPaySpend = calcNonPaySpendFromOpEx(period, rtn);
+            getAnswer(period, rtn, Q.NON_PAY_SPEND).derived(true).response(nonPaySpend);
+        }
+        return nonPaySpend;
     }
 
     // This is probably a poor approximation.
@@ -1252,13 +1416,14 @@ public class Cruncher implements digital.srp.sreport.model.surveys.SduQuestions,
     }
 
     CarbonFactor cFactor(CarbonFactors cfName, String period) {
+        LOGGER.info("Find Carbon Factor {} for period {}", cfName, period);
         for (CarbonFactor cfactor : cfactors) {
             if (cfName.name().equals(cfactor.name()) && period.equals(cfactor.applicablePeriod())) {
                 return cfactor;
             }
         }
         LOGGER.error("Unable to find Carbon Factor {} for period {}", cfName, period);
-        throw new ObjectNotFoundException(CarbonFactor.class, cfName.name());
+        throw new ObjectNotFoundException(CarbonFactor.class, cfName.name() + "_" + period);
     }
 
     private Answer crunchWeighting(String period, SurveyReturn rtn, BigDecimal nonPaySpend,

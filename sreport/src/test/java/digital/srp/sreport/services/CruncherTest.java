@@ -22,6 +22,8 @@ import digital.srp.sreport.model.Q;
 import digital.srp.sreport.model.Survey;
 import digital.srp.sreport.model.SurveyReturn;
 import digital.srp.sreport.model.WeightingFactor;
+import digital.srp.sreport.model.surveys.Sdu1617;
+import digital.srp.sreport.model.surveys.Sdu2021;
 import digital.srp.sreport.model.surveys.SduQuestions;
 
 public class CruncherTest {
@@ -173,8 +175,9 @@ public class CruncherTest {
         cfactors = new CarbonFactorCsvImporter().readCarbonFactors();
         wfactors = new WeightingFactorCsvImporter().readWeightingFactors();
         cruncher = new Cruncher(cfactors, wfactors);
+        cruncher.roadEmissionsService = new RoadEmissionsService();
+        cruncher.wasteEmissionsService = new WasteEmissionsService();
         answerFactory = new MemoryAnswerFactory();
-
         helper = new ClasspathSurveyReturnHelper();
     }
 
@@ -189,13 +192,13 @@ public class CruncherTest {
     @Test
     public void testFindCFactorByNameAndPeriod() {
         Assert.assertEquals(new BigDecimal("0.183997"),
-                cruncher.cFactor(CarbonFactors.NATURAL_GAS, "2016-17").value());
+                cruncher.cFactor(CarbonFactors.NATURAL_GAS, Sdu1617.PERIOD).value());
     }
 
     @Test
     public void testFindGasTotalCFactorByNameAndPeriod() {
         Assert.assertEquals(new BigDecimal("0.207780"),
-                cruncher.cFactor(CarbonFactors.GAS_TOTAL, "2020-21").value());
+                cruncher.cFactor(CarbonFactors.GAS_TOTAL, Sdu2021.PERIOD).value());
     }
 
     @Test
