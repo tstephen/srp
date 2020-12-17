@@ -63,11 +63,13 @@ public class CarbonFactorController {
         
         int added = 0;
         for (CarbonFactor factor : factors) {
-            // TODO this will not update with new values but only create non-existent factors
-            if (existingFactors.contains(factor)) {
-                LOGGER.info(String.format(
-                        "Skip import of existing factor: %1$s for: %2$s",
-                        factor.name(), factor.applicablePeriod()));
+            int idx = existingFactors.indexOf(factor);
+            CarbonFactor existingFactor = existingFactors.get(idx);
+            if (existingFactor != null && !existingFactor.value().equals(factor.value())) {
+                LOGGER.warn(
+                        "Updating existing factor '{}' for '{}' from {} to {}",
+                        factor.name(), factor.applicablePeriod(), 
+                        existingFactor.value(), factor.value());
             } else {
                 factor.createdBy("Installer");
                 createInternal(factor);
@@ -122,7 +124,7 @@ public class CarbonFactorController {
     public @ResponseBody List<CarbonFactor> list(
             @RequestParam(value = "page", required = false) Integer page,
             @RequestParam(value = "limit", required = false) Integer limit) {
-        LOGGER.info(String.format("List carbon factors"));
+        LOGGER.info("List carbon factors");
 
         List<CarbonFactor> list;
         if (limit == null) {
@@ -131,8 +133,7 @@ public class CarbonFactorController {
             Pageable pageable = new PageRequest(page == null ? 0 : page, limit);
             list = cfactorRepo.findPage(pageable);
         }
-        LOGGER.info(String.format("Found %1$s carbon factors", list.size()));
-
+        LOGGER.info("Found {} carbon factors", list.size());
         return list;
     }
     
