@@ -102,13 +102,14 @@ public class CarbonFactorController {
     @RequestMapping(value = "/findByName/{name}", method = RequestMethod.GET)
     @JsonView(CarbonFactorViews.Detailed.class)
     @Transactional
-    public @ResponseBody CarbonFactor findByName(
+    public @ResponseBody List<CarbonFactor> findByName(
             @PathVariable("name") String name) {
-        LOGGER.info(String.format("findByName %1$s", name));
+        LOGGER.info("findByName {}", name);
 
-        CarbonFactor cfactor = cfactorRepo.findByName(name);
+        List<CarbonFactor> cfactors = cfactorRepo.findByName(name);
 
-        return cfactor;
+        LOGGER.info("  found {}", cfactors.size());
+        return cfactors;
     }
     
     /**

@@ -111,7 +111,7 @@ public class Sdu1819 implements SurveyFactory {
                         Q.ELEC_USED,
                         Q.ELEC_USED_GREEN_TARIFF,
                         Q.ELEC_3RD_PTY_RENEWABLE_USED,
-                        Q.ELEC_RENEWABLE_USED,
+                        Q.ELEC_OWNED_RENEWABLE_USED_SDU,
                         Q.ELEC_EXPORTED,
                         Q.THIRD_PARTY_ADDITIONAL_PCT,
                         Q.GREEN_TARIFF_ADDITIONAL_PCT

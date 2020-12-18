@@ -187,9 +187,15 @@ public class CruncherTest {
     }
 
     @Test
-    public void testFindCFactorByName() {
+    public void testFindCFactorByNameAndPeriod() {
         Assert.assertEquals(new BigDecimal("0.183997"),
                 cruncher.cFactor(CarbonFactors.NATURAL_GAS, "2016-17").value());
+    }
+
+    @Test
+    public void testFindGasTotalCFactorByNameAndPeriod() {
+        Assert.assertEquals(new BigDecimal("0.207780"),
+                cruncher.cFactor(CarbonFactors.GAS_TOTAL, "2020-21").value());
     }
 
     @Test
