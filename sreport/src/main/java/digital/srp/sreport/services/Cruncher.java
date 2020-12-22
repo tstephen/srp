@@ -70,17 +70,8 @@ public class Cruncher extends AbstractEmissionsService
             calcScope2(period, rtn);
             calcScope3(period, rtn);
 
-            try {
-                if (isEClassUser(rtn)) {
-                    calcCarbonProfileEClassMethod(period, rtn);
-                } else {
-                    calcCarbonProfileSduMethod(period, rtn);
-                }
-            } catch (IllegalStateException | ObjectNotFoundException e) {
-                LOGGER.error(e.getMessage());
-            } catch (Exception e) {
-                LOGGER.error(e.getMessage());
-            }
+            calcCarbonProfileSimplifiedEClassMethod(period, rtn);
+            calcCarbonProfileSimplifiedSduMethod(period, rtn);
 
             sumAnswers(period, rtn, Q.SCOPE_1, SduQuestions.SCOPE_1_HDRS);
             sumAnswers(period, rtn, Q.SCOPE_2, SduQuestions.SCOPE_2_HDRS);
@@ -464,14 +455,6 @@ public class Cruncher extends AbstractEmissionsService
     }
 
     protected void crunchScope3Waste(String period, SurveyReturn rtn) {
-//        calcReuseCo2e(
-//                rtn.answerResponseAsBigDecimal(period, Q.DURABLES_INTERNAL_REUSE),
-//                cFactor(CarbonFactors.DURABLES_REUSE, period),
-//                getAnswer(period, rtn, Q.DURABLES_INTERNAL_REUSE_CO2E));
-//        calcReuseCo2e(
-//                rtn.answerResponseAsBigDecimal(period, Q.DURABLES_EXTERNAL_REUSE),
-//                cFactor(CarbonFactors.DURABLES_REUSE, period),
-//                getAnswer(period, rtn, Q.DURABLES_EXTERNAL_REUSE_CO2E));
         if (rtn.answer(period, Q.INCINERATION_WEIGHT).isPresent()) {
             calcIncinerationCo2e(
                     getAnswer(period, rtn, Q.INCINERATION_WEIGHT).responseAsBigDecimal(),
@@ -1005,6 +988,40 @@ public class Cruncher extends AbstractEmissionsService
         // TODO EV Owned Vehicles
     }
 
+    protected void calcCarbonProfileSimplifiedSduMethod(String period, SurveyReturn rtn) {
+        LOGGER.info("calcCarbonProfileSduMethod for {} in {}", rtn.getOrg(), rtn.applicablePeriod());
+
+        calcCarbonProfileSduMethod(period, rtn);
+
+        sumAnswers(period, rtn, Q.SDU_MEDICINES_AND_CHEMICALS, Q.PHARMA_SPEND, Q.CHEM_AND_GAS_SPEND);
+        sumAnswers(period, rtn, Q.SDU_MEDICINES_AND_CHEMICALS_CO2E, Q.PHARMA_CO2E, Q.CHEM_AND_GAS_CO2E);
+
+        sumAnswers(period, rtn, Q.SDU_MEDICAL_EQUIPMENT, Q.MED_INSTR_SPEND);
+        sumAnswers(period, rtn, Q.SDU_MEDICAL_EQUIPMENT_CO2E, Q.MED_INSTR_CO2E);
+
+        sumAnswers(period, rtn, Q.SDU_NON_MEDICAL_EQUIPMENT, Q.ICT_SPEND, Q.OTHER_MANUFACTURED_SPEND, Q.PAPER_AND_CARD_SPEND);
+        sumAnswers(period, rtn, Q.SDU_NON_MEDICAL_EQUIPMENT_CO2E, Q.ICT_CO2E, Q.OTHER_MANUFACTURED_CO2E, Q.PAPER_AND_CARD_CO2E);
+
+        sumAnswers(period, rtn, Q.SDU_BUSINESS_SERVICES, Q.BIZ_SVCS_SPEND, Q.OTHER_SPEND);
+        sumAnswers(period, rtn, Q.SDU_BUSINESS_SERVICES_CO2E, Q.BIZ_SVCS_CO2E, Q.OTHER_PROCUREMENT_CO2E);
+
+        sumAnswers(period, rtn, Q.SDU_CONSTRUCTION_AND_FREIGHT, Q.CONSTRUCTION_SPEND, Q.FREIGHT_SPEND);
+        sumAnswers(period, rtn, Q.SDU_CONSTRUCTION_AND_FREIGHT_CO2E, Q.CONSTRUCTION_CO2E, Q.FREIGHT_CO2E);
+
+        sumAnswers(period, rtn, Q.SDU_FOOD_AND_CATERING, Q.CATERING_SPEND);
+        sumAnswers(period, rtn, Q.SDU_FOOD_AND_CATERING_CO2E, Q.CATERING_CO2E);
+
+        sumAnswers(period, rtn, Q.SDU_WATER, Q.WATER_COST);
+        sumAnswers(period, rtn, Q.SDU_WATER_CO2E, Q.WATER_CO2E);
+
+        sumAnswers(period, rtn, Q.SDU_WASTE, Q.WASTE_RECYLING_COST);
+        sumAnswers(period, rtn, Q.SDU_WASTE_CO2E, Q.WASTE_CO2E);
+
+        sumAnswers(period, rtn, Q.SDU_BUSINESS_TRAVEL_AND_FLEET, Q.TOTAL_BIZ_TRAVEL_COST);
+        sumAnswers(period, rtn, Q.SDU_BUSINESS_TRAVEL_AND_FLEET_CO2E, Q.FLEET_AND_BIZ_ROAD_CO2E);
+
+    }
+
     protected void calcCarbonProfileSduMethod(String period, SurveyReturn rtn) {
         LOGGER.info("calcCarbonProfileSduMethod for {} in {}", rtn.getOrg(), rtn.applicablePeriod());
         sumAnswers(period, rtn, Q.WASTE_AND_WATER_CO2E, Q.SCOPE_3_WASTE, Q.SCOPE_3_WATER);
@@ -1126,6 +1143,32 @@ public class Cruncher extends AbstractEmissionsService
 
     private boolean isEmpty(String value) {
         return value == null || "0".equals(value);
+    }
+
+    protected void calcCarbonProfileSimplifiedEClassMethod(String period, SurveyReturn rtn) {
+        LOGGER.info("calcCarbonProfileSimplifiedEClassMethod for {} in {}", rtn.getOrg(), rtn.applicablePeriod());
+
+        calcCarbonProfileEClassMethod(period, rtn);
+        sumAnswers(period, rtn, Q.EC_MEDICINES_AND_CHEMICALS, Q.PHARMA_BLOOD_PROD_AND_MED_GASES, Q.CHEMICALS_AND_REAGENTS);
+        sumAnswers(period, rtn, Q.EC_MEDICINES_AND_CHEMICALS_CO2E, Q.PHARMA_BLOOD_PROD_AND_MED_GASES_CO2E, Q.CHEMICALS_AND_REAGENTS_CO2E);
+
+        sumAnswers(period, rtn, Q.EC_MEDICAL_EQUIPMENT, Q.DRESSINGS,Q.MEDICAL_AND_SURGICAL_EQUIPT, Q.PATIENTS_APPLIANCES, Q.DENTAL_AND_OPTICAL_EQUIPT,Q.IMAGING_AND_RADIOTHERAPY_EQUIPT_AND_SVCS);
+        sumAnswers(period, rtn, Q.EC_MEDICAL_EQUIPMENT_CO2E, Q.DRESSINGS_CO2E, Q.MEDICAL_AND_SURGICAL_EQUIPT_CO2E, Q.PATIENTS_APPLIANCES_CO2E, Q.DENTAL_AND_OPTICAL_EQUIPT_CO2E,Q.IMAGING_AND_RADIOTHERAPY_EQUIPT_AND_SVCS_CO2E);
+
+        sumAnswers(period, rtn, Q.EC_NON_MEDICAL_EQUIPMENT, Q.PATIENTS_CLOTHING_AND_FOOTWEAR, Q.STAFF_CLOTHING, Q.LAB_EQUIPT_AND_SVCS, Q.BEDDING_LINEN_AND_TEXTILES, Q.OFFICE_EQUIPT_TELCO_COMPUTERS_AND_STATIONERY, Q.REC_EQUIPT_AND_SOUVENIRS);
+        sumAnswers(period, rtn, Q.EC_NON_MEDICAL_EQUIPMENT_CO2E, Q.PATIENTS_CLOTHING_AND_FOOTWEAR_CO2E, Q.STAFF_CLOTHING_CO2E, Q.LAB_EQUIPT_AND_SVCS_CO2E, Q.BEDDING_LINEN_AND_TEXTILES_CO2E, Q.OFFICE_EQUIPT_TELCO_COMPUTERS_AND_STATIONERY_CO2E, Q.REC_EQUIPT_AND_SOUVENIRS_CO2E);
+
+        sumAnswers(period, rtn, Q.EC_BUSINESS_SERVICES, Q.HOTEL_EQUIPT_MATERIALS_AND_SVCS, Q.BLDG_AND_ENG_PROD_AND_SVCS, Q.CONSULTING_SVCS_AND_EXPENSES);
+        sumAnswers(period, rtn, Q.EC_BUSINESS_SERVICES_CO2E, Q.HOTEL_EQUIPT_MATERIALS_AND_SVCS_CO2E, Q.BLDG_AND_ENG_PROD_AND_SVCS_CO2E, Q.CONSULTING_SVCS_AND_EXPENSES_CO2E);
+
+        sumAnswers(period, rtn, Q.EC_CONSTRUCTION_AND_FREIGHT, Q.GARDENING_AND_FARMING, Q.FURNITURE_FITTINGS);
+        sumAnswers(period, rtn, Q.EC_CONSTRUCTION_AND_FREIGHT_CO2E, Q.GARDENING_AND_FARMING_CO2E, Q.FURNITURE_FITTINGS_CO2E);
+
+        sumAnswers(period, rtn, Q.EC_FOOD_AND_CATERING, Q.PROVISIONS, Q.HARDWARE_CROCKERY);
+        sumAnswers(period, rtn, Q.EC_FOOD_AND_CATERING_CO2E, Q.PROVISIONS_CO2E, Q.HARDWARE_CROCKERY_CO2E);
+
+        sumAnswers(period, rtn, Q.EC_COMMISSIONED_HEALTH_SERVICES, Q.PURCHASED_HEALTHCARE);
+        sumAnswers(period, rtn, Q.EC_COMMISSIONED_HEALTH_SERVICES_CO2E, Q.PURCHASED_HEALTHCARE_CO2E);
     }
 
     protected void calcCarbonProfileEClassMethod(String period, SurveyReturn rtn) {

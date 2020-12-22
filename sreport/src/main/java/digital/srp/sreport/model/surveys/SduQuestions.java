@@ -164,7 +164,31 @@ public interface SduQuestions {
             /* commissioning */
             Q.TOTAL_COMMISSIONING_CO2E
     };
+    Q[] SDU_PROFILE2_CO2E_HDRS = new Q[] {
+            Q.SDU_MEDICINES_AND_CHEMICALS_CO2E,
+            Q.SDU_MEDICAL_EQUIPMENT_CO2E,
+            Q.SDU_NON_MEDICAL_EQUIPMENT_CO2E,
+            Q.SDU_BUSINESS_SERVICES_CO2E,
+            Q.SDU_CONSTRUCTION_AND_FREIGHT_CO2E,
+            Q.SDU_FOOD_AND_CATERING_CO2E,
+            Q.SDU_COMMISSIONED_HEALTH_SERVICES_CO2E,
+            Q.SDU_WATER_CO2E,
+            Q.SDU_WASTE_CO2E,
+            Q.SDU_BUSINESS_TRAVEL_AND_FLEET_CO2E
+    };
 
+    Q[] ECLASS_PROFILE2_CO2E_HDRS = new Q[] {
+            Q.EC_MEDICINES_AND_CHEMICALS_CO2E,
+            Q.EC_MEDICAL_EQUIPMENT_CO2E,
+            Q.EC_NON_MEDICAL_EQUIPMENT_CO2E,
+            Q.EC_BUSINESS_SERVICES_CO2E,
+            Q.EC_CONSTRUCTION_AND_FREIGHT_CO2E,
+            Q.EC_FOOD_AND_CATERING_CO2E,
+            Q.EC_COMMISSIONED_HEALTH_SERVICES_CO2E,
+            Q.EC_WATER_CO2E,
+            Q.EC_WASTE_CO2E,
+            Q.EC_BUSINESS_TRAVEL_AND_FLEET_CO2E,
+    };
     Q[] BIOMASS_CO2E_WTT_HDRS = new Q[] {
             Q.WOOD_LOGS_WTT_CO2E, Q.WOOD_CHIPS_WTT_CO2E, Q.WOOD_PELLETS_WTT_CO2E
     };
@@ -179,6 +203,19 @@ public interface SduQuestions {
             Q.OTHER_MANUFACTURED_SPEND, Q.MED_INSTR_SPEND, Q.OTHER_SPEND,
             Q.PAPER_AND_CARD_SPEND, Q.PHARMA_SPEND, Q.TRAVEL_SPEND,
             Q.COMMISSIONING_SPEND
+    };
+
+    Q[] SDU_PROFILE2_HDRS = new Q[] {
+            Q.SDU_MEDICINES_AND_CHEMICALS,
+            Q.SDU_MEDICAL_EQUIPMENT,
+            Q.SDU_NON_MEDICAL_EQUIPMENT,
+            Q.SDU_BUSINESS_SERVICES,
+            Q.SDU_CONSTRUCTION_AND_FREIGHT,
+            Q.SDU_FOOD_AND_CATERING,
+            Q.SDU_COMMISSIONED_HEALTH_SERVICES,
+            Q.SDU_WATER,
+            Q.SDU_WASTE,
+            Q.SDU_BUSINESS_TRAVEL_AND_FLEET
     };
 
     Q[] ECLASS_PROFILE_HDRS = new Q[] {
@@ -211,6 +248,18 @@ public interface SduQuestions {
             Q.WASTE_AND_WATER_CO2E,
             /* commissioning */
             Q.TOTAL_COMMISSIONING_CO2E
+    };
+    Q[] ECLASS_PROFILE2_HDRS = new Q[] {
+            Q.EC_MEDICINES_AND_CHEMICALS,
+            Q.EC_MEDICAL_EQUIPMENT,
+            Q.EC_NON_MEDICAL_EQUIPMENT,
+            Q.EC_BUSINESS_SERVICES,
+            Q.EC_CONSTRUCTION_AND_FREIGHT,
+            Q.EC_FOOD_AND_CATERING,
+            Q.EC_COMMISSIONED_HEALTH_SERVICES,
+            Q.EC_WATER,
+            Q.EC_WASTE,
+            Q.EC_BUSINESS_TRAVEL_AND_FLEET,
     };
 
     Q[] CORE_CO2E_HDRS = new Q[] {
