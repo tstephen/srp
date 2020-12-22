@@ -458,7 +458,7 @@ public class Cruncher extends AbstractEmissionsService
         if (rtn.answer(period, Q.INCINERATION_WEIGHT).isPresent()) {
             calcIncinerationCo2e(
                     getAnswer(period, rtn, Q.INCINERATION_WEIGHT).responseAsBigDecimal(),
-                    cFactor(CarbonFactors.HIGH_TEMPERATURE_DISPOSAL_WASTE, period),
+                    cFactor(CarbonFactors.DOMESTIC_WASTE_INCINERATION, period),
                     getAnswer(period, rtn, Q.INCINERATION_CO2E));
         }
         calcRecylingCo2e(
@@ -467,7 +467,7 @@ public class Cruncher extends AbstractEmissionsService
                 getAnswer(period, rtn, Q.RECYCLING_CO2E));
         calcLandfillCo2e(
                 getAnswer(period, rtn, Q.LANDFILL_WEIGHT).responseAsBigDecimal(),
-                cFactor(CarbonFactors.LANDFILL_WEIGHTED_AVERAGE, period),
+                cFactor(CarbonFactors.LANDFILL_DOMESTIC_WASTE, period),
                 getAnswer(period, rtn, Q.LANDFILL_CO2E));
         if (rtn.answer(period, Q.WASTE_CLINICAL_INCINERATED).isPresent()) {
             calcIncinerationCo2e(
@@ -508,7 +508,7 @@ public class Cruncher extends AbstractEmissionsService
         if (rtn.answer(period, Q.WEEE_WEIGHT).isPresent() && rtn.answer(period, Q.WEEE_WEIGHT_CO2E).isPresent()) {
             calcWeeeCo2e(
                     rtn.answerResponseAsBigDecimal(period, Q.WEEE_WEIGHT),
-                    cFactor(CarbonFactors.WEEE_MIXED, period),
+                    cFactor(CarbonFactors.WEEE_AVERAGE, period),
                     getAnswer(period, rtn, Q.WEEE_WEIGHT_CO2E));
         }
         if (rtn.answer(period, Q.OTHER_RECOVERY_WEIGHT).isPresent()) {
