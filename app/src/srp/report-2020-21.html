@@ -624,18 +624,12 @@
           <h3>Inhaler prescribing <a href="#contentSect" class="govuk-back-link">Back to top</a></h3>
           <div class="rpt table2" id="inhalersRptTable2" data-qs="MDI,DPI,AMI" data-periods="4"
                data-share="http://localhost:8083/reports/{{formatAnswer('ORG_CODE')}}/{{surveyReturn.applicablePeriod}}/inhalers.html"></div>
-          <h4>Carbon emissions resulting</h4>
           <p>
-            <svg data-qs="MDI,DPI,AMI"
+            <svg data-qs="MDI,DPI,AMI" data-y-axis-label="Units prescribed"
                  data-colors="#0B4BE5,#0BBDE5,#00F299,#A2FC00,#FFEB00,#FFAD00" data-periods="4"
                  class="rpt stacked2" id="inhalersGraph2" width="600" height="400"></svg>
           </p>
-          <p>CO<sub>2</sub> Emissions (tCO<sub>2</sub>e)</p>
-
-          <div class="rpt table2" id="inhalersCo2eRptTable2" data-total="true" data-qs="MDI,DPI,AMI" data-periods="4"
-               data-share="http://localhost:8083/reports/{{formatAnswer('ORG_CODE')}}/{{surveyReturn.applicablePeriod}}/inhalers-co2e.html"></div>
-          <!--p class="narrative performance {{#if !haveAnswer('ANAESTHETIC_GASES_PERF')}}hidden-print{{/if}}" data-q="ANAESTHETIC_GASES_PERF">{{formatAnswer('ANAESTHETIC_GASES_PERF')}}</p>
-          <p class="narrative context {{#if !haveAnswer('ANAESTHETIC_GASES_CTXT')}}hidden-print{{/if}}" data-q="ANAESTHETIC_GASES_CTXT">{{formatAnswer('ANAESTHETIC_GASES_CTXT')}}</p-->
+          <p class="narrative context {{#if !haveAnswer('INHALERS_CTXT')}}hidden-print{{/if}}" data-q="INHALERS_CTXT">{{formatAnswer('INHALERS_CTXT')}}</p>
         </section>
         <section id="carbonFootprintSect" class="rpt section">
           <h2>Modelled Carbon Footprint <a href="#contentSect" class="govuk-back-link">Back to top</a></h2>

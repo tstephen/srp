@@ -381,6 +381,7 @@ public class Sdu2021 implements SurveyFactory {
         list.add(Q.PLASTICS_PLEDGE);
         list.add(Q.PLASTICS_CTXT);
         list.add(Q.AIR_POLLUTION_CTXT);
+        list.add(Q.INHALERS_CTXT);
         return list.toArray(new Q[list.size()]);
     }
 
