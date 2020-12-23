@@ -489,13 +489,20 @@
           <div class="rpt table2" id="travelRptTable2" data-total="true" data-qs="PATIENT_AND_VISITOR_MILEAGE,BIZ_MILEAGE,STAFF_COMMUTE_MILES_TOTAL" data-periods="4"
                data-share="http://localhost:8083/reports/{{formatAnswer('ORG_CODE')}}/{{surveyReturn.applicablePeriod}}/travel.html"></div>
           <h4>Breakdown of fleet mileage</h4>
-          <p>All travel is shown in miles.</p>
-          <div class="rpt table2" id="fleetTravelRptTable2" data-total="true" data-qs="CAR_MILES_PETROL,CAR_MILES_DIESEL,CAR_MILES_UNKNOWN_FUEL,OWNED_LEASED_CARBON_MILES" data-periods="4"
-               data-share="https://api.knowprocess.com/reports/{{formatAnswer('ORG_CODE')}}/{{surveyReturn.applicablePeriod}}/fleet-travel.html"></div>
+          <section class="col-md-6 col-xs-12">
+            <p>Travel where the actual fuel consumed is known.</p>
+            <div class="rpt table2" id="fleetFuelRptTable2" data-total="true" data-qs="CAR_PETROL_USED,CAR_DIESEL_USED,CAR_HYBRID_FUEL_USED" data-periods="4"
+                 data-share="http://localhost:8083/reports/{{formatAnswer('ORG_CODE')}}/{{surveyReturn.applicablePeriod}}/fleet-fuel.html"></div>
+	  </section>
+	  <section class="col-md-6 col-xs-12">
+            <p>Travel where fuel use is estimated. All travel is shown in miles.</p>
+            <div class="rpt table2" id="fleetTravelRptTable2" data-total="true" data-qs="CAR_MILES_PETROL,CAR_MILES_DIESEL,CAR_MILES_UNKNOWN_FUEL,OWNED_LEASED_CARBON_MILES" data-periods="4"
+                 data-share="http://localhost:8083/reports/{{formatAnswer('ORG_CODE')}}/{{surveyReturn.applicablePeriod}}/fleet-travel.html"></div>
+	  </section>
           <h4>Breakdown of business mileage</h4>
           <p>All travel is shown in miles.</p>
           <div class="rpt table2" id="bizTravelRptTable2" data-total="true" data-qs="BIZ_MILEAGE_ROAD,BIZ_MILEAGE_RAIL,BIZ_MILEAGE_AIR" data-periods="4"
-               data-share="https://api.knowprocess.com/reports/{{formatAnswer('ORG_CODE')}}/{{surveyReturn.applicablePeriod}}/biz-travel.html"></div>
+               data-share="http://localhost:8083/reports/{{formatAnswer('ORG_CODE')}}/{{surveyReturn.applicablePeriod}}/biz-travel.html"></div>
           <h4>Emissions resulting from travel</h4>
           <p>CO<sub>2</sub> Emissions (tCO<sub>2</sub>e)</p>
           <p>
@@ -508,12 +515,12 @@
           <p class="narrative performance {{#if !haveAnswer('TRAVEL_PERF')}}hidden-print{{/if}}" data-q="TRAVEL_PERF">{{formatAnswer('TRAVEL_PERF')}}</p>
           <h4>Breakdown of fleet emissions</h4>
           <p>CO<sub>2</sub> Emissions (tCO<sub>2</sub>e)</p>
-          <div class="rpt table2" id="roadTravelCo2eRptTable2" data-total="true" data-qs="CAR_MILES_PETROL_CO2E,CAR_MILES_DIESEL_CO2E,CAR_MILES_UNKNOWN_FUEL_CO2E,OWNED_LEASED_CARBON_MILES_CO2E" data-periods="4"
+          <div class="rpt table2" id="roadTravelCo2eRptTable2" data-total="true" data-qs="CAR_MILES_PETROL_CO2E,CAR_MILES_DIESEL_CO2E" data-periods="4"
                data-share="http://localhost:8083/reports/{{formatAnswer('ORG_CODE')}}/{{surveyReturn.applicablePeriod}}/travel-co2e.html"></div>
           <h4>Breakdown of business travel emissions</h4>
           <p>CO<sub>2</sub> Emissions (tCO<sub>2</sub>e)</p>
           <div class="rpt table2" id="travelCo2eRptTable2" data-total="true" data-qs="BIZ_MILEAGE_ROAD_CO2E,BIZ_MILEAGE_RAIL_CO2E,BIZ_MILEAGE_AIR_CO2E" data-periods="4"
-               data-share="https://api.knowprocess.com/reports/{{formatAnswer('ORG_CODE')}}/{{surveyReturn.applicablePeriod}}/travel-co2e.html"></div>
+               data-share="http://localhost:8083/reports/{{formatAnswer('ORG_CODE')}}/{{surveyReturn.applicablePeriod}}/travel-co2e.html"></div>
           <p class="narrative performance {{#if !haveAnswer('TRAVEL_PERF')}}hidden-print{{/if}}" data-q="TRAVEL_PERF">{{formatAnswer('TRAVEL_PERF')}}</p>
         </section>
 
@@ -537,17 +544,17 @@
           <span class="glyphicon glyphicon-question-sign no-print pull-right" onclick="ractive.toggleFieldHint('WASTE')" title="{{formatHint('WASTE')}}"></span>
           <p class="help-block no-print hidden" id="WASTEHint">{{{formatHint('WASTE')}}}</p>
           <p>Waste in tonnes</p>
-          <div class="rpt table2" id="wasteRptTable2" data-total="true" data-qs="RECYCLING_WEIGHT,OTHER_RECOVERY_WEIGHT,INCINERATION_WEIGHT,LANDFILL_WEIGHT" data-periods="4"
+          <div class="rpt table2" id="wasteRptTable2" data-total="true" data-qs="WASTE_CLINICAL_INCINERATED,ALT_WASTE_DISPOSAL_WEIGHT,WASTE_OFFENSIVE,LANDFILL_WEIGHT,RECYCLING_WEIGHT,WASTE_FOOD,WASTE_TEXTILES,WASTE_INCINERATION_WEIGHT,WASTE_PROCESSED_ON_SITE,WEEE_WEIGHT" data-periods="4"
                data-share="http://localhost:8083/reports/{{formatAnswer('ORG_CODE')}}/{{surveyReturn.applicablePeriod}}/waste.html"></div>
           <h4>Carbon emissions resulting</h4>
           <p>
-            <svg data-qs="RECYCLING_CO2E,OTHER_RECOVERY_CO2E,INCINERATION_CO2E,LANDFILL_CO2E"
+            <svg data-qs="DURABLES_INTERNAL_REUSE_CO2E,DURABLES_EXTERNAL_REUSE_CO2E,PAPER_USED_CO2E,WASTE_CLINICAL_INCINERATED_CO2E,ALT_WASTE_DISPOSAL_WEIGHT_CO2E,WASTE_OFFENSIVE_CO2E,LANDFILL_WEIGHT_CO2E,RECYCLING_WEIGHT_CO2E,WASTE_FOOD_CO2E,WASTE_TEXTILES_CO2E,WASTE_INCINERATION_WEIGHT_CO2E,WASTE_PROCESSED_ON_SITE_CO2E,WEEE_WEIGHT_CO2E"
                  data-colors="#0B4BE5,#0BBDE5,#00F299,#A2FC00,#FFEB00,#FFAD00" data-periods="4"
                  class="rpt stacked2" id="wasteGraph2" width="600" height="400"></svg>
           </p>
           <p>CO<sub>2</sub> Emissions (tCO<sub>2</sub>e)</p>
 
-          <div class="rpt table2" id="wasteCo2eRptTable2" data-total="true" data-qs="RECYCLING_CO2E,OTHER_RECOVERY_CO2E,INCINERATION_CO2E,LANDFILL_CO2E" data-periods="4"
+          <div class="rpt table2" id="wasteCo2eRptTable2" data-total="true" data-qs="DURABLES_INTERNAL_REUSE_CO2E,DURABLES_EXTERNAL_REUSE_CO2E,PAPER_USED_CO2E,WASTE_CLINICAL_INCINERATED_CO2E,ALT_WASTE_DISPOSAL_WEIGHT_CO2E,WASTE_OFFENSIVE_CO2E,LANDFILL_WEIGHT_CO2E,RECYCLING_WEIGHT_CO2E,WASTE_FOOD_CO2E,WASTE_TEXTILES_CO2E,WASTE_INCINERATION_WEIGHT_CO2E,WASTE_PROCESSED_ON_SITE_CO2E,WEEE_WEIGHT_CO2E" data-periods="4"
                data-share="http://localhost:8083/reports/{{formatAnswer('ORG_CODE')}}/{{surveyReturn.applicablePeriod}}/waste-c2oe.html"></div>
           <p class="narrative performance {{#if !haveAnswer('WASTE_PERF')}}hidden-print{{/if}}" data-q="WASTE_PERF">{{formatAnswer('WASTE_PERF')}}</p>
           <p class="narrative context {{#if !haveAnswer('WASTE_CONTEXT')}}hidden-print{{/if}}" data-q="WASTE_CONTEXT">{{formatAnswer('WASTE_CONTEXT')}}</p>
@@ -616,7 +623,7 @@
         <section id="inhalersSect" class="rpt section">
           <h3>Inhaler prescribing <a href="#contentSect" class="govuk-back-link">Back to top</a></h3>
           <div class="rpt table2" id="inhalersRptTable2" data-qs="MDI,DPI,AMI" data-periods="4"
-               data-share="https://api.knowprocess.com/reports/{{formatAnswer('ORG_CODE')}}/{{surveyReturn.applicablePeriod}}/inhalers.html"></div>
+               data-share="http://localhost:8083/reports/{{formatAnswer('ORG_CODE')}}/{{surveyReturn.applicablePeriod}}/inhalers.html"></div>
           <h4>Carbon emissions resulting</h4>
           <p>
             <svg data-qs="MDI,DPI,AMI"
@@ -626,7 +633,7 @@
           <p>CO<sub>2</sub> Emissions (tCO<sub>2</sub>e)</p>
 
           <div class="rpt table2" id="inhalersCo2eRptTable2" data-total="true" data-qs="MDI,DPI,AMI" data-periods="4"
-               data-share="https://api.knowprocess.com/reports/{{formatAnswer('ORG_CODE')}}/{{surveyReturn.applicablePeriod}}/inhalers-co2e.html"></div>
+               data-share="http://localhost:8083/reports/{{formatAnswer('ORG_CODE')}}/{{surveyReturn.applicablePeriod}}/inhalers-co2e.html"></div>
           <!--p class="narrative performance {{#if !haveAnswer('ANAESTHETIC_GASES_PERF')}}hidden-print{{/if}}" data-q="ANAESTHETIC_GASES_PERF">{{formatAnswer('ANAESTHETIC_GASES_PERF')}}</p>
           <p class="narrative context {{#if !haveAnswer('ANAESTHETIC_GASES_CTXT')}}hidden-print{{/if}}" data-q="ANAESTHETIC_GASES_CTXT">{{formatAnswer('ANAESTHETIC_GASES_CTXT')}}</p-->
         </section>
@@ -650,26 +657,26 @@
             <div class="rpt table2" id="carbonFootprintRptTable2" data-total="true" data-qs="CORE_CO2E_PCT,COMMISSIONING_CO2E_PCT,PROCUREMENT_2017_CO2E_PCT,COMMUNITY_CO2E_PCT" data-periods="1"
                  data-share="http://localhost:8083/reports/{{formatAnswer('ORG_CODE')}}/{{surveyReturn.applicablePeriod}}/carbon-footprint.html"></div>
           </section>
-          <section id="nhsCarbonFootprintSect" style="clear:both">
+          <section id="nonProcurementCarbonProfileSect" style="clear:both">
               <h3>NHS Carbon footprint<a href="#contentSect" class="govuk-back-link">Back to top</a></h3>
               <div class="rpt table2" id="eclassRptTable2" data-total="true" data-qs="OWNED_BUILDINGS_COAL,NET_ELEC_CO2E,OWNED_BUILDINGS_GAS,OWNED_BUILDINGS_OIL,NET_THERMAL_ENERGY_CO2E,LEASED_ASSETS_ENERGY_USE,BIZ_MILEAGE_CO2E,ANAESTHETIC_GASES_CO2E,WASTE_AND_WATER_CO2E" data-periods="4"
                    data-share="http://localhost:8083/reports/{{formatAnswer('ORG_CODE')}}/{{surveyReturn.applicablePeriod}}/eclass-carbon-profile.html"></div>
           </section>
             <section id="eclassCarbonProfileSect" class="col-md-6 col-xs-12" style="clear:both">
               <h3>E-Class procurement Carbon profile <a href="#contentSect" class="govuk-back-link">Back to top</a></h3>
-              <p>Calculated from operating expenditure of <em>&pound;{{formatAnswer('OP_EX')}},000</em>
-                {{# formatAnswer('ECLASS_SPEND')}} of which <em>&pound;{{formatAnswer('ECLASS_SPEND')}},000</em> is E-Class classified spend.{{/}}<br/><br/>
+              <p>Calculated from the e-class spend you entered, which totalled
+		<em>&pound; {{formatDecimalAnswer('ECLASS_SPEND', period, 0)}}{{#if haveAnswer('ECLASS_SPEND')}},000{{else}}0{{/if}}</em> in the current year.<br/><br/>
               </p>
               <p>CO<sub>2</sub> Emissions (tCO<sub>2</sub>e)</p>
-              <div class="rpt table2" id="eclassRptTable2" data-total="true" data-qs="PROVISIONS_CO2E,STAFF_CLOTHING_CO2E,PATIENTS_CLOTHING_AND_FOOTWEAR_CO2E,PHARMA_BLOOD_PROD_AND_MED_GASES_CO2E,DRESSINGS_CO2E,MEDICAL_AND_SURGICAL_EQUIPT_CO2E,PATIENTS_APPLIANCES_CO2E,CHEMICALS_AND_REAGENTS_CO2E,DENTAL_AND_OPTICAL_EQUIPT_CO2E,IMAGING_AND_RADIOTHERAPY_EQUIPT_AND_SVCS_CO2E,LAB_EQUIPT_AND_SVCS_CO2E,HOTEL_EQUIPT_MATERIALS_AND_SVCS_CO2E,BLDG_AND_ENG_PROD_AND_SVCS_CO2E,PURCHASED_HEALTHCARE_CO2E,GARDENING_AND_FARMING_CO2E,FURNITURE_FITTINGS_CO2E,HARDWARE_CROCKERY_CO2E,BEDDING_LINEN_AND_TEXTILES_CO2E,OFFICE_EQUIPT_TELCO_COMPUTERS_AND_STATIONERY_CO2E,REC_EQUIPT_AND_SOUVENIRS_CO2E,CONSULTING_SVCS_AND_EXPENSES_CO2E" data-periods="4"
+              <div class="rpt table2" id="eclassRptTable2" data-total="true" data-qs="EC_MEDICINES_AND_CHEMICALS_CO2E,EC_MEDICAL_EQUIPMENT_CO2E,EC_NON_MEDICAL_EQUIPMENT_CO2E,EC_BUSINESS_SERVICES_CO2E,EC_CONSTRUCTION_AND_FREIGHT_CO2E,EC_FOOD_AND_CATERING_CO2E,EC_COMMISSIONED_HEALTH_SERVICES_CO2E" data-periods="4"
                    data-share="http://localhost:8083/reports/{{formatAnswer('ORG_CODE')}}/{{surveyReturn.applicablePeriod}}/eclass-carbon-profile.html"></div>
             </section>
             <section id="sduCarbonProfileSect" class="col-md-6 col-xs-12">
               <h3>SDU procurement Carbon profile <a href="#contentSect" class="govuk-back-link">Back to top</a></h3>
-              <p>Calculated from operating expenditure of <em>&pound;{{formatAnswer('OP_EX')}},000</em> of which <em>&pound;{{formatAnswer('NON_PAY_SPEND')}},000</em> is non-pay spend based on typical values for an {{formatAnswer('ORG_TYPE')}} organisation.</p>
+              <p>Calculated from operating expenditure of <em>&pound; {{formatAnswer('OP_EX')}},000</em> of which <em>&pound; {{formatAnswer('NON_PAY_SPEND')}},000</em> is non-pay spend based on typical values for an {{formatAnswer('ORG_TYPE')}} organisation.</p>
               <p>CO<sub>2</sub> Emissions (tCO<sub>2</sub>e)</p>
-          <div class="rpt table2" id="sduProfileRptTable2" data-total="true" data-qs="BIZ_SVCS_CO2E,CAPITAL_CO2E,CONSTRUCTION_CO2E,CATERING_CO2E,FREIGHT_CO2E,ICT_CO2E,CHEM_AND_GAS_CO2E,MED_INSTR_CO2E,OTHER_MANUFACTURED_CO2E,PAPER_AND_CARD_CO2E,PHARMA_CO2E" data-periods="4"
-               data-share="https://api.knowprocess.com/reports/{{formatAnswer('ORG_CODE')}}/{{surveyReturn.applicablePeriod}}/sdu-carbon-profile.html"></div>
+          <div class="rpt table2" id="sduProfileRptTable2" data-total="true" data-qs="SDU_MEDICINES_AND_CHEMICALS_CO2E,SDU_MEDICAL_EQUIPMENT_CO2E,SDU_NON_MEDICAL_EQUIPMENT_CO2E,SDU_BUSINESS_SERVICES_CO2E,SDU_CONSTRUCTION_AND_FREIGHT_CO2E,SDU_FOOD_AND_CATERING_CO2E,SDU_COMMISSIONED_HEALTH_SERVICES_CO2E,SDU_WATER_CO2E,SDU_WASTE_CO2E,SDU_BUSINESS_TRAVEL_AND_FLEET_CO2E" data-periods="4"
+               data-share="http://localhost:8083/reports/{{formatAnswer('ORG_CODE')}}/{{surveyReturn.applicablePeriod}}/sdu-carbon-profile.html"></div>
             </section>
           <section id="remainingCarbonProfileSect" style="clear:both">
               <h3>Commissioning and community Carbon profile<a href="#contentSect" class="govuk-back-link">Back to top</a></h3>

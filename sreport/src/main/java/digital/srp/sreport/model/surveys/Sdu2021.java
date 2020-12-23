@@ -145,7 +145,7 @@ public class Sdu2021 implements SurveyFactory {
                         Q.RECYCLING_WEIGHT,
                         Q.WASTE_FOOD,
                         Q.WASTE_TEXTILES,
-                        Q.WASTE_INCINERATION_WEIGHT,
+                        Q.INCINERATION_WEIGHT,
                         Q.WASTE_PROCESSED_ON_SITE,
                         Q.WEEE_WEIGHT
                 );
@@ -175,7 +175,7 @@ public class Sdu2021 implements SurveyFactory {
                 .questionEnums(
                         Q.CAR_PETROL_USED,
                         Q.CAR_DIESEL_USED,
-                        Q.CAR_HYBRID_FUEL_USED,
+                        Q.OWNED_LEASED_LOW_CARBON_FUEL_USED,
                         Q.CAR_MILES_PETROL,
                         Q.CAR_MILES_DIESEL,
                         Q.CAR_MILES_UNKOWN_FUEL,
@@ -255,7 +255,7 @@ public class Sdu2021 implements SurveyFactory {
                 );
 
         SurveyCategory catEClassProfile = new SurveyCategory()
-                .name("Spending (e-class)")
+                .name("Spend (e-class)")
                 .questionEnums(
                         Q.ECLASS_USER,
                         Q.PROVISIONS, Q.STAFF_CLOTHING,
@@ -274,7 +274,7 @@ public class Sdu2021 implements SurveyFactory {
                 );
 
         SurveyCategory catSpendProfile = new SurveyCategory()
-                .name("Spending (Greener NHS)")
+                .name("Spend (Greener NHS)")
                 .questionEnums(SduQuestions.SDU_PROFILE_HDRS);
 
         SurveyCategory catQual = new SurveyCategory()
@@ -303,14 +303,16 @@ public class Sdu2021 implements SurveyFactory {
     public Q[] getQs() {
         ArrayList<Q> list = new ArrayList<Q>();
         list.addAll(Arrays.asList(SduQuestions.SDU_PROFILE_HDRS));
+        list.addAll(Arrays.asList(SduQuestions.SDU_PROFILE2_HDRS));
         list.addAll(Arrays.asList(SduQuestions.FOOTPRINT_PCT_HDRS));
         list.addAll(Arrays.asList(SduQuestions.FOOTPRINT_2017_PCT_HDRS));
         list.add(Q.WASTE_WATER);
         list.addAll(Arrays.asList(SduQuestions.WATER_CO2E_HDRS));
         list.add(Q.PAPER_USED);
         list.addAll(Arrays.asList(SduQuestions.WASTE_HDRS));
-        list.addAll(Arrays.asList(SduQuestions.WASTE_CO2E_HDRS));
-        list.addAll(Arrays.asList(SduQuestions.TRAVEL_CO2E_HDRS));
+        list.addAll(Arrays.asList(SduQuestions.WASTE_CO2E_HDRS_POST2020));
+        list.addAll(Arrays.asList(SduQuestions.TRAVEL_CO2E_HDRS_POST2020));
+        list.add(Q.BIZ_MILEAGE_ROAD_CO2E);
         list.addAll(Arrays.asList(SduQuestions.ENERGY_HDRS));
         list.add(Q.ELEC_USED_GREEN_TARIFF);
         list.add(Q.ELEC_3RD_PTY_RENEWABLE_USED);
@@ -332,10 +334,14 @@ public class Sdu2021 implements SurveyFactory {
         list.addAll(Arrays.asList(SduQuestions.BIOMASS_CO2E_WTT_HDRS));
         list.addAll(Arrays.asList(SduQuestions.BIOMASS_CO2E_NOSCOPE_HDRS));
         list.addAll(Arrays.asList(SduQuestions.SDU_PROFILE_CO2E_HDRS));
+        list.addAll(Arrays.asList(SduQuestions.SDU_PROFILE2_CO2E_HDRS));
         // #203 not displayed but still calculated
         list.add(Q.OTHER_PROCUREMENT_CO2E);
         list.add(Q.ECLASS_USER);
+        list.add(Q.ECLASS_SPEND);
         list.addAll(Arrays.asList(SduQuestions.ECLASS_PROFILE_HDRS));
+        list.addAll(Arrays.asList(SduQuestions.ECLASS_PROFILE2_HDRS));
+        list.addAll(Arrays.asList(SduQuestions.ECLASS_PROFILE2_CO2E_HDRS));
         list.addAll(Arrays.asList(SduQuestions.CORE_CO2E_HDRS));
         list.addAll(Arrays.asList(SduQuestions.BIZ_MILEAGE_ACTIVE_PUBLIC_HDRS));
         list.addAll(Arrays.asList(SduQuestions.BIZ_MILEAGE_HDRS));

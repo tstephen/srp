@@ -15,8 +15,11 @@ import org.apache.commons.csv.CSVRecord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import digital.srp.sreport.api.exceptions.ObjectNotFoundException;
 import digital.srp.sreport.internal.StringUtils;
 import digital.srp.sreport.model.CarbonFactor;
+import digital.srp.sreport.model.CarbonFactors;
+import digital.srp.sreport.model.surveys.Sdu2021;
 
 public class CarbonFactorCsvImporter {
 
@@ -25,7 +28,9 @@ public class CarbonFactorCsvImporter {
 
     public static final String DATA = "/data/CarbonFactors.csv";
     public static final String[] HEADERS = {
-            "category","name","unit","scope","2007-08","2008-09","2009-10","2010-11","2011-12","2012-13","2013-14","2014-15","2015-16","2016-17","2017-18","2018-19","2019-20","2020-21","comments"};
+            "category","name","unit","scope","2007-08","2008-09","2009-10",
+            "2010-11","2011-12","2012-13","2013-14","2014-15","2015-16",
+            "2016-17","2017-18","2018-19","2019-20","2020-21","comments"};
 
     public List<CarbonFactor> readCarbonFactors() throws IOException {
         try (InputStreamReader isr = new InputStreamReader(
@@ -48,20 +53,20 @@ public class CarbonFactorCsvImporter {
             LOGGER.info(String.format("importing record %1$d", record.getRecordNumber()));
             if (record.getRecordNumber() > 1) { // skip headers
                 try {
-                    cfactors.add(newCarbonFactor(record, "2007-08", 4));
-                    cfactors.add(newCarbonFactor(record, "2008-09", 5));
-                    cfactors.add(newCarbonFactor(record, "2009-10", 6));
-                    cfactors.add(newCarbonFactor(record, "2010-11", 7));
-                    cfactors.add(newCarbonFactor(record, "2011-12", 8));
-                    cfactors.add(newCarbonFactor(record, "2012-13", 9));
-                    cfactors.add(newCarbonFactor(record, "2013-14", 10));
-                    cfactors.add(newCarbonFactor(record, "2014-15", 11));
-                    cfactors.add(newCarbonFactor(record, "2015-16", 12));
-                    cfactors.add(newCarbonFactor(record, "2016-17", 13));
-                    cfactors.add(newCarbonFactor(record, "2017-18", 14));
-                    cfactors.add(newCarbonFactor(record, "2018-19", 15));
-                    cfactors.add(newCarbonFactor(record, "2019-20", 16));
-                    cfactors.add(newCarbonFactor(record, "2020-21", 17));
+                    cfactors.add(newCarbonFactor(record, HEADERS[4], 4));
+                    cfactors.add(newCarbonFactor(record, HEADERS[5], 5));
+                    cfactors.add(newCarbonFactor(record, HEADERS[6], 6));
+                    cfactors.add(newCarbonFactor(record, HEADERS[7], 7));
+                    cfactors.add(newCarbonFactor(record, HEADERS[8], 8));
+                    cfactors.add(newCarbonFactor(record, HEADERS[9], 9));
+                    cfactors.add(newCarbonFactor(record, HEADERS[10], 10));
+                    cfactors.add(newCarbonFactor(record, HEADERS[11], 11));
+                    cfactors.add(newCarbonFactor(record, HEADERS[12], 12));
+                    cfactors.add(newCarbonFactor(record, HEADERS[13], 13));
+                    cfactors.add(newCarbonFactor(record, HEADERS[14], 14));
+                    cfactors.add(newCarbonFactor(record, HEADERS[15], 15));
+                    cfactors.add(newCarbonFactor(record, HEADERS[16], 16));
+                    cfactors.add(newCarbonFactor(record, HEADERS[17], 17));
                 } catch (Exception e) {
                     String msg = String.format("Problem with record: %1$s: %2$s", record.getRecordNumber(), e.getMessage());
                     LOGGER.error(msg);
@@ -76,10 +81,18 @@ public class CarbonFactorCsvImporter {
             }
         }
 
+        for (CarbonFactors cFactor : CarbonFactors.values()) {
+            final String latestPeriod = Sdu2021.PERIOD;
+            cfactors.stream()
+                    .filter(e -> cFactor.name().equals(e.getName()) && latestPeriod.equals(e.getApplicablePeriod())).findFirst()
+                    .orElseThrow(() -> new ObjectNotFoundException(CarbonFactor.class, cFactor.name() + "_" + latestPeriod));
+
+        }
         return cfactors;
     }
 
     private CarbonFactor newCarbonFactor(CSVRecord record, String period, int idx) {
+        LOGGER.info("Parsing {}", record.toString());
         String value = record.get(idx);
         if (value.startsWith(".")) {
             value = "0" + value;
@@ -87,13 +100,15 @@ public class CarbonFactorCsvImporter {
         LOGGER.debug("value: {}", value);
 
         CarbonFactor factor = new CarbonFactor().category(record.get(0))
-                .name(StringUtils.toConst(record.get(1))).unit(record.get(2))
+                .name(StringUtils.toConst(record.get(1)))
+                .unit(record.get(2))
                 .applicablePeriod(period)
                 .comments(record.get(HEADERS.length - 1))
                 .value(new BigDecimal(value.trim()).setScale(6, RoundingMode.HALF_EVEN));
         if (record.get(3).trim().matches("[123]")) {
             factor.scope(record.get(3).trim());
         }
+        LOGGER.info("  resulted in {}", factor.toString());
         return factor;
     }
 

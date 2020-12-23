@@ -2,12 +2,15 @@ package digital.srp.sreport.services;
 
 //import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.List;
 
+import org.hamcrest.Matchers;
+import org.hamcrest.core.Is;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -22,6 +25,8 @@ import digital.srp.sreport.model.Q;
 import digital.srp.sreport.model.Survey;
 import digital.srp.sreport.model.SurveyReturn;
 import digital.srp.sreport.model.WeightingFactor;
+import digital.srp.sreport.model.surveys.Sdu1617;
+import digital.srp.sreport.model.surveys.Sdu2021;
 import digital.srp.sreport.model.surveys.SduQuestions;
 
 public class CruncherTest {
@@ -61,10 +66,10 @@ public class CruncherTest {
     private  static final String[] BIZ_SVCS_CO2E = { "4,070", "4,470",
             "4,870", "5,010", "0", "0", "0", "0", "0", "0" };
 
-    private  static final String[] WASTE_AND_WATER_CO2E = { "88.2", "96.8",
-            "106", "119", "0", "0", "0", "0", "0", "0" };
+    private  static final String[] WASTE_AND_WATER_CO2E = { "92.3", "101",
+            "111", "124", "0", "0", "0", "0", "0", "0" };
 
-    private  static final String[] SCOPE_3_WASTE = { "23.3", "25.7", "28.2", "33.3",
+    private  static final String[] SCOPE_3_WASTE = { "27.5", "30.2", "33.2", "39.2",
             "0", "0", "0", "0", "0", "0" };
 
     private  static final String[] SCOPE_3_WATER = { "64.8", "71.2", "77.5", "85.2",
@@ -173,8 +178,9 @@ public class CruncherTest {
         cfactors = new CarbonFactorCsvImporter().readCarbonFactors();
         wfactors = new WeightingFactorCsvImporter().readWeightingFactors();
         cruncher = new Cruncher(cfactors, wfactors);
+        cruncher.roadEmissionsService = new RoadEmissionsService();
+        cruncher.wasteEmissionsService = new WasteEmissionsService();
         answerFactory = new MemoryAnswerFactory();
-
         helper = new ClasspathSurveyReturnHelper();
     }
 
@@ -189,13 +195,13 @@ public class CruncherTest {
     @Test
     public void testFindCFactorByNameAndPeriod() {
         Assert.assertEquals(new BigDecimal("0.183997"),
-                cruncher.cFactor(CarbonFactors.NATURAL_GAS, "2016-17").value());
+                cruncher.cFactor(CarbonFactors.NATURAL_GAS, Sdu1617.PERIOD).value());
     }
 
     @Test
     public void testFindGasTotalCFactorByNameAndPeriod() {
         Assert.assertEquals(new BigDecimal("0.207780"),
-                cruncher.cFactor(CarbonFactors.GAS_TOTAL, "2020-21").value());
+                cruncher.cFactor(CarbonFactors.GAS_TOTAL, Sdu2021.PERIOD).value());
     }
 
     @Test
@@ -205,6 +211,7 @@ public class CruncherTest {
                 .applicablePeriod(rdr.applicablePeriod())
                 .name(rdr.getName().substring(0, rdr.getName().length()-4));
         rdr.survey(survey);
+        cruncher.ensureInitialised(rdr, YEARS_TO_CALC, answerFactory);
         SurveyReturn rtn = cruncher.calculate(rdr, YEARS_TO_CALC, answerFactory);
 
         assertNotNull(rtn);
@@ -283,9 +290,6 @@ public class CruncherTest {
                     SCOPE_3_WASTE[i],
                     rtn.answer(period, Q.SCOPE_3_WASTE).orElseThrow(() -> new IllegalStateException()).response3sf());
 
-            // ECLASS_USER must be false or missing to get SDU procurement
-            // estimates
-            assertTrue(!cruncher.isEClassUser(rtn));
             // These numbers don't match the RDR 15-16 spreadsheet, but close.
             // Rounding? Or slightly updated factors?
             assertEquals(String.format("Incorrect value of %2$s for period %1$s", period, Q.WASTE_AND_WATER_CO2E),
@@ -337,6 +341,7 @@ public class CruncherTest {
                 .applicablePeriod(rj1.applicablePeriod())
                 .name(rj1.getName().substring(0, rj1.getName().length()-4));
         rj1.survey(survey);
+        cruncher.ensureInitialised(rj1, YEARS_TO_CALC, answerFactory);
         SurveyReturn rtn = cruncher.calculate(rj1, YEARS_TO_CALC, answerFactory);
 
         assertNotNull(rtn);
@@ -487,6 +492,52 @@ public class CruncherTest {
                     CONSULTING_SVCS_AND_EXPENSES_CO2E[i],
                     rtn.answer(period, Q.CONSULTING_SVCS_AND_EXPENSES_CO2E)
                             .orElseThrow(() -> new IllegalStateException()).response3sf());
+        }
+    }
+
+    /**
+     * Tests that <em>both</em> E-Class and SDU profiles are calculated from 2020-21.
+     */
+    @Test
+    public void testCrunchZZ1() {
+        SurveyReturn zz1 = helper.readSurveyReturn("ZZ1");
+        Survey survey = new Survey()
+                .applicablePeriod(zz1.applicablePeriod())
+                .name(zz1.getName().substring(0, zz1.getName().length()-4));
+        zz1.survey(survey);
+        cruncher.ensureInitialised(zz1, YEARS_TO_CALC, answerFactory);
+        SurveyReturn rtn = cruncher.calculate(zz1, YEARS_TO_CALC, answerFactory);
+
+        assertNotNull(rtn);
+        List<String> periods = PeriodUtil.fillBackwards(rtn.applicablePeriod(),
+                YEARS_TO_CALC);
+        for (int i = 0; i < periods.size(); i++) {
+            String period = periods.get(i);
+            System.out.println("  ASSERTING RESULTS FOR "  + period);
+            // Performance and Policy only relevant to current year
+            if (i == 0) {
+                assertEquals(
+                        String.format("Incorrect value of %2$s for period %1$s",
+                                period, Q.ORG_CODE),
+                        "ZZ1", rtn.answer(period, Q.ORG_CODE).orElseThrow(() -> new IllegalStateException()).response());
+            }
+
+            // check have new simplified procurement categories from both eClass and SDU methods
+            assertThat(rtn.answer(period, Q.SDU_MEDICINES_AND_CHEMICALS)
+                    .orElseThrow(() -> new IllegalStateException()).responseAsBigDecimal(),
+                    Is.is(Matchers.greaterThanOrEqualTo(BigDecimal.ZERO)));
+            assertThat(rtn.answer(period, Q.EC_MEDICINES_AND_CHEMICALS)
+                    .orElseThrow(() -> new IllegalStateException()).responseAsBigDecimal(),
+                    Is.is(Matchers.greaterThan(BigDecimal.ZERO)));
+            assertThat(rtn.answer(period, Q.SDU_MEDICINES_AND_CHEMICALS_CO2E)
+                    .orElseThrow(() -> new IllegalStateException()).responseAsBigDecimal(),
+                    Is.is(Matchers.greaterThanOrEqualTo(BigDecimal.ZERO)));
+            assertThat(rtn.answer(period, Q.EC_MEDICINES_AND_CHEMICALS_CO2E)
+                    .orElseThrow(() -> new IllegalStateException()).responseAsBigDecimal(),
+                    Is.is(Matchers.greaterThan(BigDecimal.ZERO)));
+            assertThat(rtn.answer(period, Q.ECLASS_SPEND)
+                    .orElseThrow(() -> new IllegalStateException()).responseAsBigDecimal(),
+                    Is.is(Matchers.greaterThan(BigDecimal.ZERO)));
         }
     }
 

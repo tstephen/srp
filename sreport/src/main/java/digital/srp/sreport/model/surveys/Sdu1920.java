@@ -279,6 +279,7 @@ public class Sdu1920 implements SurveyFactory {
     public Q[] getQs() {
         ArrayList<Q> list = new ArrayList<Q>();
         list.addAll(Arrays.asList(SduQuestions.SDU_PROFILE_HDRS));
+        list.addAll(Arrays.asList(SduQuestions.SDU_PROFILE2_HDRS));
         list.addAll(Arrays.asList(SduQuestions.FOOTPRINT_PCT_HDRS));
         list.addAll(Arrays.asList(SduQuestions.FOOTPRINT_2017_PCT_HDRS));
         list.add(Q.WASTE_WATER);
@@ -308,10 +309,13 @@ public class Sdu1920 implements SurveyFactory {
         list.addAll(Arrays.asList(SduQuestions.BIOMASS_CO2E_WTT_HDRS));
         list.addAll(Arrays.asList(SduQuestions.BIOMASS_CO2E_NOSCOPE_HDRS));
         list.addAll(Arrays.asList(SduQuestions.SDU_PROFILE_CO2E_HDRS));
+        list.addAll(Arrays.asList(SduQuestions.SDU_PROFILE2_CO2E_HDRS));
         // #203 not displayed but still calculated
         list.add(Q.OTHER_PROCUREMENT_CO2E);
-        list.add(Q.ECLASS_USER);
+        list.add(Q.ECLASS_SPEND);
         list.addAll(Arrays.asList(SduQuestions.ECLASS_PROFILE_HDRS));
+        list.addAll(Arrays.asList(SduQuestions.ECLASS_PROFILE2_HDRS));
+        list.addAll(Arrays.asList(SduQuestions.ECLASS_PROFILE2_CO2E_HDRS));
         list.addAll(Arrays.asList(SduQuestions.CORE_CO2E_HDRS));
         list.addAll(Arrays.asList(SduQuestions.BIZ_MILEAGE_ACTIVE_PUBLIC_HDRS));
         list.addAll(Arrays.asList(SduQuestions.BIZ_MILEAGE_HDRS));

@@ -12,7 +12,7 @@ import digital.srp.sreport.model.SurveyReturn;
 
 public class ClasspathSurveyReturnHelper {
 
-    private  static final String DATA_FILE = "/returns/%1$s.json";
+    private static final String DATA_FILE = "/returns/%1$s.json";
     private final ObjectMapper objectMapper;
 
     public ClasspathSurveyReturnHelper() {
@@ -29,7 +29,7 @@ public class ClasspathSurveyReturnHelper {
         } catch (IOException e) {
             e.printStackTrace();
             fail();
+            return null;
         }
-        return null;
     }
 }

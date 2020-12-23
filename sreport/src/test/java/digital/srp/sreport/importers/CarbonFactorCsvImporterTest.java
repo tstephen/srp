@@ -13,11 +13,12 @@ import java.util.Map.Entry;
 import org.junit.Test;
 
 import digital.srp.sreport.model.CarbonFactor;
+import digital.srp.sreport.model.CarbonFactors;
 
 public class CarbonFactorCsvImporterTest {
 
     private static final int NO_OF_YEARS_INCLUDED = 14;
-    private static final int NO_OF_FACTORS = 170;
+    private static final int NO_OF_FACTORS = 172;
 
     @Test
     public void testImportCoversExpectedPeriods() {
@@ -58,13 +59,13 @@ public class CarbonFactorCsvImporterTest {
             assertTrue(new BigDecimal("0.28307").compareTo(elecFactor1819.value()) == 0);
             assertEquals("", elecFactor1819.comments());
 
-            CarbonFactor elecFactor2021 = factors.get(12);
+            CarbonFactor elecFactor2021 = factors.get(13);
             assertEquals("Electricity generated", elecFactor2021.category());
             assertEquals("ELECTRICITY_UK", elecFactor2021.name());
             assertEquals("kWh", elecFactor2021.unit());
             assertEquals("2", elecFactor2021.scope());
-            assertEquals("2019-20", elecFactor2021.applicablePeriod());
-            assertTrue(new BigDecimal("0.2556").compareTo(elecFactor2021.value()) == 0);
+            assertEquals("2020-21", elecFactor2021.applicablePeriod());
+            assertTrue(new BigDecimal("0.23314").compareTo(elecFactor2021.value()) == 0);
             assertEquals("", elecFactor2021.comments());
         } catch (IOException e) {
             e.printStackTrace();
@@ -82,7 +83,11 @@ public class CarbonFactorCsvImporterTest {
             assertEquals(NO_OF_FACTORS * NO_OF_YEARS_INCLUDED, factors.size());
 
             HashMap<String, Boolean> expectedFactors = new HashMap<String, Boolean>();
-            expectedFactors.put("GAS_TOTAL", false);
+            expectedFactors.put(CarbonFactors.DIESEL_TOTAL.name(), false);
+            expectedFactors.put(CarbonFactors.DOMESTIC_WASTE_INCINERATION.name(), false);
+            expectedFactors.put(CarbonFactors.HIGH_TEMPERATURE_DISPOSAL_WASTE.name(), false);
+            expectedFactors.put(CarbonFactors.GAS_TOTAL.name(), false);
+            expectedFactors.put(CarbonFactors.PAPER.name(), false);
             for (Entry<String, Boolean> entry : expectedFactors.entrySet()) {
                 for (CarbonFactor factor : factors) {
                     if (entry.getKey().equals(factor.name())) {

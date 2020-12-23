@@ -461,7 +461,26 @@ text.inverse {
 .office_equipt_telco_computers_and_stationery_co2e,
 .rec_equipt_and_souvenirs_co2e,
 .consulting_svcs_and_expenses_co2e,
-.total_procurement_2017_co2e {
+.total_procurement_2017_co2e,
+.sdu_medicines_and_chemicals_co2e,.sdu_medical_equipment_co2e,
+.sdu_non_medical_equipment_co2e,
+.sdu_business_services_co2e,
+.sdu_construction_and_freight_co2e,
+.sdu_food_and_catering_co2e,
+.sdu_commissioned_health_services_co2e,
+.sdu_water_co2e,
+.sdu_waste_co2e,
+.sdu_business_travel_and_fleet_co2e,
+.ec_medicines_and_chemicals_co2e,
+.ec_medical_equipment_co2e,
+.ec_non_medical_equipment_co2e,
+.ec_business_services_co2e,
+.ec_construction_and_freight_co2e,
+.ec_food_and_catering_co2e,
+.ec_commissioned_health_services_co2e,
+.ec_water_co2e,
+.ec_waste_co2e,
+.ec_business_travel_and_fleet_co2e {
   background-color: #007ac3;
   fill: #007ac3;
 }

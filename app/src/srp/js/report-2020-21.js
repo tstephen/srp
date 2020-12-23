@@ -51,6 +51,15 @@ var ractive = new BaseRactive({
       'CAPITAL_NEW_BUILD': 'Capital investment for new build (£)',
       'CAPITAL_SPEND': 'Capital',
       'CAPITAL_SPEND': 'Capital spend',
+      'CAR_DIESEL_USED': 'Diesel used by fleet (litres)',
+      'CAR_HYBRID_FUEL_USED': 'Hybrid elecricity used by fleet (kWh)',
+      'CAR_PETROL_USED': 'Petrol used by fleet (litres)',
+      'CAR_MILES_DIESEL':'Fleet mileage in diesel car',
+      'OWNED_LEASED_CARBON_MILES':'Fleet mileage included in leased car',
+      'CAR_MILES_PETROL':'Fleet mileage in petrol car',
+      'CAR_MILES_UNKNOWN_FUEL':'Fleet mileage in car of unknown fuel',
+      'CAR_MILES_DIESEL_CO2E':'Emissions resulting from diesel car mileage',
+      'CAR_MILES_PETROL_CO2E':'Emissions resulting from petrol car mileage',
       'CARBON_REDUCTION_BASELINE_USED': 'Does your organisation use a baseline year?',
       'CARBON_REDUCTION_BASE_YEAR': 'Which year is it?',
       'CARBON_REDUCTION_DEADLINE_YEAR': 'What is the deadline year for this target?',
@@ -478,6 +487,17 @@ var ractive = new BaseRactive({
         try {
           var answer = ractive.getAnswer(qName, period);
           return answer == undefined ? '' : answer;
+        } catch (e) {
+          return '';
+        }
+      }
+    },
+    formatDecimalAnswer: function(qName, period, decimalPlaces) {
+      if (qName==undefined || ractive.get('surveyReturn')==undefined) return '';
+      else {
+        try {
+          var answer = ractive.getAnswer(qName, period);
+          return answer == undefined ? '' : parseFloat(answer).formatDecimal(decimalPlaces);
         } catch (e) {
           return '';
         }
@@ -1058,7 +1078,10 @@ var ractive = new BaseRactive({
       table += '<th>'+ractive.renderLabel(qs[idx])+'</th>';
       table += '<th class="legend '+qs[idx].toLowerCase()+'">&nbsp;</th>';
       for (var i = 1 ; i <= periods ; i++) {
-        table += '<td class="number">'+ractive.getAnswer(qs[idx], ractive.getPeriod(i-periods))+'</td>';
+        var ans = ractive.getAnswer(qs[idx], ractive.getPeriod(i-periods));
+        table += '<td class="number">';
+        table += ans == undefined ? 'n/a' : isNaN(ans) ? ans : parseFloat(ans).sigFigs(3);
+        table += '</td>';
       }
       table += '</tr>';
     }
