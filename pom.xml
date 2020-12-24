@@ -82,6 +82,7 @@
   </scm>
 
   <modules>
+    <module>srp-ui</module>
     <module>srp-processes</module>
     <module>macc</module>
     <module>server</module>
