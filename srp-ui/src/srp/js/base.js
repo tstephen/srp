@@ -717,7 +717,6 @@ $(document).ready(function() {
   } else if (params['q']!=undefined) {
     ractive.set('searchTerm',decodeURIComponent(params['q']));
   }
-  var i18n = new I18nController($env.server+'/workmgmt/3.0.0');
 
   ractive.set('saveObserver', true);
 });

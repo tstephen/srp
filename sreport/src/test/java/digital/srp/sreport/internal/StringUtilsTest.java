@@ -21,4 +21,11 @@ public class StringUtilsTest {
     public void testCamelCaseToConst() {
         assertEquals("FLOOR_AREA", StringUtils.camelCaseToConst("floorArea"));
     }
+
+    @Test
+    public void testToSentenceCase() {
+        assertEquals("Wood pellets used", StringUtils.toSentanceCase("WOOD_PELLETS_USED"));
+    }
+
+
 }
