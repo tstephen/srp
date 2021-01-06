@@ -9,7 +9,7 @@
   <link href="./vsn/css/srp.css" rel="stylesheet">
   <link rel="icon" type="image/png" href="/srp/images/icon/favicon.ico" />
 <head>
-<body>
+<body class="rpt">
   <div class="clearfix" id="messages"></div>
   <section id="container" class="container"></section>
 
@@ -714,8 +714,7 @@
       </section>
     {{else}}
       <section class="loading" id="loadingSect">
-        <span class="loading">Your report should load automatically in the next few moments.</span>
-        <button on-click="fetch()">Load it now</button>
+        <h1 class="loading">Sit tight! We're just loading your report...</h1>
       </section>
     {{/if}}
     </section>

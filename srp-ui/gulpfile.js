@@ -24,7 +24,7 @@ gulp.task('clean', function(done) {
 });
 
 gulp.task('assets', function() {
-  gulp.src([ 'src/**/*.json', 'src/**/*.ico', 'src/**/*.png' ])
+  gulp.src([ 'src/**/*.jpg', 'src/**/*.json', 'src/**/*.ico', 'src/**/*.png' ])
       .pipe(gulp.dest(buildDir+'/'));
   gulp.src([ 'src/sdat/**/*.png' ])
       .pipe(gulp.dest(buildDir+'/sdat'));

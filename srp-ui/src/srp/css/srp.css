@@ -1,6 +1,4 @@
 /* FONTS */
-@import url('//fonts.googleapis.com/css?family=Roboto:400italic,400,700');
-@import url('//fonts.googleapis.com/css?family=Ubuntu:400italic,400,700');
 @import url('//fonts.googleapis.com/css?family=Signika:600');
 @import url('//fonts.googleapis.com/css?family=Montserrat:400italic,400');
 @import url('//api.knowprocess.com/webjars/knowprocess-icons/3.1.0/style.css ');
@@ -36,11 +34,21 @@ figure {
 .navbar-static-top {
   border-bottom-color: #ec9300;
 }
+.pace-running.rpt {
+  background-image: url('/srp/images/loading.jpg');
+  background-repeat: no-repeat;
+  background-size: 100% auto;
+}
 section h2 .kp-icon-search {
   top: -1px;
 }
 small {
   font-size: 75%;
+}
+#loadingSect h1 {
+  color: white;
+  font-size: 5rem;
+  margin-top: 7.5rem;
 }
 #messages p {
   line-height: 3em;
