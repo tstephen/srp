@@ -24,23 +24,9 @@ gulp.task('clean', function(done) {
 });
 
 gulp.task('assets', function() {
-  // FAQ
-  gulp.src([ 'src/faq/*.html' ])
-      .pipe(replace('/vsn/', '/'+vsn+'/'))
-      .pipe(gulp.dest(buildDir));
-  gulp.src([ 'src/faq/partials/**/*.html' ])
-      .pipe(replace('/vsn/', '/'+vsn+'/'))
-      .pipe(gulp.dest(buildDir+'/faq/'+vsn+'/partials/'));
-  // SRP
-  gulp.src([ 'src/srp/*.html' ])
-      .pipe(replace('/vsn/', '/'+vsn+'/'))
-      .pipe(gulp.dest(buildDir));
-  gulp.src([ 'src/srp/partials/**/*.html' ])
-      .pipe(replace('/vsn/', '/'+vsn+'/'))
-      .pipe(gulp.dest(buildDir+'/srp/'+vsn+'/partials/'));
   gulp.src([ 'src/**/*.json', 'src/**/*.ico', 'src/**/*.png' ])
       .pipe(gulp.dest(buildDir+'/'));
-  gulp.src([ 'src/sdat/**/*' ])
+  gulp.src([ 'src/sdat/**/*.png' ])
       .pipe(gulp.dest(buildDir+'/sdat'));
   return gulp.src([ 'questionnaire/**/*' ])
       .pipe(gulp.dest(buildDir+'/questionnaire'));
@@ -105,24 +91,26 @@ gulp.task('server', function(done) {
 });
 
 gulp.task('fix-paths', function() {
-  gulp.src([
-      'src/**/*.html',
-    ])
-    .pipe(replace('/vsn/', '/'+vsn+'/'))
-    .pipe(replace('http://localhost:8083', config.apiServerUrl))
-    .pipe(gulp.dest(buildDir));
+  // FAQ
   gulp.src([
       'src/faq/public/*.html'
     ])
     .pipe(replace('/vsn/', '/'+vsn+'/'))
     .pipe(replace('http://localhost:8083', config.apiServerUrl))
     .pipe(gulp.dest(buildDir+'/faq/public'));
+  gulp.src([ 'src/faq/partials/**/*.html' ])
+      .pipe(replace('/vsn/', '/'+vsn+'/'))
+      .pipe(gulp.dest(buildDir+'/faq/'+vsn+'/partials/'));
+  // SRP
   gulp.src([
       'src/srp/*.html',
     ])
     .pipe(replace('/vsn/', '/'+vsn+'/'))
     .pipe(replace('http://localhost:8083', config.apiServerUrl))
     .pipe(gulp.dest(buildDir+'/srp'));
+  gulp.src([ 'src/srp/partials/**/*.html' ])
+      .pipe(replace('/vsn/', '/'+vsn+'/'))
+      .pipe(gulp.dest(buildDir+'/srp/'+vsn+'/partials/'));
   return gulp.src([
       'src/srp/public/*.html'
     ])
