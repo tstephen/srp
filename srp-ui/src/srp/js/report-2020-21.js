@@ -164,19 +164,22 @@ var ractive = new BaseRactive({
       else return 'hidden';
     },
     stdPartials: [
-      
       { "name": "sidebar", "url": $env.server+"/partials/sidebar.html"},
       { "name": "toolbar", "url": $env.server+"/partials/toolbar.html"},
+      { "name": "nhsCarbonProfileSect", "url": "/srp/vsn/partials/nhs-carbon-profile.html"},
       { "name": "statusSect", "url": "/srp/vsn/partials/status-sect.html"}
     ],
   },
   partials: {
-    'loginSect': '',
+    'sidebarSect': '',
+    'toolbarSect': '',
+    'nhsCarbonProfileSect': '',
     'shareCtrl': '<div class="controls pull-right" style="display:none">'
                 +'  <span class="glyphicon icon-btn kp-icon-share"></span>'
                 +'  <!--span class="glyphicon icon-btn kp-icon-link"></span-->'
                 +'  <!--span class="glyphicon icon-btn kp-icon-copy"></span-->'
-                +'</div>'
+                +'</div>',
+    'statusSect': ''
   },
   calculate: function () {
     console.info('calculate...');

@@ -24,7 +24,14 @@
           <li><a href="#scope2Sect">Scope 2: Indirect emissions</a></li>
           <li><a href="#scope3Sect">Scope 3: Indirect emissions</a></li>
           <li><a href="#outsideScopesSect">Outside scopes</a></li>
-          <li><a href="#sduCarbonProfileSect">Emission profile</a></li>
+	  <li><a href="#carbonFootprintSect">Modelled Carbon footprint</a>
+            <ol>
+              <li><a href="#nonProcurementCarbonProfileSect">NHS Carbon footprint</a></li>
+              <li><a href="#eclassCarbonProfileSect">E-Class Carbon profile</a></li>
+              <li><a href="#sduCarbonProfileSect">SDU whole organisation Carbon profile</a></li>
+              <li><a href="#trajectorySect">Carbon emissions progress</a></li>
+            </ol>
+	  </li>
           <li><a href="#benchmarkingSect">Benchmarking</a></li>
         </ol>
       </section>
@@ -85,21 +92,7 @@
                data-qs="WOOD_LOGS_CO2E,WOOD_CHIPS_CO2E,WOOD_PELLETS_CO2E" data-periods="4"></div>
       </section>
 
-      {{#if formatAnswer('ECLASS_USER') == '0-E-Class'}}
-        <section id="eclassCarbonProfileSect">
-	  <h2>E-Class Procurement Profile <a href="#contentSect" class="govuk-back-link">Back to top</a></h2>
-          <p>CO<sub>2</sub> Emissions (tCO<sub>2</sub>e)</p>
-          <div class="rpt table2" id="eclassProfileRptTable2" data-total="true"
-               data-qs="PATIENT_AND_VISITOR_MILEAGE_CO2E,STAFF_COMMUTE_MILES_CO2E,PROVISIONS_CO2E,STAFF_CLOTHING_CO2E,PATIENTS_CLOTHING_AND_FOOTWEAR_CO2E,PHARMA_BLOOD_PROD_AND_MED_GASES_CO2E,DRESSINGS_CO2E,MEDICAL_AND_SURGICAL_EQUIPT_CO2E,PATIENTS_APPLIANCES_CO2E,CHEMICALS_AND_REAGENTS_CO2E,DENTAL_AND_OPTICAL_EQUIPT_CO2E,IMAGING_AND_RADIOTHERAPY_EQUIPT_AND_SVCS_CO2E,LAB_EQUIPT_AND_SVCS_CO2E,HOTEL_EQUIPT_MATERIALS_AND_SVCS_CO2E,BLDG_AND_ENG_PROD_AND_SVCS_CO2E,PURCHASED_HEALTHCARE_CO2E,GARDENING_AND_FARMING_CO2E,FURNITURE_FITTINGS_CO2E,HARDWARE_CROCKERY_CO2E,BEDDING_LINEN_AND_TEXTILES_CO2E,OFFICE_EQUIPT_TELCO_COMPUTERS_AND_STATIONERY_CO2E,REC_EQUIPT_AND_SOUVENIRS_CO2E,CONSULTING_SVCS_AND_EXPENSES_CO2E,OWNED_BUILDINGS_COAL,NET_ELEC_CO2E,OWNED_BUILDINGS_GAS,OWNED_BUILDINGS_OIL,NET_THERMAL_ENERGY_CO2E,LEASED_ASSETS_ENERGY_USE,BIZ_MILEAGE_CO2E,ANAESTHETIC_GASES_CO2E,WASTE_AND_WATER_CO2E,TOTAL_COMMISSIONING_CO2E" data-periods="4"></div>
-        </section>
-      {{else}}
-        <section id="sduCarbonProfileSect">
-	  <h2>SDU whole organisation carbon profile <a href="#contentSect" class="govuk-back-link">Back to top</a></h2>
-          <p>CO<sub>2</sub> Emissions (tCO<sub>2</sub>e)</p>
-          <div class="rpt table2" id="sduProfileRptTable2" data-total="true"
-               data-qs="PATIENT_AND_VISITOR_MILEAGE_CO2E,STAFF_COMMUTE_MILES_CO2E,BIZ_SVCS_CO2E,CAPITAL_CO2E,CONSTRUCTION_CO2E,CATERING_CO2E,FREIGHT_CO2E,ICT_CO2E,CHEM_AND_GAS_CO2E,MED_INSTR_CO2E,OTHER_MANUFACTURED_CO2E,PAPER_AND_CARD_CO2E,PHARMA_CO2E,OWNED_BUILDINGS_COAL,NET_ELEC_CO2E,OWNED_BUILDINGS_GAS,OWNED_BUILDINGS_OIL,NET_THERMAL_ENERGY_CO2E,LEASED_ASSETS_ENERGY_USE,BIZ_MILEAGE_CO2E,ANAESTHETIC_GASES_CO2E,WASTE_AND_WATER_CO2E,TOTAL_COMMISSIONING_CO2E" data-periods="4"></div>
-        </section>
-      {{/if}}
+      {{>nhsCarbonProfileSect}}
 
       <section id="benchmarkingSect">
 	<h2 id="benchmarking">Benchmarking <a href="#contentSect" class="govuk-back-link">Back to top</a></h2>
