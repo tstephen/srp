@@ -31,6 +31,8 @@ import digital.srp.sreport.model.surveys.SduQuestions;
 
 public class CruncherTest {
 
+    private static final String SURVEY_FORMAT = "SDU-%1$s";
+
     private static final int YEARS_TO_CALC = 4;
 
     private  static final String[] ANAESTHETIC_GASES_CO2E = { "5,840",
@@ -165,22 +167,24 @@ public class CruncherTest {
 
     private boolean debug = false;
 
-    private static AnswerFactory answerFactory;
-
     private static ClasspathSurveyReturnHelper helper;
 
     private static List<CarbonFactor> cfactors;
     private static List<WeightingFactor> wfactors;
     private static Cruncher cruncher;
 
+    private static HealthChecker healthChecker;
+
     @BeforeClass
     public static void setUpClass() throws IOException {
         cfactors = new CarbonFactorCsvImporter().readCarbonFactors();
         wfactors = new WeightingFactorCsvImporter().readWeightingFactors();
         cruncher = new Cruncher(cfactors, wfactors);
+        cruncher.energyEmissionsService = new EnergyEmissionsService();
         cruncher.roadEmissionsService = new RoadEmissionsService();
         cruncher.wasteEmissionsService = new WasteEmissionsService();
-        answerFactory = new MemoryAnswerFactory();
+        healthChecker = new HealthChecker(new MemoryAnswerFactory());
+        cruncher.healthChecker = healthChecker;
         helper = new ClasspathSurveyReturnHelper();
     }
 
@@ -211,8 +215,9 @@ public class CruncherTest {
                 .applicablePeriod(rdr.applicablePeriod())
                 .name(rdr.getName().substring(0, rdr.getName().length()-4));
         rdr.survey(survey);
-        cruncher.ensureInitialised(rdr, YEARS_TO_CALC, answerFactory);
-        SurveyReturn rtn = cruncher.calculate(rdr, YEARS_TO_CALC, answerFactory);
+        healthChecker.ensureInitialised(YEARS_TO_CALC,
+                String.format(SURVEY_FORMAT, rdr.applicablePeriod()), rdr);
+        SurveyReturn rtn = cruncher.calculate(rdr, YEARS_TO_CALC);
 
         assertNotNull(rtn);
         List<String> periods = PeriodUtil.fillBackwards(rtn.applicablePeriod(),
@@ -341,8 +346,9 @@ public class CruncherTest {
                 .applicablePeriod(rj1.applicablePeriod())
                 .name(rj1.getName().substring(0, rj1.getName().length()-4));
         rj1.survey(survey);
-        cruncher.ensureInitialised(rj1, YEARS_TO_CALC, answerFactory);
-        SurveyReturn rtn = cruncher.calculate(rj1, YEARS_TO_CALC, answerFactory);
+        healthChecker.ensureInitialised(YEARS_TO_CALC,
+                String.format(SURVEY_FORMAT, rj1.applicablePeriod()), rj1);
+        SurveyReturn rtn = cruncher.calculate(rj1, YEARS_TO_CALC);
 
         assertNotNull(rtn);
         List<String> periods = PeriodUtil.fillBackwards(rtn.applicablePeriod(),
@@ -505,8 +511,9 @@ public class CruncherTest {
                 .applicablePeriod(zz1.applicablePeriod())
                 .name(zz1.getName().substring(0, zz1.getName().length()-4));
         zz1.survey(survey);
-        cruncher.ensureInitialised(zz1, YEARS_TO_CALC, answerFactory);
-        SurveyReturn rtn = cruncher.calculate(zz1, YEARS_TO_CALC, answerFactory);
+        healthChecker.ensureInitialised(YEARS_TO_CALC,
+                String.format(SURVEY_FORMAT, zz1.applicablePeriod()), zz1);
+        SurveyReturn rtn = cruncher.calculate(zz1, YEARS_TO_CALC);
 
         assertNotNull(rtn);
         List<String> periods = PeriodUtil.fillBackwards(rtn.applicablePeriod(),

@@ -4,23 +4,34 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 import javax.validation.ConstraintViolation;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import digital.srp.sreport.internal.PeriodUtil;
 import digital.srp.sreport.model.Answer;
 import digital.srp.sreport.model.Q;
 import digital.srp.sreport.model.SurveyReturn;
+import digital.srp.sreport.model.surveys.SurveyFactory;
 import digital.srp.sreport.validators.DuplicateAnswerConstraintViolation;
 import digital.srp.sreport.validators.MultipleAnswerConstraintViolation;
 
 @Component
 public class HealthChecker {
     private static final Logger LOGGER = LoggerFactory.getLogger(HealthChecker.class);
+
+    @Autowired
+    protected final AnswerFactory answerFactory;
+
+    public HealthChecker(final AnswerFactory answerFactory) {
+        this.answerFactory = answerFactory;
+    }
 
     public Set<ConstraintViolation<SurveyReturn>> validate(SurveyReturn rtn) {
         Set<ConstraintViolation<SurveyReturn>> issues = new HashSet<ConstraintViolation<SurveyReturn>>();
@@ -40,12 +51,12 @@ public class HealthChecker {
                 matches.add(a);
             }
         }
-        
+
         LOGGER.debug("found {} matches for {} of {} in {}", matches.size(), q.name(), rtn.org(), period);
         switch (matches.size()) {
         case 0:
 //            violations = new HashSet<ConstraintViolation<SurveyReturn>>();
-//            violations.add(new MissingAnswerConstraintViolation(rtn, 
+//            violations.add(new MissingAnswerConstraintViolation(rtn,
 //                    Collections.singleton(new Answer().applicablePeriod(period).question(q))));
             violations = Collections.emptySet();
             break;
@@ -81,6 +92,26 @@ public class HealthChecker {
         }
         return violations;
     }
-    
-    
+
+    protected void ensureInitialised(int yearsToCalc, String surveyName, SurveyReturn rtn) {
+        LOGGER.info("Ensuring questions initialised for {} in {} and {} years prior", rtn.org(), rtn.applicablePeriod(),
+                yearsToCalc - 1);
+        List<String> periods = PeriodUtil.fillBackwards(rtn.applicablePeriod(),
+                yearsToCalc);
+
+        SurveyFactory fact = SurveyFactory.getInstance(surveyName);
+        Q[] requiredQs = fact.getQs();
+
+        for (String period : periods) {
+            for (Q q : requiredQs) {
+                Optional<Answer> optional = rtn.answer(period, q);
+                if (!optional.isPresent()) {
+                    LOGGER.warn("Correcting missing answer: {} in {} for {}", q, period, rtn.org());
+                    answerFactory.addAnswer(rtn, period, q);
+                }
+            }
+        }
+    }
+
+
 }

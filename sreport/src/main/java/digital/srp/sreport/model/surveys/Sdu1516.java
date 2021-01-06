@@ -249,6 +249,7 @@ public class Sdu1516 implements SurveyFactory {
         list.add(Q.ELEC_NON_RENEWABLE_3RD_PARTY);
         list.add(Q.THIRD_PARTY_ADDITIONAL_PCT);
         list.addAll(Arrays.asList(SduQuestions.ENERGY_CO2E_HDRS));
+        list.add(Q.ELEC_WTT_CO2E);
         list.add(Q.ELEC_NON_RENEWABLE_GREEN_TARIFF_CO2E);
         list.add(Q.ELEC_NON_RENEWABLE_3RD_PARTY_CO2E);
         list.addAll(Arrays.asList(SduQuestions.SUMMARY_SCOPE_HDRS));

@@ -20,7 +20,6 @@ import digital.srp.sreport.model.SurveyReturn;
 import digital.srp.sreport.model.WeightingFactor;
 
 public class EnergyTest {
-
     // ELEC
     private static final String ELEC_USED = "8865457";
     private static final String ELEC_EXPORTED = "554091";
@@ -45,6 +44,8 @@ public class EnergyTest {
         cfactors = new CarbonFactorCsvImporter().readCarbonFactors();
         wfactors = new WeightingFactorCsvImporter().readWeightingFactors();
         svc = new Cruncher(cfactors, wfactors);
+        svc.energyEmissionsService = new EnergyEmissionsService();
+        svc.healthChecker = new HealthChecker(new MemoryAnswerFactory());
     }
 
     @Test
@@ -62,6 +63,7 @@ public class EnergyTest {
 
         svc.crunchElectricityUsed(PERIOD, rtn);
         assertEquals(new BigDecimal("3952"), rtn.answer(PERIOD, Q.ELEC_CO2E).get().responseAsBigDecimal().setScale(0, RoundingMode.HALF_UP));
+        assertEquals(new BigDecimal("497"), rtn.answer(PERIOD, Q.ELEC_WTT_CO2E).get().responseAsBigDecimal().setScale(0, RoundingMode.HALF_UP));
         assertEquals(new BigDecimal("494"), rtn.answer(PERIOD, Q.ELEC_NON_RENEWABLE_GREEN_TARIFF_CO2E).get().responseAsBigDecimal().setScale(0, RoundingMode.HALF_UP));
         assertEquals(new BigDecimal("490"), rtn.answer(PERIOD, Q.ELEC_NON_RENEWABLE_3RD_PARTY_CO2E).get().responseAsBigDecimal().setScale(0, RoundingMode.HALF_UP));
         assertEquals(new BigDecimal("142"), rtn.answer(PERIOD, Q.ELEC_EXPORTED_CO2E).get().responseAsBigDecimal().setScale(0, RoundingMode.HALF_UP));
@@ -76,7 +78,7 @@ public class EnergyTest {
     @Test
     public void testElec0PctGreenEmissions2016() {
         String period = "2016-17";
-        SurveyReturn rtn = new SurveyReturn().applicablePeriod(period ).org(ORG_CODE);
+        SurveyReturn rtn = new SurveyReturn().applicablePeriod(period).org(ORG_CODE);
         String elecUsed = "8777680";
         rtn.getAnswers().add(new Answer().applicablePeriod(period).question(Q.ELEC_USED).response(elecUsed));
         rtn.getAnswers().add(new Answer().applicablePeriod(period).question(Q.ELEC_EXPORTED).response(ELEC_EXPORTED));
@@ -107,6 +109,7 @@ public class EnergyTest {
         rtn.getAnswers().add(new Answer().applicablePeriod(period).question(Q.ELEC_NON_RENEWABLE_3RD_PARTY_CO2E));
         rtn.getAnswers().add(new Answer().applicablePeriod(period).question(Q.ELEC_RENEWABLE_CO2E));
         rtn.getAnswers().add(new Answer().applicablePeriod(period).question(Q.ELEC_CO2E));
+        rtn.getAnswers().add(new Answer().applicablePeriod(period).question(Q.ELEC_WTT_CO2E));
         rtn.getAnswers().add(new Answer().applicablePeriod(period).question(Q.ELEC_EXPORTED_CO2E));
         rtn.getAnswers().add(new Answer().applicablePeriod(period).question(Q.NET_ELEC_CO2E));
     }

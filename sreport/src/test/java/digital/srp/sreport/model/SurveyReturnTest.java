@@ -27,6 +27,7 @@ import digital.srp.sreport.model.returns.EricQuestions;
 import digital.srp.sreport.model.surveys.Sdu1718;
 import digital.srp.sreport.services.DefaultCompletenessValidator;
 import digital.srp.sreport.services.HealthChecker;
+import digital.srp.sreport.services.MemoryAnswerFactory;
 
 public class SurveyReturnTest implements EricQuestions{
 
@@ -42,7 +43,7 @@ public class SurveyReturnTest implements EricQuestions{
     public static void setUpClass() throws IOException {
         helper = new ClasspathSurveyReturnHelper();
         completenessValidator = new DefaultCompletenessValidator();
-        healthCheck = new HealthChecker();
+        healthCheck = new HealthChecker(new MemoryAnswerFactory());
     }
 
     @Test

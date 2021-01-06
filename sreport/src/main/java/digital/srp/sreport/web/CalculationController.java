@@ -24,10 +24,9 @@ import digital.srp.sreport.repositories.AnswerRepository;
 import digital.srp.sreport.repositories.QuestionRepository;
 import digital.srp.sreport.repositories.SurveyReturnRepository;
 import digital.srp.sreport.services.HealthChecker;
-import digital.srp.sreport.services.PersistentAnswerFactory;
 
 /**
- * REST web service for performing calculations on a report.
+ * REST web service for performing calculations on a return.
  *
  * @author Tim Stephenson
  */
@@ -52,9 +51,6 @@ public class CalculationController {
 
     @Autowired
     protected AnswerRepository answerRepo;
-
-    @Autowired
-    protected PersistentAnswerFactory answerFactory;
 
     @Autowired
     protected SurveyReturnController surveyReturnController;
@@ -100,7 +96,7 @@ public class CalculationController {
             Set<ConstraintViolation<SurveyReturn>> issues = healthCheck
                     .validate(rtn);
             if (issues.size() == 0) {
-                rtn = cruncher.calculate(rtn, yearsToCalc, answerFactory);
+                rtn = cruncher.calculate(rtn, yearsToCalc);
             } else {
                 String msg = String.format(
                         "Found %1$d issues, cannot run calculations until they are corrected",

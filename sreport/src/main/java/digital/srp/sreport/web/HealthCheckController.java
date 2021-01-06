@@ -51,9 +51,9 @@ public class HealthCheckController {
     protected SurveyReturnController surveyReturnController;
 
     /**
-     * Run all calculations based on the return inputs.
+     * Run all health checks on the return.
      *
-     * @return return including latest calculations.
+     * @return health summary.
      */
     @RequestMapping(value = "/{returnId}", method = RequestMethod.GET, produces = {
             "application/json" })
@@ -71,9 +71,8 @@ public class HealthCheckController {
     }
 
     /**
-     * Run all calculations based on the return inputs.
-     *
-     * @return return including latest calculations.
+     * Convenience method for {@link #checkHealth(Long)} to avoid
+     * looking up return id externally.
      */
     @RequestMapping(value = "/{surveyName}/{org}", method = RequestMethod.GET, produces = {
             "application/json" })
@@ -94,9 +93,9 @@ public class HealthCheckController {
     }
 
     /**
-     * Run all validators on the specified return.
+     * Run all health checks on the specified return and try to fix any issues.
      *
-     * @return summary return.
+     * @return health summary after fixes.
      */
     @RequestMapping(value = "/{returnId}", method = RequestMethod.POST, produces = {
             "application/json" })
@@ -114,9 +113,8 @@ public class HealthCheckController {
     }
 
     /**
-     * Run all validators on the specified return.
-     *
-     * @return return including latest calculations.
+     * Convenience method for {@link #checkHealthAndAttemptFixes(Long)} to avoid
+     * looking up return id externally.
      */
     @RequestMapping(value = "/{surveyName}/{org}", method = RequestMethod.POST, produces = {
             "application/json" })

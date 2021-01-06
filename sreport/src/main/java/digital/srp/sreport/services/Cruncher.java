@@ -25,7 +25,6 @@ import digital.srp.sreport.model.SurveyReturn;
 import digital.srp.sreport.model.WeightingFactor;
 import digital.srp.sreport.model.WeightingFactors;
 import digital.srp.sreport.model.surveys.SduQuestions;
-import digital.srp.sreport.model.surveys.SurveyFactory;
 
 @Component
 public class Cruncher extends AbstractEmissionsService
@@ -43,6 +42,12 @@ public class Cruncher extends AbstractEmissionsService
     protected final List<WeightingFactor> wfactors;
 
     @Autowired
+    protected HealthChecker healthChecker;
+
+    @Autowired
+    protected EnergyEmissionsService energyEmissionsService;
+
+    @Autowired
     protected RoadEmissionsService roadEmissionsService;
 
     @Autowired
@@ -55,12 +60,16 @@ public class Cruncher extends AbstractEmissionsService
     }
 
     /**
-     * @see digital.srp.sreport.api.Calculator#calculate(digital.srp.sreport.model.SurveyReturn, int, AnswerFactory)
+     * @deprecated Use {@link digital.srp.sreport.services.Cruncher#calculate(SurveyReturn, int)} instead
      */
+    public SurveyReturn calculate(SurveyReturn rtn, int yearsToCalc, AnswerFactory answerFactory) {
+        return calculate(rtn, yearsToCalc);
+    }
+
     @Override
-    public synchronized SurveyReturn calculate(SurveyReturn rtn, int yearsToCalc, AnswerFactory answerFactory) {
+    public synchronized SurveyReturn calculate(SurveyReturn rtn, int yearsToCalc) {
         long start = System.currentTimeMillis();
-        ensureInitialised(rtn, yearsToCalc, answerFactory);
+        healthChecker.ensureInitialised(yearsToCalc, rtn.survey().name(), rtn);
         LOGGER.info("Calculating for {} in {}", rtn.org(), rtn.applicablePeriod());
         List<String> periods = PeriodUtil.fillBackwards(rtn.applicablePeriod(), yearsToCalc);
         for (String period : periods) {
@@ -102,25 +111,11 @@ public class Cruncher extends AbstractEmissionsService
         }
     }
 
-    // TODO replace with validator and/or health checker
-    protected void ensureInitialised(SurveyReturn rtn, int yearsToCalc, AnswerFactory answerFactory) {
-        LOGGER.info("Ensuring questions initialised for {} in {} and {} years prior", rtn.org(), rtn.applicablePeriod(),
-                yearsToCalc - 1);
-        List<String> periods = PeriodUtil.fillBackwards(rtn.applicablePeriod(),
-                yearsToCalc);
-
-        SurveyFactory fact = SurveyFactory.getInstance(rtn.survey().name());
-        Q[] requiredQs = fact.getQs();
-
-        for (String period : periods) {
-            for (Q q : requiredQs) {
-                Optional<Answer> optional = rtn.answer(period, q);
-                if (!optional.isPresent()) {
-                    LOGGER.warn("Correcting missing answer: {} in {} for {}", q, period, rtn.org());
-                    answerFactory.addAnswer(rtn, period, q);
-                }
-            }
-        }
+    /**
+     * @deprecated Use {@link digital.srp.sreport.services.HealthChecker#ensureInitialised(int,String,SurveyReturn)} instead
+     */
+    protected void ensureInitialised(SurveyReturn rtn, int yearsToCalc, String surveyName, AnswerFactory answerFactory) {
+        healthChecker.ensureInitialised(yearsToCalc, surveyName, rtn);
     }
 
     boolean isEClassUser(SurveyReturn rtn) {
@@ -409,11 +404,6 @@ public class Cruncher extends AbstractEmissionsService
         crunchPaperCo2e(period, rtn);
     }
 
-    protected void crunchScope3EnergyWtt(String period, SurveyReturn rtn) {
-        // TODO Auto-generated method stub
-
-    }
-
     protected void crunchScope3Water(String period, SurveyReturn rtn) {
         try {
             // If necessary estimate waste water as 0% of incoming
@@ -457,118 +447,74 @@ public class Cruncher extends AbstractEmissionsService
     protected void crunchScope3Waste(String period, SurveyReturn rtn) {
         if (rtn.applicablePeriod().startsWith("202")
                 && rtn.answer(period, Q.INCINERATION_WEIGHT).isPresent()) {
-            calcIncinerationCo2e(
+            wasteEmissionsService.calcIncinerationCo2e(
                     getAnswer(period, rtn, Q.INCINERATION_WEIGHT).responseAsBigDecimal(),
                     cFactor(CarbonFactors.DOMESTIC_WASTE_INCINERATION, period),
                     getAnswer(period, rtn, Q.INCINERATION_CO2E));
         } else if (rtn.answer(period, Q.INCINERATION_WEIGHT).isPresent()) {
-            calcIncinerationCo2e(
+            wasteEmissionsService.calcIncinerationCo2e(
                     getAnswer(period, rtn, Q.INCINERATION_WEIGHT).responseAsBigDecimal(),
                     cFactor(CarbonFactors.HIGH_TEMPERATURE_DISPOSAL_WASTE, period),
                     getAnswer(period, rtn, Q.INCINERATION_CO2E));
         }
-        calcRecylingCo2e(
+        wasteEmissionsService.calcRecylingCo2e(
                 rtn.answerResponseAsBigDecimal(period, Q.RECYCLING_WEIGHT),
                 cFactor(CarbonFactors.CLOSED_LOOP_OR_OPEN_LOOP, period),
                 getAnswer(period, rtn, Q.RECYCLING_CO2E));
         // factor changed from weighted avg of industrial and domestic to solely domestic in 2020-21
-        calcLandfillCo2e(
+        wasteEmissionsService.calcLandfillCo2e(
                 getAnswer(period, rtn, Q.LANDFILL_WEIGHT).responseAsBigDecimal(),
                 cFactor(CarbonFactors.LANDFILL_DOMESTIC_WASTE, period),
                 getAnswer(period, rtn, Q.LANDFILL_CO2E));
         if (rtn.answer(period, Q.WASTE_CLINICAL_INCINERATED).isPresent()) {
-            calcIncinerationCo2e(
+            wasteEmissionsService.calcIncinerationCo2e(
                     getAnswer(period, rtn, Q.WASTE_CLINICAL_INCINERATED).responseAsBigDecimal(),
                     cFactor(CarbonFactors.CLINICAL_WASTE, period),
                     getAnswer(period, rtn, Q.WASTE_CLINICAL_INCINERATED_CO2E));
         }
         if (rtn.answer(period, Q.WASTE_OFFENSIVE).isPresent()) {
-            calcOffensiveWasteCo2e(
+            wasteEmissionsService.calcOffensiveWasteCo2e(
                     getAnswer(period, rtn, Q.WASTE_OFFENSIVE).responseAsBigDecimal(),
                     cFactor(CarbonFactors.CLINICAL_WASTE, period),
                     getAnswer(period, rtn, Q.WASTE_OFFENSIVE_CO2E));
         }
         if (rtn.answer(period, Q.ALT_WASTE_DISPOSAL_WEIGHT).isPresent()) {
-            calcAltDisposalCo2e(
+            wasteEmissionsService.calcAltDisposalCo2e(
                     getAnswer(period, rtn, Q.ALT_WASTE_DISPOSAL_WEIGHT).responseAsBigDecimal(),
                     cFactor(CarbonFactors.CLINICAL_WASTE, period),
                     getAnswer(period, rtn, Q.ALT_WASTE_DISPOSAL_WEIGHT_CO2E));
         }
         if (rtn.answer(period, Q.WASTE_FOOD).isPresent()) {
-            calcFoodWasteCo2e(
+            wasteEmissionsService.calcFoodWasteCo2e(
                     getAnswer(period, rtn, Q.WASTE_FOOD).responseAsBigDecimal(),
                     cFactor(CarbonFactors.ORGANIC_FOOD_AND_DRINK_WASTE, period),
                     getAnswer(period, rtn, Q.WASTE_FOOD_CO2E));
         }
         if (rtn.answer(period, Q.WASTE_TEXTILES).isPresent()) {
-            calcTextilesCo2e(
+            wasteEmissionsService.calcTextilesCo2e(
                     getAnswer(period, rtn, Q.WASTE_TEXTILES).responseAsBigDecimal(),
                     cFactor(CarbonFactors.NON_BURN_TREATMENT_DISPOSAL_WASTE, period),
                     getAnswer(period, rtn, Q.WASTE_TEXTILES_CO2E));
         }
         if (rtn.answer(period, Q.WASTE_PROCESSED_ON_SITE).isPresent()) {
-            calcOnsiteCo2e(
+            wasteEmissionsService.calcOnsiteCo2e(
                     getAnswer(period, rtn, Q.WASTE_PROCESSED_ON_SITE).responseAsBigDecimal(),
                     cFactor(CarbonFactors.ONSITE_HEAT_AND_STEAM, period),
                     getAnswer(period, rtn, Q.WASTE_PROCESSED_ON_SITE_CO2E));
         }
         if (rtn.answer(period, Q.WEEE_WEIGHT).isPresent() && rtn.answer(period, Q.WEEE_WEIGHT_CO2E).isPresent()) {
-            calcWeeeCo2e(
+            wasteEmissionsService.calcWeeeCo2e(
                     rtn.answerResponseAsBigDecimal(period, Q.WEEE_WEIGHT),
                     cFactor(CarbonFactors.WEEE_AVERAGE, period),
                     getAnswer(period, rtn, Q.WEEE_WEIGHT_CO2E));
         }
         if (rtn.answer(period, Q.OTHER_RECOVERY_WEIGHT).isPresent()) {
-            calcOtherRecoveryCo2e(
+            wasteEmissionsService.calcOtherRecoveryCo2e(
                     rtn.answerResponseAsBigDecimal(period, Q.OTHER_RECOVERY_WEIGHT),
                     cFactor(CarbonFactors.HIGH_TEMPERATURE_DISPOSAL_WASTE_WITH_ENERGY_RECOVERY, period),
                     getAnswer(period, rtn, Q.OTHER_RECOVERY_CO2E));
         }
         sumAnswers(period, rtn, Q.SCOPE_3_WASTE, SduQuestions.WASTE_CO2E_HDRS_POST2020);
-    }
-
-//    private void calcReuseCo2e(BigDecimal waste, CarbonFactor cFactor, Answer co2e) {
-//        co2e.response(wasteEmissionsService.calculate(waste, cFactor).orElse(BigDecimal.ZERO));
-//    }
-
-    private void calcOffensiveWasteCo2e(BigDecimal waste, CarbonFactor cFactor, Answer co2e) {
-        co2e.response(wasteEmissionsService.calculate(waste, cFactor).orElse(BigDecimal.ZERO));
-    }
-
-    private void calcAltDisposalCo2e(BigDecimal waste, CarbonFactor cFactor, Answer co2e) {
-        co2e.response(wasteEmissionsService.calculate(waste, cFactor).orElse(BigDecimal.ZERO));
-    }
-
-    private void calcFoodWasteCo2e(BigDecimal waste, CarbonFactor cFactor, Answer co2e) {
-        co2e.response(wasteEmissionsService.calculate(waste, cFactor).orElse(BigDecimal.ZERO));
-    }
-
-    private void calcTextilesCo2e(BigDecimal waste, CarbonFactor cFactor, Answer co2e) {
-        co2e.response(wasteEmissionsService.calculate(waste, cFactor).orElse(BigDecimal.ZERO));
-    }
-
-    private void calcOnsiteCo2e(BigDecimal waste, CarbonFactor cFactor, Answer co2e) {
-        co2e.response(wasteEmissionsService.calculate(waste, cFactor).orElse(BigDecimal.ZERO));
-    }
-
-    private void calcWeeeCo2e(BigDecimal waste, CarbonFactor cFactor, Answer co2e) {
-        co2e.response(wasteEmissionsService.calculate(waste, cFactor).orElse(BigDecimal.ZERO));
-    }
-
-    private void calcLandfillCo2e(BigDecimal waste, CarbonFactor cFactor, Answer co2e) {
-        co2e.response(wasteEmissionsService.calculate(waste, cFactor).orElse(BigDecimal.ZERO));
-    }
-
-    private void calcIncinerationCo2e(BigDecimal waste, CarbonFactor cFactor, Answer co2e) {
-        co2e.response(wasteEmissionsService.calculate(waste, cFactor).orElse(BigDecimal.ZERO));
-    }
-
-    private void calcOtherRecoveryCo2e(BigDecimal waste, CarbonFactor cFactor, Answer co2e) {
-        co2e.response(wasteEmissionsService.calculate(waste, cFactor).orElse(BigDecimal.ZERO));
-    }
-
-    private void calcRecylingCo2e(BigDecimal waste, CarbonFactor cFactor, Answer co2e) {
-        co2e.response(wasteEmissionsService.calculate(waste, cFactor).orElse(BigDecimal.ZERO));
     }
 
     protected Answer getAnswerForPeriodWithFallback(String period,
@@ -707,6 +653,10 @@ public class Cruncher extends AbstractEmissionsService
 
         sumAnswers(period, rtn, Q.SCOPE_3_BIOMASS,
                 Q.WOOD_LOGS_CO2E, Q.WOOD_CHIPS_CO2E, Q.WOOD_PELLETS_CO2E);
+    }
+
+    public void crunchScope3EnergyWtt(String period, SurveyReturn rtn) {
+        sumAnswers(period, rtn, Q.SCOPE_3_ENERGY_WTT, Q.ELEC_WTT_CO2E);
     }
 
     protected void crunchScope3Travel(String period, SurveyReturn rtn) {
@@ -1326,14 +1276,72 @@ public class Cruncher extends AbstractEmissionsService
     }
 
     protected void crunchElectricityUsed(String period, SurveyReturn rtn) {
-        try {
-            BigDecimal nonRenewableElecUsed = getAnswer(period, rtn, Q.ELEC_USED).responseAsBigDecimal();
-            BigDecimal elecFactor = oneThousandth(cFactor(CarbonFactors.ELECTRICITY_UK_TOTAL, period));
-            getAnswer(period,rtn, Q.ELEC_CO2E).derived(true).response(nonRenewableElecUsed.multiply(elecFactor));
-        } catch (IllegalStateException | NullPointerException e) {
-            LOGGER.warn("Insufficient data to calculate CO2e from grid electricity");
-        }
+        CarbonFactor elecFactor = cFactor(CarbonFactors.ELECTRICITY_UK_TOTAL, period);
 
+        energyEmissionsService.calcGridElecCo2e(
+                getAnswer(period, rtn, Q.ELEC_USED).responseAsBigDecimal(),
+                elecFactor, getAnswer(period,rtn, Q.ELEC_CO2E));
+        energyEmissionsService.calcGridElecWttCo2e(
+                getAnswer(period, rtn, Q.ELEC_USED).responseAsBigDecimal(),
+                cFactor(CarbonFactors.ELECTRICITY_UK_WTT, period),
+                getAnswer(period, rtn, Q.ELEC_WTT_CO2E));
+
+        calcExportedElecCo2e(period, rtn);
+
+        BigDecimal renewableElecUsed = sumAnswers(period, rtn,
+                Q.ELEC_TOTAL_RENEWABLE_USED, Q.ELEC_USED_GREEN_TARIFF,
+                Q.ELEC_3RD_PTY_RENEWABLE_USED, Q.ELEC_OWNED_RENEWABLE_USED_SDU)
+                .responseAsBigDecimal();
+        getAnswer(period,rtn, Q.ELEC_TOTAL_RENEWABLE_USED).derived(true).response(renewableElecUsed);
+        try {
+            BigDecimal greenTariffGridEquivUsed = calcGreenTariffElecCo2e(
+                    period, rtn, oneThousandth(elecFactor));
+            BigDecimal thirdPtyRenewableGridEquivUsed;
+            thirdPtyRenewableGridEquivUsed = calcThirdPartyRenewableCo2e(period,
+                    rtn, oneThousandth(elecFactor));
+            BigDecimal renewableElecCo2e = greenTariffGridEquivUsed.add(thirdPtyRenewableGridEquivUsed)
+                    .multiply(oneThousandth(elecFactor)).divide(ONE_HUNDRED, RoundingMode.HALF_UP);
+            getAnswer(period,rtn, Q.ELEC_RENEWABLE_CO2E).derived(true).response(renewableElecCo2e);
+        } catch (IllegalStateException | NullPointerException e) {
+            LOGGER.warn("Insufficient data to calculate CO2e from renewable electricity");
+        }
+    }
+
+    private BigDecimal calcThirdPartyRenewableCo2e(String period,
+            SurveyReturn rtn, BigDecimal elecFactor) {
+        BigDecimal thirdPtyRenewableGridEquivUsed;
+        try {
+            thirdPtyRenewableGridEquivUsed = getAnswer(period, rtn, Q.ELEC_3RD_PTY_RENEWABLE_USED).responseAsBigDecimal().multiply(
+                    ONE_HUNDRED.subtract(getAnswer(period, rtn, Q.THIRD_PARTY_ADDITIONAL_PCT).responseAsBigDecimal()));
+            getAnswer(period,rtn, Q.ELEC_NON_RENEWABLE_3RD_PARTY).derived(true).response(thirdPtyRenewableGridEquivUsed);
+            getAnswer(period,rtn, Q.ELEC_NON_RENEWABLE_3RD_PARTY_CO2E).derived(true).response(
+                    thirdPtyRenewableGridEquivUsed.multiply(elecFactor).divide(ONE_HUNDRED, RoundingMode.HALF_UP));
+        } catch (IllegalStateException | NullPointerException e) {
+            LOGGER.warn("Insufficient data to calculate CO2e from third party renewable elec used for {} in {}", rtn.org(), period);
+            LOGGER.error(e.getMessage(), e);
+            thirdPtyRenewableGridEquivUsed = BigDecimal.ZERO;
+        }
+        return thirdPtyRenewableGridEquivUsed;
+    }
+
+    private BigDecimal calcGreenTariffElecCo2e(String period, SurveyReturn rtn,
+            BigDecimal elecFactor) {
+        BigDecimal greenTariffGridEquivUsed;
+        try {
+            greenTariffGridEquivUsed = getAnswer(period, rtn, Q.ELEC_USED_GREEN_TARIFF).responseAsBigDecimal().multiply(
+                    ONE_HUNDRED.subtract(getAnswer(period, rtn, Q.GREEN_TARIFF_ADDITIONAL_PCT).responseAsBigDecimal()));
+            getAnswer(period,rtn, Q.ELEC_NON_RENEWABLE_GREEN_TARIFF).derived(true).response(greenTariffGridEquivUsed);
+            getAnswer(period,rtn, Q.ELEC_NON_RENEWABLE_GREEN_TARIFF_CO2E).derived(true).response(
+                     greenTariffGridEquivUsed.multiply(elecFactor).divide(ONE_HUNDRED, RoundingMode.HALF_UP));
+        } catch (IllegalStateException | NullPointerException e) {
+            LOGGER.warn("Insufficient data to calculate CO2e saved from green tariff elec used for {} in {}", rtn.org(), period);
+            LOGGER.error(e.getMessage(), e);
+            greenTariffGridEquivUsed = BigDecimal.ZERO;
+        }
+        return greenTariffGridEquivUsed;
+    }
+
+    private void calcExportedElecCo2e(String period, SurveyReturn rtn) {
         BigDecimal elecExportedCo2e;
         try {
             elecExportedCo2e = getAnswer(period, rtn, Q.ELEC_EXPORTED).responseAsBigDecimal()
@@ -1345,44 +1353,6 @@ public class Cruncher extends AbstractEmissionsService
         }
         getAnswer(period,rtn, Q.NET_ELEC_CO2E).derived(true).response(
                 getAnswer(period,rtn, Q.ELEC_CO2E).responseAsBigDecimal().subtract(elecExportedCo2e));
-
-        BigDecimal renewableElecUsed = sumAnswers(period, rtn,
-                Q.ELEC_TOTAL_RENEWABLE_USED, Q.ELEC_USED_GREEN_TARIFF,
-                Q.ELEC_3RD_PTY_RENEWABLE_USED, Q.ELEC_OWNED_RENEWABLE_USED_SDU)
-                .responseAsBigDecimal();
-        getAnswer(period,rtn, Q.ELEC_TOTAL_RENEWABLE_USED).derived(true).response(renewableElecUsed);
-        try {
-            BigDecimal elecFactor = oneThousandth(cFactor(CarbonFactors.ELECTRICITY_UK_TOTAL, period));
-            BigDecimal greenTariffGridEquivUsed;
-            try {
-                greenTariffGridEquivUsed = getAnswer(period, rtn, Q.ELEC_USED_GREEN_TARIFF).responseAsBigDecimal().multiply(
-                        ONE_HUNDRED.subtract(getAnswer(period, rtn, Q.GREEN_TARIFF_ADDITIONAL_PCT).responseAsBigDecimal()));
-                getAnswer(period,rtn, Q.ELEC_NON_RENEWABLE_GREEN_TARIFF).derived(true).response(greenTariffGridEquivUsed);
-                getAnswer(period,rtn, Q.ELEC_NON_RENEWABLE_GREEN_TARIFF_CO2E).derived(true).response(
-                         greenTariffGridEquivUsed.multiply(elecFactor).divide(ONE_HUNDRED, RoundingMode.HALF_UP));
-            } catch (IllegalStateException | NullPointerException e) {
-                LOGGER.warn("Insufficient data to calculate CO2e saved from green tariff elec used for {} in {}", rtn.org(), period);
-                LOGGER.error(e.getMessage(), e);
-                greenTariffGridEquivUsed = BigDecimal.ZERO;
-            }
-            BigDecimal thirdPtyRenewableGridEquivUsed;
-            try {
-                thirdPtyRenewableGridEquivUsed = getAnswer(period, rtn, Q.ELEC_3RD_PTY_RENEWABLE_USED).responseAsBigDecimal().multiply(
-                        ONE_HUNDRED.subtract(getAnswer(period, rtn, Q.THIRD_PARTY_ADDITIONAL_PCT).responseAsBigDecimal()));
-                getAnswer(period,rtn, Q.ELEC_NON_RENEWABLE_3RD_PARTY).derived(true).response(thirdPtyRenewableGridEquivUsed);
-                getAnswer(period,rtn, Q.ELEC_NON_RENEWABLE_3RD_PARTY_CO2E).derived(true).response(
-                        thirdPtyRenewableGridEquivUsed.multiply(elecFactor).divide(ONE_HUNDRED, RoundingMode.HALF_UP));
-            } catch (IllegalStateException | NullPointerException e) {
-                LOGGER.warn("Insufficient data to calculate CO2e from third party renewable elec used for {} in {}", rtn.org(), period);
-                LOGGER.error(e.getMessage(), e);
-                thirdPtyRenewableGridEquivUsed = BigDecimal.ZERO;
-            }
-            BigDecimal renewableElecCo2e = greenTariffGridEquivUsed.add(thirdPtyRenewableGridEquivUsed)
-                    .multiply(elecFactor).divide(ONE_HUNDRED, RoundingMode.HALF_UP);
-            getAnswer(period,rtn, Q.ELEC_RENEWABLE_CO2E).derived(true).response(renewableElecCo2e);
-        } catch (IllegalStateException | NullPointerException e) {
-            LOGGER.warn("Insufficient data to calculate CO2e from renewable electricity");
-        }
     }
 
     protected void crunchOwnedBuildings(String period, SurveyReturn rtn) {
