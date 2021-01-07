@@ -106,8 +106,9 @@ public class Eric1516 implements EricQuestions, SurveyFactory {
                 );
         
         Survey survey = new Survey().name(ID).status(StatusType.Published.name())
-                .applicablePeriod("2015-16")
-                .categories(catOrg, catProfile, catStrategy, catContractingOut, catFinance, catSafety, catFireSafety);
+                .applicablePeriod(PERIOD)
+                .categories(catOrg, catProfile, catStrategy, catContractingOut,
+                        catFinance, catSafety, catFireSafety);
         return survey;
     }
 

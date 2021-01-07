@@ -213,7 +213,7 @@ public class Sdu1516 implements SurveyFactory {
                 .name("Qualitative questions")
                 .questionEnums(SduQuestions.QUALITATIVE_QS);
         Survey survey = new Survey().name(ID).status("Draft")
-                .applicablePeriod("2016-17")
+                .applicablePeriod(PERIOD)
                 .categories(catOrg, catPolicy, catPerf,
                         catFinancial, catEnergy, catWaste,
                         catWater, catBizTravel, catOtherTravel, catGases,
