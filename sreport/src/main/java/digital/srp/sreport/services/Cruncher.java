@@ -478,7 +478,7 @@ public class Cruncher extends AbstractEmissionsService
                     cFactor(CarbonFactors.CLINICAL_WASTE, period),
                     getAnswer(period, rtn, Q.WASTE_OFFENSIVE_CO2E));
         }
-        if (rtn.answer(period, Q.ALT_WASTE_DISPOSAL_WEIGHT).isPresent()) {
+        if (rtn.answer(period, Q.ALT_WASTE_DISPOSAL_WEIGHT).isPresent() && rtn.answer(period, Q.ALT_WASTE_DISPOSAL_WEIGHT_CO2E).isPresent()) {
             wasteEmissionsService.calcAltDisposalCo2e(
                     getAnswer(period, rtn, Q.ALT_WASTE_DISPOSAL_WEIGHT).responseAsBigDecimal(),
                     cFactor(CarbonFactors.CLINICAL_WASTE, period),
@@ -508,7 +508,7 @@ public class Cruncher extends AbstractEmissionsService
                     cFactor(CarbonFactors.WEEE_AVERAGE, period),
                     getAnswer(period, rtn, Q.WEEE_WEIGHT_CO2E));
         }
-        if (rtn.answer(period, Q.OTHER_RECOVERY_WEIGHT).isPresent()) {
+        if (rtn.answer(period, Q.OTHER_RECOVERY_WEIGHT).isPresent() && rtn.answer(period, Q.OTHER_RECOVERY_CO2E).isPresent()) {
             wasteEmissionsService.calcOtherRecoveryCo2e(
                     rtn.answerResponseAsBigDecimal(period, Q.OTHER_RECOVERY_WEIGHT),
                     cFactor(CarbonFactors.HIGH_TEMPERATURE_DISPOSAL_WASTE_WITH_ENERGY_RECOVERY, period),
