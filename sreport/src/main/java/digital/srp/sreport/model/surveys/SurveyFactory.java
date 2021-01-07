@@ -11,8 +11,6 @@ import digital.srp.sreport.model.Survey;
  */
 public interface SurveyFactory {
 
-    String PERIOD = "2015-16";
-    String ID = "ERIC-" + PERIOD;
     Survey getSurvey();
     Q[] getQs();
 
