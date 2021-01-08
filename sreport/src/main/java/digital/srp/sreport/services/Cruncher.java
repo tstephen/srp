@@ -144,8 +144,9 @@ public class Cruncher extends AbstractEmissionsService
             totalTravelCo2e = getAnswer(period, rtn, Q.SCOPE_3_TRAVEL).responseAsBigDecimal();
         } catch (Exception e) { }
 
-        Answer totalProcurementCo2eA = sumAnswers(period, rtn, Q.TOTAL_PROCUREMENT_CO2E, Q.PROCUREMENT_CO2E,
-                Q.ANAESTHETIC_GASES_CO2E, Q.SCOPE_3_WASTE, Q.SCOPE_3_WATER, Q.CAPITAL_CO2E);
+        Answer totalProcurementCo2eA = sumAnswers(period, rtn, Q.TOTAL_PROCUREMENT_CO2E,
+                Q.PROCUREMENT_CO2E, Q.ANAESTHETIC_GASES_CO2E,
+                Q.SCOPE_3_WASTE, Q.SCOPE_3_WATER, Q.CAPITAL_CO2E);
         BigDecimal totalProcurementCo2e = totalProcurementCo2eA.responseAsBigDecimal();
 
         // CORE CO2E
@@ -229,34 +230,34 @@ public class Cruncher extends AbstractEmissionsService
                 Q.TOTAL_COMMISSIONING_CO2E);
         BigDecimal totalCo2e = totalCo2eA.responseAsBigDecimal();
 
-        benchmarkPerMetric(period, rtn, totalEnergyCo2e, totalTravelCo2e,
-                totalProcurementCo2e, totalCoreCo2e, totalCommissioningCo2e,
-                totalCommunityCo2e, totalProcurement2017Co2e, totalCo2e,
+        benchmarkPerMetric(period, rtn, totalCo2e, totalCoreCo2e,
+                totalCommissioningCo2e, totalProcurementCo2e, totalProcurement2017Co2e,
+                totalCommunityCo2e, totalEnergyCo2e, totalTravelCo2e,
                 getAnswerForPeriodWithFallback(period, rtn, Q.POPULATION).responseAsBigDecimal(),
                 "population");
-        benchmarkPerMetric(period, rtn, totalEnergyCo2e, totalTravelCo2e,
-                totalProcurementCo2e, totalCoreCo2e, totalCommissioningCo2e,
-                totalCommunityCo2e, totalProcurement2017Co2e, totalCo2e,
+        benchmarkPerMetric(period, rtn, totalCo2e, totalCoreCo2e,
+                totalCommissioningCo2e, totalProcurementCo2e, totalProcurement2017Co2e,
+                totalCommunityCo2e, totalEnergyCo2e, totalTravelCo2e,
                 getAnswerForPeriodWithFallback(period, rtn, Q.FLOOR_AREA).responseAsBigDecimal(),
                 "floorArea");
-        benchmarkPerMetric(period, rtn, totalEnergyCo2e, totalTravelCo2e,
-                totalProcurementCo2e, totalCoreCo2e, totalCommissioningCo2e,
-                totalCommunityCo2e, totalProcurement2017Co2e, totalCo2e,
+        benchmarkPerMetric(period, rtn, totalCo2e, totalCoreCo2e,
+                totalCommissioningCo2e, totalProcurementCo2e, totalProcurement2017Co2e,
+                totalCommunityCo2e, totalEnergyCo2e, totalTravelCo2e,
                 getAnswerForPeriodWithFallback(period, rtn, Q.NO_STAFF).responseAsBigDecimal(),
                 "noStaff");
-        benchmarkPerMetric(period, rtn, totalEnergyCo2e, totalTravelCo2e,
-                totalProcurementCo2e, totalCoreCo2e, totalCommissioningCo2e,
-                totalCommunityCo2e, totalProcurement2017Co2e, totalCo2e,
+        benchmarkPerMetric(period, rtn, totalCo2e, totalCoreCo2e,
+                totalCommissioningCo2e, totalProcurementCo2e, totalProcurement2017Co2e,
+                totalCommunityCo2e, totalEnergyCo2e, totalTravelCo2e,
                 getAnswerForPeriodWithFallback(period, rtn, Q.OCCUPIED_BEDS).responseAsBigDecimal(),
                 "occupiedBeds");
-        benchmarkPerMetric(period, rtn, totalEnergyCo2e, totalTravelCo2e,
-                totalProcurementCo2e, totalCoreCo2e, totalCommissioningCo2e,
-                totalCommunityCo2e, totalProcurement2017Co2e, totalCo2e,
+        benchmarkPerMetric(period, rtn, totalCo2e, totalCoreCo2e,
+                totalCommissioningCo2e, totalProcurementCo2e, totalProcurement2017Co2e,
+                totalCommunityCo2e, totalEnergyCo2e, totalTravelCo2e,
                 getAnswerForPeriodWithFallback(period, rtn, Q.NO_PATIENT_CONTACTS).responseAsBigDecimal(),
                 "patientContacts");
-        benchmarkPerMetric(period, rtn, totalEnergyCo2e, totalTravelCo2e,
-                totalProcurementCo2e, totalCoreCo2e, totalCommissioningCo2e,
-                totalCommunityCo2e, totalProcurement2017Co2e, totalCo2e,
+        benchmarkPerMetric(period, rtn, totalCo2e, totalCoreCo2e,
+                totalCommissioningCo2e, totalProcurementCo2e, totalProcurement2017Co2e,
+                totalCommunityCo2e, totalEnergyCo2e, totalTravelCo2e,
                 getAnswerForPeriodWithFallback(period, rtn, Q.OP_EX).responseAsBigDecimal(),
                 "opex");
 
@@ -318,24 +319,20 @@ public class Cruncher extends AbstractEmissionsService
     }
 
     protected void benchmarkPerMetric(String period, SurveyReturn rtn,
+            BigDecimal totalCo2e, BigDecimal totalCoreCo2e,
+            BigDecimal totalCommissioningCo2e, BigDecimal totalProcurementCo2e,
+            BigDecimal totalProcurement2017Co2e, BigDecimal totalCommunityCo2e,
             BigDecimal totalEnergyCo2e, BigDecimal totalTravelCo2e,
-            BigDecimal totalProcurementCo2e, BigDecimal totalCoreCo2e,
-            BigDecimal totalCommissioningCo2e, BigDecimal totalCommunityCo2e,
-            BigDecimal totalProcurement2017Co2e, BigDecimal totalCo2e,
             BigDecimal metric, String metricName) {
         try {
-            getAnswer(period, rtn, getTargetQ("TOTAL_CO2E",metricName)).derived(true).response(
-                    totalCo2e // change tonnes to kgs
+            getAnswer(period, rtn, getTargetQ("TOTAL_CO2E",metricName))
+                    .derived(true)
+                    .response(totalCo2e // change tonnes to kgs
                             .multiply(ONE_THOUSAND)
                             .divide(metric, RoundingMode.HALF_UP));
             getAnswer(period, rtn, getTargetQ("TOTAL_CORE_CO2E",metricName))
                     .derived(true)
                     .response(totalCoreCo2e // change tonnes to kgs
-                            .multiply(ONE_THOUSAND)
-                            .divide(metric, RoundingMode.HALF_UP));
-            getAnswer(period, rtn, getTargetQ("TOTAL_ENERGY_CO2E",metricName))
-                    .derived(true)
-                    .response(totalEnergyCo2e // change tonnes to kgs
                             .multiply(ONE_THOUSAND)
                             .divide(metric, RoundingMode.HALF_UP));
             getAnswer(period, rtn, getTargetQ("TOTAL_COMMUNITY_CO2E",metricName))
@@ -353,11 +350,6 @@ public class Cruncher extends AbstractEmissionsService
                     .response(totalCommissioningCo2e // change tonnes to kgs
                             .multiply(ONE_THOUSAND)
                             .divide(metric, RoundingMode.HALF_UP));
-            getAnswer(period, rtn, getTargetQ("TOTAL_TRAVEL_CO2E",metricName))
-                    .derived(true)
-                    .response(totalTravelCo2e // change tonnes to kgs
-                            .multiply(ONE_THOUSAND)
-                            .divide(metric, RoundingMode.HALF_UP));
             getAnswer(period, rtn, getTargetQ("TOTAL_PROCUREMENT_CO2E",metricName))
                     .derived(true)
                     .response(totalProcurementCo2e // change tonnes to kgs
@@ -368,6 +360,26 @@ public class Cruncher extends AbstractEmissionsService
                     metricName, e.getMessage());
         } catch (IllegalStateException e) {
             LOGGER.error("Unable to calculate CO2e by {}. Cause: {}",
+                    metricName, e.getMessage());
+        }
+        try {
+            getAnswer(period, rtn, getTargetQ("TOTAL_ENERGY_CO2E",metricName))
+                    .derived(true)
+                    .response(totalEnergyCo2e // change tonnes to kgs
+                            .multiply(ONE_THOUSAND)
+                            .divide(metric, RoundingMode.HALF_UP));
+        } catch (ArithmeticException | IllegalStateException e) {
+            LOGGER.info("Unable to calculate deprecated benchmark {}. Cause: {}",
+                    metricName, e.getMessage());
+        }
+        try {
+            getAnswer(period, rtn, getTargetQ("TOTAL_TRAVEL_CO2E",metricName))
+                    .derived(true)
+                    .response(totalTravelCo2e // change tonnes to kgs
+                            .multiply(ONE_THOUSAND)
+                            .divide(metric, RoundingMode.HALF_UP));
+        } catch (ArithmeticException | IllegalStateException e) {
+            LOGGER.info("Unable to calculate deprecated benchmark {}. Cause: {}",
                     metricName, e.getMessage());
         }
     }
@@ -1129,7 +1141,7 @@ public class Cruncher extends AbstractEmissionsService
         sumAnswers(period, rtn, Q.EC_COMMISSIONED_HEALTH_SERVICES, Q.PURCHASED_HEALTHCARE);
         sumAnswers(period, rtn, Q.EC_COMMISSIONED_HEALTH_SERVICES_CO2E, Q.PURCHASED_HEALTHCARE_CO2E);
 
-        sumAnswers(period, rtn, Q.ECLASS_SPEND, ECLASS_PROFILE_HDRS);
+        sumAnswers(period, rtn, Q.ECLASS_SPEND, ECLASS_PROFILE_SPEND_HDRS);
     }
 
     protected void calcCarbonProfileEClassMethod(String period, SurveyReturn rtn) {

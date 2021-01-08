@@ -287,7 +287,7 @@ public class Sdu1819 implements SurveyFactory {
         // #203 not displayed but still calculated
         list.add(Q.OTHER_PROCUREMENT_CO2E);
         list.add(Q.ECLASS_SPEND);
-        list.addAll(Arrays.asList(SduQuestions.ECLASS_PROFILE_HDRS));
+        list.addAll(Arrays.asList(SduQuestions.ECLASS_PROFILE_CO2E_HDRS));
         list.addAll(Arrays.asList(SduQuestions.ECLASS_PROFILE2_HDRS));
         list.addAll(Arrays.asList(SduQuestions.ECLASS_PROFILE2_CO2E_HDRS));
         list.addAll(Arrays.asList(SduQuestions.CORE_CO2E_HDRS));

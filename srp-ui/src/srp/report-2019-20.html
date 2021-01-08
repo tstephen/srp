@@ -512,7 +512,7 @@
 	    to reduce our use of single-use plastics.</p>
           <p class="narrative performance {{#if !haveAnswer('PLASTICS_PLEDGE')}}hidden-print{{/if}}" data-q="PLASTICS_PLEDGE">{{formatAnswer('PLASTICS_PLEDGE')}}</p>
           <div class="rpt table2" id="plasticsRptTable2"
-               data-qs="NO_PLASTICS_CUPS,NO_PLASTIC_LINED_COFFEE_CUP,NO_PLASTIC_PLATES,NO_PLASTIC_CUTLERY,NO_PLASTIC_STRAWS,NO_PLASTIC_STIRRERS,NO_PLASTIC_FOOD_CONTAINER"
+               data-qs="NO_PLASTICS_CUPS,NO_PLASTIC_LINED_COFFEE_CUPS,NO_PLASTIC_PLATES,NO_PLASTIC_CUTLERY,NO_PLASTIC_STIRRERS,NO_PLASTIC_STRAWS,NO_PLASTIC_FOOD_CONTAINERS"
 	       data-periods="4"
                data-share="http://localhost:8083/reports/{{formatAnswer('ORG_CODE')}}/{{surveyReturn.applicablePeriod}}/plastics.html"
 	       data-total="true"></div>
@@ -586,9 +586,10 @@
           {{#if isEClassUser()}}
             <section id="eclassCarbonProfileSect" style="clear:both">
               <h2>E-Class Procurement Profile</h2>
-              <p>Calculated from operating expenditure of <em>&pound;{{formatAnswer('OP_EX')}},000</em>
-                {{# formatAnswer('ECLASS_SPEND')}} of which <em>&pound;{{formatAnswer('ECLASS_SPEND')}},000</em> is E-Class classified spend.{{/}}
+              <p>Calculated from the e-class spend you entered, which totalled
+                <em>&pound; {{formatDecimalAnswer('ECLASS_SPEND', period, 0)}}{{#if haveAnswer('ECLASS_SPEND')}},000{{else}}0{{/if}}</em> in the current year.<br/><br/>
               </p>
+              <p>CO<sub>2</sub> Emissions (tCO<sub>2</sub>e)</p>
               <div class="rpt table2" id="eclassRptTable2" data-total="true" data-qs="PATIENT_AND_VISITOR_MILEAGE_CO2E,STAFF_COMMUTE_MILES_CO2E,PROVISIONS_CO2E,STAFF_CLOTHING_CO2E,PATIENTS_CLOTHING_AND_FOOTWEAR_CO2E,PHARMA_BLOOD_PROD_AND_MED_GASES_CO2E,DRESSINGS_CO2E,MEDICAL_AND_SURGICAL_EQUIPT_CO2E,PATIENTS_APPLIANCES_CO2E,CHEMICALS_AND_REAGENTS_CO2E,DENTAL_AND_OPTICAL_EQUIPT_CO2E,IMAGING_AND_RADIOTHERAPY_EQUIPT_AND_SVCS_CO2E,LAB_EQUIPT_AND_SVCS_CO2E,HOTEL_EQUIPT_MATERIALS_AND_SVCS_CO2E,BLDG_AND_ENG_PROD_AND_SVCS_CO2E,PURCHASED_HEALTHCARE_CO2E,GARDENING_AND_FARMING_CO2E,FURNITURE_FITTINGS_CO2E,HARDWARE_CROCKERY_CO2E,BEDDING_LINEN_AND_TEXTILES_CO2E,OFFICE_EQUIPT_TELCO_COMPUTERS_AND_STATIONERY_CO2E,REC_EQUIPT_AND_SOUVENIRS_CO2E,CONSULTING_SVCS_AND_EXPENSES_CO2E,OWNED_BUILDINGS_COAL,NET_ELEC_CO2E,OWNED_BUILDINGS_GAS,OWNED_BUILDINGS_OIL,NET_THERMAL_ENERGY_CO2E,LEASED_ASSETS_ENERGY_USE,BIZ_MILEAGE_CO2E,ANAESTHETIC_GASES_CO2E,WASTE_AND_WATER_CO2E,TOTAL_COMMISSIONING_CO2E" data-periods="4"
                    data-share="http://localhost:8083/reports/{{formatAnswer('ORG_CODE')}}/{{surveyReturn.applicablePeriod}}/eclass-carbon-profile.html"></div>
             </section>

@@ -493,6 +493,17 @@ var ractive = new BaseRactive({
       if (timeString==undefined) return 'n/a';
       return new Date(timeString).toLocaleString(navigator.languages);
     },
+    formatDecimalAnswer: function(qName, period, decimalPlaces) {
+      if (qName==undefined || ractive.get('surveyReturn')==undefined) return '';
+      else {
+        try {
+          var answer = ractive.getAnswer(qName, period);
+          return answer == undefined ? '' : parseFloat(answer).formatDecimal(decimalPlaces);
+        } catch (e) {
+          return '';
+        }
+      }
+    },
     formatHint: function(qName) {
       for (i in ractive.get('q.categories')) {
         for (j in ractive.get('q.categories.'+i+'.questions')) {
@@ -581,7 +592,6 @@ var ractive = new BaseRactive({
       else return 'hidden';
     },
     stdPartials: [
-      
       { "name": "sidebar", "url": $env.server+"/partials/sidebar.html"},
       { "name": "toolbar", "url": $env.server+"/partials/toolbar.html"},
       { "name": "statusSect", "url": "/srp/vsn/partials/status-sect.html"}
@@ -1040,7 +1050,10 @@ var ractive = new BaseRactive({
       table += '<th>'+ractive.renderLabel(qs[idx])+'</th>';
       table += '<th class="legend '+qs[idx].toLowerCase()+'">&nbsp;</th>';
       for (var i = 1 ; i <= periods ; i++) {
-        table += '<td class="number">'+ractive.getAnswer(qs[idx], ractive.getPeriod(i-periods))+'</td>';
+        var ans = ractive.getAnswer(qs[idx], ractive.getPeriod(i-periods));
+        table += '<td class="number">';
+        table += ans == undefined ? 'n/a' : isNaN(ans) ? ans : parseFloat(ans).sigFigs(3);
+        table += '</td>';
       }
       table += '</tr>';
     }

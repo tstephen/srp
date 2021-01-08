@@ -49,17 +49,6 @@ var ractive = new BaseRactive({
         }
       }
     },
-    formatDecimalAnswer: function(qName, period, decimalPlaces) {
-      if (qName==undefined || ractive.get('surveyReturn')==undefined) return '';
-      else {
-        try {
-          var answer = ractive.getAnswer(qName, period);
-          return answer == undefined ? '' : parseFloat(answer).formatDecimal(decimalPlaces);
-        } catch (e) {
-          return '';
-        }
-      }
-    },
     formatCommissionerAnswer: function(idx,qName) {
       if (qName==undefined || ractive.get('surveyReturn.commissioners.'+idx)==undefined) return '';
       else {
@@ -75,6 +64,17 @@ var ractive = new BaseRactive({
       // console.log('formatDate: '+timeString);
       if (timeString==undefined) return 'n/a';
       return new Date(timeString).toLocaleString(navigator.languages);
+    },
+    formatDecimalAnswer: function(qName, period, decimalPlaces) {
+      if (qName==undefined || ractive.get('surveyReturn')==undefined) return '';
+      else {
+        try {
+          var answer = ractive.getAnswer(qName, period);
+          return answer == undefined ? '' : parseFloat(answer).formatDecimal(decimalPlaces);
+        } catch (e) {
+          return '';
+        }
+      }
     },
     formatHint: function(qName) {
       for (i in ractive.get('q.categories')) {
