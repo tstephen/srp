@@ -114,6 +114,7 @@
           {{#if formatAnswer('NO_POPULATION') == ''}}
             <p>No population data available</p>
           {{else}}
+	    <p>Based on the population of {{formatAnswer('NO_POPULATION')}}.</p>
             <p>
               <svg data-qs="TOTAL_CORE_CO2E_BY_POP,TOTAL_COMMISSIONING_CO2E_BY_POP,TOTAL_PROCUREMENT_2017_CO2E_BY_POP,TOTAL_COMMUNITY_CO2E_BY_POP"
                    data-periods="4"
@@ -131,6 +132,7 @@
           {{#if formatAnswer('FLOOR_AREA') == ''}}
             <p>No floor area data available</p>
           {{else}}
+	    <p>Based on the floor area of {{formatAnswer('FLOOR_AREA')}}m<sup>2</sup>.</p>
             <p>
               <svg data-qs="TOTAL_CORE_CO2E_BY_FLOOR,TOTAL_COMMISSIONING_CO2E_BY_FLOOR,TOTAL_PROCUREMENT_2017_CO2E_BY_FLOOR,TOTAL_COMMUNITY_CO2E_BY_FLOOR"
                    data-periods="4"
@@ -144,10 +146,11 @@
         </section>
 
         <section id="totalEmissionsByWteSect">
-          <h3>Benchmarking by number of staff (tCO<sub>2</sub>e/WTE)</h3>
+          <h3>Benchmarking by number of staff (kgCO<sub>2</sub>e/WTE)</h3>
           {{#if formatAnswer('NO_STAFF') == ''}}
             <p>No staff data available</p>
           {{else}}
+	    <p>Based on staff numbers of {{formatAnswer('NO_STAFF')}} WTEs.</p>
             <p>
               <svg data-qs="TOTAL_CORE_CO2E_BY_WTE,TOTAL_COMMISSIONING_CO2E_BY_WTE,TOTAL_PROCUREMENT_2017_CO2E_BY_WTE,TOTAL_COMMUNITY_CO2E_BY_WTE"
                    data-periods="4"
@@ -164,6 +167,7 @@
           {{#if formatAnswer('NO_BEDS') == ''}}
             <p>No bed data available</p>
           {{else}}
+	    <p>Based on bed numbers of {{formatAnswer('NO_BEDS')}} beds.</p>
             <p>
               <svg data-qs="TOTAL_CORE_CO2E_BY_BEDS,TOTAL_COMMISSIONING_CO2E_BY_BEDS,TOTAL_PROCUREMENT_2017_CO2E_BY_BEDS,TOTAL_COMMUNITY_CO2E_BY_BEDS"
                    data-periods="4"
@@ -181,6 +185,7 @@
           {{#if !haveAnswer('NO_PATIENT_CONTACTS') || formatAnswer('NO_PATIENT_CONTACTS') == 0}}
             <p>No patient contact data available</p>
           {{else}}
+	    <p>Based on patient contacts of {{formatAnswer('NO_PATIENT_CONTACTS')}}.</p>
             <p>
               <svg data-qs="TOTAL_CORE_CO2E_BY_PATIENT_CONTACT,TOTAL_COMMISSIONING_CO2E_BY_PATIENT_CONTACT,TOTAL_PROCUREMENT_2017_CO2E_BY_PATIENT_CONTACT,TOTAL_COMMUNITY_CO2E_BY_PATIENT_CONTACT"
                    data-periods="4"
@@ -198,6 +203,7 @@
           {{#if formatAnswer('OP_EX') == ''}}
             <p>No operating expenditure data available</p>
           {{else}}
+	    <p>Based on operating expenditure of &pound;{{formatAnswer('OP_EX')}},000.</p>
             <p>
               <svg data-qs="TOTAL_CORE_CO2E_BY_OPEX,TOTAL_COMMISSIONING_CO2E_BY_OPEX,TOTAL_PROCUREMENT_2017_CO2E_BY_OPEX,TOTAL_COMMUNITY_CO2E_BY_OPEX" 
                    data-periods="4"
