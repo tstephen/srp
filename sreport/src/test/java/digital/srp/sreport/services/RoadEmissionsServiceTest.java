@@ -19,58 +19,82 @@ public class RoadEmissionsServiceTest {
     private static List<CarbonFactor> cfactors;
     private static final String PERIOD = "2020-21";
     private RoadEmissionsService svc;
-    private CarbonFactor carTotal;
+    private CarbonFactor carMileageFactor;
+    private CarbonFactor carMileageWttFactor;
     private CarbonFactor dieselFactor;
+    private CarbonFactor dieselWttFactor;
     private CarbonFactor petrolFactor;
+    private CarbonFactor petrolWttFactor;
 
     @Before
     public void setUp() throws IOException {
         svc = new RoadEmissionsService();
         cfactors = new CarbonFactorCsvImporter().readCarbonFactors();
-        carTotal = cfactors.stream()
-                .filter(e -> "CAR_TOTAL".equals(e.getName()) && PERIOD.equals(e.getApplicablePeriod())).findFirst()
-                .orElseThrow(() -> new ObjectNotFoundException(CarbonFactor.class, "CAR_TOTAL"));
+        carMileageFactor = cfactors.stream()
+                .filter(e -> "CAR_AVERAGE_SIZE".equals(e.getName()) && PERIOD.equals(e.getApplicablePeriod())).findFirst()
+                .orElseThrow(() -> new ObjectNotFoundException(CarbonFactor.class, "CAR_AVERAGE_SIZE"));
+        carMileageWttFactor = cfactors.stream()
+                .filter(e -> "CAR_WTT_AVERAGE_SIZE".equals(e.getName()) && PERIOD.equals(e.getApplicablePeriod())).findFirst()
+                .orElseThrow(() -> new ObjectNotFoundException(CarbonFactor.class, "CAR_WTT_AVERAGE_SIZE"));
         dieselFactor = cfactors.stream()
-                .filter(e -> "DIESEL_TOTAL".equals(e.getName()) && PERIOD.equals(e.getApplicablePeriod())).findFirst()
-                .orElseThrow(() -> new ObjectNotFoundException(CarbonFactor.class, "DIESEL_TOTAL"));
+                .filter(e -> "DIESEL_DIRECT".equals(e.getName()) && PERIOD.equals(e.getApplicablePeriod())).findFirst()
+                .orElseThrow(() -> new ObjectNotFoundException(CarbonFactor.class, "DIESEL_DIRECT"));
+        dieselWttFactor = cfactors.stream()
+                .filter(e -> "DIESEL_WTT".equals(e.getName()) && PERIOD.equals(e.getApplicablePeriod())).findFirst()
+                .orElseThrow(() -> new ObjectNotFoundException(CarbonFactor.class, "DIESEL_WTT"));
         petrolFactor = cfactors.stream()
-                .filter(e -> "PETROL_TOTAL".equals(e.getName()) && PERIOD.equals(e.getApplicablePeriod())).findFirst()
-                .orElseThrow(() -> new ObjectNotFoundException(CarbonFactor.class, "PETROLTOTAL"));
+                .filter(e -> "PETROL_DIRECT".equals(e.getName()) && PERIOD.equals(e.getApplicablePeriod())).findFirst()
+                .orElseThrow(() -> new ObjectNotFoundException(CarbonFactor.class, "PETROL_DIRECT"));
+        petrolWttFactor = cfactors.stream()
+                .filter(e -> "PETROL_WTT".equals(e.getName()) && PERIOD.equals(e.getApplicablePeriod())).findFirst()
+                .orElseThrow(() -> new ObjectNotFoundException(CarbonFactor.class, "PETROL_WTT"));
     }
 
     @Test
     public void testCalcByDiesel() {
         BigDecimal dieselUsed = new BigDecimal("1000.00");
         Optional<BigDecimal> emissions = svc.calculate(dieselFactor, 
-                Optional.of(dieselUsed), carTotal,
+                Optional.of(dieselUsed), carMileageFactor,
                 Optional.empty());
-        assertEquals(new BigDecimal("3.16"), emissions.get());
+        Optional<BigDecimal> wttEmissions = svc.calculate(dieselWttFactor, 
+                Optional.of(dieselUsed), carMileageWttFactor,
+                Optional.empty());
+        assertEquals(new BigDecimal("3.16"), emissions.get().add(wttEmissions.get()));
     }
 
     @Test
     public void testCalcByDieselMileage() {
         BigDecimal dieselMileage = new BigDecimal("6000.00");
         Optional<BigDecimal> emissions = svc.calculate(dieselFactor, 
-                Optional.empty(), carTotal,
+                Optional.empty(), carMileageFactor,
                 Optional.of(dieselMileage));
-        assertEquals(new BigDecimal("2.08"), emissions.get());
+        Optional<BigDecimal> wttEmissions = svc.calculate(dieselWttFactor, 
+                Optional.empty(), carMileageWttFactor,
+                Optional.of(dieselMileage));
+        assertEquals(new BigDecimal("2.09"), emissions.get().add(wttEmissions.get()));
     }
 
     @Test
     public void testCalcByPetrol() {
         BigDecimal petrolUsed = new BigDecimal("1000.00");
         Optional<BigDecimal> emissions = svc.calculate(petrolFactor, 
-                Optional.of(petrolUsed), carTotal,
+                Optional.of(petrolUsed), carMileageFactor,
                 Optional.empty());
-        assertEquals(new BigDecimal("2.76"), emissions.get());
+        Optional<BigDecimal> wttEmissions = svc.calculate(petrolWttFactor, 
+                Optional.of(petrolUsed), carMileageWttFactor,
+                Optional.empty());
+        assertEquals(new BigDecimal("2.76"), emissions.get().add(wttEmissions.get()));
     }
 
     @Test
     public void testCalcByPetrolMileage() {
         BigDecimal petrolMileage = new BigDecimal("6000.00");
         Optional<BigDecimal> emissions = svc.calculate(petrolFactor, 
-                Optional.empty(), carTotal,
+                Optional.empty(), carMileageFactor,
                 Optional.of(petrolMileage));
-        assertEquals(new BigDecimal("2.08"), emissions.get());
+        Optional<BigDecimal> wttEmissions = svc.calculate(petrolFactor, 
+                Optional.empty(), carMileageWttFactor,
+                Optional.of(petrolMileage));
+        assertEquals(new BigDecimal("2.09"), emissions.get().add(wttEmissions.get()));
     }
 }

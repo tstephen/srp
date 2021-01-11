@@ -92,8 +92,8 @@ public class CruncherTest {
     private  static final String[] NET_THERMAL_ENERGY_CO2E = { "246", "295",
             "286", "341", "0", "0", "0", "0", "0", "0" };
 
-    private  static final String[] SCOPE_1 = { "8,180", "8,990", "13,300",
-            "16,300", "0", "0", "0", "0", "0", "0" };
+    private  static final String[] SCOPE_1 = { "8,260", "9,090", "13,400",
+            "16,400", "0", "0", "0", "0", "0", "0" };
 
     private  static final String[] PORTABLE_NITROUS_OXIDE_MIX_MATERNITY_CO2E = {
             "0", "0", "0", "0", "0", "0", "0", "0", "0", "0" };
@@ -113,8 +113,8 @@ public class CruncherTest {
     private  static final String[] DESFLURANE_CO2E = { "3,720", "4,090",
             "7,440", "9,300", "0", "0", "0", "0", "0", "0" };
 
-    private  static final String[] OWNED_VEHICLES = { "142", "158", "172",
-            "187", "0", "0", "0", "0", "0", "0" };
+    private  static final String[] OWNED_FLEET_TRAVEL_CO2E = { "228", "254", "276",
+            "301", "0", "0", "0", "0", "0", "0" };
 
     private  static final String[] OWNED_BUILDINGS_GAS = { "2,190", "2,410",
             "2,640", "2,960", "0", "0", "0", "0", "0", "0" };
@@ -234,9 +234,9 @@ public class CruncherTest {
             assertEquals(String.format("Incorrect value of %2$s for period %1$s", period, Q.OWNED_BUILDINGS_GAS),
                     OWNED_BUILDINGS_GAS[i],
                     rtn.answer(period, Q.OWNED_BUILDINGS_GAS).orElseThrow(() -> new IllegalStateException()).response3sf());
-            assertEquals(String.format("Incorrect value of %2$s for period %1$s", period, Q.OWNED_VEHICLES),
-                    OWNED_VEHICLES[i],
-                    rtn.answer(period, Q.OWNED_VEHICLES).orElseThrow(() -> new IllegalStateException()).response3sf());
+            assertEquals(String.format("Incorrect value of %2$s for period %1$s", period, Q.OWNED_FLEET_TRAVEL_CO2E),
+                    OWNED_FLEET_TRAVEL_CO2E[i],
+                    rtn.answer(period, Q.OWNED_FLEET_TRAVEL_CO2E).orElseThrow(() -> new IllegalStateException()).response3sf());
 
             // ANAESTHETIC GASES
             assertEquals(String.format("Incorrect value of %2$s for period %1$s", period, Q.DESFLURANE_CO2E),

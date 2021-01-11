@@ -67,7 +67,7 @@ public interface SduQuestions {
 
     Q[] BIZ_MILEAGE_CO2E_HDRS = new Q[] {
             Q.BIZ_MILEAGE_ROAD_CO2E,
-            Q.OWNED_FLEET_TRAVEL_CO2E,
+            Q.OWNED_FLEET_TRAVEL_WTT_CO2E,
             Q.OWNED_LEASED_LOW_CARBON_CO2E,
             Q.BIZ_MILEAGE_AIR_CO2E,
             Q.BIZ_MILEAGE_RAIL_CO2E,
@@ -122,7 +122,7 @@ public interface SduQuestions {
 
     Q[] SCOPE_1_HDRS = new Q[] {
             Q.OWNED_BUILDINGS_GAS, Q.OWNED_BUILDINGS_OIL, Q.OWNED_BUILDINGS_COAL,
-            Q.OWNED_VEHICLES, Q.ANAESTHETIC_GASES_CO2E };
+            Q.OWNED_FLEET_TRAVEL_CO2E, Q.ANAESTHETIC_GASES_CO2E };
 
     Q[] SCOPE_2_HDRS = new Q[] { Q.NET_THERMAL_ENERGY_CO2E, Q.NET_ELEC_CO2E };
 
@@ -136,7 +136,7 @@ public interface SduQuestions {
         Q.BIZ_MILEAGE_ROAD_CO2E,
         Q.BIZ_MILEAGE_RAIL_CO2E,
         Q.BIZ_MILEAGE_AIR_CO2E,
-        /* Q.FUEL_WTT, BIZ_MILEAGE calculated including WTT */
+        Q.OWNED_FLEET_TRAVEL_WTT_CO2E,
         Q.PATIENT_AND_VISITOR_MILEAGE_CO2E,
         Q.STAFF_COMMUTE_MILES_CO2E
     };

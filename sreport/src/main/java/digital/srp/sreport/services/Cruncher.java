@@ -674,7 +674,11 @@ public class Cruncher extends AbstractEmissionsService
     protected void crunchScope3Travel(String period, SurveyReturn rtn) {
         crunchPatientVisitorMileageCo2e(period, rtn);
         crunchStaffCommuteCo2e(period, rtn);
-        crunchFleetAndBizTravelPre2020(period, rtn);
+        if (rtn.applicablePeriod().startsWith("202")) {
+            crunchFleetAndBizTravel(period, rtn);
+        } else {
+            crunchFleetAndBizTravelPre2020(period, rtn);
+        }
         try {
             sumAnswers(period, rtn, Q.SCOPE_3_TRAVEL,
                     SduQuestions.SCOPE_3_TRAVEL_HDRS);
@@ -704,8 +708,6 @@ public class Cruncher extends AbstractEmissionsService
     }
 
     private void crunchCarCo2ePre2020(String period, SurveyReturn rtn) {
-        // CAR_TOTAL means primary and WTT combined due to CAR
-        CarbonFactor cFactor = cFactor(CarbonFactors.CAR_TOTAL, period);
         try {
             getAnswer(period, rtn, Q.OWNED_LEASED_LOW_CARBON_CO2E)
                     .derived(true)
@@ -717,24 +719,33 @@ public class Cruncher extends AbstractEmissionsService
             LOGGER.warn("Insufficient data to calculate CO2e from low carbon fleet miles");
         }
 
+        CarbonFactor mileageFactor = cFactor(CarbonFactors.CAR_AVERAGE_SIZE, period);
+        CarbonFactor mileageWttFactor = cFactor(CarbonFactors.CAR_WTT_AVERAGE_SIZE, period);
+
         try {
-            // Treasury row 51: Owned vehicles both direct and Well to Tank
             getAnswer(period, rtn, Q.OWNED_FLEET_TRAVEL_CO2E)
                     .derived(true)
                     .response(getAnswer(period, rtn, Q.FLEET_ROAD_MILES).responseAsBigDecimal()
-                            .multiply(cFactor.value())
+                            .multiply(mileageFactor.value())
+                            .multiply(m2km)
+                            .divide(ONE_THOUSAND, 0, RoundingMode.HALF_UP));
+            // Treasury row 51: Owned vehicles Well to Tank
+            getAnswer(period, rtn, Q.OWNED_FLEET_TRAVEL_WTT_CO2E)
+                    .derived(true)
+                    .response(getAnswer(period, rtn, Q.FLEET_ROAD_MILES).responseAsBigDecimal()
+                            .multiply(mileageWttFactor.value())
                             .multiply(m2km)
                             .divide(ONE_THOUSAND, 0, RoundingMode.HALF_UP));
         } catch (IllegalStateException | NullPointerException e) {
             LOGGER.warn("Insufficient data to calculate CO2e from fleet miles");
         }
 
-        crunchBizTravelRoadCo2e(period, rtn, cFactor);
+        crunchBizTravelRoadCo2e(period, rtn, mileageFactor);
 
-        // It is probably a bug to have omitted Low EV here and certainly an
-        // abuse of BIZ_MILEAGE_ROAD_CO2E but preserve for backwards compatibility
-        sumAnswers(period, rtn, Q.BIZ_MILEAGE_ROAD_CO2E,
-                Q.OWNED_FLEET_TRAVEL_CO2E, Q.BIZ_MILEAGE_ROAD_CO2E);
+        // Fleet WTT is included within biz mileage as both are scope 3
+        sumAnswers(period, rtn, Q.BIZ_MILEAGE_CO2E,
+                Q.OWNED_LEASED_LOW_CARBON_CO2E, Q.OWNED_FLEET_TRAVEL_WTT_CO2E,
+                Q.BIZ_MILEAGE_ROAD_CO2E);
     }
 
     protected void crunchBizTravelRoadCo2e(String period, SurveyReturn rtn,
@@ -756,7 +767,7 @@ public class Cruncher extends AbstractEmissionsService
     protected void crunchCarCo2e(String period, SurveyReturn rtn) {
         // CAR_TOTAL means primary and WTT combined due to CAR
         CarbonFactor cFactor = cFactor(CarbonFactors.CAR_TOTAL, period);
-        crunchFleetCo2e(period, rtn, cFactor);
+        crunchFleetCo2e(period, rtn);
         crunchBizTravelRoadCo2e(period, rtn, cFactor);
 
         sumAnswers(period, rtn, Q.FLEET_AND_BIZ_ROAD_CO2E,
@@ -854,35 +865,59 @@ public class Cruncher extends AbstractEmissionsService
     }
 
     // From 2020-21 FLEET_ROAD_MILES is sub-divided by fuel
-    protected void crunchFleetCo2e(String period, SurveyReturn rtn,
-            CarbonFactor cFactor) {
-        getAnswer(period, rtn, Q.OWNED_LEASED_LOW_CARBON_CO2E)
-                .derived(true)
-                .response(roadEmissionsService.calculate(
-                                cFactor(CarbonFactors.ELECTRICITY_FROM_GRID, period),
-                                getAnswer(period, rtn, Q.OWNED_LEASED_LOW_CARBON_FUEL_USED).responseAsOptional(),
-                                cFactor(CarbonFactors.AVERAGE_BATTERY_AND_PLUGIN_HYBRID_EV_TOTAL, period),
-                                getAnswer(period, rtn, Q.OWNED_LEASED_LOW_CARBON_MILES).responseAsOptional())
-                        .get());
-        getAnswer(period, rtn, Q.CAR_DIESEL_USED_CO2E)
-                .derived(true)
-                .response(roadEmissionsService.calculate(
-                        cFactor(CarbonFactors.DIESEL_TOTAL, period),
-                        getAnswer(period, rtn, Q.CAR_DIESEL_USED).responseAsOptional(),
-                        cFactor,
-                        getAnswer(period, rtn, Q.CAR_MILES_DIESEL).responseAsOptional())
-                .get());
-        getAnswer(period, rtn, Q.CAR_PETROL_USED_CO2E)
-                .derived(true)
-                .response(roadEmissionsService.calculate(
-                        cFactor(CarbonFactors.PETROL_TOTAL, period),
-                        getAnswer(period, rtn, Q.CAR_PETROL_USED).responseAsOptional(),
-                        cFactor,
-                        getAnswer(period, rtn, Q.CAR_MILES_PETROL).responseAsOptional())
-                .get());
+    protected void crunchFleetCo2e(String period, SurveyReturn rtn) {
+        CarbonFactor mileageFactor = cFactor(CarbonFactors.CAR_AVERAGE_SIZE, period);
+        CarbonFactor mileageWttFactor = cFactor(CarbonFactors.CAR_WTT_AVERAGE_SIZE, period);
+
+        try {
+            getAnswer(period, rtn, Q.OWNED_LEASED_LOW_CARBON_CO2E)
+                    .derived(true)
+                    .response(roadEmissionsService.calculate(
+                                    cFactor(CarbonFactors.ELECTRICITY_FROM_GRID, period),
+                                    getAnswer(period, rtn, Q.OWNED_LEASED_LOW_CARBON_FUEL_USED).responseAsOptional(),
+                                    cFactor(CarbonFactors.AVERAGE_BATTERY_AND_PLUGIN_HYBRID_EV_TOTAL, period),
+                                    getAnswer(period, rtn, Q.OWNED_LEASED_LOW_CARBON_MILES).responseAsOptional())
+                            .get());
+            getAnswer(period, rtn, Q.CAR_DIESEL_USED_CO2E)
+                    .derived(true)
+                    .response(roadEmissionsService.calculate(
+                            cFactor(CarbonFactors.DIESEL_DIRECT, period),
+                            getAnswer(period, rtn, Q.CAR_DIESEL_USED).responseAsOptional(),
+                            mileageFactor,
+                            getAnswer(period, rtn, Q.CAR_MILES_DIESEL).responseAsOptional())
+                    .get());
+            getAnswer(period, rtn, Q.CAR_DIESEL_WTT_CO2E)
+                    .derived(true)
+                    .response(roadEmissionsService.calculate(
+                            cFactor(CarbonFactors.DIESEL_WTT, period),
+                            getAnswer(period, rtn, Q.CAR_DIESEL_USED).responseAsOptional(),
+                            mileageWttFactor,
+                            getAnswer(period, rtn, Q.CAR_MILES_DIESEL).responseAsOptional())
+                    .get());
+            getAnswer(period, rtn, Q.CAR_PETROL_USED_CO2E)
+                    .derived(true)
+                    .response(roadEmissionsService.calculate(
+                            cFactor(CarbonFactors.PETROL_DIRECT, period),
+                            getAnswer(period, rtn, Q.CAR_PETROL_USED).responseAsOptional(),
+                            mileageFactor,
+                            getAnswer(period, rtn, Q.CAR_MILES_PETROL).responseAsOptional())
+                    .get());
+            getAnswer(period, rtn, Q.CAR_PETROL_WTT_CO2E)
+                    .derived(true)
+                    .response(roadEmissionsService.calculate(
+                            cFactor(CarbonFactors.PETROL_WTT, period),
+                            getAnswer(period, rtn, Q.CAR_PETROL_USED).responseAsOptional(),
+                            mileageWttFactor,
+                            getAnswer(period, rtn, Q.CAR_MILES_PETROL).responseAsOptional())
+                    .get());
+        } catch (IllegalStateException e) {
+            // almost certainly OK since these are newer questions
+            LOGGER.warn(e.getMessage());
+        }
 
         sumAnswers(period, rtn, Q.OWNED_FLEET_TRAVEL_CO2E,
-                        Q.CAR_DIESEL_USED_CO2E, Q.CAR_PETROL_USED_CO2E,
+                        Q.CAR_DIESEL_USED_CO2E, Q.CAR_DIESEL_WTT_CO2E,
+                        Q.CAR_PETROL_USED_CO2E, Q.CAR_PETROL_WTT_CO2E,
                         Q.OWNED_LEASED_LOW_CARBON_CO2E);
     }
 
@@ -947,7 +982,7 @@ public class Cruncher extends AbstractEmissionsService
     protected void calcScope1(String period, SurveyReturn rtn) {
         crunchOwnedBuildings(period, rtn);
         CarbonFactor cFactor = cFactor(CarbonFactors.CAR_AVERAGE_SIZE, period);
-        crunchCO2e(period, rtn, Q.FLEET_ROAD_MILES, oneThousandth(cFactor), Q.OWNED_VEHICLES);
+        crunchCO2e(period, rtn, Q.FLEET_ROAD_MILES,oneThousandth(cFactor), Q.OWNED_FLEET_TRAVEL_CO2E);
         crunchAnaestheticGases(period, rtn);
     }
 

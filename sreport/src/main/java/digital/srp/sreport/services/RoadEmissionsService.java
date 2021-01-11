@@ -16,16 +16,16 @@ public class RoadEmissionsService extends AbstractEmissionsService {
             .getLogger(RoadEmissionsService.class);
 
     public Optional<BigDecimal> calculate(CarbonFactor fuelFactor,
-            Optional<BigDecimal> fuelUsed, CarbonFactor mileageTotalFactor,
+            Optional<BigDecimal> fuelUsed, CarbonFactor mileageFactor,
             Optional<BigDecimal> mileage) {
         LOGGER.info("calculate({},{},{},{})", fuelFactor, fuelUsed,
-                mileageTotalFactor, mileage);
+                mileageFactor, mileage);
         if (fuelUsed.isPresent()) {
             return Optional.of(fuelUsed.get().multiply(fuelFactor.value())
                     .divide(ONE_THOUSAND, divisionScale, RoundingMode.HALF_UP));
         } else if (mileage.isPresent()) {
             return Optional.of(mileage.get()
-                    .multiply(mileageTotalFactor.value()).multiply(m2km)
+                    .multiply(mileageFactor.value()).multiply(m2km)
                     .divide(ONE_THOUSAND, divisionScale, RoundingMode.HALF_UP));
         } else {
             return Optional.empty();

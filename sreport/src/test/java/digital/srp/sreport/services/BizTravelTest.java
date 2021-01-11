@@ -39,9 +39,11 @@ public class BizTravelTest {
     private static final String PERIOD = "2017-18";
     private static final String PERIOD_2020_21 = "2020-21";
 
-    private static final String FLEET_AND_BIZ_ROAD_CO2E_PRE2020 = "1184";
-    private static final String CAR_DIESEL_USED_CO2E = "789";
-    private static final String CAR_PETROL_USED_CO2E = "690";
+    private static final String BIZ_ROAD_CO2E_PRE2020 = "160";
+    private static final String CAR_DIESEL_USED_CO2E = "637";
+    private static final String CAR_DIESEL_WTT_CO2E = "153";
+    private static final String CAR_PETROL_USED_CO2E = "542";
+    private static final String CAR_PETROL_WTT_CO2E = "148";
     private static final String OWNED_LEASED_LOW_CARBON_CO2E = "0.29";
     private static final String FLEET_AND_BIZ_ROAD_CO2E = "1480";
 
@@ -74,7 +76,7 @@ public class BizTravelTest {
         rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD).question(Q.OWNED_FLEET_TRAVEL_CO2E));
 
         svc.crunchFleetAndBizTravelPre2020(PERIOD, rtn);
-        assertEquals(new BigDecimal(FLEET_AND_BIZ_ROAD_CO2E_PRE2020), rtn.answer(PERIOD, Q.BIZ_MILEAGE_ROAD_CO2E).get().responseAsBigDecimal().setScale(0, RoundingMode.HALF_UP));
+        assertEquals(new BigDecimal(BIZ_ROAD_CO2E_PRE2020), rtn.answer(PERIOD, Q.BIZ_MILEAGE_ROAD_CO2E).get().responseAsBigDecimal().setScale(0, RoundingMode.HALF_UP));
         assertEquals(new BigDecimal(BIZ_MILEAGE_ROAD_ONLY), rtn.answer(PERIOD, Q.BIZ_MILEAGE).get().responseAsBigDecimal().setScale(0, RoundingMode.HALF_UP));
 
         // check inputs unchanged
@@ -109,14 +111,16 @@ public class BizTravelTest {
         rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD).question(Q.OWNED_FLEET_TRAVEL_CO2E));
         rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD_2020_21).question(Q.OWNED_LEASED_LOW_CARBON_CO2E));
         rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD_2020_21).question(Q.CAR_PETROL_USED_CO2E));
+        rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD_2020_21).question(Q.CAR_PETROL_WTT_CO2E));
         rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD_2020_21).question(Q.CAR_DIESEL_USED_CO2E));
+        rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD_2020_21).question(Q.CAR_DIESEL_WTT_CO2E));
         rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD_2020_21).question(Q.OWNED_FLEET_TRAVEL_CO2E));
         rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD_2020_21).question(Q.FLEET_AND_BIZ_ROAD_CO2E));
         rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD_2020_21).question(Q.BIZ_MILEAGE));
         rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD_2020_21).question(Q.BIZ_MILEAGE_CO2E));
 
         svc.crunchFleetAndBizTravelPre2020(PERIOD, rtn);
-        assertEquals(new BigDecimal(FLEET_AND_BIZ_ROAD_CO2E_PRE2020), rtn.answer(PERIOD, Q.BIZ_MILEAGE_ROAD_CO2E).get().responseAsBigDecimal().setScale(0, RoundingMode.HALF_UP));
+        assertEquals(new BigDecimal(BIZ_ROAD_CO2E_PRE2020), rtn.answer(PERIOD, Q.BIZ_MILEAGE_ROAD_CO2E).get().responseAsBigDecimal().setScale(0, RoundingMode.HALF_UP));
         assertEquals(new BigDecimal("2.04"), rtn.answer(PERIOD, Q.BIZ_MILEAGE_BUS_CO2E).get().responseAsBigDecimal());
         assertEquals(new BigDecimal("166"), rtn.answer(PERIOD, Q.BIZ_MILEAGE_RAIL_CO2E).get().responseAsBigDecimal().setScale(0, RoundingMode.HALF_UP));
         assertEquals(new BigDecimal("6.70"), rtn.answer(PERIOD, Q.BIZ_MILEAGE_TAXI_CO2E).get().responseAsBigDecimal());
@@ -124,7 +128,9 @@ public class BizTravelTest {
 
         svc.crunchFleetAndBizTravel(PERIOD_2020_21, rtn);
         assertEquals(new BigDecimal(CAR_DIESEL_USED_CO2E), rtn.answer(PERIOD_2020_21, Q.CAR_DIESEL_USED_CO2E).get().responseAsBigDecimal().setScale(0, RoundingMode.HALF_UP));
+        assertEquals(new BigDecimal(CAR_DIESEL_WTT_CO2E), rtn.answer(PERIOD_2020_21, Q.CAR_DIESEL_WTT_CO2E).get().responseAsBigDecimal().setScale(0, RoundingMode.HALF_UP));
         assertEquals(new BigDecimal(CAR_PETROL_USED_CO2E), rtn.answer(PERIOD_2020_21, Q.CAR_PETROL_USED_CO2E).get().responseAsBigDecimal().setScale(0, RoundingMode.HALF_UP));
+        assertEquals(new BigDecimal(CAR_PETROL_WTT_CO2E), rtn.answer(PERIOD_2020_21, Q.CAR_PETROL_WTT_CO2E).get().responseAsBigDecimal().setScale(0, RoundingMode.HALF_UP));
         assertEquals(new BigDecimal(OWNED_LEASED_LOW_CARBON_CO2E), rtn.answer(PERIOD_2020_21, Q.OWNED_LEASED_LOW_CARBON_CO2E).get().responseAsBigDecimal().setScale(2, RoundingMode.HALF_UP));
         assertEquals(new BigDecimal(FLEET_AND_BIZ_ROAD_CO2E), rtn.answer(PERIOD_2020_21, Q.FLEET_AND_BIZ_ROAD_CO2E).get().responseAsBigDecimal().setScale(0, RoundingMode.HALF_UP));
 
