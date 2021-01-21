@@ -99,6 +99,19 @@ public class SurveyReturnController {
     }
 
     /**
+     * Refresh the cache.
+     *
+     * @param returnId The return this answer belongs to.
+     * @param q The name of the question this answer belongs to.
+     * @param period The period of this answer, if omitted the period of the return is assumed.
+     */
+    @ResponseStatus(value = HttpStatus.NO_CONTENT)
+    @RequestMapping(value = "/refreshCache", method = RequestMethod.POST)
+    public @ResponseBody void refreshCache() throws IOException {
+        init();
+    }
+
+    /**
      * Return a single survey return with the specified id.
      *
      * @return the specified survey.
