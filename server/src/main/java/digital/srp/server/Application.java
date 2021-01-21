@@ -31,6 +31,8 @@ import org.springframework.hateoas.Link;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+import org.springframework.web.servlet.config.annotation.CorsRegistration;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
@@ -60,6 +62,9 @@ public class Application extends WebMvcConfigurerAdapter {
 
     @Value("${srp.tomcat.ajp.scheme:http2}")
     String ajpScheme;
+
+    @Value("${srp.cors.allowedOrigins:http://localhost:8080}")
+    String corsOrigins;
 
     @Bean
     public EmbeddedServletContainerFactory servletContainer() {
@@ -113,6 +118,14 @@ public class Application extends WebMvcConfigurerAdapter {
                 .build();
         converters.add(new MappingJackson2HttpMessageConverter(objectMapper));
         super.configureMessageConverters(converters);
+    }
+
+    @Override
+    public void addCorsMappings(CorsRegistry registry) {
+        CorsRegistration reg = registry.addMapping("/**");
+        for(String url: corsOrigins.split(",")) {
+            reg.allowedOrigins(url);
+        }
     }
     
     public static void main(String[] args) {
