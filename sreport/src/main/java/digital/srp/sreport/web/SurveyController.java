@@ -1,6 +1,6 @@
 package digital.srp.sreport.web;
 
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import javax.transaction.Transactional;
@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import com.fasterxml.jackson.annotation.JsonView;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import digital.srp.sreport.api.exceptions.ObjectNotFoundException;
 import digital.srp.sreport.model.Q;
 import digital.srp.sreport.model.Survey;
 import digital.srp.sreport.model.SurveyCategory;
@@ -74,7 +75,8 @@ public class SurveyController {
             @PathVariable("id") Long surveyId) {
         LOGGER.info(String.format("findById %1$s", surveyId));
 
-        Survey survey = surveyRepo.findOne(surveyId);
+        Survey survey = surveyRepo.findById(surveyId)
+                .orElseThrow(() -> new ObjectNotFoundException(Survey.class, surveyId));
         // use logger for force child load
         LOGGER.info(String.format("Found survey with id %1$d named %2$s and with %3$d categories of questions", survey.id(), survey.name(), survey.categories().size()));
 
@@ -125,7 +127,7 @@ public class SurveyController {
         if (limit == null) {
             list = surveyRepo.findAll();
         } else {
-            Pageable pageable = new PageRequest(page == null ? 0 : page, limit);
+            Pageable pageable = PageRequest.of(page == null ? 0 : page, limit);
             list = surveyRepo.findPage(pageable);
         }
         LOGGER.info(String.format("Found %1$s surveys", list.size()));
@@ -150,7 +152,7 @@ public class SurveyController {
         if (limit == null) {
             list = returnRepo.findBySurvey(surveyId);
         } else {
-            Pageable pageable = new PageRequest(page == null ? 0 : page, limit);
+            Pageable pageable = PageRequest.of(page == null ? 0 : page, limit);
             list = returnRepo.findPageBySurvey(surveyId, pageable);
         }
         LOGGER.info(String.format("Found %1$s returns", list.size()));
@@ -269,7 +271,10 @@ public class SurveyController {
         LOGGER.info(String.format("Setting survey %1$s to status %2$s",
                 surveyId, status));
 
-        Survey survey = surveyRepo.findOne(surveyId).status(status);
+        Survey survey = surveyRepo.findById(surveyId)
+                .orElseThrow(() -> new ObjectNotFoundException(Survey.class, surveyId))
+                .status(status);
+
         surveyRepo.save(survey);
     }
 
@@ -280,13 +285,11 @@ public class SurveyController {
     @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
     @Transactional
     public @ResponseBody void delete(@PathVariable("id") Long surveyId) {
-        surveyRepo.delete(surveyId);
+        surveyRepo.deleteById(surveyId);
     }
 
     private Survey addLinks(Survey survey) {
-        List<Link> links = new ArrayList<Link>();
-        links.add(new Link(getClass().getAnnotation(RequestMapping.class).value()[0] + "/" + survey.id()));
-        
-        return survey.links(links);
+        return survey.links(Collections.singletonList(
+                Link.of(getClass().getAnnotation(RequestMapping.class).value()[0] + "/" + survey.id())));
     }
 }

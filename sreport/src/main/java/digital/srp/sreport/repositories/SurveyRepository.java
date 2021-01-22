@@ -36,6 +36,6 @@ public interface SurveyRepository extends CrudRepository<Survey, Long> {
     @Override
     @Query("UPDATE #{#entityName} x set x.status = 'deleted' where x.id = :id")
     @Modifying(clearAutomatically = true)
-    public void delete(@Param("id") Long id);
+    public void deleteById(@Param("id") Long id);
 
 }

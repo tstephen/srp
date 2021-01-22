@@ -5,8 +5,6 @@ import javax.validation.ConstraintViolationException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -14,7 +12,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
 import com.fasterxml.jackson.annotation.JsonView;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import digital.srp.sreport.api.exceptions.FailedHealthCheckException;
 import digital.srp.sreport.api.exceptions.ObjectNotFoundException;
@@ -25,9 +22,6 @@ import digital.srp.sreport.model.views.HealthCheckViews;
 public class SReportExceptionHandler {
     protected static final Logger LOGGER = LoggerFactory
             .getLogger(SReportExceptionHandler.class);
-    @Autowired
-    @Qualifier("objectMapper")
-    private ObjectMapper mapper;
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(ConstraintViolationException.class)

@@ -1,14 +1,16 @@
 package digital.srp.sreport.model.surveys;
 
-import static org.junit.Assert.fail;
+
+import static org.junit.jupiter.api.Assertions.fail;
 
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
 
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -16,10 +18,11 @@ import digital.srp.sreport.model.Survey;
 
 public class Sdu1617SurveyServiceIntegrationTest {
 
+    @Autowired
     private static ObjectMapper objectMapper;
     private static File outDir = new File("target", "test-classes");
     
-    @BeforeClass
+    @BeforeAll
     public static void setUp() {
         objectMapper = new ObjectMapper();
         outDir.mkdirs();

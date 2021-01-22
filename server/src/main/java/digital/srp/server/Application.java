@@ -22,8 +22,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
-import org.springframework.boot.context.embedded.EmbeddedServletContainerFactory;
-import org.springframework.boot.context.embedded.tomcat.TomcatEmbeddedServletContainerFactory;
+import org.springframework.boot.web.embedded.tomcat.TomcatServletWebServerFactory;
+import org.springframework.boot.web.server.WebServerFactoryCustomizer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
@@ -34,7 +34,7 @@ import org.springframework.http.converter.json.MappingJackson2HttpMessageConvert
 import org.springframework.web.servlet.config.annotation.CorsRegistration;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -46,7 +46,7 @@ import digital.srp.sreport.internal.SReportConfiguration;
 //@EnableAutoConfiguration(exclude = { EndpointMBeanExportAutoConfiguration.class })
 @Configuration
 @Import({ SrpConfig.class, MaccConfig.class, SReportConfiguration.class })
-public class Application extends WebMvcConfigurerAdapter {
+public class Application implements WebMvcConfigurer {
 
     protected static final Logger LOGGER = LoggerFactory
             .getLogger(Application.class);
@@ -67,26 +67,27 @@ public class Application extends WebMvcConfigurerAdapter {
     String corsOrigins;
 
     @Bean
-    public EmbeddedServletContainerFactory servletContainer() {
-
-        TomcatEmbeddedServletContainerFactory tomcat = new TomcatEmbeddedServletContainerFactory();
-        if (tomcatAjpEnabled) {
-            Connector ajpConnector = new Connector("AJP/1.3");
-            ajpConnector.setProtocol("AJP/1.3");
-            ajpConnector.setPort(ajpPort);
-            ajpConnector.setSecure(ajpSecure);
-            ajpConnector.setAllowTrace(false);
-            ajpConnector.setScheme(ajpScheme);
-            tomcat.addAdditionalTomcatConnectors(ajpConnector);
-            LOGGER.info("Enabled AJP connector:");
-            LOGGER.info("  port: {}", ajpPort);
-            LOGGER.info("  secure: {}", ajpSecure);
-            LOGGER.info("  scheme: {}", ajpScheme);
+    public WebServerFactoryCustomizer<TomcatServletWebServerFactory> servletContainer() {
+      return server -> {
+        if (server instanceof TomcatServletWebServerFactory && tomcatAjpEnabled) {
+            ((TomcatServletWebServerFactory) server).addAdditionalTomcatConnectors(redirectConnector());
         } else {
             LOGGER.info("No AJP connector configured, set srp.tomcat.* to enable");
         }
+      };
+    }
 
-        return tomcat;
+    private Connector redirectConnector() {
+        Connector ajpConnector = new Connector("AJP/1.3");
+        ajpConnector.setPort(ajpPort);
+        ajpConnector.setSecure(ajpSecure);
+        ajpConnector.setAllowTrace(false);
+        ajpConnector.setScheme(ajpScheme);
+        LOGGER.info("Enabled AJP connector:");
+        LOGGER.info("  port: {}", ajpPort);
+        LOGGER.info("  secure: {}", ajpSecure);
+        LOGGER.info("  scheme: {}", ajpScheme);
+        return ajpConnector;
     }
 
     @Override
@@ -117,7 +118,6 @@ public class Application extends WebMvcConfigurerAdapter {
                 .mixIn(Link.class, SrpLinkMixIn.class)
                 .build();
         converters.add(new MappingJackson2HttpMessageConverter(objectMapper));
-        super.configureMessageConverters(converters);
     }
 
     @Override

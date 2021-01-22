@@ -15,11 +15,11 @@
  *******************************************************************************/
 package digital.srp.macc.internal;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -30,7 +30,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.apache.commons.io.input.BOMInputStream;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import digital.srp.macc.maths.InterventionTypeValidator;
 import digital.srp.macc.maths.SignificantFiguresFormat;
@@ -114,7 +114,6 @@ public class CsvInterventionTypeImporterTest {
     }
 
     protected List<InterventionType> read(String resourceName) {
-        InputStream is = null;
         String[] headers = { "status", "name", "classification", "description",
                 "existing", "strategicFocus", "tacticalDriver",
                 "operationalSubCategory", "dataStatus", "analysisStatus",
@@ -123,23 +122,12 @@ public class CsvInterventionTypeImporterTest {
                 "annualCashOutflows", "annualCashInflows",
                 "annualTonnesCo2eSaved", "organisationType" };
         List<InterventionType> interventions = null;
-        try {
-
-            is = getClass().getResourceAsStream(resourceName);
-            final Reader in = new InputStreamReader(new BOMInputStream(is),
-                    "UTF-8");
-
+        try (InputStream is = getClass().getResourceAsStream(resourceName);
+                final Reader in = new InputStreamReader(new BOMInputStream(is), "UTF-8")) {
             interventions = importer.readInterventions(in, headers);
-
         } catch (Exception e) {
             e.printStackTrace();
             fail("exception: " + e.getMessage());
-        } finally {
-            try {
-                is.close();
-            } catch (Exception e) {
-                fail(e.getMessage());
-            }
         }
         return interventions;
     }
@@ -148,9 +136,8 @@ public class CsvInterventionTypeImporterTest {
         System.out.println("  intervention: " + intervention);
 
         assertNotNull(intervention);
-        assertEquals("Dry Recycling".toLowerCase(), intervention
-.getName()
-                .toLowerCase());
+        assertEquals("Dry Recycling".toLowerCase(),
+                intervention.getName().toLowerCase());
         assertEquals("Dry Recycling of General Waste".toLowerCase(),
                 intervention.getClassification()
                         .toLowerCase());
@@ -180,15 +167,13 @@ public class CsvInterventionTypeImporterTest {
         assertEquals(Float.valueOf("70"), intervention
                 .getScaling());
         assertEquals(Long.valueOf("1842800").longValue(),
- intervention
-                .getCashOutflowsUpFront().longValue());
+                intervention.getCashOutflowsUpFront().longValue());
         assertEquals(Long.valueOf("0").longValue(),
                 intervention.getAnnualCashOutflows().longValue());
         assertEquals(Long.valueOf("465360").longValue(), intervention
                 .getAnnualCashInflows().toBigInteger().longValue());
         assertEquals(Long.valueOf("1525007").longValue(),
- intervention
-                .getAnnualTonnesCo2eSaved().longValue());
+                intervention.getAnnualTonnesCo2eSaved().longValue());
     }
 
     private void assertType2DiabetesValues(InterventionType intervention) {
@@ -225,8 +210,7 @@ public class CsvInterventionTypeImporterTest {
         assertEquals(Float.valueOf("100"), intervention
                 .getScaling());
         assertEquals(Long.valueOf("100000").longValue(),
- intervention
-                .getCashOutflowsUpFront().longValue());
+                intervention.getCashOutflowsUpFront().longValue());
         assertEquals("500000,500000,500000,500000,500000",
                 intervention.getAnnualCashOutflowsTS());
         BigDecimal[] annualCashOutflowsTimeSeries = { new BigDecimal("500000"),

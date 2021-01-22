@@ -15,12 +15,12 @@
  *******************************************************************************/
 package digital.srp.macc;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.GregorianCalendar;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import digital.srp.macc.model.Invoice;
 import digital.srp.macc.model.ReportingYear;
@@ -29,7 +29,7 @@ public class InvoiceTest {
 
     private ReportingYear year;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         year = new ReportingYear("Calendar 2013", new GregorianCalendar(2013,
                 0, 1).getTime(), new GregorianCalendar(2013, 11, 31).getTime());

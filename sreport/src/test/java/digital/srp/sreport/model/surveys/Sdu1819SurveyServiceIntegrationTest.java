@@ -1,31 +1,23 @@
 package digital.srp.sreport.model.surveys;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.fail;
 
-import org.junit.BeforeClass;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit4.SpringRunner;
 
 import digital.srp.sreport.Application;
 import digital.srp.sreport.model.Survey;
 import digital.srp.sreport.services.SurveyService;
 
-@RunWith(SpringRunner.class)
 @SpringBootTest(classes = Application.class)
 @AutoConfigureMockMvc
 public class Sdu1819SurveyServiceIntegrationTest {
 
     @Autowired
     private SurveyService svc;
-
-    @BeforeClass
-    public static void setUpClass() {
-    }
 
     @Test
     public void testInitSurveyAndShowStatus() {

@@ -1,7 +1,8 @@
 package digital.srp.sreport.model;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -11,18 +12,11 @@ import java.util.function.Predicate;
 
 import javax.validation.ConstraintViolation;
 
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 import digital.srp.sreport.api.CompletenessValidator;
 import digital.srp.sreport.internal.ClasspathSurveyReturnHelper;
-import digital.srp.sreport.model.Answer;
-import digital.srp.sreport.model.Q;
-import digital.srp.sreport.model.Question;
-import digital.srp.sreport.model.StatusType;
-import digital.srp.sreport.model.Survey;
-import digital.srp.sreport.model.SurveyCategory;
-import digital.srp.sreport.model.SurveyReturn;
 import digital.srp.sreport.model.returns.EricQuestions;
 import digital.srp.sreport.model.surveys.Sdu1718;
 import digital.srp.sreport.services.DefaultCompletenessValidator;
@@ -39,7 +33,7 @@ public class SurveyReturnTest implements EricQuestions{
     private static CompletenessValidator completenessValidator;
     private static HealthChecker healthCheck;
 
-    @BeforeClass
+    @BeforeAll
     public static void setUpClass() throws IOException {
         helper = new ClasspathSurveyReturnHelper();
         completenessValidator = new DefaultCompletenessValidator();
@@ -120,14 +114,17 @@ public class SurveyReturnTest implements EricQuestions{
 
     @Test
     public void testComplete() {
-        SurveyReturn rdr = helper.readSurveyReturn("RDR");
+        SurveyReturn rdr = helper.readSurveyReturn("RDR")
+                .orElseThrow(IllegalStateException::new);
         completenessValidator.validate(rdr);
         assertEquals(0, rdr.completeness().size());
     }
     
     @Test
     public void testDuplicateDetection() {
-        SurveyReturn rtn = helper.readSurveyReturn("RDR2").survey(Sdu1718.getInstance().getSurvey());
+        SurveyReturn rtn = helper.readSurveyReturn("RDR2")
+                .orElseThrow(IllegalStateException::new)
+                .survey(Sdu1718.getInstance().getSurvey());
         
         assertEquals(4, rtn.getIncludedPeriods().size());
 

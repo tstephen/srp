@@ -1,15 +1,15 @@
 package digital.srp.sreport.services;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.List;
 
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 import digital.srp.sreport.importers.CarbonFactorCsvImporter;
 import digital.srp.sreport.importers.WeightingFactorCsvImporter;
@@ -65,7 +65,7 @@ public class WasteTest {
     private static List<CarbonFactor> cfactors;
     private static List<WeightingFactor> wfactors;
 
-    @BeforeClass
+    @BeforeAll
     public static void setUpClass() {
         try {
             cfactors = new CarbonFactorCsvImporter().readCarbonFactors();

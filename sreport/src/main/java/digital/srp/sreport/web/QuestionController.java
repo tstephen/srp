@@ -1,7 +1,7 @@
 package digital.srp.sreport.web;
 
 import java.net.URI;
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -30,6 +30,7 @@ import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBui
 import com.fasterxml.jackson.annotation.JsonView;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import digital.srp.sreport.api.exceptions.ObjectNotFoundException;
 import digital.srp.sreport.internal.NullAwareBeanUtils;
 import digital.srp.sreport.model.Question;
 import digital.srp.sreport.model.views.QuestionViews;
@@ -89,7 +90,8 @@ public class QuestionController {
             @PathVariable("id") Long questionId) {
         LOGGER.info(String.format("findById %1$s", questionId));
 
-        Question question = questionRepo.findOne(questionId);
+        Question question = questionRepo.findById(questionId)
+                .orElseThrow(() -> new ObjectNotFoundException(Question.class, questionId));
 
         return addLinks(question);
     }
@@ -128,7 +130,7 @@ public class QuestionController {
         if (limit == null) {
             list = questionRepo.findAll();
         } else {
-            Pageable pageable = new PageRequest(page == null ? 0 : page, limit);
+            Pageable pageable = PageRequest.of(page == null ? 0 : page, limit);
             list = questionRepo.findPage(pageable);
         }
         LOGGER.info(String.format("Found %1$s questions", list.size()));
@@ -144,7 +146,8 @@ public class QuestionController {
     public @ResponseBody void update(@PathVariable("tenantId") String tenantId,
             @PathVariable("id") Long questionId,
             @RequestBody Question updatedQuestion) {
-        Question question = questionRepo.findOne(questionId);
+        Question question = questionRepo.findById(questionId)
+                .orElseThrow(() -> new ObjectNotFoundException(Question.class, questionId));
 
         NullAwareBeanUtils.copyNonNullProperties(updatedQuestion, question, "id");
 
@@ -159,7 +162,7 @@ public class QuestionController {
     public @ResponseBody void delete(
             @PathVariable("tenantId") String tenantId,
             @PathVariable("id") Long questionId) {
-        questionRepo.delete(questionId);
+        questionRepo.deleteById(questionId);
     }
 
     private List<Question> addLinks(final List<Question> list) {
@@ -170,9 +173,9 @@ public class QuestionController {
     }
 
     private Question addLinks(Question question) {
-        List<Link> links = new ArrayList<Link>();
-        links.add(new Link(getClass().getAnnotation(RequestMapping.class).value()[0].replace("{tenantId}", question.tenantId()) + "/" + question.id()));
-        
-        return question.links(links);
+        return question.links(Collections.singletonList(Link
+                .of(getClass().getAnnotation(RequestMapping.class).value()[0]
+                        .replace("{tenantId}", question.tenantId()) + "/"
+                        + question.id())));
     }
 }

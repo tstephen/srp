@@ -1,7 +1,7 @@
 package digital.srp.sreport.web;
 
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -32,6 +32,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import com.fasterxml.jackson.annotation.JsonView;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import digital.srp.sreport.api.exceptions.ObjectNotFoundException;
 import digital.srp.sreport.importers.CarbonFactorCsvImporter;
 import digital.srp.sreport.model.CarbonFactor;
 import digital.srp.sreport.model.views.CarbonFactorViews;
@@ -89,7 +90,8 @@ public class CarbonFactorController {
             @PathVariable("id") Long cfactorId) {
         LOGGER.info(String.format("findById %1$s", cfactorId));
 
-        CarbonFactor cfactor = cfactorRepo.findOne(cfactorId);
+        CarbonFactor cfactor = cfactorRepo.findById(cfactorId)
+                .orElseThrow(() -> new ObjectNotFoundException(CarbonFactor.class, cfactorId));
 
         return addLinks(cfactor);
     }
@@ -128,7 +130,7 @@ public class CarbonFactorController {
         if (limit == null) {
             list = cfactorRepo.findAll();
         } else {
-            Pageable pageable = new PageRequest(page == null ? 0 : page, limit);
+            Pageable pageable = PageRequest.of(page == null ? 0 : page, limit);
             list = cfactorRepo.findPage(pageable);
         }
         LOGGER.info(String.format("Found %1$s carbon factors", list.size()));
@@ -188,13 +190,12 @@ public class CarbonFactorController {
     @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
     @Transactional
     public @ResponseBody void delete(@PathVariable("id") Long cfactorId) {
-        cfactorRepo.delete(cfactorId);
+        cfactorRepo.deleteById(cfactorId);
     }
 
     private CarbonFactor addLinks(CarbonFactor cfactor) {
-        List<Link> links = new ArrayList<Link>();
-        links.add(new Link(getClass().getAnnotation(RequestMapping.class).value()[0] + "/" + cfactor.id()));
-        
-        return cfactor.links(links);
+        return cfactor.links(Collections.singletonList(Link
+                .of(getClass().getAnnotation(RequestMapping.class).value()[0]
+                        + "/" + cfactor.id())));
     }
 }

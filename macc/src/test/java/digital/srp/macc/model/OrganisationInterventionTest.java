@@ -15,13 +15,13 @@
  *******************************************************************************/
 package digital.srp.macc.model;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 import digital.srp.macc.maths.Finance;
 import digital.srp.macc.maths.SignificantFiguresFormat;
@@ -41,7 +41,7 @@ public class OrganisationInterventionTest {
     protected static OrganisationTypeController svc;
     protected static SignificantFiguresFormat sigFigFormatter;
 
-    @BeforeClass
+    @BeforeAll
     public static void setUpBeforeClass() throws Exception {
         svc = new OrganisationTypeController();
         sigFigFormatter = SignificantFiguresFormat.getInstance();

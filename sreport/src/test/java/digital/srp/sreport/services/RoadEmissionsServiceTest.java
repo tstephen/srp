@@ -1,14 +1,14 @@
 package digital.srp.sreport.services;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import digital.srp.sreport.api.exceptions.ObjectNotFoundException;
 import digital.srp.sreport.importers.CarbonFactorCsvImporter;
@@ -26,7 +26,7 @@ public class RoadEmissionsServiceTest {
     private CarbonFactor petrolFactor;
     private CarbonFactor petrolWttFactor;
 
-    @Before
+    @BeforeEach
     public void setUp() throws IOException {
         svc = new RoadEmissionsService();
         cfactors = new CarbonFactorCsvImporter().readCarbonFactors();

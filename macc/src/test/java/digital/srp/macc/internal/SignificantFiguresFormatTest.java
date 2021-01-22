@@ -15,12 +15,13 @@
  *******************************************************************************/
 package digital.srp.macc.internal;
 
-import static org.junit.Assert.assertEquals;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.math.BigDecimal;
 
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 import digital.srp.macc.maths.SignificantFiguresFormat;
 
@@ -28,7 +29,7 @@ public class SignificantFiguresFormatTest {
 
     private static SignificantFiguresFormat sigFigFormatter;
 
-    @BeforeClass
+    @BeforeAll
     public static void setUpBeforeClass() throws Exception {
         sigFigFormatter = new SignificantFiguresFormat();
     }

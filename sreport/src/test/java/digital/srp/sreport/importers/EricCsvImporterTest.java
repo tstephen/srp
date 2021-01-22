@@ -1,8 +1,9 @@
 package digital.srp.sreport.importers;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.fail;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -10,7 +11,7 @@ import java.io.StringReader;
 import java.util.List;
 import java.util.Scanner;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,8 +29,8 @@ public class EricCsvImporterTest {
 
     @Test
     public void test1617Import() {
-        String content = readFile(Eric1617.DATA_FILE);
         try {
+            String content = readFile(Eric1617.DATA_FILE);
             List<SurveyReturn> returns = new EricCsvImporter()
                     .readEricReturns(new StringReader(content), Eric1617.HEADERS, Eric1617.PERIOD);
             LOGGER.debug(" found {} returns for {}", returns.size(), Eric1617.PERIOD);
@@ -68,8 +69,8 @@ public class EricCsvImporterTest {
 
     @Test
     public void test1516Import() {
-        String content = readFile(Eric1516.DATA_FILE);
         try {
+            String content = readFile(Eric1516.DATA_FILE);
             List<SurveyReturn> returns = new EricCsvImporter()
                     .readEricReturns(new StringReader(content), Eric1516.HEADERS, Eric1516.PERIOD);
             LOGGER.debug(" found {} returns for {}", returns.size(), Eric1516.PERIOD);
@@ -105,8 +106,8 @@ public class EricCsvImporterTest {
 
     @Test
     public void test1415Import() {
-        String content = readFile(Eric1415.DATA_FILE);
         try {
+            String content = readFile(Eric1415.DATA_FILE);
             List<SurveyReturn> returns = new EricCsvImporter()
                     .readEricReturns(new StringReader(content), Eric1415.HEADERS, Eric1415.PERIOD);
             LOGGER.debug(" found {} returns for {}", returns.size(), Eric1415.PERIOD);
@@ -144,8 +145,8 @@ public class EricCsvImporterTest {
 
     @Test
     public void test1314Import() {
-        String content = readFile(Eric1314.DATA_FILE);
         try {
+            String content = readFile(Eric1314.DATA_FILE);
             List<SurveyReturn> returns = new EricCsvImporter()
                     .readEricReturns(new StringReader(content), Eric1314.HEADERS, Eric1314.PERIOD);
             LOGGER.debug(" found {} returns for {}", returns.size(), Eric1314.PERIOD);
@@ -187,18 +188,11 @@ public class EricCsvImporterTest {
     }
 
     @SuppressWarnings("resource")
-    private String readFile(String dataFile) {
-        InputStream is = null;
-        try {
-            is = getClass().getResourceAsStream(dataFile);
-            assertNotNull(String.format("Unable to find test data at %1$s",
-                    Eric1516.DATA_FILE), is);
+    private String readFile(String dataFile) throws IOException {
+        try (InputStream is = getClass().getResourceAsStream(dataFile)) {
+            assertNotNull(is, String.format("Unable to find test data at %1$s",
+                    Eric1516.DATA_FILE));
             return new Scanner(is).useDelimiter("\\A").next();
-        } finally {
-            try {
-                is.close();
-            } catch (Exception e) {
-            }
         }
     }
 

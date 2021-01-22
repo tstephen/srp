@@ -15,9 +15,10 @@
  *******************************************************************************/
 package digital.srp.macc.web;
 
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
+import org.hibernate.ObjectNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -73,7 +74,7 @@ public class ModelParameterController {
         if (limit == null) {
             list = modelParamRepo.findAllForTenant(tenantId);
         } else {
-            Pageable pageable = new PageRequest(page == null ? 0 : page, limit);
+            Pageable pageable = PageRequest.of(page == null ? 0 : page, limit);
             list = modelParamRepo.findPageForTenant(tenantId, pageable);
         }
         LOGGER.info(String.format("Found %1$s messages", list.size()));
@@ -93,7 +94,9 @@ public class ModelParameterController {
 
         ModelParameter parameter;
         try {
-            parameter = modelParamRepo.findOne(Long.parseLong(param));
+            parameter = modelParamRepo.findById(Long.valueOf(param))
+                    .orElseThrow(() -> new ObjectNotFoundException(param,
+                            ModelParameter.class.getSimpleName()));
         } catch (NumberFormatException e) {
             parameter = modelParamRepo.findByName(param);
         }
@@ -117,7 +120,7 @@ public class ModelParameterController {
         if (limit == null) {
             list = modelParamRepo.findAllForTenant(tenantId);
         } else {
-            Pageable pageable = new PageRequest(page == null ? 0 : page, limit);
+            Pageable pageable = PageRequest.of(page == null ? 0 : page, limit);
             list = modelParamRepo.findPageForTenant(tenantId, pageable);
         }
         LOGGER.info(String.format("Found %1$s messages", list.size()));
@@ -133,7 +136,9 @@ public class ModelParameterController {
     public @ResponseBody void update(@PathVariable("tenantId") String tenantId,
             @PathVariable("id") Long paramId,
             @RequestBody ModelParameter updatedParam) {
-        ModelParameter param = modelParamRepo.findOne(paramId);
+        ModelParameter param = modelParamRepo.findById(paramId)
+                .orElseThrow(() -> new ObjectNotFoundException(paramId,
+                        ModelParameter.class.getSimpleName()));
 
         BeanUtils.copyProperties(updatedParam, param, "id", "valueAsBigDecimal");
         param.setTenantId(tenantId);
@@ -148,10 +153,9 @@ public class ModelParameterController {
     }
     
     private ModelParameter addLinks(ModelParameter modelParameter) {
-        List<Link> links = new ArrayList<Link>();
-        links.add(new Link(String.format("/%1$s/parameters/%2$d", modelParameter.getTenantId(), modelParameter.getId())));
-
-        modelParameter.setLinks(links);
-        return modelParameter;
+        return modelParameter.links(Collections
+                .singletonList(Link.of(String.format("/%1$s/parameters/%2$d",
+                        modelParameter.getTenantId(),
+                        modelParameter.getId()))));
     }
 }

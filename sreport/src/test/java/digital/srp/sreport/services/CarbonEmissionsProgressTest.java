@@ -1,12 +1,12 @@
 package digital.srp.sreport.services;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.io.IOException;
 import java.util.List;
 
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 import digital.srp.sreport.importers.CarbonFactorCsvImporter;
 import digital.srp.sreport.importers.WeightingFactorCsvImporter;
@@ -52,7 +52,7 @@ public class CarbonEmissionsProgressTest {
     private static List<CarbonFactor> cfactors;
     private static List<WeightingFactor> wfactors;
 
-    @BeforeClass
+    @BeforeAll
     public static void setUpClass() throws IOException {
         cfactors = new CarbonFactorCsvImporter().readCarbonFactors();
         wfactors = new WeightingFactorCsvImporter().readWeightingFactors();

@@ -18,9 +18,10 @@ package digital.srp.macc.web;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
+import org.hibernate.ObjectNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -95,7 +96,7 @@ public class OrganisationTypeController {
             orgType.setTenantId(tenantId);
         }
 
-        Iterable<OrganisationType> result = organisationTypeRepo.save(list);
+        Iterable<OrganisationType> result = organisationTypeRepo.saveAll(list);
         LOGGER.info("  saved.");
         return result;
     }
@@ -142,7 +143,7 @@ public class OrganisationTypeController {
         } else if (limit == null) {
             list = organisationTypeRepo.findAllForTenant(tenantId);
         } else {
-            Pageable pageable = new PageRequest(page == null ? 0 : page, limit);
+            Pageable pageable = PageRequest.of(page == null ? 0 : page, limit);
             list = organisationTypeRepo.findPageForTenant(tenantId, pageable);
         }
         LOGGER.info(String.format("Found %1$s organisation types", list.size()));
@@ -157,10 +158,14 @@ public class OrganisationTypeController {
     @JsonView({ OrganisationTypeViews.Summary.class })
     public @ResponseBody OrganisationType findById(
             @PathVariable("tenantId") String tenantId,
-            @PathVariable("id") Long id) {
-        LOGGER.info(String.format("Find organisation types for tenant %1$s with id %2$d", tenantId, id));
+            @PathVariable("id") Long orgTypeId) {
+        LOGGER.info(String.format(
+                "Find organisation types for tenant %1$s with id %2$d",
+                tenantId, orgTypeId));
 
-        return addLinks(organisationTypeRepo.findOne(id));
+        return addLinks(organisationTypeRepo.findById(orgTypeId)
+                .orElseThrow(() -> new ObjectNotFoundException(orgTypeId,
+                        OrganisationType.class.getSimpleName())));
     }
     
     /**
@@ -200,7 +205,7 @@ public class OrganisationTypeController {
         if (limit == null) {
             list = organisationTypeRepo.findAllForTenant(tenantId);
         } else {
-            Pageable pageable = new PageRequest(page == null ? 0 : page, limit);
+            Pageable pageable = PageRequest.of(page == null ? 0 : page, limit);
             list = organisationTypeRepo.findPageForTenant(tenantId, pageable);
         }
         LOGGER.info(String.format("Found %1$s organisation types", list.size()));
@@ -216,7 +221,9 @@ public class OrganisationTypeController {
     public @ResponseBody void update(@PathVariable("tenantId") String tenantId,
             @PathVariable("id") Long orgTypeId,
             @RequestBody OrganisationType updatedOrgType) {
-        OrganisationType orgType = organisationTypeRepo.findOne(orgTypeId);
+        OrganisationType orgType = organisationTypeRepo.findById(orgTypeId)
+                .orElseThrow(() -> new ObjectNotFoundException(orgTypeId,
+                        OrganisationType.class.getSimpleName()));
 
         BeanUtils.copyProperties(updatedOrgType, orgType, "id");
         orgType.setTenantId(tenantId);
@@ -231,11 +238,9 @@ public class OrganisationTypeController {
     }
 
     private OrganisationType addLinks(final OrganisationType orgType) {
-        List<Link> links = new ArrayList<Link>();
-        links.add(new Link(getTenantUri(orgType)));
-
-        orgType.setLinks(links);
-        return orgType;
+        return orgType.links(Collections.singletonList(
+                Link.of(String.format("/%1$s/organisation-types/%2$d",
+                        orgType.getTenantId(), orgType.getId()))));
     }
 
     private String getTenantUri(final OrganisationType orgType) {

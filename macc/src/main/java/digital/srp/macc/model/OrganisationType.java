@@ -166,4 +166,9 @@ public class OrganisationType {
     @JsonProperty("links")
     @JsonView({ OrganisationTypeViews.Summary.class })
     private List<Link> links;
+
+    public OrganisationType links(List<Link> links) {
+        setLinks(links);
+        return this;
+    }
 }

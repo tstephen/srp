@@ -305,4 +305,9 @@ public class OrganisationIntervention {
     public String getSlug() {
         return intervention.getInterventionType().getSlug();
     }
+
+    public OrganisationIntervention links(List<Link> links) {
+        setLinks(links);
+        return this;
+    }
 }

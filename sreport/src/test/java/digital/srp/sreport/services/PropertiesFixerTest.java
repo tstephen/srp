@@ -1,6 +1,6 @@
 package digital.srp.sreport.services;
 
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -12,7 +12,7 @@ import java.util.Enumeration;
 import java.util.Properties;
 import java.util.Vector;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import digital.srp.sreport.internal.StringUtils;
 

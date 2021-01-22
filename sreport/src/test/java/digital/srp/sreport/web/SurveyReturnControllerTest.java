@@ -1,14 +1,14 @@
 package digital.srp.sreport.web;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 import org.springframework.data.domain.Pageable;
 
 import digital.srp.sreport.model.Answer;
@@ -24,7 +24,7 @@ public class SurveyReturnControllerTest {
 
     private static SurveyReturnController svc;
 
-    @BeforeClass
+    @BeforeAll
     public static void setUpClass() {
         svc = new SurveyReturnController();
         svc.returnRepo = new SurveyReturnControllerTest.MockSurveyReturnRepository();
@@ -66,22 +66,12 @@ public class SurveyReturnControllerTest {
         }
 
         @Override
-        public <S extends SurveyReturn> Iterable<S> save(Iterable<S> entities) {
+        public <S extends SurveyReturn> Iterable<S> saveAll(Iterable<S> entities) {
             return entities;
         }
 
         @Override
-        public SurveyReturn findOne(Long id) {
-            return null;
-        }
-
-        @Override
-        public boolean exists(Long id) {
-            return false;
-        }
-
-        @Override
-        public Iterable<SurveyReturn> findAll(Iterable<Long> ids) {
+        public Optional<SurveyReturn> findById(Long id) {
             return null;
         }
 
@@ -91,15 +81,11 @@ public class SurveyReturnControllerTest {
         }
 
         @Override
-        public void delete(Long id) {
+        public void deleteById(Long id) {
         }
 
         @Override
         public void delete(SurveyReturn entity) {
-        }
-
-        @Override
-        public void delete(Iterable<? extends SurveyReturn> entities) {
         }
 
         @Override
@@ -157,6 +143,22 @@ public class SurveyReturnControllerTest {
         public List<SurveyReturn> findByName(String name) {
             // TODO Auto-generated method stub
             return null;
+        }
+
+        @Override
+        public boolean existsById(Long id) {
+            return findById(id).isPresent();
+        }
+
+        @Override
+        public Iterable<SurveyReturn> findAllById(Iterable<Long> ids) {
+            // TODO Auto-generated method stub
+            return null;
+        }
+
+        @Override
+        public void deleteAll(Iterable<? extends SurveyReturn> entities) {
+            // TODO Auto-generated method stub
         }
 
     }

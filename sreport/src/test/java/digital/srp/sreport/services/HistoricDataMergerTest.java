@@ -1,12 +1,12 @@
 package digital.srp.sreport.services;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.HashSet;
 import java.util.Set;
 
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 import digital.srp.sreport.model.Answer;
 import digital.srp.sreport.model.Q;
@@ -22,7 +22,7 @@ public class HistoricDataMergerTest {
     private static final String ELEC_USED_ALT = "101.01";
     private static HistoricDataMerger svc;
 
-    @BeforeClass
+    @BeforeAll
     public static void setUpClass() {
         svc = new HistoricDataMerger();
     }

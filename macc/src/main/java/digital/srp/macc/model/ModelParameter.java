@@ -128,4 +128,9 @@ public class ModelParameter {
         valueTS = TimeSeries.asString(values);
     }
 
+    public ModelParameter links(List<Link> links) {
+        setLinks(links);
+        return this;
+    }
+
 }

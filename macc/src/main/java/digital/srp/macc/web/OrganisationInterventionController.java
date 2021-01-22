@@ -16,6 +16,7 @@
 package digital.srp.macc.web;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -127,10 +128,8 @@ public class OrganisationInterventionController {
     }
 
     private OrganisationIntervention addLinks(OrganisationIntervention oi) {
-        List<Link> links = new ArrayList<Link>();
-        links.add(new Link(String.format("/%1$s/organisation-interventions/%2$d", oi.getTenantId(), oi.getId())));
-
-        oi.setLinks(links);
-        return oi;
+        return oi.links(Collections
+                .singletonList(Link.of(String.format("/%1$s/organisation-interventions/%2$d",
+                        oi.getTenantId(), oi.getId()))));
     }
 }

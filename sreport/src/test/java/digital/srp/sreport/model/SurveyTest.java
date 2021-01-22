@@ -1,18 +1,16 @@
 package digital.srp.sreport.model;
 
-import static org.junit.Assert.assertEquals;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.Arrays;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import digital.srp.sreport.model.returns.EricQuestions;
 
 public class SurveyTest implements EricQuestions{
     
-    /**
-     * 
-     */
     @Test
     public void testBusinessDataEquality() {
         SurveyCategory catOrg = new SurveyCategory()

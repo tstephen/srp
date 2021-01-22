@@ -7,7 +7,7 @@
   <parent>
     <groupId>digital.srp</groupId>
     <artifactId>srp-root</artifactId>
-    <version>2.5.0-SNAPSHOT</version>
+    <version>3.0.0-SNAPSHOT</version>
     <relativePath>..</relativePath>
   </parent>
 
@@ -28,24 +28,10 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-api</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>mysql</groupId>
-      <artifactId>mysql-connector-java</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
       <groupId>org.subethamail</groupId>
       <artifactId>subethasmtp-wiser</artifactId>
       <version>1.2</version>
       <scope>test</scope>
-    </dependency>
-    <dependency>
-    	<groupId>commons-dbcp</groupId>
-    	<artifactId>commons-dbcp</artifactId>
-    	<scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.activiti</groupId>
@@ -58,6 +44,12 @@
       <groupId>com.knowprocess.bpaas</groupId>
       <artifactId>kp-processes</artifactId>
       <version>${work-mgmt.version}</version>
+      <exclusions>
+        <exclusion>
+          <groupId>org.springframework.boot</groupId>
+          <artifactId>spring-boot-starter</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
   </dependencies>
 

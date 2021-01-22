@@ -1,6 +1,6 @@
 package digital.srp.sreport.web;
 
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import javax.transaction.Transactional;
@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import com.fasterxml.jackson.annotation.JsonView;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import digital.srp.sreport.api.exceptions.ObjectNotFoundException;
 import digital.srp.sreport.model.SurveyCategory;
 import digital.srp.sreport.model.views.SurveyCategoryViews;
 import digital.srp.sreport.repositories.SurveyCategoryRepository;
@@ -55,7 +56,8 @@ public class SurveyCategoryController {
             @PathVariable("id") Long catId) {
         LOGGER.info(String.format("findById %1$s", catId));
 
-        SurveyCategory cat = catRepo.findOne(catId);
+        SurveyCategory cat = catRepo.findById(catId)
+                .orElseThrow(() -> new ObjectNotFoundException(SurveyCategory.class, catId));
 
         return addLinks(cat);
     }
@@ -76,7 +78,7 @@ public class SurveyCategoryController {
         if (limit == null) {
             list = catRepo.findAll();
         } else {
-            Pageable pageable = new PageRequest(page == null ? 0 : page, limit);
+            Pageable pageable = PageRequest.of(page == null ? 0 : page, limit);
             list = catRepo.findPage(pageable);
         }
         LOGGER.info(String.format("Found %1$s categories", list.size()));
@@ -91,13 +93,11 @@ public class SurveyCategoryController {
     @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
     @Transactional
     public @ResponseBody void delete(@PathVariable("id") Long catId) {
-        catRepo.delete(catId);
+        catRepo.deleteById(catId);
     }
 
     private SurveyCategory addLinks(SurveyCategory cat) {
-        List<Link> links = new ArrayList<Link>();
-        links.add(new Link(getClass().getAnnotation(RequestMapping.class).value()[0] + "/" + cat.id()));
-        
-        return cat.links(links);
+        return cat.links(Collections.singletonList(Link.of(
+                getClass().getAnnotation(RequestMapping.class).value()[0] + "/" + cat.id())));
     }
 }

@@ -17,9 +17,10 @@ package digital.srp.macc.web;
 
 import java.io.IOException;
 import java.io.StringReader;
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
+import org.hibernate.ObjectNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -94,7 +95,7 @@ public class InterventionTypeController {
             message.setTenantId(tenantId);
         }
 
-        Iterable<InterventionType> result = interventionTypeRepo.save(list);
+        Iterable<InterventionType> result = interventionTypeRepo.saveAll(list);
         LOGGER.info("  saved.");
         return result;
     }
@@ -125,7 +126,7 @@ public class InterventionTypeController {
             interventionType.setTenantId(tenantId);
         }
 
-        Iterable<InterventionType> result = interventionTypeRepo.save(list);
+        Iterable<InterventionType> result = interventionTypeRepo.saveAll(list);
         LOGGER.info("  saved.");
         return result;
     }
@@ -147,7 +148,7 @@ public class InterventionTypeController {
         if (limit == null) {
             list = interventionTypeRepo.findAllForTenant(tenantId);
         } else {
-            Pageable pageable = new PageRequest(page == null ? 0 : page, limit);
+            Pageable pageable = PageRequest.of(page == null ? 0 : page, limit);
             list = interventionTypeRepo.findPageForTenant(tenantId, pageable);
         }
         LOGGER.info(String.format("Found %1$s intervention types", list.size()));
@@ -164,9 +165,12 @@ public class InterventionTypeController {
             @PathVariable("id") Long interventionTypeId) {
         LOGGER.info(String.format("findById %1$s", interventionTypeId));
 
-        InterventionType interventionType = interventionTypeRepo.findOne(interventionTypeId);
+        InterventionType intvnType = interventionTypeRepo
+                .findById(interventionTypeId).orElseThrow(
+                        () -> new ObjectNotFoundException(interventionTypeId,
+                                InterventionType.class.getSimpleName()));
 
-        return addLinks(interventionType);
+        return addLinks(intvnType);
     }
 
     /**
@@ -187,7 +191,7 @@ public class InterventionTypeController {
         if (limit == null) {
             list = interventionTypeRepo.findAllForTenant(tenantId);
         } else {
-            Pageable pageable = new PageRequest(page == null ? 0 : page, limit);
+            Pageable pageable = PageRequest.of(page == null ? 0 : page, limit);
             list = interventionTypeRepo.findPageForTenant(tenantId, pageable);
         }
         LOGGER.info(String.format("Found %1$s interventions", list.size()));
@@ -226,7 +230,10 @@ public class InterventionTypeController {
     public @ResponseBody void update(@PathVariable("tenantId") String tenantId,
             @PathVariable("id") Long interventionTypeId,
             @RequestBody InterventionType updatedIntvnType) {
-        InterventionType intvnType = interventionTypeRepo.findOne(interventionTypeId);
+        InterventionType intvnType = interventionTypeRepo
+                .findById(interventionTypeId).orElseThrow(
+                        () -> new ObjectNotFoundException(interventionTypeId,
+                                InterventionType.class.getSimpleName()));
 
         BeanUtils.copyProperties(updatedIntvnType, intvnType, "id");
         intvnType.setTenantId(tenantId);
@@ -241,11 +248,9 @@ public class InterventionTypeController {
         return interventionTypes;
     }
 
-    private InterventionType addLinks(final InterventionType interventionType) {
-        List<Link> links = new ArrayList<Link>();
-        links.add(new Link(String.format("/%1$s/intervention-types/%2$d", interventionType.getTenantId(), interventionType.getId())));
-
-        interventionType.setLinks(links);
-        return interventionType;
+    private InterventionType addLinks(final InterventionType type) {
+        return type.links(Collections
+                .singletonList(Link.of(String.format("/%1$s/intervention-types/%2$d",
+                        type.getTenantId(), type.getId()))));
     }
 }

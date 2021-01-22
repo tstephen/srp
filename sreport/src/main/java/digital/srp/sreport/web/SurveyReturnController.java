@@ -1,7 +1,7 @@
 package digital.srp.sreport.web;
 
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -122,10 +122,8 @@ public class SurveyReturnController {
     public @ResponseBody SurveyReturn findById(@PathVariable("id") Long returnId) {
         LOGGER.info(String.format("findById %1$s", returnId));
 
-        SurveyReturn rtn = returnRepo.findOne(returnId);
-        if (rtn == null) {
-            throw new ObjectNotFoundException(SurveyReturn.class, returnId);
-        }
+        SurveyReturn rtn = returnRepo.findById(returnId)
+                .orElseThrow(()-> new ObjectNotFoundException(SurveyReturn.class, returnId));
         // use logger for force child load
         LOGGER.info(String.format("Found return with id %1$d with status %2$s and containing %3$d answers", rtn.id(), rtn.status(), rtn.answers().size()));
 
@@ -326,7 +324,7 @@ public class SurveyReturnController {
         if (limit == null) {
             list = returnRepo.findAll();
         } else {
-            Pageable pageable = new PageRequest(page == null ? 0 : page, limit);
+            Pageable pageable = PageRequest.of(page == null ? 0 : page, limit);
             list = returnRepo.findPage(pageable);
         }
         LOGGER.info(String.format("Found %1$s returns", list.size()));
@@ -448,7 +446,8 @@ public class SurveyReturnController {
     @Transactional
     public @ResponseBody void restate(
             @PathVariable("id") Long returnId) {
-        SurveyReturn existing = returnRepo.findOne(returnId);
+        SurveyReturn existing = returnRepo.findById(returnId)
+                .orElseThrow(()-> new ObjectNotFoundException(SurveyReturn.class, returnId));
         existing.status(StatusType.Superseded.name());
         for (Answer a : existing.answers()) {
             a.status(StatusType.Superseded.name());
@@ -487,7 +486,9 @@ public class SurveyReturnController {
         LOGGER.info(String.format("Setting survey %1$s to status %2$s",
                 returnId, status));
 
-        SurveyReturn survey = returnRepo.findOne(returnId).status(status);
+        SurveyReturn survey = returnRepo.findById(returnId)
+                .orElseThrow(()-> new ObjectNotFoundException(SurveyReturn.class, returnId))
+                .status(status);
         switch (StatusType.valueOf(status)) {
         case Published:
             publish(survey);
@@ -533,7 +534,7 @@ public class SurveyReturnController {
     @Transactional
     public @ResponseBody void delete(
             @PathVariable("id") Long returnId) {
-        returnRepo.delete(returnId);
+        returnRepo.deleteById(returnId);
     }
 
     private List<SurveyReturn> addLinks(List<SurveyReturn> returns) {
@@ -544,9 +545,8 @@ public class SurveyReturnController {
     }
 
     private SurveyReturn addLinks(SurveyReturn rtn) {
-        List<Link> links = new ArrayList<Link>();
-        links.add(new Link(baseUrl+getClass().getAnnotation(RequestMapping.class).value()[0] + "/" + rtn.id()));
-
-        return rtn.links(links);
+        return rtn.links(Collections.singletonList(Link.of(baseUrl
+                + getClass().getAnnotation(RequestMapping.class).value()[0]
+                + "/" + rtn.id())));
     }
 }

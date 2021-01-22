@@ -1,8 +1,8 @@
 package digital.srp.sreport.services;
 
 import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.fail;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -14,8 +14,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.hamcrest.Matchers;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 import digital.srp.sreport.internal.StringUtils;
 import digital.srp.sreport.model.Q;
@@ -24,7 +24,7 @@ public class MessageServiceTest {
 
     protected static MessageService svc;
 
-    @BeforeClass
+    @BeforeAll
     public static void setUp() {
         svc = new MessageService();
     }

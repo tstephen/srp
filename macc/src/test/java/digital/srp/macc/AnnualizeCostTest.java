@@ -15,15 +15,15 @@
  *******************************************************************************/
 package digital.srp.macc;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.util.ArrayList;
 import java.util.GregorianCalendar;
 import java.util.List;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import digital.srp.macc.maths.ProRataAnnualizer;
 import digital.srp.macc.model.AnnualizedCost;
@@ -35,7 +35,7 @@ public class AnnualizeCostTest {
     private ReportingYear year;
     private List<Invoice> invoices;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         year = new ReportingYear("Calendar 2013", new GregorianCalendar(2013,
                 0, 1).getTime(), new GregorianCalendar(2013, 11, 31).getTime());

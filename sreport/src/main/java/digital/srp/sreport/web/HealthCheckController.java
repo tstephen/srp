@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.fasterxml.jackson.annotation.JsonView;
 
 import digital.srp.sreport.api.exceptions.FailedHealthCheckException;
+import digital.srp.sreport.api.exceptions.ObjectNotFoundException;
 import digital.srp.sreport.internal.PeriodUtil;
 import digital.srp.sreport.model.Answer;
 import digital.srp.sreport.model.HealthCheck;
@@ -62,7 +63,8 @@ public class HealthCheckController {
             @PathVariable("returnId") Long returnId) {
         LOGGER.info(String.format("Checking health for %1$s", returnId));
 
-        SurveyReturn rtn = returnRepo.findOne(returnId);
+        SurveyReturn rtn = returnRepo.findById(returnId)
+                .orElseThrow(() -> new ObjectNotFoundException(SurveyReturn.class, returnId));
         checkHealth(rtn,
                 PeriodUtil.periodsSinceInc(rtn.applicablePeriod(), "2007-08"),
                 false);
@@ -104,7 +106,8 @@ public class HealthCheckController {
             @PathVariable("returnId") Long returnId) {
         LOGGER.info(String.format("Checking health for %1$s", returnId));
 
-        SurveyReturn rtn = returnRepo.findOne(returnId);
+        SurveyReturn rtn = returnRepo.findById(returnId)
+                .orElseThrow(() -> new ObjectNotFoundException(SurveyReturn.class, returnId));
         checkHealth(rtn,
                 PeriodUtil.periodsSinceInc(rtn.applicablePeriod(), "2007-08"),
                 true);

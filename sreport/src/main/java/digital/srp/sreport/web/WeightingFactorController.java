@@ -1,7 +1,7 @@
 package digital.srp.sreport.web;
 
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -32,6 +32,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import com.fasterxml.jackson.annotation.JsonView;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import digital.srp.sreport.api.exceptions.ObjectNotFoundException;
 import digital.srp.sreport.importers.WeightingFactorCsvImporter;
 import digital.srp.sreport.model.WeightingFactor;
 import digital.srp.sreport.model.views.WeightingFactorViews;
@@ -84,7 +85,8 @@ public class WeightingFactorController {
             @PathVariable("id") Long factorId) {
         LOGGER.info(String.format("findById %1$s", factorId));
 
-        WeightingFactor factor = wfactorRepo.findOne(factorId);
+        WeightingFactor factor = wfactorRepo.findById(factorId)
+                .orElseThrow(()-> new ObjectNotFoundException(WeightingFactor.class, factorId));
 
         return addLinks(factor);
     }
@@ -122,7 +124,7 @@ public class WeightingFactorController {
         if (limit == null) {
             list = wfactorRepo.findAll();
         } else {
-            Pageable pageable = new PageRequest(page == null ? 0 : page, limit);
+            Pageable pageable = PageRequest.of(page == null ? 0 : page, limit);
             list = wfactorRepo.findPage(pageable);
         }
         LOGGER.info(String.format("Found %1$s carbon factors", list.size()));
@@ -182,13 +184,12 @@ public class WeightingFactorController {
     @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
     @Transactional
     public @ResponseBody void delete(@PathVariable("id") Long cfactorId) {
-        wfactorRepo.delete(cfactorId);
+        wfactorRepo.deleteById(cfactorId);
     }
 
     private WeightingFactor addLinks(WeightingFactor cfactor) {
-        List<Link> links = new ArrayList<Link>();
-        links.add(new Link(getClass().getAnnotation(RequestMapping.class).value()[0] + "/" + cfactor.id()));
-        
-        return cfactor.links(links);
+        return cfactor.links(Collections.singletonList(Link
+                .of(getClass().getAnnotation(RequestMapping.class).value()[0]
+                        + "/" + cfactor.id())));
     }
 }

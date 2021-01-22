@@ -1,6 +1,7 @@
 package digital.srp.sreport.web;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 
@@ -32,6 +33,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import com.fasterxml.jackson.annotation.JsonView;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import digital.srp.sreport.api.exceptions.ObjectNotFoundException;
 import digital.srp.sreport.api.exceptions.ResultSetTooLargeException;
 import digital.srp.sreport.model.Answer;
 import digital.srp.sreport.model.Criterion;
@@ -90,7 +92,8 @@ public class AnswerController {
             @PathVariable("id") Long answerId) {
         LOGGER.info(String.format("findById %1$s", answerId));
 
-        Answer answer = answerRepo.findOne(answerId);
+        Answer answer = answerRepo.findById(answerId)
+                .orElseThrow(() -> new ObjectNotFoundException(Answer.class, answerId));
 
         return addLinks(answer);
     }
@@ -112,7 +115,7 @@ public class AnswerController {
         if (limit == null) {
             list = answerRepo.findAll();
         } else {
-            Pageable pageable = new PageRequest(page == null ? 0 : page, limit);
+            Pageable pageable = PageRequest.of(page == null ? 0 : page, limit);
             list = answerRepo.findPage(pageable);
         }
         LOGGER.info(String.format("Found %1$s answers", list.size()));
@@ -249,7 +252,7 @@ public class AnswerController {
         if (limit == null) {
             list = answerRepo.findByPeriod(period);
         } else {
-            Pageable pageable = new PageRequest(page == null ? 0 : page, limit);
+            Pageable pageable = PageRequest.of(page == null ? 0 : page, limit);
             list = answerRepo.findPageByPeriod(pageable, period);
         }
         LOGGER.info(String.format("Found %1$s answers", list.size()));
@@ -274,7 +277,8 @@ public class AnswerController {
         switch (list.size()) {
         case 0:
             Question question = qRepo.findByName(q);
-            SurveyReturn rtn = rtnRepo.findOne(rtnId);
+            SurveyReturn rtn = rtnRepo.findById(rtnId)
+                    .orElseThrow(() -> new ObjectNotFoundException(SurveyReturn.class, rtnId));
             a = new Answer().question(question).addSurveyReturn(rtn)
                     .applicablePeriod(period);
             if (q.equals(Q.ORG_CODE.code())) {
@@ -301,13 +305,12 @@ public class AnswerController {
     @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
     @Transactional
     public @ResponseBody void delete(@PathVariable("id") Long answerId) {
-        answerRepo.delete(answerId);
+        answerRepo.deleteById(answerId);
     }
 
     private Answer addLinks(Answer answer) {
-        List<Link> links = new ArrayList<Link>();
-        links.add(new Link(getClass().getAnnotation(RequestMapping.class).value()[0] + "/" + answer.id()));
-
-        return answer.links(links);
+        return answer.links(Collections.singletonList(Link
+                .of(getClass().getAnnotation(RequestMapping.class).value()[0]
+                        + "/" + answer.id())));
     }
 }

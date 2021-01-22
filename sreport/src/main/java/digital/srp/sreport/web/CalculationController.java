@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.fasterxml.jackson.annotation.JsonView;
 
 import digital.srp.sreport.api.Calculator;
+import digital.srp.sreport.api.exceptions.ObjectNotFoundException;
 import digital.srp.sreport.internal.PeriodUtil;
 import digital.srp.sreport.model.SurveyReturn;
 import digital.srp.sreport.model.views.SurveyReturnViews;
@@ -65,7 +66,8 @@ public class CalculationController {
             @PathVariable("returnId") Long returnId) {
         LOGGER.info(String.format("Running calculations for %1$s", returnId));
 
-        SurveyReturn rtn = returnRepo.findOne(returnId);
+        SurveyReturn rtn = returnRepo.findById(returnId)
+                .orElseThrow(() -> new ObjectNotFoundException(SurveyReturn.class, returnId));
         calculate(rtn, PeriodUtil.periodsSinceInc(rtn.applicablePeriod(), "2007-08"));
 
         return rtn;

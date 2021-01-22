@@ -7,8 +7,8 @@ import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Properties;
 
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 import digital.srp.sreport.internal.ClasspathSurveyReturnHelper;
 import digital.srp.sreport.model.Answer;
@@ -18,17 +18,19 @@ public class MergerTest {
 
     private static ClasspathSurveyReturnHelper helper;
 
-    @BeforeClass
+    @BeforeAll
     public static void setUpClass() throws IOException {
         helper = new ClasspathSurveyReturnHelper();
     }
 
     @Test
     public void testMergeTwoRevisions() throws IOException {
-        SurveyReturn rw5 = helper.readSurveyReturn("RW5");
+        SurveyReturn rw5 = helper.readSurveyReturn("RW5")
+                .orElseThrow(IllegalStateException::new);
         writeProperties(rw5);
 
-        SurveyReturn old = helper.readSurveyReturn("RW5.fixed");
+        SurveyReturn old = helper.readSurveyReturn("RW5.fixed")
+                .orElseThrow(IllegalStateException::new);
         writeProperties(old);
         
         merge(rw5, old);

@@ -1,10 +1,11 @@
 package digital.srp.sreport.internal;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Optional;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -19,17 +20,16 @@ public class ClasspathSurveyReturnHelper {
         objectMapper = new ObjectMapper();
     }
 
-    public SurveyReturn readSurveyReturn(String org) {
+    public Optional<SurveyReturn> readSurveyReturn(String org) {
         String dataFile = String.format(DATA_FILE, org.toLowerCase());
         try (InputStream is = getClass().getResourceAsStream(dataFile)) {
-            assertNotNull(
-                    String.format("Unable to find test data at %1$s", dataFile),
-                    is);
-            return objectMapper.readValue(is, SurveyReturn.class);
+            assertNotNull(is,
+                    String.format("Unable to find test data at %1$s", dataFile));
+            return Optional.of(objectMapper.readValue(is, SurveyReturn.class));
         } catch (IOException e) {
             e.printStackTrace();
             fail();
-            return null;
+            return Optional.empty();
         }
     }
 }

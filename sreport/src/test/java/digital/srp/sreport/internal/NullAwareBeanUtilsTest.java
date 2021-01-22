@@ -1,20 +1,16 @@
 package digital.srp.sreport.internal;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
 
-import org.junit.BeforeClass;
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+
+import org.junit.jupiter.api.Test;
 
 import digital.srp.sreport.model.Question;
 
 public class NullAwareBeanUtilsTest {
 
     private static final String NAME = "Foo";
-
-    @BeforeClass
-    public static void setUpBeforeClass() throws Exception {
-    }
 
     @Test
     public void testCopyNonNullProperties() {

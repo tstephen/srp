@@ -730,6 +730,11 @@ public class InterventionType implements CsvSerializable {
                 .replaceAll(", ", ",");
     }
 
+    public InterventionType links(List<Link> links) {
+        setLinks(links);
+        return this;
+    }
+
     public String toCsv() {
         return String
                 .format("%s,\"%s\",\"%s\",%s,%s,%s,\"%s\",%s,%s,\"%s\",%s,%s,%s",

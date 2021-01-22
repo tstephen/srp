@@ -316,6 +316,11 @@ public class Intervention implements CsvSerializable {
     public String getSlug() {
         return getInterventionType().getSlug();
     }
+    
+    public Intervention links(List<Link> links) {
+        setLinks(links);
+        return this;
+    }
 
     @Override
     public String toString() {

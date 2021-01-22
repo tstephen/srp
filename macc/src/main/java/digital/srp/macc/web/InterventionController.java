@@ -17,8 +17,10 @@ package digital.srp.macc.web;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
+import org.hibernate.ObjectNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -114,7 +116,8 @@ public class InterventionController {
     public @ResponseBody void update(@PathVariable("tenantId") String tenantId,
             @PathVariable("id") Long interventionId,
             @RequestBody Intervention updatedIntvn) {
-        Intervention intvn = interventionRepo.findOne(interventionId);
+        Intervention intvn = interventionRepo.findById(interventionId)
+                .orElseThrow(() -> new ObjectNotFoundException(interventionId, Intervention.class.getSimpleName()));
 
         BeanUtils.copyProperties(updatedIntvn, intvn, "id");
         intvn.setTenantId(tenantId);
@@ -158,7 +161,7 @@ public class InterventionController {
         if (limit == null) {
             list = interventionRepo.findAllForTenant(tenantId);
         } else {
-            Pageable pageable = new PageRequest(page == null ? 0 : page, limit);
+            Pageable pageable = PageRequest.of(page == null ? 0 : page, limit);
             list = interventionRepo.findPageForTenant(tenantId, pageable);
         }
 
@@ -200,9 +203,11 @@ public class InterventionController {
             @PathVariable("id") Long interventionId) {
         LOGGER.info(String.format("findById %1$s", interventionId));
 
-        Intervention intervention = interventionRepo.findOne(interventionId);
+        Intervention intvn = interventionRepo.findById(interventionId)
+                .orElseThrow(() -> new ObjectNotFoundException(interventionId,
+                        Intervention.class.getSimpleName()));
 
-        return addLinks(intervention);
+        return addLinks(intvn);
     }
 
     private List<Intervention> addLinks(final List<Intervention> interventions) {
@@ -213,10 +218,8 @@ public class InterventionController {
     }
 
     private Intervention addLinks(final Intervention intervention) {
-        List<Link> links = new ArrayList<Link>();
-        links.add(new Link(String.format("/%1$s/interventions/%2$d", intervention.getTenantId(), intervention.getId())));
-
-        intervention.setLinks(links);
-        return intervention;
+        return intervention.links(Collections
+                .singletonList(Link.of(String.format("/%1$s/interventions/%2$d",
+                        intervention.getTenantId(), intervention.getId()))));
     }
 }
