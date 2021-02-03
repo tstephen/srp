@@ -1,0 +1,37 @@
+<!--
+  Copyright 2015-2018 Tim Stephenson and contributors
+
+   Licensed under the Apache License, Version 2.0 (the "License"); you may not
+   use this file except in compliance with the License.  You may obtain a copy
+   of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+   WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+   License for the specific language governing permissions and limitations under
+   the License.
+-->
+{{# profile!=undefined && profile.id!=undefined}}
+<div class="menu-burger navbar-side" on-click="toggleSidebar()">
+  <span class="clickable glyphicon icon-btn kp-icon-menu" title="{{title}}"></span>
+</div>
+<div class="toolbar {{#profile.toolbarPosition}}toolbar-{{profile.toolbarPosition}}{{/}} {{^profile.toolbarPosition}}toolbar-left{{/}}">
+  <ul>
+    <li>
+      <span class="clickable glyphicon icon-btn kp-icon-menu" on-click="toggleSidebar()" title="{{title}}"></span>
+    </li>
+    {{>toolbar { toolbar: tenant.toolbar } }}
+    <li class="powered-by-icon">
+      {{#if window.location.host == 'srp.digital'}}
+        <img src="/srp/2.0.0/images/icon/srp-icon-32x32.png" alt="Sustainable Resource Planning&trade;">
+      {{else}}
+        <a href="/about.html">
+          <img src="//knowprocess.com/images/icon/knowprocess-icon-48x48.png" alt="KnowProcess&trade;">
+        </a>
+      {{/if}}
+    </li>
+  </ul>
+</div>
+{{/}}

@@ -164,8 +164,8 @@ var ractive = new BaseRactive({
       else return 'hidden';
     },
     stdPartials: [
-      { "name": "sidebar", "url": $env.server+"/partials/sidebar.html"},
-      { "name": "toolbar", "url": $env.server+"/partials/toolbar.html"},
+      { "name": "sidebar", "url": "/partials/sidebar.html"},
+      { "name": "toolbar", "url": "/partials/toolbar.html"},
       { "name": "nhsCarbonProfileSect", "url": "/srp/vsn/partials/nhs-carbon-profile.html"},
       { "name": "statusSect", "url": "/srp/vsn/partials/status-sect.html"}
     ],
@@ -291,7 +291,7 @@ var ractive = new BaseRactive({
   fetchMessages: function() {
     $.ajax({
       dataType: "json",
-      url: ractive.getServer()+'/messages?lang='+navigator.language,
+      url: ractive.getServer()+'/messages_'+navigator.language+'.json',
       crossDomain: true,
       headers: {
         "X-Requested-With": "XMLHttpRequest",
@@ -802,7 +802,7 @@ var ractive = new BaseRactive({
 });
 
 $(document).ready(function() {
-  $('head').append('<link href="'+ractive.getServer()+'/css/sdu-1.0.0.css" rel="stylesheet">');
+  $('head').append('<link href="/sdu/css/sdu-1.0.0.css" rel="stylesheet">');
   $('.menu-burger, .toolbar').addClass('no-print');
 })
 

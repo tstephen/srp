@@ -1,0 +1,1357 @@
+/*******************************************************************************
+ *Copyright 2011-2018 Tim Stephenson and contributors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License.  You may obtain a copy
+ * of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ ******************************************************************************/
+/* FONTS */
+@import url('https://fonts.googleapis.com/css?family=Ubuntu:400italic,400,700');
+@import url('https://fonts.googleapis.com/css?family=Signika');
+@import url('https://api.knowprocess.com/webjars/knowprocess-icons/3.1.0/style.css ');
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Signika', sans-serif;
+  font-weight: 500;
+}
+
+/* END FONTS */
+
+/*
+ * COLOURS
+ *   pink-purple: #da72ae
+ *   green:       #779C95
+ *   green-grey:  #9ebfb9
+ *   grey 1:      #6f6f71
+ *   grey 2:      #939598
+ *   grey 3:      #b7b7b7
+ *   charcoal:    #515151
+ */
+
+/* RESPONSIVE OVERRIDES */
+
+@media (min-width: 920px) {
+	.min-md-180  {
+	  min-width: 180px;
+	}
+}
+
+
+/* START BOOTSTRAP OVERRIDES */
+
+body, text {
+  color: #6f6f71;
+  font-family: Ubuntu;
+  font-size: 16px;
+}
+h1 {
+	color: #779c95;
+}
+h2 {
+	font-size: 24px;
+}
+h3 {
+  font-size: 24px;
+}
+h4 {
+  font-size: 20px;
+  border-bottom: 3px double #939598;
+}
+h5,
+legend {
+  border-bottom: 1px solid #939598;
+  color: #6f6f71;
+  font-size:16px;
+}
+img.entity-context {
+  width: 90%;
+}
+input,select,textarea {
+	border: solid 1px;
+	border-color: #ccc;
+  line-height:1.4em;
+	padding: 0 10px 0 10px;
+}
+input[not(type='checkbox')]
+  box-shadow: inset 0px 1px 1px rgba(0,0,0,0.075), 0px 0px 8px rgba(102,175,233,0.6);
+}
+input:active,select:active,textarea:active {
+  border-color: #66afe9;
+}
+textarea.rich-content {
+	height: 30em;
+	margin: 0 -10px;
+}
+input.field-error:invalid,
+select.field-error:invalid,
+textarea.field-error:invalid,
+ul.tagit.field-error {
+  border: solid 3px #f33;
+}
+
+/* TODO not used ? */
+input:focus:invalid,
+select:focus:invalid,
+textarea:focus:invalid,
+ul.tagit.field-error:focus {
+  border: solid 3px #f33 ;
+}
+
+input ~ .field-hint,
+select ~ .field-hint,
+textarea ~ .field-hint {
+  visibility: hidden ;
+  line-height: 0em;
+}
+input[type='checkbox'].form-control {
+  box-shadow: none;
+  -webkit-box-shadow: none;
+}
+input[type='checkbox'] ~ .secondary-label {
+  left: 0.2em;
+  position: relative;
+  top: -0.7em;
+}
+input[type='checkbox'] ~ .help-block {
+	margin-top: -1em;
+}
+td[contenteditable].form-control {
+  width: 16.7% /* eq col-xx-2 */
+}
+td[contenteditable].form-control:active {
+  background-color: white;
+  border: solid 1px #ccc;
+  box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
+}
+td ul {
+  list-style:none;
+  padding-inline-start: 0px;
+}
+/* help-block is the bootstrap terminology, field-hint is deprecated */
+input:invalid ~ .help-block,
+select:invalid ~ .help-block,
+textarea:invalid ~ .help-block {
+  color: #f33 ;
+}
+input:focus:invalid ~ .help-block,
+select:focus:invalid ~ .help-block,
+textarea:focus:invalid ~ .help-block,
+input:focus:invalid ~ .field-hint,
+select:focus:invalid ~ .field-hint,
+textarea:focus:invalid ~ .field-hint {
+  color: #f33 ;
+  visibility: visible ;
+  line-height: 1.5em;
+}
+input:readonly,
+select:readonly,
+textarea:readonly {
+  background-color: #cbcbcb;
+}
+.inline-form textarea.form-control {
+  margin-left:5px;
+}
+label.required::after {
+  color: red;
+  content: '*';
+}
+/* problematic 'cos stage is applied as a class in contacts table */
+.lead {
+  font-size: inherit;
+}
+section {
+	clear: both;
+}
+/* This causes a problem with tables when tenant stages include 'active'
+not sure if anything requires it
+section .active {
+	display: inline;
+}*/
+section h2 {
+  border-bottom: solid 1px #da72ae;
+  color: #779c95;
+  padding-bottom: 5px;
+  padding-top: 10px;
+  padding-left: 20px;
+  padding-right: 20px;
+}
+@media (max-width: 767px) {
+	section:nth-of-type(1) h2 {
+    height: 85px;
+	}
+  section h2 div {
+    height: 40px;
+  }
+}
+@media (min-width: 768px) {
+  section:nth-of-type(1) h2 {
+    height: 45px;
+  }
+}
+section h2 .search {
+/*margin-bottom: 10px;*/
+  margin-right: 0;
+  border-bottom-right-radius: 0px;
+  border-top-right-radius: 0px;
+  border-color: #779c95;
+}
+@media (min-width: 992px) {
+  section h2 .search {
+    min-width: 15em;
+  }
+}
+section h2 .glyphicon,
+section h3 .glyphicon {
+  height: 34px;
+  margin: -6px 0px 2px 0px;
+}
+section h3 a.glyphicon {
+	margin-right: 2px;
+}
+section h2 .glyphicon-search,
+section h2 .kp-icon-search {
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 15px;
+  border-top-left-radius: 0;
+  border-top-right-radius: 15px;
+  font-size: 20px;
+  margin-left: 0px;
+  position: relative;
+  left: -7px;
+  top: 2px;
+}
+section h2 .entity {
+  border-bottom-right-radius: 0px !important;
+  border-top-right-radius: 0px !important;
+  border-color: #779c95;
+  padding-right: 0;
+  /*margin-bottom: 10px;*/
+  margin-right: -1px;
+  margin-top: -5px;
+  width: 110px;
+}
+section h2 .file {
+  border-radius: 0 !important;
+  border-color: #779c95;
+  /*margin-bottom: 10px;*/
+  margin-left: 0;
+  margin-right: 0;
+  margin-top: -5px;
+  width: 110px;
+}
+section .pasteZone {
+  background-color:#efefef;
+  border: #666 dashed 3px;
+  height:30em;
+}
+section .pasteZone .target {
+  position: relative;
+  top: 42%;
+  text-align: center;
+  padding: 1em;
+  border-radius: 5px;
+}
+section h3 {
+  border-bottom: solid 1px #da72ae;
+  padding-left: 20px;
+}
+.alert-counter {
+  border-radius: 1.75em;
+  padding: 0.13em 0.25em;
+  border-width: 1px;
+  border-style: solid;
+}
+.alert-hidden {
+	display:none;
+}
+.table>thead>tr>th, .table>tbody>tr>th, .table>tfoot>tr>th, .table>thead>tr>td, .table>tbody>tr>td, .table>tfoot>tr>td {
+  vertical-align: middle;
+}
+.table-striped>tbody>tr:nth-of-type(odd).overdue {
+	background-color: rgba(255,0,0,0.4);
+}
+.table-striped>tbody>tr:nth-of-type(even).overdue {
+  background-color: rgba(255,0,0,0.3);
+}
+.table-striped>tbody>tr:nth-of-type(odd).due {
+  background-color: rgba(255,100,0,0.4);
+}
+.table-striped>tbody>tr:nth-of-type(even).due {
+  background-color: rgba(255,100,0,0.3);
+}
+th {
+	font-weight: bold;
+}
+tfoot th {
+	font-style: italic;
+  font-weight: normal;
+  text-align: center;
+}
+.a-primary-label {
+  font-weight:bold;
+  text-decoration: underline;
+}
+
+.a-primary-data {
+}
+
+.a-secondary-label {
+  font-weight:bold;
+}
+
+.a-secondary-data {
+}
+
+.admin,
+.super-admin,
+.tenant,
+.user {
+  display: none;
+  font-size: 16px;
+}
+#ajax-loader, .ajax-loader {
+  display: inline;
+  position: fixed;
+  z-index: 1500;
+}
+#ajax-loader img.ajax-loader {
+  position: fixed;
+  left: 43%;
+  top: 44%;
+  z-index: 200;
+}
+#ajax-loader span {
+	font-size: 3.5em;
+  left: 39%;
+  position: fixed;
+  top: 45%;
+  z-index: 200;
+}
+.ajax-loader {
+  /*ALTERNATIVE animation: blinker 1s linear infinite;*/
+  animation-name: spin;
+  animation-duration: 4000ms;
+  animation-iteration-count: infinite;
+  animation-timing-function: linear;
+}
+
+@keyframes blinker {
+  50% { opacity: 0; }
+}
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  } to {
+    transform: rotate(360deg);
+  }
+}
+.beta {
+  border: solid 1px #da72ae;
+  color: #da72ae;
+  display:none;
+  font-family: sans-serif;
+  font-style: italic;
+  line-height: 1.1em;
+  padding: 0;
+  position: absolute;
+  left: 10px;
+  text-align: center;
+  top: 10px;
+  width: 40px;
+}
+}
+.dropdown {
+  text-decoration: none !important;
+}
+.btn-toolbar .btn {
+  font-size: 3rem;
+}
+.btn-default, .btn-primary {
+  background-image: none;
+}
+.chosen-container {
+  left: -7px;
+}
+.col-actions {
+  line-height: 2.4em;
+  min-width: 105px !important;
+}
+.container-fluid {
+  padding-right: 35px;
+  padding-left: 35px;
+}
+.container-fluid .search {
+  bottom:2px;
+}
+.tenants.table td.col-actions {
+  line-height: 2.4em;
+}
+.col-scroll {
+  max-width: 200px;
+  overflow: scroll;
+  width: 200px;
+}
+.col-truncate {
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+ul.field-json,
+ul.json {
+  list-style: none;
+  left: -40px;
+  max-height: 200px;
+  overflow-y: auto;
+  position: relative;
+}
+ul.field-json ul.field-json {
+  max-height: 10000px; /* avoid nesting scroll bars */
+}
+ul.field-json li label,
+ul.json li label {
+  width: 30%;
+}
+
+.field-json .table {
+  margin-bottom: 0px;
+}
+.field-scalar {
+  display: inline-block;
+  max-height: 100px !important;
+  max-width: 850px;
+  min-height: 60px;
+  overflow: overlay;
+}
+.date, .time {
+  max-width: 170px;
+  min-width: 170px;
+}
+.field-age {
+	width:20%
+}
+.field-author, .field-favorite {
+  width:3em;
+}
+.confidential,
+.unfavorite {
+	display:none;
+}
+.field-text {
+	width:80%;
+}
+.form-control {
+  border-radius: 0;
+}
+.form-group {
+	clear: both;
+  margin-bottom: 0px;
+}
+input[type="checkbox"].form-control:focus {
+  -webkit-box-shadow: 0px 0px 0px 0px rgba(255,255,255,1);
+  -moz-box-shadow: 0px 0px 0px 0px rgba(255,255,255,1);
+  box-shadow: 0px 0px 0px 0px rgba(255,255,255,1);
+}
+.btn-group-social {
+	min-width:95px;
+}
+.btn-group .glyphicon {
+  margin: 0px;
+  min-height: 36px;
+}
+.btn-group .glyphicon:nth-child(1) {
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
+.btn-group .glyphicon:nth-child(2) {
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+  left: -4px;
+  top: 2px;
+}
+.glyphicon.disabled,
+.glyphicon.disabled:active,
+.glyphicon.disabled:hover,
+.glyphicon.disabled:visited {
+  color: #6f6f71;
+  background-color: #b7b7b7;
+}
+.glyphicon-btn,
+.icon-btn {
+  border: solid 1px;
+}
+.txt-btn {
+  font-family: Ubuntu, sans-serif;
+  padding: 6px;
+}
+.glyphicon-sm,
+.icon-sm {
+  padding: 2px;
+  border-radius: 2px;
+  color: #779c95;
+  text-align: center;
+}
+.glyphicon,
+.icon {
+  font-size: 20px;
+  padding: 6px;
+  margin: 2px 1px;
+  border-radius: 5px;
+  color: #779c95;
+  min-width: 36px;
+  text-align: center;
+}
+
+/* Weird edge case */
+#orderSect h3 .kp-icon-new-tab {
+  padding-top: 5px;
+  padding-bottom: 3px;
+}
+/* Weird edge case */
+#currentContactForm .table .kp-icon-remove,
+#currentOrderForm .table .kp-icon-remove {
+  padding: 6px;
+}
+.alert-success {
+  color: #3c763d;
+  background-color: #dff0d8;
+  border-color: #d6e9c6;
+}
+a.glyphicon,
+a.glyphicon:visited,
+h2 a.glyphicon,
+h2 a.glyphicon:visited {
+  color: #939598;
+  text-decoration: none;
+}
+.input-group-addon .glyphicon {
+  font-size: 16px;
+  border: none;
+  padding: 0px;
+  margin: 0px;
+  border-radius: 0px !important;
+}
+.clickable:focus,
+.clickable:hover,
+a.glyphicon:focus,
+a.glyphicon:hover,
+h2 a.glyphicon:focus,
+h2 a.glyphicon:hover {
+  color: #da72ae;
+  /*color: #646669;*/
+}
+.sort-asc,
+.sort-desc {
+  border: none;
+  font-size: .7em;
+  font-family: 'knowprocess';
+}
+
+.help-block {
+  clear: both;
+  font-size: 0.65em;
+  font-style: italic;
+  line-height: 1em;
+  margin-top: 2px;
+  padding-left: 5px;
+}
+.modal .help-block {
+  margin-top: -0.1em;
+}
+.help-block-lg {
+  line-height: 1.2em;
+  font-size: 0.8em;
+}
+.navbar-brand {
+	padding: 0;
+  position: relative;
+  top: -24px;
+}
+.navbar-brand + span {
+  position: relative;
+  top: -3px;
+}
+.navbar-brand img,
+.brand-logo {
+  max-height: 80px;
+  min-height: 55px;
+}
+.brand-logo {
+  max-width: 160px;
+}
+.navbar-top {
+	 background-color:white;
+	 z-index:200;
+	 position:relative;
+	 margin-top: 0;
+   padding-top: 23px;
+}
+@media print {
+	.container-sticky {
+	  display: none;
+	}
+  .screen {
+    display: none;
+  }
+}
+@media screen {
+	.container-sticky {
+    background: white;
+    padding-left:0;
+	  padding-right: 30px;
+	  position: fixed;
+	  top: 0;
+	  z-index: 100;
+	}
+	.navbar-sticky {
+	  background-color: white;
+	  margin-top:0;
+	  padding-left: 0;
+	  position: relative;
+	  left: auto;
+	  right: auto;
+	  z-index:100;
+	}
+	.navbar-sticky h2 {
+	  margin-top:0;
+	}
+	.navbar-sticky .profile-img img {
+      margin-top: -6px;
+	}
+	.navbar-sticky .profile.pull-right {
+	  position: absolute;
+	  right: 0%;
+	  top: 7px;
+	}
+    .navbar-sticky .tenant {
+      display:none !important;
+	}
+	.print {
+    display: none;
+  }
+}
+.criteria,
+.search {
+  display:inline;
+  position:relative;
+  bottom:3px;
+  width:25%; /* This is a problem for data explorer, consider .inline-form instead */
+}
+.search {
+	 border-radius:15px;
+}
+@media (min-width: 480px) {
+	.search {
+	  width:30%;
+	}
+}
+@media (min-width: 768px) {
+  .search {
+    width:40%;
+  }
+}
+/* END BOOTSTRAP OVERRIDES */
+
+/* ACTIVE TABLE */
+
+.active-table input:disabled {
+  box-shadow: none;
+  border: none;
+  background-color: inherit;
+}
+.active-table td.actions {
+  min-width: 106px;
+}
+.active-table td.editing>input {
+  padding: 3px;
+  margin: 0;
+}
+.editing[contenteditable='true']:focus {
+  border-color: #66afe9;
+  outline: 0;
+  -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.075),0 0 8px rgba(102,175,233,.6);
+  box-shadow: inset 0 1px 1px rgba(0,0,0,.075),0 0 8px rgba(102,175,233,.6);
+}
+.editing[contenteditable='true'] {
+    border: 1px solid #ccc;
+    -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
+    box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
+    -webkit-transition: border-color ease-in-out .15s,-webkit-box-shadow ease-in-out .15s;
+    -o-transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;
+    transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;
+}
+.editing.glyphicon {
+  border-style: inset;
+  background-color: rgba(0,82,132,.5);
+}
+
+/* END ACTIVE TABLE */
+
+/* TOOLBAR */
+@media screen {
+	.toolbar {
+	  background-color: #eee;
+	  color: #da72ae;
+	  position: fixed;
+	}
+	.toolbar-left {
+	  border-bottom-style: none;
+	  border-right-style: double;
+	  border-top-style: none;
+	  bottom: 0;
+	  display:none;
+	  left: 0px;
+	  top: 0;
+	  width: 50px;
+	  z-index: 300;
+	}
+	.toolbar-left>ul>.page,
+	.toolbar-left .submenu {
+      position: relative;
+      top: 20px;
+	}
+    .toolbar-left .submenu ul {
+      background-color: #eee;
+      border-right-style: double;
+      display: none;
+      margin-left: 40px;
+    }
+    .toolbar-left .submenu ul li {
+      display: inherit;
+    }
+    .toolbar-left .submenu ul li:nth-child(1) {
+      border-top: 1px solid;
+    }
+	.toolbar-left .powered-by-icon img {
+	  position: fixed;
+	  bottom: 10px;
+	  width: 40px;
+	}
+	.toolbar li.admin-bar span {
+	  /*color: red;*/
+	}
+	.toolbar li {
+	  list-style: none;
+	  margin-left: -36px;
+	}
+	.toolbar li span.glyphicon:hover,
+	.toolbar li span.glyphicon:active,
+	.toolbar li span.glyphicon.active {
+	  color: #fcf8e3;
+	  background-color: #da72ae;
+	}
+	.toolbar li span:not(.active) {
+	  border: 0px;
+	}
+	.toolbar-left li span:not(.active):not(:active):not(:hover) {
+	  border-bottom: solid 1px #da72ae;
+	  border-bottom-right-radius: 0;
+	  border-bottom-left-radius: 0;
+	}
+	.toolbar li:last-child span {
+	  border-bottom: 0;
+	}
+
+	.toolbar-top {
+	  border-bottom-right-radius: 5px;
+	  border-bottom-left-radius: 5px;
+	  border-bottom-style: double;
+	  border-right-style: double;
+	  border-left-style: double;
+	  left: 20%;
+	  top: 0%;
+	  width: 750px;
+	  padding-left: 20px;
+	  right: 20%;
+	}
+
+	.toolbar-top ul>li {
+	  float: left;
+	  position: relative;
+	  display: block;
+	}
+	.toolbar-top ul>li>a {
+		border-radius: 4px;
+	  position: relative;
+	  display: block;
+	  padding: 5px 7px;
+	}
+	.toolbar-top ul>li+li {
+	  margin-left: 2px;
+	}
+	.toolbar-top .glyphicon {
+		padding: 10px
+	}
+
+	.menu-burger {
+	  /*border-bottom-style: double;
+	  border-right-style: double;*/
+		left: 0px;
+		position: fixed;
+		top: 0px;
+		z-index: 300;
+	}
+}
+/* END TOOLBAR */
+
+/* SUPPORT BAR */
+@media screen {
+	.support-bar {
+		background-color: #da72ae;
+	  border-bottom-left-radius: 1em;
+		border-top-left-radius: 1em;
+	  height: 3.5em;
+		position: fixed;
+	  right: 0;
+	  top: 49%;
+		width: 3.5em;
+	}
+	.support-bar .glyphicon {
+	  border:none;
+	  color: #9ebfb9; /* pale blue */ /* b7b7b7 grey*/
+	  font-size: 2.5em;
+	  padding-top: .1em;
+	}
+}
+/* END SUPPORT BAR */
+
+.clickable:active,
+.clickable:focus,
+.clickable:hover {
+	cursor: pointer;
+}
+.currentBody {
+	margin-top: 10px;
+}
+.filter.dropdown-menu li:nth-child(1) {
+  margin-top: 10px;
+}
+.dropdown.dropdown-menu li {
+	height: 25px;
+	padding-left: 10px;
+  text-transform: none;
+}
+.dropdown.dropdown-menu li.selected::after {
+  float: right;
+  margin-right: 10px;
+}
+.dropdown.dropdown-menu li.divider {
+  background-color: #da72ae;
+  height: 1px;
+  margin: 0 10px 10px 10px;
+}
+#customActionBtn {
+	top: 1px;
+}
+#customActionMenu.omny-dropdown {
+	left: -100px;
+}
+.create-form {
+  height: 2.2em;
+}
+.edit-form {
+	/*height: 1.8em;*/
+}
+#filterMenu.omny-dropdown {
+  width: 200px;
+}
+.form {
+	display: block;
+	list-style: none;
+  /*padding-top: 20px;
+  margin-bottom: -30px;*/
+}
+.form,
+#loginForm,
+#messages {
+  line-height: 2.5em;
+}
+
+form#uploadForm {
+  margin: 0 auto;
+  text-align: center;
+}
+
+.dropZone {
+  border: 5px solid blue;
+  width:  200px;
+  height: 100px;
+}
+
+/* TAG IT overrides */
+
+/* omny styling */
+ul.tagit {
+	margin-bottom: 10px;
+}
+
+/* tagit.ui-zendesk.css: Optional scoped theme for tag-it which mimics the zendesk widget. */
+ul.tagit {
+  border-style: solid;
+  border-width: 1px;
+  border-color: #C6C6C6;
+  background: inherit;
+  min-height: 5em;
+}
+ul.tagit li.tagit-choice {
+  -moz-border-radius: 6px;
+  border-radius: 6px;
+  -webkit-border-radius: 6px;
+  border: 1px solid #CAD8F3;
+
+  background: none;
+  background-color: #d9edf7;
+
+  font-weight: normal;
+}
+ul.tagit li.tagit-choice .tagit-label:not(a) {
+    color: #555;
+}
+ul.tagit li.tagit-choice a.tagit-close {
+    text-decoration: none;
+}
+ul.tagit li.tagit-choice .tagit-close {
+    right: .4em;
+}
+ul.tagit li.tagit-choice .ui-icon {
+    display: none;
+}
+ul.tagit li.tagit-choice .tagit-close .text-icon {
+    display: inline;
+    font-family: arial, sans-serif;
+    font-size: 16px;
+    line-height: 16px;
+    color: #777;
+}
+ul.tagit li.tagit-choice:hover, ul.tagit li.tagit-choice.remove {
+    background-color: #d9edf7;
+    border-color: #6d95e0;
+}
+ul.tagit li.tagit-choice a.tagLabel:hover,
+ul.tagit li.tagit-choice a.tagit-close .text-icon:hover {
+    color: #222;
+}
+ul.tagit input[type="text"] {
+    color: #333333;
+    background: none;
+}
+.ui-widget {
+    font-size: 1.1em;
+}
+
+/* Forked from a jQuery UI theme, so that we don't require the jQuery UI CSS as a dependency. */
+.tagit-autocomplete.ui-autocomplete { position: absolute; cursor: default; }
+* html .tagit-autocomplete.ui-autocomplete { width:1px; } /* without this, the menu expands to 100% in IE6 */
+.tagit-autocomplete.ui-menu {
+    list-style:none;
+    padding: 2px;
+    margin: 0;
+    display:block;
+    float: left;
+}
+.tagit-autocomplete.ui-menu .ui-menu {
+    margin-top: -3px;
+}
+.tagit-autocomplete.ui-menu .ui-menu-item {
+    margin:0;
+    padding: 0;
+    zoom: 1;
+    float: left;
+    clear: left;
+    width: 100%;
+}
+.tagit-autocomplete.ui-menu .ui-menu-item a {
+    text-decoration:none;
+    display:block;
+    padding:.2em .4em;
+    line-height:1.5;
+    zoom:1;
+}
+.tagit-autocomplete .ui-menu .ui-menu-item a.ui-state-hover,
+.tagit-autocomplete .ui-menu .ui-menu-item a.ui-state-active {
+    font-weight: normal;
+    margin: -1px;
+}
+.tagit-autocomplete.ui-widget-content { border: 1px solid #aaaaaa; background: #ffffff 50% 50% repeat-x; color: #222222; }
+.tagit-autocomplete.ui-corner-all, .tagit-autocomplete .ui-corner-all { -moz-border-radius: 4px; -webkit-border-radius: 4px; -khtml-border-radius: 4px; border-radius: 4px; }
+.tagit-autocomplete .ui-state-hover, .tagit-autocomplete .ui-state-focus { border: 1px solid #999999; background: #dadada; font-weight: normal; color: #212121; }
+.tagit-autocomplete .ui-state-active  { border: 1px solid #aaaaaa; }
+
+.tagit-autocomplete .ui-widget-content { border: 1px solid #aaaaaa; }
+.tagit .ui-helper-hidden-accessible { position: absolute !important; clip: rect(1px,1px,1px,1px); }
+
+/* END tagit.ui-zendesk.css */
+
+.form ul.tagit li.tagit-choice {
+  line-height: 1.5em;
+}
+.form .tagit-label {
+	margin-left:5px;
+}
+.form ul.tagit li {
+  margin: 2px 0px 2px 5px;
+}
+.form .ui-widget {
+  font-size: 1em;
+}
+.form .tagit-new {
+  margin-bottom: 0px;
+  margin-left:5px;
+	margin-top: 0px;
+  padding-bottom: 0px;
+  padding-top: 0px;
+}
+/* END TAG IT overrides */
+form#upload {
+	min-width: 263px;
+}
+.form li {
+	/*margin: 5px 0 5px;*/
+}
+.form label, .form input {
+  display:inline-block;
+  /*top: -25px*/
+}
+.form-inline label,
+.form label {
+  line-height: 2.5em;
+  margin-right: 5px;
+  padding: 0 0 0 0;
+  text-align: right;
+}
+.form .col-md-6 label {
+  margin-bottom: 0px;
+}
+.form label.textarea {
+  vertical-align: top;
+  line-height: 1.2em;
+}
+.form .col-md-6 label.textarea {
+  /*width: 17%;*/
+}
+.form label.checkbox,
+.form label.radio {
+	width:10%;
+}
+.form input,
+.form select,
+.form textarea {
+	width: 60%;
+}
+@media (min-width: 920px) {
+	.form .col-md-12 textarea {
+	  width: 80%;
+	}
+}
+.form input[type='checkbox'],
+.form input[type='radio'] {
+  position:relative;
+  margin-left: 10px;
+  width: 20px;
+}
+.form input.year {
+	width:80px;
+}
+h2.form.create-form {
+	color:white;
+	padding-bottom: 8px;
+}
+.form input.create-field {
+  border-width: 1px;
+  margin: 5px;
+}
+.form input#curTitle {
+	border-radius: 0;
+  line-height: normal;
+  width: 70px;
+}
+.form input#curFirstName,
+.form input#curLastName {
+  line-height: normal;
+	width: 40%;
+}
+.form input.edit-field {
+  border-width: 1px;
+}
+.form .typeahead {
+/*	position: relative;
+	left: -5px;*/
+}
+.form .tagit {
+  width: 60%;
+}
+
+.form .tagit input {
+	font-size: 0.85em;
+}
+ul.form,
+.form ul {
+	padding-left: 0px;
+}
+h4 a.kp-icon-remove {
+  position: relative;
+  top: -12px;
+}
+.powered-by {
+  display:none;
+  float: left;
+  left: -1px;
+  opacity: 0.5;
+  position: absolute;
+  top: 290px;
+  transform: rotate(-90deg);
+  transform-origin: left top 0;
+}
+.powered-by h1 {
+  margin:0px;
+}
+.powered-by-text {
+	color:#6f6f71;
+	font-size:14px;
+	font-style:italic;
+}
+.profile {
+	font-style: italic;
+	position: relative;
+	z-index: 250;
+}
+
+.profile .tenant {
+  display:inline;
+}
+.profile select.tenant {
+  border-color: #6f6f71;
+  color: #6f6f71;
+  height: 34px;
+  border-radius: 5px;
+  top: -2px;
+  position: relative;
+}
+.profile-img img {
+  margin-top: -8px;
+  width: 34px;
+}
+.wizard {
+	clear: both;
+	margin-top: 50px;
+}
+.wizard-step li a {
+	border-radius: 40px;
+  border: #9ebfb9 solid 1px;
+  padding: 5px 15px;
+  margin-right: 50px;
+}
+@media only screen {
+	#connectivityMessages {
+	  position: fixed;
+	  top: 5px;
+	  margin-left: 35%;
+	  margin-right: 35%;
+	  text-align: center;
+	  width: 30%;
+	  z-index: 500;
+	}
+	#messages,
+	.messages {
+		line-height: 2em;
+		padding: 0 10px 0 10px;
+	}
+	#messages {
+	  position: fixed;
+	  top: 45px;
+	  margin-left: 25%;
+	  margin-right: 25%;
+	  width: 50%;
+	  z-index: 500;
+	}
+	#messages.text-danger {
+	  font-style: italic;
+	}
+}
+/* MODALS */
+
+.modal-dialog {
+	width: 80%;
+	height: 80%;
+}
+
+.modal-dialog .helpContent {
+  border: solid 1px;
+  width: 100%;
+}
+
+.modal-header h4 {
+	border-bottom: none;
+}
+
+/* SVG DIAGRAMS */
+
+div.bpmnDiagram {
+  border: 1px solid #ccc;
+  overflow: auto;
+  resize: both;
+}
+
+div.bpmnProperties {
+  background: #efefef;
+  border-radius: 10px;
+  left: 20%;
+  padding: 10px;
+  position: fixed;
+  right: 20%;
+  bottom: 20px;
+}
+
+path.association,
+path.flow,
+rect.dataStoreReference {
+  fill: transparent;
+}
+
+rect.lane:nth-of-type(even) {
+  fill: #fff;
+}
+rect.lane:nth-of-type(odd) {
+	fill: #f9f9f9;
+}
+rect.participant {
+  fill: #b7b7b7;
+}
+
+text {
+  stroke-width: 0px;
+}
+text.endEvent,
+text.intermediateCatchEvent,
+text.intermediateThrowEvent,
+text.startEvent {
+  stroke-width: 0px;
+}
+
+text.callActivity,
+text.businessRuleTask,
+text.manualTask,
+text.receiveTask,
+text.scriptTask,
+text.sendTask,
+text.serviceTask,
+text.task,
+text.userTask {
+  stroke-width: 0px;
+}
+text.textAnnotation {
+	fill: #666;
+  font-size: 75%;
+  stroke-width: 0px;
+}
+
+#funnel g:nth-of-type(even) text {
+  fill: #6f6f71;
+}
+
+#funnel g:nth-of-type(odd) text {
+  fill: #f9f9f9;
+}
+
+#propertySectMin {
+  background-color: #fcf8e3;
+  border: #da72ae double 3px;
+  bottom: 0;
+  display: none;
+  position: fixed;
+  right:5%;
+}
+#propertySectMin .glyphicon {
+	border:none;
+}
+
+#propertySect {
+	background-color: #fcf8e3;
+	border: #da72ae double 3px;
+  display:'inline';
+  padding: 20px;
+  position: fixed;
+  z-index:'100';
+  bottom: 0;
+  left: auto;
+  right: auto;
+  height: 150px;
+  width: 90%;
+}
+#propertySect .close {
+  top: -20px;
+  right: -20px;
+  border: none;
+}
+
+.selected {
+  stroke: #da72ae;
+  stroke-width: 3px;
+}
+
+/* END SVG DIAGRAMS */
+
+/* COMPANIES HOUSE */
+
+#fhTable th:nth-child(1) {
+  width: 100px;
+}
+#fhTable th:nth-child(4) {
+  width: 150px;
+}
+
+/* ANALYTICS */
+
+#funnelResultSect {
+	font-size: 1.2em;
+}
+#funnelResultLegend2 {
+  position:relative;
+  left:30px;
+}
+.funnel-legend {
+	position: absolute;
+	left: 100px;
+}
+.funnel-legend#stage1 {
+  top: 190px;
+}
+.funnel-legend#stage2 {
+  top: 310px;
+}
+.funnel-legend#stage3 {
+  top: 430px;
+}
+.funnel-legend#stage4 {
+  top: 550px;
+}
+.funnel-legend#stage5 {
+  top: 670px;
+}
+/* END ANALYTICS */
+
+/* CKEDITOR OVERRIDES */
+
+.cke_top,
+.cke_bottom {
+  background-color: #ccc !important;
+  background-image: none !important;
+}
+
+/* PRINT */
+@media print {
+  .beta,
+  .toolbar,
+  .profile {
+    display:none;
+  }
+}
+

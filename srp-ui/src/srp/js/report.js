@@ -591,8 +591,8 @@ var ractive = new BaseRactive({
       else return 'hidden';
     },
     stdPartials: [
-      { "name": "sidebar", "url": $env.server+"/partials/sidebar.html"},
-      { "name": "toolbar", "url": $env.server+"/partials/toolbar.html"},
+      { "name": "sidebar", "url": "partials/sidebar.html"},
+      { "name": "toolbar", "url": "partials/toolbar.html"},
       { "name": "statusSect", "url": "/srp/vsn/partials/status-sect.html"}
     ],
   },
@@ -1197,7 +1197,7 @@ var ractive = new BaseRactive({
 });
 
 $(document).ready(function() {
-  $('head').append('<link href="'+ractive.getServer()+'/css/sdu-1.0.0.css" rel="stylesheet">');
+  $('head').append('<link href="/sdu/css/sdu-1.0.0.css" rel="stylesheet">');
   $('.menu-burger, .toolbar').addClass('no-print');
 
   if (Object.keys(getSearchParameters()).indexOf('error')!=-1) {

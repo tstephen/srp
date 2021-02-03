@@ -122,8 +122,8 @@ var ractive = new BaseRactive({
     stdPartials: [
       { "name": "navbar", "url": "./vsn/partials/organisation-type-navbar.html"},
       { "name": "profileArea", "url": $env.server+"/partials/profile-area.html"},
-      { "name": "sidebar", "url": $env.server+"/partials/sidebar.html"},
-      { "name": "toolbar", "url": $env.server+"/partials/toolbar.html"},
+      { "name": "sidebar", "url": "partials/sidebar.html"},
+      { "name": "toolbar", "url": "partials/toolbar.html"},
       { "name": "titleArea", "url": $env.server+"/partials/title-area.html"},
       { "name": "organisationTypeListSect", "url": "./vsn/partials/organisation-type-list-sect.html"},
       { "name": "organisationTypeCurrentSect", "url": "./vsn/partials/organisation-type-current-sect.html"}

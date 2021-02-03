@@ -529,8 +529,8 @@ var $r = (function ($, ractive) {
   ractive.set('stdPartials', [
       { "name": "questionnaire", "url": "/questionnaire/partials/questionnaire.html"},
       { "name": "questionnaireContact", "url": "/questionnaire/partials/questionnaire-contact.html"},
-      { "name": "sidebar", "url": $env.server+"/partials/sidebar.html"},
-      { "name": "toolbar", "url": $env.server+"/partials/toolbar.html"}
+      { "name": "sidebar", "url": "partials/sidebar.html"},
+      { "name": "toolbar", "url": "partials/toolbar.html"}
     ])
   ractive.loadStandardPartials(ractive.get('stdPartials'));
 

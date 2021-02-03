@@ -9,7 +9,7 @@ var replace     = require('gulp-replace');
 var rsync       = require('gulp-rsync');
 var through2    = require('through2');
 var zip         = require('gulp-zip');
-var vsn         = '2.5.0-SNAPSHOT';
+var vsn         = '3.0.0-SNAPSHOT';
 
 var buildDir = 'target/classes';
 var finalName = 'srp-ui-'+vsn+'.jar'
@@ -24,7 +24,7 @@ gulp.task('clean', function(done) {
 });
 
 gulp.task('assets', function() {
-  gulp.src([ 'src/**/*.jpg', 'src/**/*.json', 'src/**/*.ico', 'src/**/*.png' ])
+  gulp.src([ 'src/**/*.jpg', 'src/**/*.json', 'src/**/*.ico', 'src/**/*.png', 'src/**/*.svg' ])
       .pipe(gulp.dest(buildDir+'/'));
   gulp.src([ 'src/sdat/**/*.png' ])
       .pipe(gulp.dest(buildDir+'/sdat'));
@@ -54,6 +54,11 @@ gulp.task('test', function() {
 });
 
 gulp.task('styles', function() {
+  gulp.src([
+    'src/sdu/css/**/*.css'
+  ])
+  .pipe(config.css.minify ? cleanCSS() : through2.obj())
+  .pipe(gulp.dest(buildDir+'/sdu/css'));
   return gulp.src([
     'src/srp/css/**/*.css'
   ])
@@ -91,6 +96,10 @@ gulp.task('server', function(done) {
 });
 
 gulp.task('fix-paths', function() {
+  // SHARED
+  gulp.src([ 'src/partials/**/*.html' ])
+      .pipe(replace('/vsn/', '/'+vsn+'/'))
+      .pipe(gulp.dest(buildDir+'/partials/'));
   // FAQ
   gulp.src([
       'src/faq/public/*.html'

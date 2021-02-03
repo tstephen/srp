@@ -670,7 +670,7 @@ $(document).ready(function() {
   }
 
   // ajax loader
-  if ($('#ajax-loader').length==0) $('body').append('<div id="ajax-loader"><img class="ajax-loader" src="'+ractive.getServer()+'/images/ajax-loader.svg" alt="Loading..."/></div>');
+  if ($('#ajax-loader').length==0) $('body').append('<div id="ajax-loader"><img class="ajax-loader" src="/images/ajax-loader.svg" alt="Loading..."/></div>');
   $( document ).ajaxStart(function() {
     $( "#ajax-loader" ).show();
   });

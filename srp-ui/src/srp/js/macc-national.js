@@ -271,7 +271,7 @@ ractive.on( 'sort', function ( event, column ) {
 });
 
 $(document).ready(function() {
-  $('head').append('<link href="'+ractive.getServer()+'/css/sdu-1.0.0.css" rel="stylesheet">');
+  $('head').append('<link href="/sdu/css/sdu-1.0.0.css" rel="stylesheet">');
   $(window).bind('resize', function () {
     //console.log('resized to '+window.innerWidth);
     ractive.replaceGraph();

@@ -89,8 +89,8 @@ var ractive = new BaseRactive({
       
       { "name": "navbar", "url": "/srp/vsn/partials/answer-navbar.html"},
       { "name": "profileArea", "url": $env.server+"/partials/profile-area.html"},
-      { "name": "sidebar", "url": $env.server+"/partials/sidebar.html"},
-      { "name": "toolbar", "url": $env.server+"/partials/toolbar.html"},
+      { "name": "sidebar", "url": "partials/sidebar.html"},
+      { "name": "toolbar", "url": "partials/toolbar.html"},
       { "name": "titleArea", "url": $env.server+"/partials/title-area.html"},
       { "name": "answerCriteriaSect", "url": "/srp/vsn/partials/answer-criteria-sect.html"},
       { "name": "answerListSect", "url": "/srp/vsn/partials/answer-list-sect.html"}
@@ -258,7 +258,7 @@ var ractive = new BaseRactive({
 });
 
 $(document).ready(function() {
-  $('head').append('<link href="'+ractive.getServer()+'/css/sdu-1.0.0.css" rel="stylesheet">');
+  $('head').append('<link href="/sdu/css/sdu-1.0.0.css" rel="stylesheet">');
 
   if (Object.keys(getSearchParameters()).indexOf('error')!=-1) {
     ractive.showError('The username and password provided do not match a valid account');
