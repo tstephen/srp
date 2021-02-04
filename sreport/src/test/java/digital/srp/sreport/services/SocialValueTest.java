@@ -1,3 +1,18 @@
+/*******************************************************************************
+ * Copyright 2014-2021 Tim Stephenson and contributors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License.  You may obtain a copy
+ * of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ ******************************************************************************/
 package digital.srp.sreport.services;
 
 
@@ -20,21 +35,21 @@ import digital.srp.sreport.model.WeightingFactor;
 public class SocialValueTest {
 
     private static final String PERIOD = "2017-18";
-    
+
     private static final String SV_GROWTH = "1000";
     private static final String SV_ENVIRONMENT = "2000";
     private static final String SV_INNOVATION = "3000";
     private static final String SV_JOBS = "4000";
     private static final String SV_SOCIAL = "5000";
     private static final String SV_TOTAL = "15,000";
-    
+
     private static final String SI_GROWTH = "1001";
     private static final String SI_ENVIRONMENT = "2002";
     private static final String SI_INNOVATION = "3003";
     private static final String SI_JOBS = "4004";
     private static final String SI_SOCIAL = "5005";
-    private static final String SI_TOTAL = "15,000";    
-    
+    private static final String SI_TOTAL = "15,000";
+
     private static Cruncher svc;
 
     private static List<CarbonFactor> cfactors;
@@ -84,6 +99,6 @@ public class SocialValueTest {
         assertEquals(SI_INNOVATION, rtn.answer(PERIOD, Q.SI_INNOVATION).get().response());
         assertEquals(SI_JOBS, rtn.answer(PERIOD, Q.SI_JOBS).get().response());
         assertEquals(SI_SOCIAL, rtn.answer(PERIOD, Q.SI_SOCIAL).get().response());
-        assertEquals(SI_TOTAL, rtn.answer(PERIOD, Q.SI_TOTAL).get().response3sf());        
+        assertEquals(SI_TOTAL, rtn.answer(PERIOD, Q.SI_TOTAL).get().response3sf());
     }
 }

@@ -1,3 +1,18 @@
+/*******************************************************************************
+ * Copyright 2014-2021 Tim Stephenson and contributors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License.  You may obtain a copy
+ * of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ ******************************************************************************/
 package digital.srp.sreport.services;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -53,10 +68,10 @@ public class RoadEmissionsServiceTest {
     @Test
     public void testCalcByDiesel() {
         BigDecimal dieselUsed = new BigDecimal("1000.00");
-        Optional<BigDecimal> emissions = svc.calculate(dieselFactor, 
+        Optional<BigDecimal> emissions = svc.calculate(dieselFactor,
                 Optional.of(dieselUsed), carMileageFactor,
                 Optional.empty());
-        Optional<BigDecimal> wttEmissions = svc.calculate(dieselWttFactor, 
+        Optional<BigDecimal> wttEmissions = svc.calculate(dieselWttFactor,
                 Optional.of(dieselUsed), carMileageWttFactor,
                 Optional.empty());
         assertEquals(new BigDecimal("3.16"), emissions.get().add(wttEmissions.get()));
@@ -65,10 +80,10 @@ public class RoadEmissionsServiceTest {
     @Test
     public void testCalcByDieselMileage() {
         BigDecimal dieselMileage = new BigDecimal("6000.00");
-        Optional<BigDecimal> emissions = svc.calculate(dieselFactor, 
+        Optional<BigDecimal> emissions = svc.calculate(dieselFactor,
                 Optional.empty(), carMileageFactor,
                 Optional.of(dieselMileage));
-        Optional<BigDecimal> wttEmissions = svc.calculate(dieselWttFactor, 
+        Optional<BigDecimal> wttEmissions = svc.calculate(dieselWttFactor,
                 Optional.empty(), carMileageWttFactor,
                 Optional.of(dieselMileage));
         assertEquals(new BigDecimal("2.09"), emissions.get().add(wttEmissions.get()));
@@ -77,10 +92,10 @@ public class RoadEmissionsServiceTest {
     @Test
     public void testCalcByPetrol() {
         BigDecimal petrolUsed = new BigDecimal("1000.00");
-        Optional<BigDecimal> emissions = svc.calculate(petrolFactor, 
+        Optional<BigDecimal> emissions = svc.calculate(petrolFactor,
                 Optional.of(petrolUsed), carMileageFactor,
                 Optional.empty());
-        Optional<BigDecimal> wttEmissions = svc.calculate(petrolWttFactor, 
+        Optional<BigDecimal> wttEmissions = svc.calculate(petrolWttFactor,
                 Optional.of(petrolUsed), carMileageWttFactor,
                 Optional.empty());
         assertEquals(new BigDecimal("2.76"), emissions.get().add(wttEmissions.get()));
@@ -89,10 +104,10 @@ public class RoadEmissionsServiceTest {
     @Test
     public void testCalcByPetrolMileage() {
         BigDecimal petrolMileage = new BigDecimal("6000.00");
-        Optional<BigDecimal> emissions = svc.calculate(petrolFactor, 
+        Optional<BigDecimal> emissions = svc.calculate(petrolFactor,
                 Optional.empty(), carMileageFactor,
                 Optional.of(petrolMileage));
-        Optional<BigDecimal> wttEmissions = svc.calculate(petrolFactor, 
+        Optional<BigDecimal> wttEmissions = svc.calculate(petrolFactor,
                 Optional.empty(), carMileageWttFactor,
                 Optional.of(petrolMileage));
         assertEquals(new BigDecimal("2.09"), emissions.get().add(wttEmissions.get()));

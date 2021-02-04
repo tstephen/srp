@@ -1,18 +1,18 @@
 /*******************************************************************************
- * Copyright 2015, 2017 Tim Stephenson and contributors
+ * Copyright 2014-2021 Tim Stephenson and contributors
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License.  You may obtain a copy
+ * of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *    http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *******************************************************************************/
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ ******************************************************************************/
 package digital.srp.macc.web;
 
 import java.io.IOException;
@@ -50,7 +50,7 @@ import digital.srp.macc.views.InterventionTypeViews;
 
 /**
  * REST endpoint for accessing {@link InterventionType}
- * 
+ *
  * @author Tim Stephenson
  */
 @Controller
@@ -68,10 +68,10 @@ public class InterventionTypeController {
 
     /**
      * Imports JSON representation of interventions.
-     * 
+     *
      * <p>
      * This is a handy link: http://shancarter.github.io/mr-data-converter/
-     * 
+     *
      * @param file
      *            A file posted in a multi-part request
      * @return The meta data of the added model
@@ -133,7 +133,7 @@ public class InterventionTypeController {
 
     /**
      * Return just the interventions for a specific tenant.
-     * 
+     *
      * @return interventions for that tenant.
      */
     @RequestMapping(value = "/", method = RequestMethod.GET, produces = "application/json")
@@ -175,7 +175,7 @@ public class InterventionTypeController {
 
     /**
      * Export all interventionTypes for the tenant.
-     * 
+     *
      * @return interventionTypes for that tenant.
      */
     @JsonView(InterventionTypeViews.Detailed.class)
@@ -201,7 +201,7 @@ public class InterventionTypeController {
 
     /**
      * Return just the matching interventions for a specific tenant.
-     * 
+     *
      * @param tenantId
      * @status Comma separated list of status to include.
      * @return interventions for that tenant.

@@ -1,3 +1,18 @@
+/*******************************************************************************
+ * Copyright 2014-2021 Tim Stephenson and contributors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License.  You may obtain a copy
+ * of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ ******************************************************************************/
 package digital.srp.sreport.web;
 
 import java.io.IOException;
@@ -43,7 +58,7 @@ import digital.srp.sreport.services.QuestionService;
 
 /**
  * REST web service for accessing questions.
- * 
+ *
  * @author Tim Stephenson
  */
 @Controller
@@ -53,9 +68,9 @@ public class QuestionController {
     private static final Logger LOGGER = LoggerFactory
             .getLogger(QuestionController.class);
 
-    @Autowired 
+    @Autowired
     protected ObjectMapper objectMapper;
-    
+
     @Autowired
     protected QuestionRepository questionRepo;
 
@@ -92,7 +107,7 @@ public class QuestionController {
         headers.setLocation(location);
         return new ResponseEntity<Object>(headers, HttpStatus.CREATED);
     }
-    
+
     /**
      * @return The specified question.
      */
@@ -125,12 +140,12 @@ public class QuestionController {
 
         Question question = questionRepo.findByName(name);
         // use logger for force child load
-        LOGGER.info(String.format("Found question with id %1$d named %2$s", 
+        LOGGER.info(String.format("Found question with id %1$d named %2$s",
                 question.id(), question.name()));
 
         return question;
     }
-    
+
     /**
      * @return a list of questions, optionally paged.
      */

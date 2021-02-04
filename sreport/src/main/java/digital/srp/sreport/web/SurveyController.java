@@ -1,3 +1,18 @@
+/*******************************************************************************
+ * Copyright 2014-2021 Tim Stephenson and contributors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License.  You may obtain a copy
+ * of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ ******************************************************************************/
 package digital.srp.sreport.web;
 
 import java.util.Collections;
@@ -43,7 +58,7 @@ import digital.srp.sreport.services.SurveyService;
 
 /**
  * REST web service for accessing surveys.
- * 
+ *
  * @author Tim Stephenson
  */
 @Controller
@@ -53,18 +68,18 @@ public class SurveyController {
     private static final Logger LOGGER = LoggerFactory
             .getLogger(SurveyController.class);
 
-    @Autowired 
+    @Autowired
     protected ObjectMapper objectMapper;
-    
+
     @Autowired
     protected SurveyRepository surveyRepo;
 
     @Autowired
     protected SurveyCategoryRepository catRepo;
-    
+
     @Autowired
     protected QuestionRepository questionRepo;
-    
+
     @Autowired
     protected SurveyReturnRepository returnRepo;
 
@@ -107,7 +122,7 @@ public class SurveyController {
 
         Survey survey = surveyRepo.findByName(name);
         // use logger for force child load
-        LOGGER.info(String.format("Found survey with id %1$d named %2$s and with %3$d categories totalling %4$d questions", 
+        LOGGER.info(String.format("Found survey with id %1$d named %2$s and with %3$d categories totalling %4$d questions",
                 survey.id(), survey.name(), survey.categories().size(),
                 survey.questionCodes().size()));
 
@@ -118,10 +133,10 @@ public class SurveyController {
                 cat.questions().add(questionRepo.findByName(q.name()));
             }
         }
-        
+
         return survey;
     }
-    
+
     /**
      * @return list of surveys, optionally paged.
      */
@@ -145,7 +160,7 @@ public class SurveyController {
 
         return list;
     }
-    
+
     /**
      * @return a list of survey returns, optionally paged.
      */

@@ -1,3 +1,18 @@
+/*******************************************************************************
+ * Copyright 2014-2021 Tim Stephenson and contributors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License.  You may obtain a copy
+ * of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ ******************************************************************************/
 package digital.srp.sreport.web;
 
 import java.io.IOException;
@@ -42,7 +57,7 @@ import digital.srp.sreport.repositories.WeightingFactorRepository;
 
 /**
  * REST web service for accessing carbon factors.
- * 
+ *
  * @author Tim Stephenson
  */
 @Controller
@@ -52,9 +67,9 @@ public class WeightingFactorController {
     private static final Logger LOGGER = LoggerFactory
             .getLogger(WeightingFactorController.class);
 
-    @Autowired 
+    @Autowired
     protected ObjectMapper objectMapper;
-    
+
     @Autowired
     protected  WeightingFactorRepository wfactorRepo;
 
@@ -62,7 +77,7 @@ public class WeightingFactorController {
     protected void init() throws IOException {
         List<WeightingFactor> existingFactors = wfactorRepo.findAll();
         List<WeightingFactor> factors = new WeightingFactorCsvImporter().readWeightingFactors();
-        
+
         for (WeightingFactor factor : factors) {
             if (existingFactors.contains(factor)) {
                 LOGGER.info(String.format(
@@ -74,7 +89,7 @@ public class WeightingFactorController {
             }
         }
     }
-    
+
     /**
      * @return The specified weighting factor.
      */
@@ -107,7 +122,7 @@ public class WeightingFactorController {
 
         return factor;
     }
-    
+
     /**
      * @return List if weighting factors, optionally paged.
      */
@@ -129,7 +144,7 @@ public class WeightingFactorController {
 
         return list;
     }
-    
+
     /**
      * @return The newly-created weighting factor.
      */

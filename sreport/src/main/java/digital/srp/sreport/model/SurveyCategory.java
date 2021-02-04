@@ -1,3 +1,18 @@
+/*******************************************************************************
+ * Copyright 2014-2021 Tim Stephenson and contributors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License.  You may obtain a copy
+ * of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ ******************************************************************************/
 package digital.srp.sreport.model;
 
 import java.util.ArrayList;
@@ -37,7 +52,7 @@ import lombok.experimental.Accessors;
 
 /**
  * Container for survey questions.
- * 
+ *
  * @author Tim Stephenson
  */
 @Accessors(fluent=true)
@@ -55,25 +70,25 @@ public class SurveyCategory {
     @JsonView({ SurveyCategoryViews.Summary.class, SurveyViews.Detailed.class })
     @Column(name = "id")
     private Long id;
-    
+
     @NotNull
     @Size(max = 50)
     @JsonProperty
     @JsonView({ SurveyCategoryViews.Summary.class, SurveyViews.Detailed.class })
     @Column(name = "name")
     private String name;
-    
+
     @JsonProperty
     @JsonView({ SurveyCategoryViews.Summary.class, SurveyViews.Detailed.class })
     @Column(name = "questions")
     @Lob
 //    @OneToMany(orphanRemoval=true, cascade = CascadeType.ALL, mappedBy = "category")
     private String questionNames;
-    
+
     @Transient
     @JsonView({ SurveyCategoryViews.Detailed.class, SurveyViews.Detailed.class })
     private List<Question> questions;
-    
+
     @JsonProperty
     @JsonBackReference
     @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
@@ -89,7 +104,7 @@ public class SurveyCategory {
         questionEnums(Arrays.asList(questions));
         return this;
     }
-    
+
     public SurveyCategory questionEnums(List<Q> questions) {
         StringBuilder sb = new StringBuilder();
         for (Iterator<Q> it = questions.iterator(); it.hasNext();) {
@@ -102,12 +117,12 @@ public class SurveyCategory {
         this.questionNames = sb.toString();
         return this;
     }
-    
+
     public List<Q> questionEnums() {
         if (questionNames == null) {
             return Collections.emptyList();
         }
-        
+
         ArrayList<Q> list = new ArrayList<Q>();
         String[] qNames = questionNames.split(",");
         for (String name : qNames) {
@@ -115,10 +130,10 @@ public class SurveyCategory {
         }
         return list;
     }
-    
+
     public List<Question> questions() {
         if (questions == null) {
-            questions = new ArrayList<Question>(); 
+            questions = new ArrayList<Question>();
         }
         return questions;
     }
@@ -154,7 +169,7 @@ public class SurveyCategory {
     public void setLinks(List<Link> links) {
         this.links = links;
     }
-    
+
 //    public SurveyQuestion question(String qName) {
 //        for (SurveyQuestion q : questions) {
 //            if (qName.equals(q.name())) {
@@ -163,7 +178,7 @@ public class SurveyCategory {
 //        }
 //        return null;
 //    }
-//    
+//
 //    public boolean equivalent(Object obj) {
 //        if (this == obj)
 //            return true;

@@ -1,3 +1,18 @@
+/*******************************************************************************
+ * Copyright 2014-2021 Tim Stephenson and contributors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License.  You may obtain a copy
+ * of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ ******************************************************************************/
 package digital.srp.sreport.model;
 
 import java.util.ArrayList;
@@ -43,7 +58,7 @@ import lombok.experimental.Accessors;
 
 /**
  * Root object defining questions and categories to present to user.
- * 
+ *
  * @author Tim Stephenson
  */
 @Accessors(fluent=true)
@@ -55,7 +70,7 @@ import lombok.experimental.Accessors;
 @EntityListeners(AuditingEntityListener.class)
 @Table(name= "SR_SURVEY")
 public class Survey {
-    
+
     private static final Logger LOGGER = LoggerFactory.getLogger(Survey.class);
 
     @Id
@@ -64,24 +79,24 @@ public class Survey {
     @JsonProperty
     @JsonView(SurveyViews.Summary.class)
     private Long id;
-    
+
     @NotNull
     @Size(max = 50)
     @JsonProperty
     @JsonView({ AnswerViews.Detailed.class, SurveyReturnViews.Summary.class, SurveyViews.Summary.class })
     @Column(name = "name")
     private String name;
-    
+
     @NotNull
     @Size(max = 50)
     @JsonProperty
     @JsonView(SurveyViews.Summary.class)
     @Column(name = "status")
     private String status = "Draft";
-    
-    /** 
-     * Period this set of responses apply to. 
-     * 
+
+    /**
+     * Period this set of responses apply to.
+     *
      * <p>For example: calendar or financial year, quarter etc.
      */
     @NotNull
@@ -95,21 +110,21 @@ public class Survey {
     @JsonView(SurveyViews.Detailed.class)
     @OneToMany(orphanRemoval=true, cascade= CascadeType.ALL, mappedBy = "survey")
     private List<SurveyCategory> categories;
-    
+
     @Transient
     @XmlElement(name = "link", namespace = Link.ATOM_NAMESPACE)
     @JsonProperty("links")
     @JsonView(SurveyViews.Summary.class)
     private List<Link> links;
-    
+
     @Column(name = "created", nullable = false, updatable = false)
     @CreatedDate
     private Date created;
- 
+
     @Column(name = "created_by")
     @CreatedBy
     private String createdBy;
- 
+
     @Column(name = "last_updated")
     @LastModifiedDate
     private Date lastUpdated;
@@ -117,29 +132,29 @@ public class Survey {
     @Column(name = "updated_by")
     @LastModifiedBy
     private String updatedBy;
-    
+
     public List<SurveyCategory> categories() {
         if (categories == null) {
             categories = new ArrayList<SurveyCategory>();
         }
         return categories;
     }
-    
+
     public Survey categories(SurveyCategory... categories) {
         categories(Arrays.asList(categories));
         return this;
     }
-    
+
     public Survey categories(List<SurveyCategory> categories) {
         this.categories = categories;
-        
+
         for (SurveyCategory cat : categories) {
             cat.survey(this);
         }
-        
+
         return this;
     }
-    
+
     @JsonProperty
     @Transient
     public List<Q> questionCodes() {

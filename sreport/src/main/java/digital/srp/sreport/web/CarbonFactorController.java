@@ -1,3 +1,18 @@
+/*******************************************************************************
+ * Copyright 2014-2021 Tim Stephenson and contributors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License.  You may obtain a copy
+ * of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ ******************************************************************************/
 package digital.srp.sreport.web;
 
 import java.io.IOException;
@@ -43,7 +58,7 @@ import digital.srp.sreport.repositories.CarbonFactorRepository;
 
 /**
  * REST web service for accessing carbon factors.
- * 
+ *
  * @author Tim Stephenson
  */
 @Controller
@@ -53,9 +68,9 @@ public class CarbonFactorController {
     private static final Logger LOGGER = LoggerFactory
             .getLogger(CarbonFactorController.class);
 
-    @Autowired 
+    @Autowired
     protected ObjectMapper objectMapper;
-    
+
     @Autowired
     protected  CarbonFactorRepository cfactorRepo;
 
@@ -64,7 +79,7 @@ public class CarbonFactorController {
         LOGGER.info("init");
         List<CarbonFactor> existingFactors = cfactorRepo.findAll();
         List<CarbonFactor> factors = new CarbonFactorCsvImporter().readCarbonFactors();
-        
+
         int added = 0;
         for (CarbonFactor factor : factors) {
             // TODO this will not update with new values but only create non-existent factors
@@ -80,7 +95,7 @@ public class CarbonFactorController {
         }
         LOGGER.info("init complete: Carbon factors added {}", added);
     }
-    
+
     /**
      * @return The specified Carbon factor.
      */
@@ -114,7 +129,7 @@ public class CarbonFactorController {
         LOGGER.info("  found {}", cfactors.size());
         return cfactors;
     }
-    
+
     /**
      * @return list of Carbon factors, optionally paged.
      */
@@ -137,7 +152,7 @@ public class CarbonFactorController {
 
         return list;
     }
-    
+
     /**
      * @return Newly created Carbon factor.
      */

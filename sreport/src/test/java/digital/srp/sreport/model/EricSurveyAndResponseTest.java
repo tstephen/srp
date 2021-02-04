@@ -1,3 +1,18 @@
+/*******************************************************************************
+ * Copyright 2014-2021 Tim Stephenson and contributors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License.  You may obtain a copy
+ * of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ ******************************************************************************/
 package digital.srp.sreport.model;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -31,23 +46,23 @@ public class EricSurveyAndResponseTest {
     };
 
     private ObjectMapper objectMapper = new ObjectMapper();
-    
+
     @BeforeAll
     public static void setUpClass() {
         OUT_DIR.mkdirs();
     }
-    
+
     /**
-     * Test that it is possible to build a survey containing all the required 
+     * Test that it is possible to build a survey containing all the required
      * information for the 2015-16 ERIC data.
      */
     @Test
     public void create1516EricReturn() {
         Survey survey = Eric1516.getInstance().getSurvey();
         assertSurvey(survey);
-        
+
         assertQuestionJsonFileOk(survey);
-        
+
         Set<Answer> answers = new HashSet<Answer>();
         for (int i = 0; i < survey.categories().size(); i++) {
             System.out.println(String.format(
@@ -61,18 +76,18 @@ public class EricSurveyAndResponseTest {
                         .response(ANSWERS[i][j]));
             }
         }
-        
+
         SurveyReturn response = new SurveyReturn()
                 .submittedBy(SUBMITTER)
                 .applicablePeriod("2015-16")
                 .answers(answers);
-        
+
         assertIsComplete(survey);
-        
+
         assertResponseJsonFileOk(response);
     }
 
-    
+
 
     private void assertSurvey(Survey survey) {
         assertEquals(7, survey.categories().size());
@@ -98,13 +113,13 @@ public class EricSurveyAndResponseTest {
             e.printStackTrace();
             fail("Unable to write JSON representation of ERIC data");
         }
-        
+
         try {
             Survey survey2 = objectMapper.readValue(resultFile, Survey.class);
             assertEquals(survey.categories().size(), survey2.categories().size());
             assertEquals(survey.questionCodes().size(), survey2.questionCodes().size());
             assertEquals(survey.hashCode(), survey2.hashCode());
-            assertSurvey(survey2);           
+            assertSurvey(survey2);
         } catch (IOException e) {
             e.printStackTrace();
             fail("Unable to re-read ERIC data from JSON");

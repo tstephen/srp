@@ -1,13 +1,28 @@
+#-------------------------------------------------------------------------------
+# Copyright 2014-2021 Tim Stephenson and contributors
+#
+# Licensed under the Apache License, Version 2.0 (the "License"); you may not
+# use this file except in compliance with the License.  You may obtain a copy
+# of the License at
+#
+#    http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+# WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+# License for the specific language governing permissions and limitations under
+# the License.
+#-------------------------------------------------------------------------------
 # Create intervention
 curl -X POST -H 'Content-Type:application/json' -v -u tstephen:tstephen -d '{"name":"Turn down 1 degree C","description":""}' http://localhost:8083/interventions
 
 # GET interventions
 curl -X GET -v -u tstephen:tstephen http://localhost:8083/interventions
 
-# GET intervention types by Status 
+# GET intervention types by Status
 curl -X GET -v -u tstephen:tstephen -H 'Accept:application/json' http://localhost:8083/sdu/intervention-types/status/green
 
-# GET interventions by org type 
+# GET interventions by org type
 curl -X GET -v -u tstephen:tstephen -H 'Accept:application/json' http://localhost:8083/sdu/interventions/status/green/GP%20Surgery
 
 # GET org intervention plan by org type

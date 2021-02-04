@@ -1,3 +1,18 @@
+/*******************************************************************************
+ * Copyright 2014-2021 Tim Stephenson and contributors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License.  You may obtain a copy
+ * of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ ******************************************************************************/
 package digital.srp.sreport.model;
 
 import java.math.BigDecimal;
@@ -33,7 +48,7 @@ import lombok.ToString;
 import lombok.experimental.Accessors;
 
 /**
- * 
+ *
  * @author Tim Stephenson
  */
 @Accessors(fluent=true)
@@ -58,14 +73,14 @@ public class WeightingFactor {
     @JsonView(WeightingFactorViews.Summary.class)
     @Column(name = "org_type")
     private String orgType;
-    
+
     @NotNull
     @Size(max = 60)
     @JsonProperty
     @JsonView(WeightingFactorViews.Summary.class)
     @Column(name = "category")
     private String category;
-    
+
     /**
      * Currently only done once in 2014-15
      */
@@ -75,7 +90,7 @@ public class WeightingFactor {
     @JsonView(WeightingFactorViews.Summary.class)
     @Column(name = "period")
     private String applicablePeriod;
-    
+
     /**
      * Volume of carbon emissions in kgCO<sub>2</sub>e.
      */
@@ -84,7 +99,7 @@ public class WeightingFactor {
     @JsonView(WeightingFactorViews.Summary.class)
     @Column(name = "c_val", precision = 12, scale = 0)
     private BigDecimal carbonValue;
-  
+
     /**
      * Value of spend in £s.
      */
@@ -94,7 +109,7 @@ public class WeightingFactor {
     @Column(name = "m_val", precision = 12, scale = 0)
     private BigDecimal moneyValue;
 
-    
+
     /**
      * Proportion of total spending spent on this category (derived empirically).
      */
@@ -102,7 +117,7 @@ public class WeightingFactor {
     @JsonView(WeightingFactorViews.Summary.class)
     @Column(name = "p_val", precision = 6, scale = 3)
     private BigDecimal proportionOfTotal;
-    
+
     /**
      * Intensity of carbon emissions in kgCO<sub>2</sub>e / £.
      */
@@ -110,21 +125,21 @@ public class WeightingFactor {
     @JsonView(WeightingFactorViews.Summary.class)
     @Column(name = "i_val", precision = 6, scale = 3)
     private BigDecimal intensityValue;
-    
+
     @Transient
     @XmlElement(name = "link", namespace = Link.ATOM_NAMESPACE)
     @JsonProperty("links")
     @JsonView(SurveyViews.Summary.class)
     private List<Link> links;
-    
+
     @Column(name = "created", nullable = false, updatable = false)
     @CreatedDate
     private Date created;
- 
+
     @Column(name = "created_by")
     @CreatedBy
     private String createdBy;
- 
+
     @Column(name = "last_updated")
     @LastModifiedDate
     private Date lastUpdated;

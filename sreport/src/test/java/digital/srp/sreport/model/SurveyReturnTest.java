@@ -1,3 +1,18 @@
+/*******************************************************************************
+ * Copyright 2014-2021 Tim Stephenson and contributors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License.  You may obtain a copy
+ * of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ ******************************************************************************/
 package digital.srp.sreport.model;
 
 
@@ -119,27 +134,27 @@ public class SurveyReturnTest implements EricQuestions{
         completenessValidator.validate(rdr);
         assertEquals(0, rdr.completeness().size());
     }
-    
+
     @Test
     public void testDuplicateDetection() {
         SurveyReturn rtn = helper.readSurveyReturn("RDR2")
                 .orElseThrow(IllegalStateException::new)
                 .survey(Sdu1718.getInstance().getSurvey());
-        
+
         assertEquals(4, rtn.getIncludedPeriods().size());
 
-        // There are 10 answers in the test data but ORG_CODE 2017-18 is 
+        // There are 10 answers in the test data but ORG_CODE 2017-18 is
         // eliminated by the HashSet which does not allow duplicates and hash
         // code does not include id (to give business data equality)
-        // (beware if ever tempted to change to List) 
+        // (beware if ever tempted to change to List)
         assertEquals(9, rtn.answers().size());
-        
+
         Set<ConstraintViolation<SurveyReturn>> issues = healthCheck.validate(rtn);
         System.out.println("Issues: ");
         for (ConstraintViolation<SurveyReturn> issue : issues) {
             System.out.println("  "+issue);
         }
-        
+
         // ELEC used has two different values so that's a problem
         assertEquals(1, issues.size());
         ConstraintViolation<SurveyReturn> issue1 = issues.iterator().next();
@@ -149,7 +164,7 @@ public class SurveyReturnTest implements EricQuestions{
         assertTrue(answers.stream().anyMatch(new AnswerIdPredicate(10785l)));
         assertTrue(answers.stream().anyMatch(new AnswerIdPredicate(10786l)));
     }
-    
+
     class AnswerIdPredicate implements Predicate<Answer> {
         private final Long _id;
         public AnswerIdPredicate(long id) {
