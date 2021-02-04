@@ -1,21 +1,66 @@
 Sustainable Resource Planning
 =============================
 
+Getting started
+---------------
+
+The easiest way to get started is to build and run a docker container. This
+will, by default, use an embedded h2 database but you will need to connect
+a keycloak identity server.
+
+Build image:
+
+```
+./mvnw install
+```
+
+Run image, using just HTTP Basic security with a username and password provided.
+This is handy for local development and testing.
+
+```
+docker run -p 8080:8080 \
+  -e SPRING_SECURITY_USER_NAME=<usr> \
+  -e SPRING_SECURITY_USER_password=<pwd> \
+  knowprocess/srp
+```
+
 Useful commands
 ---------------
 
 - Check health of a particular return
-  ```
-  curl -v -u usr:pwd https://api.srp.digital/admin/health/SDU-2020-21/ZZ1
-  ```
+  
+ ```
+ curl -v -u usr:pwd http://localhost:8080/admin/health/SDU-2020-21/ZZ1
+ ```
+
 - Import previous year's return into this years
-  ```
-  curl -v -X POST -u usr:pwd https://api.srp.digital/returns/import/SDU-2019-20-ZZ1/SDU-2020-21-ZZ1
-  ```
+
+ ```
+ curl -v -X POST -u usr:pwd http://localhost:8080/returns/import/SDU-2019-20-ZZ1/SDU-2020-21-ZZ1
+ ```
+
 - Create / update a survey with the latest definition
-  ```
-  curl -v -X POST -u usr:pwd https://api.srp.digital/admin/data-mgmt/surveys/SDU-2020-21
-  ```
+
+ ```
+ curl -v -X POST -u usr:pwd http://localhost:8080/admin/data-mgmt/surveys/SDU-2020-21
+ ```
+
+Configuring security using OAuth2 via Keycloak
+----------------------------------------------
+
+This assumes you have a Keycloak server available, there are any resources on
+how to provide this including: https://www.keycloak.org/docs/latest/.
+
+The image may then be started as follows:
+
+```
+docker run -p 8080:8080 \
+  -e KEYCLOAK_REALM=<realm> \
+  -e KEYCLOAK_AUTH-SERVER-URL=<URL>/auth \
+  -e KEYCLOAK_RESOURCE=<client_id> \
+  -e KEYCLOAK_ENABLED=true \
+  knowprocess/srp
+```
 
 Release History
 ---------------

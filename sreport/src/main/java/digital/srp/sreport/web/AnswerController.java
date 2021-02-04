@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 
+import javax.annotation.security.RolesAllowed;
 import javax.persistence.EntityManager;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
@@ -33,6 +34,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import com.fasterxml.jackson.annotation.JsonView;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import digital.srp.sreport.api.SrpRoles;
 import digital.srp.sreport.api.exceptions.ObjectNotFoundException;
 import digital.srp.sreport.api.exceptions.ResultSetTooLargeException;
 import digital.srp.sreport.model.Answer;
@@ -81,10 +83,9 @@ public class AnswerController {
     private int maxAnswers;
 
     /**
-     * Return just the specified answer.
-     *
      * @return The specified answer.
      */
+    @RolesAllowed(SrpRoles.USER)
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
     @JsonView(AnswerViews.Detailed.class)
     @Transactional
@@ -100,10 +101,9 @@ public class AnswerController {
 
     // TODO remove or require paging
     /**
-     * Return a list of answers, optionally paged.
-     *
      * @return answers.
      */
+    @RolesAllowed(SrpRoles.ADMIN)
     @RequestMapping(value = "/", method = RequestMethod.GET)
     @JsonView(AnswerViews.Summary.class)
     public @ResponseBody List<Answer> list(
@@ -140,6 +140,7 @@ public class AnswerController {
         }
     }
 
+    @RolesAllowed(SrpRoles.ADMIN)
     @RequestMapping(value = "/findByCriteria", method = RequestMethod.POST)
     @JsonView(AnswerViews.Detailed.class)
     public @ResponseBody List<Answer> findByCriteria(
@@ -240,6 +241,7 @@ public class AnswerController {
     /**
      * @return list of answers for a given period, optionally paged.
      */
+    @RolesAllowed(SrpRoles.ADMIN)
     @RequestMapping(value = "/findByPeriod/{period}", method = RequestMethod.GET)
     @JsonView(AnswerViews.Detailed.class)
     public @ResponseBody List<Answer> findByPeriod(
@@ -264,6 +266,7 @@ public class AnswerController {
     /**
      * @return answer to the given question for the specified return and period.
      */
+    @RolesAllowed(SrpRoles.USER)
     @RequestMapping(value = "/findByReturnPeriodAndQ/{rtn}/{period}/{q}", method = RequestMethod.GET)
     @JsonView(AnswerViews.Detailed.class)
     public @ResponseBody Answer findByReturnPeriodAndQ(
@@ -301,6 +304,7 @@ public class AnswerController {
     /**
      * Delete an existing answer.
      */
+    @RolesAllowed(SrpRoles.ADMIN)
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
     @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
     @Transactional

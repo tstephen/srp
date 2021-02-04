@@ -9,6 +9,7 @@
 *.log.*
 */application.properties
 **/.*
+**/logs/*
 target/
 
 *.ear

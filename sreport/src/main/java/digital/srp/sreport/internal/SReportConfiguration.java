@@ -8,11 +8,8 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 @Configuration
 @ComponentScan(basePackages = { "digital.srp.sreport" })
-@EntityScan({ "digital.srp.sreport.model", "io.onedecision.engine.decisions.model",
-    "io.onedecision.engine.domain.model" })
-@EnableJpaRepositories({ "digital.srp.sreport.repositories",
-    "io.onedecision.engine.decisions.repositories",
-    "io.onedecision.engine.domain.repositories" })
+@EntityScan({ "digital.srp.sreport.model" })
+@EnableJpaRepositories({ "digital.srp.sreport.repositories" })
 @EnableJpaAuditing
 public class SReportConfiguration {
 

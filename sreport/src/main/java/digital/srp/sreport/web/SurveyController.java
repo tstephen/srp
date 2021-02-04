@@ -3,6 +3,8 @@ package digital.srp.sreport.web;
 import java.util.Collections;
 import java.util.List;
 
+import javax.annotation.PostConstruct;
+import javax.annotation.security.RolesAllowed;
 import javax.transaction.Transactional;
 
 import org.slf4j.Logger;
@@ -15,6 +17,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -24,6 +27,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import com.fasterxml.jackson.annotation.JsonView;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import digital.srp.sreport.api.SrpRoles;
 import digital.srp.sreport.api.exceptions.ObjectNotFoundException;
 import digital.srp.sreport.model.Q;
 import digital.srp.sreport.model.Survey;
@@ -35,6 +39,7 @@ import digital.srp.sreport.repositories.QuestionRepository;
 import digital.srp.sreport.repositories.SurveyCategoryRepository;
 import digital.srp.sreport.repositories.SurveyRepository;
 import digital.srp.sreport.repositories.SurveyReturnRepository;
+import digital.srp.sreport.services.SurveyService;
 
 /**
  * REST web service for accessing surveys.
@@ -52,22 +57,29 @@ public class SurveyController {
     protected ObjectMapper objectMapper;
     
     @Autowired
-    protected  SurveyRepository surveyRepo;
+    protected SurveyRepository surveyRepo;
 
     @Autowired
-    protected  SurveyCategoryRepository catRepo;
+    protected SurveyCategoryRepository catRepo;
     
     @Autowired
-    protected  QuestionRepository questionRepo;
+    protected QuestionRepository questionRepo;
     
     @Autowired
-    protected  SurveyReturnRepository returnRepo;
-    
+    protected SurveyReturnRepository returnRepo;
+
+    @Autowired
+    protected SurveyService surveySvc;
+
+    @PostConstruct
+    protected void init() {
+        surveySvc.initSurveys();
+    }
+
     /**
-     * Return just the specified survey.
-     * 
      * @return The specified survey.
      */
+    @RolesAllowed(SrpRoles.USER)
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
     @JsonView(SurveyViews.Detailed.class)
     @Transactional
@@ -84,10 +96,9 @@ public class SurveyController {
     }
 
     /**
-     * Return just the specified survey.
-     * 
      * @return The specified survey.
      */
+    @RolesAllowed(SrpRoles.USER)
     @RequestMapping(value = "/findByName/{name}", method = RequestMethod.GET)
     @JsonView(SurveyViews.Detailed.class)
     public @ResponseBody Survey findByName(
@@ -112,13 +123,13 @@ public class SurveyController {
     }
     
     /**
-     * Return a list of surveys, optionally paged.
-     * 
-     * @return surveys.
+     * @return list of surveys, optionally paged.
      */
+    @RolesAllowed(SrpRoles.ADMIN)
     @RequestMapping(value = "/", method = RequestMethod.GET)
     @JsonView(SurveyViews.Summary.class)
     public @ResponseBody List<Survey> list(
+            @RequestHeader String Authorization,
             @RequestParam(value = "page", required = false) Integer page,
             @RequestParam(value = "limit", required = false) Integer limit) {
         LOGGER.info(String.format("List surveys"));
@@ -136,17 +147,16 @@ public class SurveyController {
     }
     
     /**
-     * Return a list of survey returns, optionally paged.
-     * 
-     * @return survey returns.
+     * @return a list of survey returns, optionally paged.
      */
+    @RolesAllowed(SrpRoles.ADMIN)
     @RequestMapping(value = "/{id}/returns", method = RequestMethod.GET)
     @JsonView(SurveyReturnViews.Summary.class)
     public @ResponseBody List<SurveyReturn> listReturns(
             @PathVariable("id") Long surveyId,
             @RequestParam(value = "page", required = false) Integer page,
             @RequestParam(value = "limit", required = false) Integer limit) {
-        LOGGER.info(String.format("List returns"));
+        LOGGER.info("List returns");
 
         List<SurveyReturn> list;
         if (limit == null) {
@@ -161,109 +171,9 @@ public class SurveyController {
     }
 
     /**
-     * Create a new survey.
-     * 
-     * @return
-     */
-//    @SuppressWarnings({ "rawtypes", "unchecked" })
-//    @ResponseStatus(value = HttpStatus.CREATED)
-//    @RequestMapping(value = "/", method = RequestMethod.POST)
-//    public @ResponseBody ResponseEntity<?> create(
-//            @RequestBody Survey survey) {
-//
-//        createInternal(survey);
-//
-//        UriComponentsBuilder builder = MvcUriComponentsBuilder
-//                .fromController(getClass());
-//        HashMap<String, String> vars = new HashMap<String, String>();
-//        vars.put("id", survey.id().toString());
-//
-//        HttpHeaders headers = new HttpHeaders();
-//        headers.setLocation(builder.path("/{id}").buildAndExpand(vars).toUri());
-//        return new ResponseEntity(headers, HttpStatus.CREATED);
-//    }
-
-//    @Transactional
-//    protected void createInternal(Survey survey) {
-////        ArrayList<SurveyCategory> newCats = new ArrayList<SurveyCategory>(survey.categories().size());
-//        for (SurveyCategory cat : survey.categories()) {
-//            if (cat.name()==null) {
-//                System.err.println("No name for cat : "+cat);
-//            }
-//            cat.survey(survey);
-////            SurveyCategory foundCat = catRepo.findOne(cat.id());
-////            if (foundCat == null) {
-////                catRepo.save(cat);
-////                ArrayList<SurveyQuestion> newQs = new ArrayList<SurveyQuestion>(cat.questions().size());
-//                for (SurveyQuestion q : cat.questions()) {
-////                    SurveyQuestion foundQ = qRepo.findOne(q.id());
-////                    if (foundQ == null) {
-//                        q.category(cat);
-////                        newQs.add(qRepo.save(q));
-////                    } else {
-////                        newQs.add(foundQ);
-////                    }
-//                }
-////                cat.questions(newQs);
-////                newCats.add(catRepo.save(cat));
-////            } else {
-////                newCats.add(foundCat);
-////            }
-//        }
-////        survey.categories(newCats);
-////        for (SurveyQuestion q : survey.questions()) {
-////            qRepo.save(q);
-////        }
-//        survey = surveyRepo.save(survey);
-//    }
-
-    /**
-     * Update an existing survey.
-     */
-//    @ResponseStatus(value = HttpStatus.NO_CONTENT)
-//    @RequestMapping(value = "/{idOrName}", method = RequestMethod.PUT, consumes = { "application/json" })
-//    @Transactional
-//    public @ResponseBody void update(
-//            @PathVariable("idOrName") String idOrName,
-//            @RequestBody Survey updatedSurvey) {
-//        
-//        Survey survey = null;
-//        try {
-//            Long surveyId = Long.parseLong(idOrName);
-//            survey = surveyRepo.findOne(surveyId);
-//        } catch (NumberFormatException e) {
-//            LOGGER.info("Cannot parse survey id from '{}', assume it's a name", idOrName);
-//            survey = surveyRepo.findByName(idOrName);
-//        }
-//        LOGGER.info("Updated survey '{}' has {} questions, compared to {}", 
-//                idOrName, updatedSurvey.questions().size(), survey.questions().size());
-//        
-//        for (SurveyCategory uCat : updatedSurvey.categories()) {
-//            SurveyCategory cat = survey.category(uCat.name());
-//            if (cat == null) {
-//                uCat.survey(survey);
-//                cat = catRepo.save(uCat);
-//                survey.categories().add(cat);
-//            }
-//            for (SurveyQuestion uq : uCat.questions()) {
-//                SurveyQuestion q = survey.question(uq.name());
-//                if (q == null) {
-//                    uq.category(cat);
-//                    q = qRepo.save(uq);
-//                    cat.questions().add(q);
-//                } else {
-//                    q.category(cat).hint(uq.hint()).label(uq.label()).required(uq.required()).type(uq.type()).unit(uq.unit());
-//                }
-//            }
-//        }
-//        LOGGER.info("... survey now has {} questions", survey.questions().size());
-//
-//        surveyRepo.save(survey);
-//    }
-
-    /**
      * Change the status the survey has reached.
      */
+    @RolesAllowed(SrpRoles.USER)
     @RequestMapping(value = "/{surveyId}/status", method = RequestMethod.POST, consumes = "application/json")
     public @ResponseBody void setStatus(
             @PathVariable("surveyId") Long surveyId,
@@ -281,6 +191,7 @@ public class SurveyController {
     /**
      * Delete an existing survey.
      */
+    @RolesAllowed(SrpRoles.ADMIN)
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
     @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
     @Transactional

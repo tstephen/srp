@@ -1,11 +1,14 @@
 package digital.srp.sreport.web;
 
+import java.io.IOException;
 import java.net.URI;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.annotation.PostConstruct;
+import javax.annotation.security.RolesAllowed;
 import javax.transaction.Transactional;
 
 import org.slf4j.Logger;
@@ -30,11 +33,13 @@ import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBui
 import com.fasterxml.jackson.annotation.JsonView;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import digital.srp.sreport.api.SrpRoles;
 import digital.srp.sreport.api.exceptions.ObjectNotFoundException;
 import digital.srp.sreport.internal.NullAwareBeanUtils;
 import digital.srp.sreport.model.Question;
 import digital.srp.sreport.model.views.QuestionViews;
 import digital.srp.sreport.repositories.QuestionRepository;
+import digital.srp.sreport.services.QuestionService;
 
 /**
  * REST web service for accessing questions.
@@ -52,11 +57,20 @@ public class QuestionController {
     protected ObjectMapper objectMapper;
     
     @Autowired
-    protected  QuestionRepository questionRepo;
+    protected QuestionRepository questionRepo;
+
+    @Autowired
+    protected QuestionService questionSvc;
+
+    @PostConstruct
+    protected void init() throws IOException {
+        questionSvc.initQuestions();
+    }
 
     /**
      * @return the created question.
      */
+    @RolesAllowed(SrpRoles.ANALYST)
     @ResponseStatus(value = HttpStatus.CREATED)
     @RequestMapping(value = "/", method = RequestMethod.POST)
     public @ResponseBody ResponseEntity<?> create(
@@ -82,6 +96,7 @@ public class QuestionController {
     /**
      * @return The specified question.
      */
+    @RolesAllowed(SrpRoles.ANALYST)
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
     @JsonView(QuestionViews.Detailed.class)
     @Transactional
@@ -99,6 +114,7 @@ public class QuestionController {
     /**
      * @return The specified question.
      */
+    @RolesAllowed(SrpRoles.ANALYST)
     @RequestMapping(value = "/findByName/{name}", method = RequestMethod.GET)
     @JsonView(QuestionViews.Detailed.class)
     @Transactional
@@ -118,6 +134,7 @@ public class QuestionController {
     /**
      * @return a list of questions, optionally paged.
      */
+    @RolesAllowed(SrpRoles.ANALYST)
     @RequestMapping(value = "/", method = RequestMethod.GET)
     @JsonView(QuestionViews.Summary.class)
     public @ResponseBody List<Question> list(
@@ -141,6 +158,7 @@ public class QuestionController {
     /**
      * Update an existing question.
      */
+    @RolesAllowed(SrpRoles.ANALYST)
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
     @RequestMapping(value = "/{id}", method = RequestMethod.PUT, consumes = { "application/json" })
     public @ResponseBody void update(@PathVariable("tenantId") String tenantId,

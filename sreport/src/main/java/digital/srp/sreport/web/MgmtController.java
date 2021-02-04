@@ -5,7 +5,10 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
+
+import javax.annotation.security.RolesAllowed;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import digital.srp.sreport.api.SrpRoles;
 import digital.srp.sreport.api.exceptions.SReportException;
 import digital.srp.sreport.importers.EricCsvImporter;
 import digital.srp.sreport.model.Answer;
@@ -26,12 +30,6 @@ import digital.srp.sreport.model.SurveyCategory;
 import digital.srp.sreport.model.SurveyReturn;
 import digital.srp.sreport.model.returns.EricDataSet;
 import digital.srp.sreport.model.returns.EricDataSetFactory;
-import digital.srp.sreport.model.surveys.Eric1516;
-import digital.srp.sreport.model.surveys.Sdu1617;
-import digital.srp.sreport.model.surveys.Sdu1718;
-import digital.srp.sreport.model.surveys.Sdu1819;
-import digital.srp.sreport.model.surveys.Sdu1920;
-import digital.srp.sreport.model.surveys.Sdu2021;
 import digital.srp.sreport.model.surveys.SurveyFactory;
 import digital.srp.sreport.repositories.AnswerRepository;
 import digital.srp.sreport.repositories.QuestionRepository;
@@ -83,6 +81,7 @@ public class MgmtController {
     @Autowired
     protected SurveyService surveySvc;
 
+    @RolesAllowed(SrpRoles.ADMIN)
     @RequestMapping(value = "/", method = RequestMethod.GET, headers = "Accept=application/json")
     public String showStatus(final Model model) throws IOException {
         LOGGER.info("showStatus");
@@ -105,6 +104,7 @@ public class MgmtController {
         model.addAttribute("now", isoFormatter.format(new Date()));
     }
 
+    @RolesAllowed(SrpRoles.ADMIN)
     @RequestMapping(value = "/", method = RequestMethod.POST, headers = "Accept=application/json")
     public String initAndShowStatus(final Model model) throws IOException {
         LOGGER.info(String.format("initAndShowStatus"));
@@ -120,6 +120,7 @@ public class MgmtController {
         return showStatus(model);
     }
 
+    @RolesAllowed(SrpRoles.ADMIN)
     @RequestMapping(value = "/questions", method = RequestMethod.GET, headers = "Accept=application/json")
     public String showQuestionStatus(final Model model) throws IOException {
         long questions = qRepo.count();
@@ -129,12 +130,14 @@ public class MgmtController {
         return "json-status";
     }
 
+    @RolesAllowed(SrpRoles.ADMIN)
     @RequestMapping(value = "/questions", method = RequestMethod.POST, headers = "Accept=application/json")
     public String initQuestions(final Model model) throws IOException {
         questionSvc.initQuestions();
         return showQuestionStatus(model);
     }
 
+    @RolesAllowed(SrpRoles.ADMIN)
     @RequestMapping(value = "/surveys", method = RequestMethod.GET, headers = "Accept=application/json")
     public String showSurveysStatus(final Model model) throws IOException {
         model.addAttribute("surveys", surveyRepo.count());
@@ -142,23 +145,15 @@ public class MgmtController {
         return "json-status";
     }
 
+    @RolesAllowed(SrpRoles.ADMIN)
     @RequestMapping(value = "/surveys", method = RequestMethod.POST, headers = "Accept=application/json")
     public String initSurveys(final Model model) throws IOException {
-        Survey[] expectedSurveys = {
-                Eric1516.getInstance().getSurvey(),
-                Sdu1617.getInstance().getSurvey(),
-                Sdu1718.getInstance().getSurvey(),
-                Sdu1819.getInstance().getSurvey(),
-                Sdu1920.getInstance().getSurvey(),
-                Sdu2021.getInstance().getSurvey()
-        };
-        for (Survey expected : expectedSurveys) {
-            surveySvc.initSurvey(expected);
-        }
+        surveySvc.initSurveys();
 
         return showSurveysStatus(model);
     }
 
+    @RolesAllowed(SrpRoles.ADMIN)
     @RequestMapping(value = "/surveys/{surveyName}", method = RequestMethod.GET, headers = "Accept=application/json")
     public String showSurveyStatus(
             @PathVariable("surveyName") final String surveyName,
@@ -182,6 +177,7 @@ public class MgmtController {
         return "json-summary";
     }
 
+    @RolesAllowed(SrpRoles.ADMIN)
     @RequestMapping(value = "/surveys/{surveyName}", method = RequestMethod.POST, headers = "Accept=application/json")
     public String initSurveyAndShowStatus(
             @PathVariable("surveyName") final String surveyName,
@@ -191,6 +187,7 @@ public class MgmtController {
         return showSurveyStatus(surveyName, model);
     }
 
+    @RolesAllowed(SrpRoles.ADMIN)
     @RequestMapping(value = "/answers/{ericDataSet}", method = RequestMethod.GET, headers = "Accept=application/json")
     public @ResponseBody String initEricReturns(@PathVariable("ericDataSet") String ericDataSet) {
         List<SurveyReturn> existingReturns = returnRepo.findBySurveyName(ericDataSet);
@@ -218,13 +215,13 @@ public class MgmtController {
             List<SurveyReturn> existingReturns, List<SurveyReturn> returns) {
         for (SurveyReturn surveyReturn : returns) {
             surveyReturn.survey(survey);
-            SurveyReturn existingReturn = findBySurveyAndOrg(existingReturns, surveyReturn);
-            if (existingReturn == null) {
-                saveReturnAndAnswers(surveyReturn);
-            } else {
+            Optional<SurveyReturn> existingReturn = findBySurveyAndOrg(existingReturns, surveyReturn);
+            if (existingReturn.isPresent()) {
                 LOGGER.debug("Starting to add answers for org: {}", surveyReturn.org());
-                long count = historicDataMerger.merge(surveyReturn.answers(), existingReturn);
+                long count = historicDataMerger.merge(surveyReturn.answers(), existingReturn.get());
                 LOGGER.debug("... added {} answers for org: {}", count, surveyReturn.org());
+            } else {
+                saveReturnAndAnswers(surveyReturn);
             }
         }
     }
@@ -255,16 +252,16 @@ public class MgmtController {
         returnRepo.save(surveyReturn);
     }
 
-    private SurveyReturn findBySurveyAndOrg(List<SurveyReturn> existingReturns,
+    private Optional<SurveyReturn> findBySurveyAndOrg(List<SurveyReturn> existingReturns,
             SurveyReturn surveyReturn) {
         for (SurveyReturn ret : existingReturns) {
             if (ret.name().equals(surveyReturn.name())
                     && ret.org().equals(surveyReturn.org())) {
                 LOGGER.info(String.format("Skipping insert of return for %1$s because %2$d matches name and org", surveyReturn.name(), ret.id()));
-                return ret;
+                return Optional.of(ret);
             }
         }
-        return null;
+        return Optional.empty();
     }
 
 }

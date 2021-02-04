@@ -25,7 +25,7 @@ import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 
 import digital.srp.macc.model.Intervention;
 
-@RepositoryRestResource(path = "/interventions")
+@RepositoryRestResource(path = "interventions")
 public interface InterventionRepository extends CrudRepository<Intervention, Long> {
 
     @Query("SELECT c FROM Intervention c INNER JOIN c.interventionType it INNER JOIN c.organisationType ot WHERE it.name = :name")

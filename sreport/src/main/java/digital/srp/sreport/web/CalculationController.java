@@ -2,6 +2,7 @@ package digital.srp.sreport.web;
 
 import java.util.Set;
 
+import javax.annotation.security.RolesAllowed;
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.fasterxml.jackson.annotation.JsonView;
 
 import digital.srp.sreport.api.Calculator;
+import digital.srp.sreport.api.SrpRoles;
 import digital.srp.sreport.api.exceptions.ObjectNotFoundException;
 import digital.srp.sreport.internal.PeriodUtil;
 import digital.srp.sreport.model.SurveyReturn;
@@ -60,6 +62,7 @@ public class CalculationController {
      * Run all calculations based on the return inputs.
      * @return return including latest calculations.
      */
+    @RolesAllowed(SrpRoles.USER)
     @RequestMapping(value = "/{returnId}", method = RequestMethod.POST)
     @JsonView(SurveyReturnViews.Detailed.class)
     public @ResponseBody SurveyReturn calculate(
@@ -77,6 +80,7 @@ public class CalculationController {
      * Run all calculations based on the return inputs.
      * @return return including latest calculations.
      */
+    @RolesAllowed(SrpRoles.USER)
     @RequestMapping(value = "/{surveyName}/{org}", method = RequestMethod.POST)
     @JsonView(SurveyReturnViews.Detailed.class)
     public @ResponseBody SurveyReturn calculate(

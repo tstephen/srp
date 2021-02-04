@@ -25,7 +25,7 @@ import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 
 import digital.srp.macc.model.OrganisationType;
 
-@RepositoryRestResource(path = "/organisation-types")
+@RepositoryRestResource(path = "organisation-types")
 public interface OrganisationTypeRepository extends
         CrudRepository<OrganisationType, Long> {
 

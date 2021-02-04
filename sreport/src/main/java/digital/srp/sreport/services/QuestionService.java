@@ -22,9 +22,15 @@ public class QuestionService {
     @Autowired
     protected QuestionRepository qRepo;
 
-    public void initQuestions() throws IOException {
+    public void initQuestions() {
         LOGGER.info("initQuestions");
-        List<Question> questions = new QuestionCsvImporter().readQuestions();
+        List<Question> questions;
+        try {
+            questions = new QuestionCsvImporter().readQuestions();
+        } catch (IOException e) {
+            LOGGER.error(e.getMessage(), e);
+            throw new IllegalStateException(e.getMessage(), e);
+        }
         LOGGER.info("questions to import found: {}", questions.size());
         List<Question> existingQuestions = qRepo.findAll();
         LOGGER.info("existing questions found: {}", existingQuestions.size());

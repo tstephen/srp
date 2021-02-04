@@ -1,6 +1,5 @@
 package digital.srp.sreport.services;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,6 +11,7 @@ import org.springframework.stereotype.Service;
 import digital.srp.sreport.model.Question;
 import digital.srp.sreport.model.Survey;
 import digital.srp.sreport.model.SurveyCategory;
+import digital.srp.sreport.model.surveys.SurveyFactory;
 import digital.srp.sreport.repositories.QuestionRepository;
 import digital.srp.sreport.repositories.SurveyCategoryRepository;
 import digital.srp.sreport.repositories.SurveyRepository;
@@ -33,7 +33,7 @@ public class SurveyService {
     @Autowired
     protected SurveyCategoryRepository catRepo;
 
-    public void initSurvey(final Survey expected) throws IOException {
+    public void initSurvey(final Survey expected) {
         Survey survey = surveyRepo.findByName(expected.name());
         if (survey == null) {
             LOGGER.warn(String.format(
@@ -69,6 +69,13 @@ public class SurveyService {
         if (missingQs.size() > 0) {
             throw new IllegalStateException(String.format(
                     "Need to init question(s): '%1$s'", missingQs.toString()));
+        }
+    }
+
+    public void initSurveys() {
+        Survey[] expectedSurveys = SurveyFactory.getExpectedSurveys();
+        for (Survey expected : expectedSurveys) {
+            initSurvey(expected);
         }
     }
 }

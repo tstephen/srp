@@ -3,6 +3,7 @@ package digital.srp.sreport.web;
 import java.util.ArrayList;
 import java.util.Set;
 
+import javax.annotation.security.RolesAllowed;
 import javax.validation.ConstraintViolation;
 
 import org.slf4j.Logger;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.fasterxml.jackson.annotation.JsonView;
 
+import digital.srp.sreport.api.SrpRoles;
 import digital.srp.sreport.api.exceptions.FailedHealthCheckException;
 import digital.srp.sreport.api.exceptions.ObjectNotFoundException;
 import digital.srp.sreport.internal.PeriodUtil;
@@ -56,6 +58,7 @@ public class HealthCheckController {
      *
      * @return health summary.
      */
+    @RolesAllowed(SrpRoles.ADMIN)
     @RequestMapping(value = "/{returnId}", method = RequestMethod.GET, produces = {
             "application/json" })
     @JsonView(HealthCheckViews.Summary.class)
@@ -76,6 +79,7 @@ public class HealthCheckController {
      * Convenience method for {@link #checkHealth(Long)} to avoid
      * looking up return id externally.
      */
+    @RolesAllowed(SrpRoles.ADMIN)
     @RequestMapping(value = "/{surveyName}/{org}", method = RequestMethod.GET, produces = {
             "application/json" })
     @JsonView(HealthCheckViews.Summary.class)
@@ -99,6 +103,7 @@ public class HealthCheckController {
      *
      * @return health summary after fixes.
      */
+    @RolesAllowed(SrpRoles.ADMIN)
     @RequestMapping(value = "/{returnId}", method = RequestMethod.POST, produces = {
             "application/json" })
     @JsonView(HealthCheckViews.Summary.class)
@@ -119,6 +124,7 @@ public class HealthCheckController {
      * Convenience method for {@link #checkHealthAndAttemptFixes(Long)} to avoid
      * looking up return id externally.
      */
+    @RolesAllowed(SrpRoles.ADMIN)
     @RequestMapping(value = "/{surveyName}/{org}", method = RequestMethod.POST, produces = {
             "application/json" })
     @JsonView(HealthCheckViews.Summary.class)

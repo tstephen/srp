@@ -24,7 +24,7 @@ import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 
 import digital.srp.macc.model.OrganisationIntervention;
 
-@RepositoryRestResource(path = "/organisation-interventions")
+@RepositoryRestResource(path = "organisation-interventions")
 public interface OrganisationInterventionRepository extends
         CrudRepository<OrganisationIntervention, Long> {
 

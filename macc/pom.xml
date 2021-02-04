@@ -5,7 +5,6 @@
     <name>Marginal Abatement Cost Curves</name>
     <artifactId>macc</artifactId>
     <packaging>jar</packaging>
-    <version>2.4.0</version>
    
     <parent>
       <groupId>digital.srp</groupId>
@@ -19,16 +18,6 @@
         <groupId>org.projectlombok</groupId>
         <artifactId>lombok</artifactId>
         <scope>provided</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-starter-web</artifactId>
-        <exclusions>
-          <exclusion>
-            <artifactId>spring-boot-starter-logging</artifactId>
-            <groupId>org.springframework.boot</groupId>
-          </exclusion>
-        </exclusions>
       </dependency>
       <dependency>
         <groupId>org.springframework.boot</groupId>

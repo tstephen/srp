@@ -1,0 +1,5 @@
+{"properties": [{
+  "name": "srp.cors.allowed-origins",
+  "type": "java.lang.String",
+  "description": "Comma-separated list of URLs that may make CORS requests (no wildcards)"
+}]}

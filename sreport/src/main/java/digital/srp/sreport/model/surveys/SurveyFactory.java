@@ -14,6 +14,18 @@ public interface SurveyFactory {
     Survey getSurvey();
     Q[] getQs();
 
+    static Survey[] getExpectedSurveys() {
+        Survey[] expectedSurveys = {
+                Eric1516.getInstance().getSurvey(),
+                Sdu1617.getInstance().getSurvey(),
+                Sdu1718.getInstance().getSurvey(),
+                Sdu1819.getInstance().getSurvey(),
+                Sdu1920.getInstance().getSurvey(),
+                Sdu2021.getInstance().getSurvey()
+        };
+        return expectedSurveys;
+    }
+
     static SurveyFactory getInstance(String name) {
         switch (name) {
         case Eric1516.ID:

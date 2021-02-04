@@ -40,19 +40,7 @@
 	<relativePath/> <!-- lookup parent from repository -->
   </parent>
 
-  <pluginRepositories>
-    <pluginRepository>
-      <id>spring-milestones</id>
-      <name>spring-milestones</name>
-      <url>http://repo.springsource.org/milestone/</url>
-    </pluginRepository>
-  </pluginRepositories>
   <repositories>
-    <repository>
-      <id>spring-milestones</id>
-      <name>spring-milestones</name>
-      <url>http://repo.springsource.org/milestone/</url>
-    </repository>
     <repository>
       <id>kp-mvn-repo</id>
       <url>https://knowprocess.com/maven/</url>
@@ -71,21 +59,21 @@
   </licenses>
 
   <issueManagement>
-    <system>Gitlab</system>
-    <url>https://code.knowprocess.com/puffin/srp/issues</url>
+    <system>GitHub</system>
+    <url>https://github.com/tstephen/srp/issues</url>
   </issueManagement>
 
   <scm>
-    <url>https://code.knowprocess.com/puffin/srp</url>
-    <connection>scm:git:git@code.knowprocess.com/puffin/srp.git</connection>
-    <developerConnection>scm:git:git@code.knowprocess.com/puffin/srp.git</developerConnection>
+    <url>https://github.com/tstephen/srp/issues</url>
+    <connection>scm:git:git@https://github.com/tstephen/srp.git</connection>
+    <developerConnection>scm:git:git@https://github.com/tstephen/srp.git</developerConnection>
   </scm>
 
   <modules>
     <module>srp-ui</module>
     <module>srp-processes</module>
     <module>macc</module>
-    <module>server</module>
+    <module>srp-server</module>
     <module>sreport</module>
     <!--module>integration-tests</module-->
   </modules>

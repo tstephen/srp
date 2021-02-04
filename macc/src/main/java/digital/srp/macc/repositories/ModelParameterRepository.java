@@ -25,7 +25,7 @@ import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 
 import digital.srp.macc.model.ModelParameter;
 
-@RepositoryRestResource(path = "/parameters")
+@RepositoryRestResource(path = "parameters")
 public interface ModelParameterRepository extends
         CrudRepository<ModelParameter, Long> {
 

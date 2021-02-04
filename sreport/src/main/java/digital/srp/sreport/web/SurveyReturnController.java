@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
-import javax.annotation.PostConstruct;
+import javax.annotation.security.RolesAllowed;
 import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
 
@@ -37,6 +37,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import com.fasterxml.jackson.annotation.JsonView;
 
 import digital.srp.sreport.api.Calculator;
+import digital.srp.sreport.api.SrpRoles;
 import digital.srp.sreport.api.exceptions.ObjectNotFoundException;
 import digital.srp.sreport.internal.PeriodUtil;
 import digital.srp.sreport.model.Answer;
@@ -92,8 +93,7 @@ public class SurveyReturnController {
     @Autowired
     protected DefaultCompletenessValidator validator = new DefaultCompletenessValidator();
 
-    @PostConstruct
-    protected void init() throws IOException {
+    protected void initCache() {
         questions = qRepo.findAll();
         LOGGER.info("Cached {} questions", questions.size());
     }
@@ -108,7 +108,7 @@ public class SurveyReturnController {
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
     @RequestMapping(value = "/refreshCache", method = RequestMethod.POST)
     public @ResponseBody void refreshCache() throws IOException {
-        init();
+        initCache();
     }
 
     /**
@@ -116,6 +116,7 @@ public class SurveyReturnController {
      *
      * @return the specified survey.
      */
+    @RolesAllowed(SrpRoles.USER)
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
     @JsonView(SurveyReturnViews.Detailed.class)
     @Transactional
@@ -135,6 +136,7 @@ public class SurveyReturnController {
      *
      * @return returns. May be more than one because occasionally returns are restated. .
      */
+    @RolesAllowed(SrpRoles.USER)
     @RequestMapping(value = "/findBySurveyName/{surveyName}", method = RequestMethod.GET)
     @JsonView(SurveyReturnViews.Detailed.class)
     @Transactional
@@ -152,6 +154,7 @@ public class SurveyReturnController {
      *
      * @return returns. May be more than one because occasionally returns are restated.
      */
+    @RolesAllowed(SrpRoles.USER)
     @RequestMapping(value = "/findBySurveyNameAndOrg/{surveyName}/{org}", method = RequestMethod.GET)
     @JsonView(SurveyReturnViews.Detailed.class)
     public @ResponseBody List<SurveyReturn> findBySurveyAndOrg(
@@ -207,6 +210,7 @@ public class SurveyReturnController {
     }
 
     protected void ensureInitialized(Survey requested, SurveyReturn rtn) {
+        if (questions == null) initCache();
         for (SurveyCategory cat : requested.categories()) {
             for (Q q : cat.questionEnums()) {
                 if (!rtn.answer(rtn.applicablePeriod(), q).isPresent()) {
@@ -225,6 +229,7 @@ public class SurveyReturnController {
         returnRepo.save(rtn);
     }
 
+    @RolesAllowed(SrpRoles.USER)
     @RequestMapping(value = "/findCurrentBySurveyNameAndOrg/{surveyName}/{org}", method = RequestMethod.GET)
     @JsonView(SurveyReturnViews.Detailed.class)
     public @ResponseBody SurveyReturn findCurrentBySurveyNameAndOrg(
@@ -281,6 +286,7 @@ public class SurveyReturnController {
         return findCurrentBySurveyNameAndOrg(surveyName, org);
     }
 
+    @RolesAllowed(SrpRoles.ADMIN)
     @RequestMapping(value = "/import/{sourceReturnName}/{targetReturnName}", method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.OK)
     @Transactional
@@ -309,10 +315,9 @@ public class SurveyReturnController {
     }
 
     /**
-     * Return a list of survey returns, optionally paged.
-     *
-     * @return survey returns.
+     * @return list of survey returns, optionally paged.
      */
+    @RolesAllowed(SrpRoles.ANALYST)
     @RequestMapping(value = "/", method = RequestMethod.GET)
     @JsonView(SurveyReturnViews.Summary.class)
     public @ResponseBody List<SurveyReturn> list(
@@ -337,6 +342,7 @@ public class SurveyReturnController {
      *
      * @return survey returns.
      */
+    @RolesAllowed(SrpRoles.ANALYST)
     @RequestMapping(value = "/findByOrg/{org}", method = RequestMethod.GET)
     @JsonView(SurveyReturnViews.Summary.class)
     public @ResponseBody List<SurveyReturn> findByOrg(
@@ -350,10 +356,9 @@ public class SurveyReturnController {
     }
 
     /**
-     * Create a new survey response.
-     *
-     * @return
+     * @return The newly created survey return.
      */
+    @RolesAllowed(SrpRoles.USER)
     @SuppressWarnings({ "rawtypes", "unchecked" })
     @ResponseStatus(value = HttpStatus.CREATED)
     @RequestMapping(value = "/", method = RequestMethod.POST)
@@ -381,6 +386,7 @@ public class SurveyReturnController {
      * @param q The name of the question this answer belongs to.
      *
      */
+    @RolesAllowed(SrpRoles.USER)
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
     @RequestMapping(value = "/{id}/answers/{q}", method = RequestMethod.POST, consumes = "application/json")
     public @ResponseBody void updateCurrentAnswer(
@@ -398,6 +404,7 @@ public class SurveyReturnController {
      * @param q The name of the question this answer belongs to.
      * @param period The period of this answer, if omitted the period of the return is assumed.
      */
+    @RolesAllowed(SrpRoles.USER)
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
     @RequestMapping(value = "/{id}/answers/{q}/{period}", method = RequestMethod.POST, consumes = "application/json")
     public @ResponseBody void updateAnswer(
@@ -441,6 +448,7 @@ public class SurveyReturnController {
     /**
      * Re-stating a return preserves the existing one and saves the updates as a new revision.
      */
+    @RolesAllowed(SrpRoles.USER)
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
     @RequestMapping(value = "/{id}/restate", method = RequestMethod.POST, consumes = { "application/json" })
     @Transactional
@@ -475,8 +483,9 @@ public class SurveyReturnController {
 
     /**
      * Change the status the return has reached.
-     * @return
+     * @return The updated return
      */
+    @RolesAllowed(SrpRoles.USER)
     @RequestMapping(value = "/{returnId}/status/{status}", method = RequestMethod.POST, consumes = "application/json")
     @JsonView(SurveyReturnViews.Detailed.class)
     public @ResponseBody SurveyReturn setStatus(
@@ -529,6 +538,7 @@ public class SurveyReturnController {
     /**
      * Delete an existing return.
      */
+    @RolesAllowed(SrpRoles.ADMIN)
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
     @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
     @Transactional

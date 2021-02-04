@@ -53,7 +53,7 @@ var $r = (function ($, ractive) {
       console.info('skip fetch lists while logging in');
       return;
     }
-    $.getJSON(_server+'/sdu/accounts/', function(data) {
+    $.getJSON('https://api.knowprocess.com/sdu/accounts/', function(data) {
       ractive.set('orgs', data);
       ractive.addDataList({ name: 'orgs' },data);
       // if (_survey != undefined) $('#ORG_NAME').attr('list','orgs');
@@ -75,7 +75,7 @@ var $r = (function ($, ractive) {
       ractive.set('username', $r.getProfile().username);
     }
 
-    $.getJSON(_server+'/returns/findCurrentBySurveyNameAndOrg/'+_surveyName+'/'+$r.getProfile().attributes['org'],function(data) {
+    $.getJSON(_server+'/returns/findCurrentBySurveyNameAndOrg/'+_surveyName+'/'+$r.getProfileAttribute('org'), function(data) {
       me.rtn = data;
       if (_survey!=undefined) _fill(_survey);
     });
@@ -109,7 +109,7 @@ var $r = (function ($, ractive) {
               $('[data-id="ECLASS_USER"][value="'+me.rtn.answers[k].response+'"]').attr('checked','checked');
               break;
             case 'ORG_CODE':
-              ractive.set('q.categories.'+i+'.questions.'+j+'.response', $r.getProfile().attributes['org']);
+              ractive.set('q.categories.'+i+'.questions.'+j+'.response', $r.getProfileAttribute('org'));
               $('#ORG_CODE').attr('readonly','readonly').attr('disabled','disabled');
               break;
             case 'ORG_NAME':
@@ -321,6 +321,7 @@ var $r = (function ($, ractive) {
   }
 
   me.loginSuccessful = function() {
+    ractive.fetch();
     if (me.rtn == undefined) _fetchReturn();
     if (ractive.get('orgTypes') == undefined) _fetchLists();
     _showQuestionnaire();
@@ -359,6 +360,17 @@ var $r = (function ($, ractive) {
       return JSON.parse(profile);
     }
   }
+  me.getProfileAttribute = function(attr) {
+    if (Array.isArray(me.getProfile().attributes[attr])) {
+      return me.getProfile().attributes[attr][0];
+    } else {
+      return me.getProfile().attributes[attr];
+    }
+  },
+  me.getSurveyName = function() {
+    return _surveyName;
+  },
+
 
   /*me.loadTenantConfig = function(tenant) {
     if ($r.getProfile() == undefined) {
@@ -529,16 +541,13 @@ var $r = (function ($, ractive) {
   ractive.set('stdPartials', [
       { "name": "questionnaire", "url": "/questionnaire/partials/questionnaire.html"},
       { "name": "questionnaireContact", "url": "/questionnaire/partials/questionnaire-contact.html"},
-      { "name": "sidebar", "url": "partials/sidebar.html"},
-      { "name": "toolbar", "url": "partials/toolbar.html"}
+      { "name": "sidebar", "url": "/partials/sidebar.html"},
+      { "name": "toolbar", "url": "/partials/toolbar.html"}
     ])
   ractive.loadStandardPartials(ractive.get('stdPartials'));
 
-  $('head').append('<link href="'+_server+'/css/sdu-1.0.0.css" rel="stylesheet">');
+  $('head').append('<link href="/sdu/css/sdu-1.0.0.css" rel="stylesheet">');
   $('head').append('<link rel="icon" type="image/png" href="/srp/images/icon/sdu-icon-16x16.png">');
-
-  // set and load questionnaire
-  ractive.set('questionnaireDef',_server+'/surveys/findByName/'+_surveyName);
 
   if (ractive['fetchCallbacks']==undefined) ractive.fetchCallbacks = $.Callbacks();
   ractive.fetchCallbacks.add(_hideCalcs);
@@ -579,6 +588,10 @@ $(document).ready(function() {
   $r.keycloak.init({ onLoad: 'login-required' })
       .success(function(authenticated) {
     console.info(authenticated ? 'authenticated' : 'not authenticated');
+    // now safe to set and load questionnaire
+    ractive.set('questionnaireDef',$env.server+'/surveys/findByName/'+$r.getSurveyName());
+    localStorage['token'] = $r.keycloak.token; // used by questionnaire
+
     $r.keycloak.loadUserProfile().success(function(profile) {
       localStorage['profile'] = JSON.stringify(profile);
       $r.loginSuccessful();

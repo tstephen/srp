@@ -86,7 +86,7 @@ var ractive = new BaseRactive({
       else return 'hidden';
     },
     stdPartials: [
-      
+
       { "name": "navbar", "url": "/srp/vsn/partials/answer-navbar.html"},
       { "name": "profileArea", "url": $env.server+"/partials/profile-area.html"},
       { "name": "sidebar", "url": "partials/sidebar.html"},
@@ -196,7 +196,8 @@ var ractive = new BaseRactive({
       crossDomain: true,
       headers: {
         "X-Requested-With": "XMLHttpRequest",
-        "X-Authorization": "Bearer "+localStorage['token'],
+        "X-Authorization": "Bearer "+ractive.keycloak.token,
+        "Authorization": "Bearer "+ractive.keycloak.token,
         "Cache-Control": "no-cache"
       },
       success: function( data ) {

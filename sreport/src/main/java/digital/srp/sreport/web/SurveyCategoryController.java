@@ -3,6 +3,7 @@ package digital.srp.sreport.web;
 import java.util.Collections;
 import java.util.List;
 
+import javax.annotation.security.RolesAllowed;
 import javax.transaction.Transactional;
 
 import org.slf4j.Logger;
@@ -23,6 +24,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import com.fasterxml.jackson.annotation.JsonView;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import digital.srp.sreport.api.SrpRoles;
 import digital.srp.sreport.api.exceptions.ObjectNotFoundException;
 import digital.srp.sreport.model.SurveyCategory;
 import digital.srp.sreport.model.views.SurveyCategoryViews;
@@ -45,10 +47,9 @@ public class SurveyCategoryController {
     protected  SurveyCategoryRepository catRepo;
 
     /**
-     * Return just the specified category.
-     * 
      * @return The specified category.
      */
+    @RolesAllowed(SrpRoles.USER)
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
     @JsonView(SurveyCategoryViews.Detailed.class)
     @Transactional
@@ -63,10 +64,9 @@ public class SurveyCategoryController {
     }
 
     /**
-     * Return a list of categories, optionally paged.
-     * 
      * @return categories.
      */
+    @RolesAllowed(SrpRoles.USER)
     @RequestMapping(value = "/", method = RequestMethod.GET)
     @JsonView(SurveyCategoryViews.Summary.class)
     public @ResponseBody List<SurveyCategory> list(
@@ -89,6 +89,7 @@ public class SurveyCategoryController {
     /**
      * Delete an existing survey category.
      */
+    @RolesAllowed(SrpRoles.ADMIN)
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
     @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
     @Transactional

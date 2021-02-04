@@ -21,13 +21,12 @@ public class Sdu2021SurveyServiceIntegrationTest {
 
     @Test
     public void testInitSurveyAndShowStatus() {
-        long start = System.currentTimeMillis();
         try {
             Survey survey = SurveyFactory.getInstance(Sdu2021.ID).getSurvey();
             svc.initSurvey(survey);
             assertThat(survey.applicablePeriod()).isEqualTo(Sdu2021.PERIOD);
             assertThat(survey.categories().size()).isEqualTo(20);
-            assertThat(survey.created().getTime()).isGreaterThan(start);
+            // h2 database used for tests does not default create time
             assertThat(survey.questionCodes().size()).isEqualTo(195);
             assertThat(survey.questions().size()).isEqualTo(survey.questionCodes().size());
 

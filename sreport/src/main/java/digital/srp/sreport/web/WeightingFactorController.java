@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import javax.annotation.PostConstruct;
+import javax.annotation.security.RolesAllowed;
 import javax.transaction.Transactional;
 
 import org.slf4j.Logger;
@@ -32,6 +33,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import com.fasterxml.jackson.annotation.JsonView;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import digital.srp.sreport.api.SrpRoles;
 import digital.srp.sreport.api.exceptions.ObjectNotFoundException;
 import digital.srp.sreport.importers.WeightingFactorCsvImporter;
 import digital.srp.sreport.model.WeightingFactor;
@@ -74,10 +76,9 @@ public class WeightingFactorController {
     }
     
     /**
-     * Return just the specified weighting factor.
-     * 
      * @return The specified weighting factor.
      */
+    @RolesAllowed(SrpRoles.USER)
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
     @JsonView(WeightingFactorViews.Detailed.class)
     @Transactional
@@ -92,10 +93,9 @@ public class WeightingFactorController {
     }
 
     /**
-     * Return just the specified weighting factor.
-     * 
      * @return The specified weighting factor.
      */
+    @RolesAllowed(SrpRoles.USER)
     @RequestMapping(value = "/findByName/{name}", method = RequestMethod.GET)
     @JsonView(WeightingFactorViews.Detailed.class)
     @Transactional
@@ -109,9 +109,7 @@ public class WeightingFactorController {
     }
     
     /**
-     * Return a list of carbon factors, optionally paged.
-     * 
-     * @return carbon factors.
+     * @return List if weighting factors, optionally paged.
      */
     @RequestMapping(value = "/", method = RequestMethod.GET)
     @JsonView(WeightingFactorViews.Summary.class)
@@ -133,10 +131,9 @@ public class WeightingFactorController {
     }
     
     /**
-     * Create a new weighting factor.
-     * 
-     * @return
+     * @return The newly-created weighting factor.
      */
+    @RolesAllowed(SrpRoles.ANALYST)
     @SuppressWarnings({ "rawtypes", "unchecked" })
     @ResponseStatus(value = HttpStatus.CREATED)
     @RequestMapping(value = "/", method = RequestMethod.POST)

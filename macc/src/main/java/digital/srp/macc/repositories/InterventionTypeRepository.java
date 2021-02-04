@@ -25,7 +25,7 @@ import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 
 import digital.srp.macc.model.InterventionType;
 
-@RepositoryRestResource(path = "/intervention-types")
+@RepositoryRestResource(path = "intervention-types")
 public interface InterventionTypeRepository extends
         CrudRepository<InterventionType, Long> {
 
