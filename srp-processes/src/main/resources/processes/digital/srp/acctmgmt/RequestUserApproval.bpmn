@@ -1,0 +1,218 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions
+    xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+    xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+    xmlns:dc="http://www.omg.org/spec/DD/20100524/DC"
+    xmlns:di="http://www.omg.org/spec/DD/20100524/DI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:activiti="http://activiti.org/bpmn"
+    xmlns:tns="http://srp.digital/RequestUserApprovalDefinitions"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+    id="RequestUserApprovalDefinitions" name="" targetNamespace="http://srp.digital/acct-mgmt/RequestUserApprovalDefinitions" expressionLanguage="http://activiti.org/Juel" exporter="KnowProcess Modeler" exporterVersion="3.0.0" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL http://bpmn.sourceforge.net/schemas/BPMN20.xsd">
+    <process id="RequestUserApproval" name="Request approval of a new user for an organisation" processType="None" isClosed="false" isExecutable="true">
+        <documentation id="RequestUserApproval_D_1">Request existing user to approve access for a new one.</documentation>
+        <extensionElements>
+        </extensionElements>
+        <ioSpecification>
+            <dataInput id="_8" name="contactId"/>
+            <dataInput id="_3" name="userId"/>
+            <dataInput id="dataInput_87y999zrc" name="newUser"/>
+            <dataInput id="dataInput_3i5xr4zhq" name="newUserEmail"/>
+            <dataInput id="dataInput_8y1xk4ysh" name="memoName"/>
+            <inputSet>
+                <dataInputRefs>_8</dataInputRefs>
+                <dataInputRefs>_3</dataInputRefs>
+                <dataInputRefs>dataInput_87y999zrc</dataInputRefs>
+                <dataInputRefs>dataInput_3i5xr4zhq</dataInputRefs>
+                <dataInputRefs>dataInput_8y1xk4ysh</dataInputRefs>
+            </inputSet>
+            <outputSet/>
+        </ioSpecification>
+        <endEvent id="endEvent" name="End event">
+            <incoming>Flow_0iziowm</incoming>
+            <inputSet/>
+        </endEvent>
+        <sequenceFlow id="_19" sourceRef="_2" targetRef="_4"/>
+        <startEvent id="_2" name="Start event">
+            <outgoing>_19</outgoing>
+            <outputSet/>
+        </startEvent>
+        <callActivity id="_4" calledElement="SendMemo" name="Send memo">
+            <extensionElements>
+              <activiti:in source="contactId" target="contactId"/>
+              <activiti:in source="memoName" target="memoName"/>
+              <activiti:in source="memoVars" target="memoVars"/>
+              <activiti:in source="newUser" target="newUser"/>
+              <activiti:in source="newUserEmail" target="newUserEmail"/>
+              <activiti:in sourceExpression="${execution.tenantId}" target="tenantId"/>
+            </extensionElements>
+            <incoming>_19</incoming>
+            <outgoing>Flow_0iziowm</outgoing>
+            <ioSpecification>
+                <dataInput name="contact"/>
+                <dataInput id="dataInput_soo5q8dd8" name=""/>
+                <dataInput id="dataInput_5f3nwzrcu" name=""/>
+                <dataInput id="dataInput_n5bysydko" name=""/>
+                <dataOutput name="account"/>
+                <inputSet>
+                    <dataInputRefs>dataInput_soo5q8dd8</dataInputRefs>
+                    <dataInputRefs>dataInput_5f3nwzrcu</dataInputRefs>
+                    <dataInputRefs>dataInput_n5bysydko</dataInputRefs>
+                </inputSet>
+                <outputSet/>
+            </ioSpecification>
+            <property id="Property_1nvxaf9" name="__targetRef_placeholder"/>
+            <dataInputAssociation id="_wz3noadk9">
+                <sourceRef>_8</sourceRef>
+                <targetRef>Property_1nvxaf9</targetRef>
+            </dataInputAssociation>
+            <dataInputAssociation id="_yozmmo4xc">
+                <sourceRef>_3</sourceRef>
+                <targetRef>Property_1nvxaf9</targetRef>
+            </dataInputAssociation>
+            <dataInputAssociation id="_5zz8hbr6v">
+                <sourceRef>_8</sourceRef>
+                <targetRef>_4</targetRef>
+            </dataInputAssociation>
+            <dataInputAssociation id="_b2d96nvl8">
+                <sourceRef>dataInput_8y1xk4ysh</sourceRef>
+                <targetRef>Property_1nvxaf9</targetRef>
+            </dataInputAssociation>
+            <dataInputAssociation id="_451f5m8f2">
+                <sourceRef>_3</sourceRef>
+                <targetRef>_4</targetRef>
+            </dataInputAssociation>
+            <dataInputAssociation id="_4wz9ul6t2">
+                <sourceRef>_8</sourceRef>
+                <targetRef>_4</targetRef>
+            </dataInputAssociation>
+            <dataInputAssociation id="_lr99fz0pv">
+                <sourceRef>dataInput_3i5xr4zhq</sourceRef>
+                <targetRef>Property_1nvxaf9</targetRef>
+            </dataInputAssociation>
+            <dataInputAssociation id="_3yreicsfn">
+                <sourceRef>dataInput_87y999zrc</sourceRef>
+                <targetRef>Property_1nvxaf9</targetRef>
+            </dataInputAssociation>
+        </callActivity>
+        <sequenceFlow id="Flow_0iziowm" sourceRef="_4" targetRef="endEvent"/>
+        <textAnnotation id="_7">
+            <text>REQUEST USER APPROVAL</text>
+        </textAnnotation>
+    </process>
+    <bpmndi:BPMNDiagram id="di_RequestUserApproval" name="Request user approval" resolution="96">
+        <bpmndi:BPMNPlane bpmnElement="RequestUserApproval">
+            <bpmndi:BPMNEdge id="Flow_0iziowm_di" bpmnElement="Flow_0iziowm">
+                <di:waypoint x="440" y="229"/>
+                <di:waypoint x="564" y="229"/>
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNEdge id="di_19" bpmnElement="_19">
+                <di:waypoint x="204" y="229"/>
+                <di:waypoint x="340" y="229"/>
+                <bpmndi:BPMNLabel
+                    xmlns:color="http://www.omg.org/spec/BPMN/non-normative/color/1.0" color:color="#666666">
+                    <dc:Bounds x="161" y="228" width="0" height="14"/>
+                </bpmndi:BPMNLabel>
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNShape id="diendEvent" bpmnElement="endEvent">
+                <dc:Bounds x="564" y="213" width="32" height="32"/>
+                <bpmndi:BPMNLabel>
+                    <dc:Bounds x="555" y="254" width="50" height="14"/>
+                </bpmndi:BPMNLabel>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape id="Activity_1i6fph3_di" bpmnElement="_4">
+                <dc:Bounds x="340" y="189" width="100" height="80"/>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape id="di_8" bpmnElement="_8">
+                <dc:Bounds x="170" y="300" width="36" height="50"/>
+                <bpmndi:BPMNLabel>
+                    <dc:Bounds x="164" y="350" width="45" height="14"/>
+                </bpmndi:BPMNLabel>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape id="di_3" bpmnElement="_3">
+                <dc:Bounds x="170" y="380" width="36" height="50"/>
+                <bpmndi:BPMNLabel>
+                    <dc:Bounds x="170" y="430" width="31" height="14"/>
+                </bpmndi:BPMNLabel>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape
+                xmlns:color="http://www.omg.org/spec/BPMN/non-normative/color/1.0" id="dataInput_87y999zrc_di" bpmnElement="dataInput_87y999zrc" color:border-color="#666666" color:background-color="#779C95">
+                <dc:Bounds x="170" y="460" width="36" height="50"/>
+                <bpmndi:BPMNLabel color:color="#666666">
+                    <dc:Bounds x="163" y="515" width="44" height="14"/>
+                </bpmndi:BPMNLabel>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape
+                xmlns:color="http://www.omg.org/spec/BPMN/non-normative/color/1.0" id="dataInput_3i5xr4zhq_di" bpmnElement="dataInput_3i5xr4zhq" color:border-color="#666666" color:background-color="#779C95">
+                <dc:Bounds x="170" y="540" width="36" height="50"/>
+                <bpmndi:BPMNLabel color:color="#666666">
+                    <dc:Bounds x="152" y="590" width="71" height="14"/>
+                </bpmndi:BPMNLabel>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape
+                xmlns:color="http://www.omg.org/spec/BPMN/non-normative/color/1.0" id="dataInput_8y1xk4ysh_di" bpmnElement="dataInput_8y1xk4ysh" color:border-color="#666666" color:background-color="#779C95">
+                <dc:Bounds x="170" y="620" width="36" height="50"/>
+                <bpmndi:BPMNLabel color:color="#666666">
+                    <dc:Bounds x="156" y="670" width="60" height="14"/>
+                </bpmndi:BPMNLabel>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape id="di_7" bpmnElement="_7">
+                <dc:Bounds x="168" y="41" width="193" height="31"/>
+                <bpmndi:BPMNLabel>
+                    <dc:Bounds x="42" y="49.01" width="166" height="20.98"/>
+                </bpmndi:BPMNLabel>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape id="di_2" bpmnElement="_2">
+                <dc:Bounds x="172" y="213" width="32" height="32"/>
+                <bpmndi:BPMNLabel>
+                    <dc:Bounds x="161" y="254" width="54" height="14"/>
+                </bpmndi:BPMNLabel>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNEdge id="_wz3noadk9_di" bpmnElement="_wz3noadk9">
+                <di:waypoint x="206" y="320"/>
+                <di:waypoint x="360" y="320"/>
+                <di:waypoint x="360" y="270"/>
+                <bpmndi:BPMNLabel
+                    xmlns:color="http://www.omg.org/spec/BPMN/non-normative/color/1.0" color:color="#666666">
+                    <dc:Bounds x="165" y="416" width="0" height="14"/>
+                </bpmndi:BPMNLabel>
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNEdge id="_yozmmo4xc_di" bpmnElement="_yozmmo4xc">
+                <di:waypoint x="206" y="400"/>
+                <di:waypoint x="360" y="400"/>
+                <di:waypoint x="360" y="270"/>
+                <bpmndi:BPMNLabel
+                    xmlns:color="http://www.omg.org/spec/BPMN/non-normative/color/1.0" color:color="#666666">
+                    <dc:Bounds x="165" y="496" width="0" height="14"/>
+                </bpmndi:BPMNLabel>
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNEdge id="_b2d96nvl8_di" bpmnElement="_b2d96nvl8">
+                <di:waypoint x="206" y="640"/>
+                <di:waypoint x="360" y="640"/>
+                <di:waypoint x="360" y="270"/>
+                <bpmndi:BPMNLabel
+                    xmlns:color="http://www.omg.org/spec/BPMN/non-normative/color/1.0" color:color="#666666">
+                    <dc:Bounds x="165" y="736" width="0" height="14"/>
+                </bpmndi:BPMNLabel>
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNEdge id="_lr99fz0pv_di" bpmnElement="_lr99fz0pv">
+                <di:waypoint x="206" y="560"/>
+                <di:waypoint x="360" y="560"/>
+                <di:waypoint x="360" y="270"/>
+                <bpmndi:BPMNLabel
+                    xmlns:color="http://www.omg.org/spec/BPMN/non-normative/color/1.0" color:color="#666666">
+                    <dc:Bounds x="165" y="656" width="0" height="14"/>
+                </bpmndi:BPMNLabel>
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNEdge id="_3yreicsfn_di" bpmnElement="_3yreicsfn">
+                <di:waypoint x="206" y="480"/>
+                <di:waypoint x="360" y="480"/>
+                <di:waypoint x="360" y="270"/>
+                <bpmndi:BPMNLabel
+                    xmlns:color="http://www.omg.org/spec/BPMN/non-normative/color/1.0" color:color="#666666">
+                    <dc:Bounds x="165" y="576" width="0" height="14"/>
+                </bpmndi:BPMNLabel>
+            </bpmndi:BPMNEdge>
+        </bpmndi:BPMNPlane>
+    </bpmndi:BPMNDiagram>
+</definitions>
