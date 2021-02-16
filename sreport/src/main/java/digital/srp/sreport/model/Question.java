@@ -29,17 +29,9 @@ import javax.persistence.Table;
 import javax.persistence.Transient;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
-import javax.xml.bind.annotation.XmlElement;
-
-import org.springframework.hateoas.Link;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonView;
 
-import digital.srp.sreport.model.views.AnswerViews;
-import digital.srp.sreport.model.views.QuestionViews;
-import digital.srp.sreport.model.views.SurveyReturnViews;
-import digital.srp.sreport.model.views.SurveyViews;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -64,7 +56,6 @@ public class Question {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @JsonProperty
-    @JsonView( {SurveyViews.Detailed.class, SurveyReturnViews.Detailed.class} )
     @Column(name = "id", columnDefinition = "int(11) NOT NULL")
     protected Long id;
 
@@ -73,84 +64,66 @@ public class Question {
 
     @NotNull
     @JsonProperty
-    @JsonView( { AnswerViews.Summary.class, QuestionViews.Summary.class, SurveyViews.Detailed.class, SurveyReturnViews.Detailed.class } )
     @Column(name = "name")
     protected String name;
 
     @JsonProperty
-    @JsonView({ AnswerViews.Summary.class, QuestionViews.Summary.class, SurveyViews.Detailed.class })
     @Column(name = "label")
     protected String label;
 
     @NotNull
     @JsonProperty
-    @JsonView({ AnswerViews.Summary.class, QuestionViews.Summary.class, SurveyViews.Detailed.class, SurveyReturnViews.Detailed.class })
     @Column(name = "required")
     protected boolean required;
 
     @JsonProperty
-    @JsonView({ QuestionViews.Detailed.class, SurveyViews.Detailed.class })
     @Column(name = "hint")
     @Lob
     protected String hint;
 
     @JsonProperty
-    @JsonView({ QuestionViews.Detailed.class, SurveyViews.Detailed.class })
     @Column(name = "placeholder")
     protected String placeholder;
 
     @Size(max = 20)
     @JsonProperty
-    @JsonView({ QuestionViews.Summary.class, SurveyViews.Detailed.class, SurveyReturnViews.Summary.class })
     @Column(name = "type")
     protected String type;
 
     @Size(max = 20)
     @JsonProperty
-    @JsonView({ QuestionViews.Detailed.class, SurveyViews.Detailed.class })
     @Column(name = "unit")
     protected String unit;
 
     @Size(max = 50)
     @JsonProperty
-    @JsonView({ QuestionViews.Detailed.class, SurveyViews.Detailed.class })
     @Column(name = "validation")
     protected String validation;
 
     @Size(max = 50)
     @JsonProperty
-    @JsonView({ QuestionViews.Summary.class, SurveyViews.Detailed.class })
     @Column(name = "source")
     protected String source;
 
     @JsonProperty
-    @JsonView({ QuestionViews.Detailed.class, SurveyViews.Detailed.class })
     @Column(name = "def_val")
     protected String defaultValue;
 
     @JsonProperty
-    @JsonView({ QuestionViews.Detailed.class, SurveyViews.Detailed.class })
     @Column(name = "options")
     protected String optionNames;
 
     @JsonProperty
-    @JsonView({ QuestionViews.Detailed.class })
     @Column(name = "tenant_id")
     protected String tenantId;
 
     @Transient
     @JsonProperty("categories")
-    @JsonView({ QuestionViews.Detailed.class, AnswerViews.Detailed.class })
     protected List<String> categories;
-
-    @Transient
-    @XmlElement(name = "link", namespace = Link.ATOM_NAMESPACE)
-    @JsonProperty("links")
-    @JsonView(QuestionViews.Summary.class)
-    protected List<Link> links;
 
     public Question q(Q q) {
         this.name = q.name();
+        this.q = q;
         return this;
     }
 
@@ -159,7 +132,6 @@ public class Question {
     }
 
     @JsonProperty("optionNames")
-    @JsonView({ QuestionViews.Detailed.class, SurveyViews.Detailed.class })
     public List<String> optionNames() {
         if (optionNames == null) {
             return Collections.emptyList();
@@ -169,7 +141,6 @@ public class Question {
     }
 
     @JsonProperty("optionNames")
-    @JsonView({ QuestionViews.Detailed.class, SurveyViews.Detailed.class })
     public Question optionNames(List<String> optionNames) {
         this.optionNames = String.join(",", optionNames);
         return this;
@@ -293,13 +264,5 @@ public class Question {
 
     public void setCategories(List<String> categories) {
         this.categories = categories;
-    }
-
-    public List<Link> getLinks() {
-        return links;
-    }
-
-    public void setLinks(List<Link> links) {
-        this.links = links;
     }
 }

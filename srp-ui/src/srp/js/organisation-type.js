@@ -121,17 +121,16 @@ var ractive = new BaseRactive({
     },
     stdPartials: [
       { "name": "navbar", "url": "./vsn/partials/organisation-type-navbar.html"},
-      { "name": "profileArea", "url": $env.server+"/partials/profile-area.html"},
-      { "name": "sidebar", "url": "partials/sidebar.html"},
-      { "name": "toolbar", "url": "partials/toolbar.html"},
-      { "name": "titleArea", "url": $env.server+"/partials/title-area.html"},
+      { "name": "profileArea", "url": "/partials/profile-area.html"},
+      { "name": "sidebar", "url": "/partials/sidebar.html"},
+      { "name": "toolbar", "url": "/partials/toolbar.html"},
+      { "name": "titleArea", "url": "/partials/title-area.html"},
       { "name": "organisationTypeListSect", "url": "./vsn/partials/organisation-type-list-sect.html"},
       { "name": "organisationTypeCurrentSect", "url": "./vsn/partials/organisation-type-current-sect.html"}
     ],
     title: "Organisation Types"
   },
   partials: {
-    'loginSect':'',
     'organisationTypeCurrentSect':'',
     'organisationTypeListSect':'',
     'profileArea':'',
@@ -167,44 +166,38 @@ var ractive = new BaseRactive({
     $('.create-form,create-field').hide();
     ractive.select(organisationType);
   },
-  editField: function (selector, path) {
-    console.log('editField '+path+'...');
-    $(selector).css('border-width','1px').css('padding','5px 10px 5px 10px');
-  },
   delete: function (obj) {
     console.log('delete '+obj+'...');
-    var url = obj.links != undefined
-        ? obj.links.filter(function(d) { console.log('this:'+d);if (d['rel']=='self') return d;})[0].href
-        : obj._links.self.href;
-    $.ajax({
-        url: url,
-        type: 'DELETE',
-        success: completeHandler = function(data) {
-          ractive.fetch();
-          ractive.toggleResults();
-        }
-    });
+    ractive.srp.deleteOrgType(ractive.get('current'))
+        .then(response => {
+          switch (response.status) {
+          case 204:
+            ractive.fetch();
+            ractive.toggleResults();
+            break;
+          default:
+            ractive.showMessage('Unable to delete the organisation type ('+response.status+')');
+          }
+        });
     return false; // cancel bubbling to prevent edit as well as delete
   },
   fetch: function () {
     console.log('fetch...');
+    if (ractive.keycloak.token === undefined) return;
     ractive.set('saveObserver', false);
-    $.ajax({
-      dataType: "json",
-      url: ractive.getServer()+'/'+ractive.get('tenant.id')+'/organisation-types/',
-      crossDomain: true,
-      success: function( data ) {
-        if (data['_embedded'] == undefined) {
-          ractive.merge('organisationTypes', data);
-        }else{
-          ractive.merge('organisationTypes', data['_embedded'].organisationTypes);
-        }
-        if (ractive.hasRole('admin')) $('.admin').show();
-        if (ractive.fetchCallbacks!=null) ractive.fetchCallbacks.fire();
-        ractive.set('searchMatched',$('#organisationTypesTable tbody tr:visible').length);
-        ractive.set('saveObserver', true);
+    ractive.srp.fetchOrgTypes(ractive.get('tenant.id'))
+    .then(response => response.json()) // catch (e) { console.error('unable to parse response as JSON') } })
+    .then(data => {
+      if (data['_embedded'] == undefined) {
+        ractive.merge('organisationTypes', data);
+      } else {
+        ractive.merge('organisationTypes', data['_embedded'].organisationTypes);
       }
-    });
+      if (ractive.hasRole('admin')) $('.admin').show();
+      if (ractive.fetchCallbacks!=null) ractive.fetchCallbacks.fire();
+      ractive.set('searchMatched',$('#organisationTypesTable tbody tr:visible').length);
+      ractive.set('saveObserver', true);
+    })
   },
   filter: function(field,value) {
     console.log('filter: field '+field+' = '+value);
@@ -242,38 +235,32 @@ var ractive = new BaseRactive({
     console.log('oninit');
   },
   save: function () {
-    console.log('save organisationType: '+ractive.get('current').lastName+'...');
+    console.log('save organisationType: '+ractive.get('current.name')+'...');
     ractive.set('saveObserver',false);
-    var id = ractive.uri(ractive.get('current'));
     if (document.getElementById('currentForm')==undefined) {
       // loading... ignore
       ractive.set('saveObserver',true);
-    } else if(document.getElementById('currentForm').checkValidity()) {
+    } else if (document.getElementById('currentForm').checkValidity()) {
       // cannot save organisationType and account in one (grrhh), this will clone...
       var tmp = JSON.parse(JSON.stringify(ractive.get('current')));
       tmp.notes = undefined;
       tmp.documents = undefined;
       tmp.tenantId = ractive.get('tenant.id');
 //      console.log('ready to save organisationType'+JSON.stringify(tmp)+' ...');
-      $.ajax({
-        url: id === undefined ? ractive.getServer()+'/organisation-types' : id,
-        type: id === undefined ? 'POST' : 'PUT',
-        contentType: 'application/json',
-        data: JSON.stringify(tmp),
-        success: completeHandler = function(data, textStatus, jqXHR) {
-          //console.log('data: '+ data);
-          var location = jqXHR.getResponseHeader('Location');
-          ractive.set('saveObserver',false);
-          if (location != undefined) ractive.set('current._links.self.href',location);
-          if (jqXHR.status == 201) {
-            ractive.set('currentIdx',ractive.get('organisationTypes').push(ractive.get('current'))-1);
-          }
-          if (jqXHR.status == 204) ractive.splice('organisationTypes',ractive.get('currentIdx'),1,ractive.get('current'));
-
-          ractive.showMessage('Organisation Type saved');
-          ractive.set('saveObserver',true);
-        }
-      });
+      ractive.srp.saveOrgType(tmp, ractive.get('tenant.id'))
+          .then(response => {
+            switch(response.status) {
+            case 201:
+              ractive.set('currentIdx',ractive.get('organisationTypes').push(ractive.get('current'))-1);
+              return response.json();
+            }
+          })
+          .then(data => {
+            if (data !== undefined) ractive.set('current', data);
+            ractive.splice('organisationTypes',ractive.get('currentIdx'),1,ractive.get('current'));
+            ractive.set('saveObserver', true);
+            ractive.showMessage('Organisation Type saved');
+          });
     } else {
       console.warn('Cannot save yet as Organisation Type is invalid');
       $('#currentForm :invalid').addClass('field-error');
@@ -284,6 +271,7 @@ var ractive = new BaseRactive({
   select: function(organisationType) {
     console.log('select: '+JSON.stringify(organisationType));
     ractive.set('saveObserver',false);
+    // TODO obsolete?
 	  if (organisationType._links != undefined) {
 	    var url = ractive.tenantUri(organisationType);
 	    console.log('loading detail for '+url);
@@ -298,14 +286,11 @@ var ractive = new BaseRactive({
     } else {
       console.log('Skipping load as no _links.'+organisationType.name);
       ractive.set('current', organisationType);
+      ractive.set('currentIdx', ractive.get('organisationTypes').indexOf(organisationType));
       ractive.set('saveObserver',true);
     }
 	  ractive.toggleResults();
 	  $('#currentSect').slideDown();
-  },
-  showActivityIndicator: function(msg, addClass) {
-    document.body.style.cursor='progress';
-    this.showMessage(msg, addClass);
   },
   showResults: function() {
     $('#organisationTypesTableToggle').addClass('kp-icon-caret-down').removeClass('kp-icon-caret-right');

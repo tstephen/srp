@@ -48,11 +48,11 @@ public class MaccConfig {
                 OrganisationType.class);
     }
 
-    @Bean
-    public HttpMessageConverters customConverters() {
-        HttpMessageConverter<?> interventionCsv = new CsvConverter();
-        return new HttpMessageConverters(interventionCsv);
-    }
+//    @Bean
+//    public HttpMessageConverters customConverters() {
+//        HttpMessageConverter<?> interventionCsv = new CsvConverter();
+//        return new HttpMessageConverters(interventionCsv);
+//    }
 
     @Bean
     public CommandLineRunner init(

@@ -17,6 +17,7 @@ package digital.srp.sreport.services;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,35 +38,45 @@ public class SurveyService {
             .getLogger(SurveyService.class);
 
     @Autowired
-    protected QuestionService questionSvc;
+    protected final QuestionService questionSvc;
 
     @Autowired
-    protected QuestionRepository questionRepo;
+    protected final QuestionRepository questionRepo;
 
     @Autowired
-    protected SurveyRepository surveyRepo;
+    protected final SurveyRepository surveyRepo;
 
     @Autowired
-    protected SurveyCategoryRepository catRepo;
+    protected final SurveyCategoryRepository catRepo;
 
-    public void initSurvey(final Survey expected) {
+    public SurveyService(final QuestionService questionSvc,
+            final QuestionRepository questionRepo,
+            final SurveyRepository surveyRepo,
+            final SurveyCategoryRepository catRepo) {
+        this.questionSvc = questionSvc;
+        this.questionRepo = questionRepo;
+        this.catRepo = catRepo;
+        this.surveyRepo = surveyRepo;
+    }
+
+    public void initSurvey(Survey expected) {
         Survey survey = surveyRepo.findByName(expected.name());
         if (survey == null) {
             LOGGER.warn(String.format(
                     "Could not find expected survey %1$s, attempt to create",
                     expected));
-            surveyRepo.save(expected);
+            expected = surveyRepo.save(expected);
         } else {
             LOGGER.debug("Expected survey {} found, checking categories",
                     expected);
             for (SurveyCategory cat : expected.categories()) {
-                SurveyCategory existingCat = catRepo
+                Optional<SurveyCategory> existingCat = catRepo
                         .findBySurveyAndCategory(expected.name(), cat.name());
-                if (existingCat == null) {
-                    catRepo.save(cat.survey(survey));
-                } else {
+                if (existingCat.isPresent()) {
                     catRepo.save(
-                            existingCat.questionEnums(cat.questionEnums()));
+                            existingCat.get().questionEnums(cat.questionEnums()));
+                } else {
+                    catRepo.save(cat.survey(survey));
                 }
             }
         }
@@ -73,12 +84,12 @@ public class SurveyService {
         List<String> missingQs = new ArrayList<String>();
         for (SurveyCategory cat : expected.categories()) {
             for (String qName : cat.getQuestionNames().split(",")) {
-                Question q = questionRepo.findByName(qName);
-                if (q == null) {
+                Optional<Question> q = questionRepo.findByName(qName);
+                if (!q.isPresent()) {
                     LOGGER.error("Need to init question: '{}'", qName);
                     missingQs.add(qName);
                 }
-                cat.questions().add(q);
+                cat.questions().add(q.get());
             }
         }
         if (missingQs.size() > 0) {

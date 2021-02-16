@@ -15,7 +15,10 @@
  ******************************************************************************/
 package digital.srp.sreport.web;
 
-import java.util.Collections;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
+
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.annotation.PostConstruct;
@@ -27,19 +30,16 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.hateoas.Link;
+import org.springframework.hateoas.EntityModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
-import com.fasterxml.jackson.annotation.JsonView;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import digital.srp.sreport.api.SrpRoles;
@@ -48,8 +48,6 @@ import digital.srp.sreport.model.Q;
 import digital.srp.sreport.model.Survey;
 import digital.srp.sreport.model.SurveyCategory;
 import digital.srp.sreport.model.SurveyReturn;
-import digital.srp.sreport.model.views.SurveyReturnViews;
-import digital.srp.sreport.model.views.SurveyViews;
 import digital.srp.sreport.repositories.QuestionRepository;
 import digital.srp.sreport.repositories.SurveyCategoryRepository;
 import digital.srp.sreport.repositories.SurveyRepository;
@@ -96,16 +94,16 @@ public class SurveyController {
      */
     @RolesAllowed(SrpRoles.USER)
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
-    @JsonView(SurveyViews.Detailed.class)
     @Transactional
-    public @ResponseBody Survey findById(
+    public @ResponseBody EntityModel<Survey> findById(
             @PathVariable("id") Long surveyId) {
-        LOGGER.info(String.format("findById %1$s", surveyId));
+        LOGGER.info("findById {}", surveyId);
 
         Survey survey = surveyRepo.findById(surveyId)
                 .orElseThrow(() -> new ObjectNotFoundException(Survey.class, surveyId));
         // use logger for force child load
-        LOGGER.info(String.format("Found survey with id %1$d named %2$s and with %3$d categories of questions", survey.id(), survey.name(), survey.categories().size()));
+        LOGGER.info("Found survey with id {} named {} and with {} categories of questions",
+                survey.id(), survey.name(), survey.categories().size());
 
         return addLinks(survey);
     }
@@ -115,26 +113,25 @@ public class SurveyController {
      */
     @RolesAllowed(SrpRoles.USER)
     @RequestMapping(value = "/findByName/{name}", method = RequestMethod.GET)
-    @JsonView(SurveyViews.Detailed.class)
-    public @ResponseBody Survey findByName(
+    public @ResponseBody EntityModel<Survey> findByName(
             @PathVariable("name") String name) {
-        LOGGER.info(String.format("findByName %1$s", name));
+        LOGGER.info("findByName {}", name);
 
         Survey survey = surveyRepo.findByName(name);
         // use logger for force child load
-        LOGGER.info(String.format("Found survey with id %1$d named %2$s and with %3$d categories totalling %4$d questions",
+        LOGGER.info("Found survey with id {} named {} and with {} categories totalling {} questions",
                 survey.id(), survey.name(), survey.categories().size(),
-                survey.questionCodes().size()));
+                survey.questionCodes().size());
 
         // TODO fetch all questions to optimise db access?
 //        List<SurveyQuestion> surveyQuestions = qRepo.findBySurvey(survey.name());
         for (SurveyCategory cat : survey.categories()) {
             for (Q q : cat.questionEnums()) {
-                cat.questions().add(questionRepo.findByName(q.name()));
+                cat.questions().add(questionRepo.findByName(q.name()).get());
             }
         }
 
-        return survey;
+        return addLinks(survey);
     }
 
     /**
@@ -142,12 +139,10 @@ public class SurveyController {
      */
     @RolesAllowed(SrpRoles.ADMIN)
     @RequestMapping(value = "/", method = RequestMethod.GET)
-    @JsonView(SurveyViews.Summary.class)
-    public @ResponseBody List<Survey> list(
-            @RequestHeader String Authorization,
+    public @ResponseBody List<EntityModel<Survey>> list(
             @RequestParam(value = "page", required = false) Integer page,
             @RequestParam(value = "limit", required = false) Integer limit) {
-        LOGGER.info(String.format("List surveys"));
+        LOGGER.info("List surveys");
 
         List<Survey> list;
         if (limit == null) {
@@ -156,9 +151,9 @@ public class SurveyController {
             Pageable pageable = PageRequest.of(page == null ? 0 : page, limit);
             list = surveyRepo.findPage(pageable);
         }
-        LOGGER.info(String.format("Found %1$s surveys", list.size()));
 
-        return list;
+        LOGGER.info("Found {} surveys", list.size());
+        return addLinks(list);
     }
 
     /**
@@ -166,7 +161,6 @@ public class SurveyController {
      */
     @RolesAllowed(SrpRoles.ADMIN)
     @RequestMapping(value = "/{id}/returns", method = RequestMethod.GET)
-    @JsonView(SurveyReturnViews.Summary.class)
     public @ResponseBody List<SurveyReturn> listReturns(
             @PathVariable("id") Long surveyId,
             @RequestParam(value = "page", required = false) Integer page,
@@ -180,27 +174,8 @@ public class SurveyController {
             Pageable pageable = PageRequest.of(page == null ? 0 : page, limit);
             list = returnRepo.findPageBySurvey(surveyId, pageable);
         }
-        LOGGER.info(String.format("Found %1$s returns", list.size()));
-
+        LOGGER.info("Found {} returns", list.size());
         return list;
-    }
-
-    /**
-     * Change the status the survey has reached.
-     */
-    @RolesAllowed(SrpRoles.USER)
-    @RequestMapping(value = "/{surveyId}/status", method = RequestMethod.POST, consumes = "application/json")
-    public @ResponseBody void setStatus(
-            @PathVariable("surveyId") Long surveyId,
-            @RequestBody String status) {
-        LOGGER.info(String.format("Setting survey %1$s to status %2$s",
-                surveyId, status));
-
-        Survey survey = surveyRepo.findById(surveyId)
-                .orElseThrow(() -> new ObjectNotFoundException(Survey.class, surveyId))
-                .status(status);
-
-        surveyRepo.save(survey);
     }
 
     /**
@@ -214,8 +189,17 @@ public class SurveyController {
         surveyRepo.deleteById(surveyId);
     }
 
-    private Survey addLinks(Survey survey) {
-        return survey.links(Collections.singletonList(
-                Link.of(getClass().getAnnotation(RequestMapping.class).value()[0] + "/" + survey.id())));
+    protected List<EntityModel<Survey>> addLinks(List<Survey> surveys) {
+        List<EntityModel<Survey>> entities = new ArrayList<EntityModel<Survey>>();
+        for (Survey rtn : surveys) {
+            entities.add(addLinks(rtn));
+        }
+        return entities;
+    }
+
+    protected EntityModel<Survey> addLinks(Survey survey) {
+        return EntityModel.of(survey,
+                linkTo(methodOn(SurveyController.class).findById(survey.id()))
+                        .withSelfRel());
     }
 }

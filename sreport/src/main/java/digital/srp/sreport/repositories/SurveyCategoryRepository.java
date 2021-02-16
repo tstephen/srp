@@ -16,6 +16,7 @@
 package digital.srp.sreport.repositories;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
@@ -33,13 +34,13 @@ import digital.srp.sreport.model.SurveyCategory;
 public interface SurveyCategoryRepository extends CrudRepository<SurveyCategory, Long> {
 
     @Query("SELECT o FROM SurveyCategory o WHERE o.name = :name ORDER BY o.name ASC")
-    SurveyCategory findByName(@Param("name") String name);
+    Optional<SurveyCategory> findByName(@Param("name") String name);
 
     @Query("SELECT o FROM SurveyCategory o WHERE o.survey.name = :survey ORDER BY o.name ASC")
     List<SurveyCategory> findBySurveyName(@Param("survey") String survey);
 
     @Query("SELECT o FROM SurveyCategory o WHERE o.name = :category AND o.survey.name = :survey ORDER BY o.name ASC")
-    SurveyCategory findBySurveyAndCategory(@Param("survey") String survey, @Param("category") String category);
+    Optional<SurveyCategory> findBySurveyAndCategory(@Param("survey") String survey, @Param("category") String category);
 
     @Query("SELECT o FROM SurveyCategory o ORDER BY o.name ASC")
     List<SurveyCategory> findAll();

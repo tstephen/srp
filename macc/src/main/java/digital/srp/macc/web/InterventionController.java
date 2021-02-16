@@ -15,9 +15,11 @@
  ******************************************************************************/
 package digital.srp.macc.web;
 
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
+
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import org.hibernate.ObjectNotFoundException;
@@ -27,7 +29,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.hateoas.Link;
+import org.springframework.hateoas.EntityModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -39,13 +41,11 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.fasterxml.jackson.annotation.JsonView;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import digital.srp.macc.model.Intervention;
 import digital.srp.macc.repositories.InterventionRepository;
-import digital.srp.macc.views.InterventionViews;
 
 /**
  * REST endpoint for accessing {@link Interventions}
@@ -130,13 +130,11 @@ public class InterventionController {
      * @return interventions for that tenant.
      */
     @RequestMapping(value = "/", method = RequestMethod.GET, produces = "application/json")
-    @JsonView(InterventionViews.Detailed.class)
-    public @ResponseBody List<Intervention> listForTenantAsJson(
+    public @ResponseBody List<EntityModel<digital.srp.macc.model.Intervention>> listForTenantAsJson(
             @PathVariable("tenantId") String tenantId,
             @RequestParam(value = "page", required = false) Integer page,
             @RequestParam(value = "limit", required = false) Integer limit) {
-        List<Intervention> interventions = listForTenant(tenantId, page, limit);
-        return addLinks(interventions);
+        return listForTenant(tenantId, page, limit);
     }
 
     /**
@@ -145,14 +143,14 @@ public class InterventionController {
      * @return interventions for that tenant.
      */
     @RequestMapping(value = "/", method = RequestMethod.GET, produces = "text/csv")
-    public @ResponseBody List<Intervention> exportAsCsv(
+    public @ResponseBody List<EntityModel<digital.srp.macc.model.Intervention>> exportAsCsv(
             @PathVariable("tenantId") String tenantId,
             @RequestParam(value = "page", required = false) Integer page,
             @RequestParam(value = "limit", required = false) Integer limit) {
         return listForTenant(tenantId, page, limit);
     }
 
-    protected List<Intervention> listForTenant(String tenantId, Integer page,
+    protected List<EntityModel<digital.srp.macc.model.Intervention>> listForTenant(String tenantId, Integer page,
             Integer limit) {
         LOGGER.info(String.format("List interventions for tenant %1$s",
                 tenantId));
@@ -178,8 +176,7 @@ public class InterventionController {
      * @return interventions for that tenant.
      */
     @RequestMapping(value = "/status/{status}/{orgTypeName}", method = RequestMethod.GET)
-    @JsonView(InterventionViews.Detailed.class)
-    public @ResponseBody List<Intervention> findByStatusForTenantAndOrgType(
+    public @ResponseBody List<EntityModel<digital.srp.macc.model.Intervention>> findByStatusForTenantAndOrgType(
             @PathVariable("tenantId") String tenantId,
             @PathVariable("status") String status,
             @PathVariable("orgTypeName") String orgTypeName) {
@@ -198,8 +195,7 @@ public class InterventionController {
      * @return The specified intervention.
      */
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
-    @JsonView(InterventionViews.Detailed.class)
-    public @ResponseBody Intervention findById(
+    public @ResponseBody EntityModel<digital.srp.macc.model.Intervention> findById(
             @PathVariable("id") Long interventionId) {
         LOGGER.info(String.format("findById %1$s", interventionId));
 
@@ -210,16 +206,17 @@ public class InterventionController {
         return addLinks(intvn);
     }
 
-    private List<Intervention> addLinks(final List<Intervention> interventions) {
-        for (Intervention i : interventions) {
-            addLinks(i);
+    protected List<EntityModel<Intervention>> addLinks(List<Intervention> intvns) {
+        List<EntityModel<Intervention>> entities = new ArrayList<EntityModel<Intervention>>();
+        for (Intervention rtn : intvns) {
+            entities.add(addLinks(rtn));
         }
-        return interventions;
+        return entities;
     }
 
-    private Intervention addLinks(final Intervention intervention) {
-        return intervention.links(Collections
-                .singletonList(Link.of(String.format("/%1$s/interventions/%2$d",
-                        intervention.getTenantId(), intervention.getId()))));
+    protected EntityModel<Intervention> addLinks(Intervention intvn) {
+        return EntityModel.of(intvn,
+                linkTo(methodOn(InterventionController.class).findById(intvn.getId()))
+                        .withSelfRel());
     }
 }

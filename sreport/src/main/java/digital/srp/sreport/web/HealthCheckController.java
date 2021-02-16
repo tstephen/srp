@@ -30,8 +30,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.fasterxml.jackson.annotation.JsonView;
-
 import digital.srp.sreport.api.SrpRoles;
 import digital.srp.sreport.api.exceptions.FailedHealthCheckException;
 import digital.srp.sreport.api.exceptions.ObjectNotFoundException;
@@ -39,7 +37,6 @@ import digital.srp.sreport.internal.PeriodUtil;
 import digital.srp.sreport.model.Answer;
 import digital.srp.sreport.model.HealthCheck;
 import digital.srp.sreport.model.SurveyReturn;
-import digital.srp.sreport.model.views.HealthCheckViews;
 import digital.srp.sreport.repositories.AnswerRepository;
 import digital.srp.sreport.repositories.SurveyReturnRepository;
 import digital.srp.sreport.services.HealthChecker;
@@ -76,7 +73,6 @@ public class HealthCheckController {
     @RolesAllowed(SrpRoles.ADMIN)
     @RequestMapping(value = "/{returnId}", method = RequestMethod.GET, produces = {
             "application/json" })
-    @JsonView(HealthCheckViews.Summary.class)
     public @ResponseBody HealthCheck checkHealth(
             @PathVariable("returnId") Long returnId) {
         LOGGER.info(String.format("Checking health for %1$s", returnId));
@@ -97,7 +93,6 @@ public class HealthCheckController {
     @RolesAllowed(SrpRoles.ADMIN)
     @RequestMapping(value = "/{surveyName}/{org}", method = RequestMethod.GET, produces = {
             "application/json" })
-    @JsonView(HealthCheckViews.Summary.class)
     public @ResponseBody HealthCheck checkHealth(
             @PathVariable("surveyName") String surveyName,
             @PathVariable("org") String org) {
@@ -121,7 +116,6 @@ public class HealthCheckController {
     @RolesAllowed(SrpRoles.ADMIN)
     @RequestMapping(value = "/{returnId}", method = RequestMethod.POST, produces = {
             "application/json" })
-    @JsonView(HealthCheckViews.Summary.class)
     public @ResponseBody HealthCheck checkHealthAndAttemptFixes(
             @PathVariable("returnId") Long returnId) {
         LOGGER.info(String.format("Checking health for %1$s", returnId));
@@ -142,7 +136,6 @@ public class HealthCheckController {
     @RolesAllowed(SrpRoles.ADMIN)
     @RequestMapping(value = "/{surveyName}/{org}", method = RequestMethod.POST, produces = {
             "application/json" })
-    @JsonView(HealthCheckViews.Summary.class)
     public @ResponseBody HealthCheck checkHealthAndAttemptFixes(
             @PathVariable("surveyName") String surveyName,
             @PathVariable("org") String org) {

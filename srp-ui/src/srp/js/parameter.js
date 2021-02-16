@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2015-2020 Tim Stephenson and contributors
+ * Copyright 2015-2021 Tim Stephenson and contributors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -120,17 +120,16 @@ var ractive = new BaseRactive({
     },
     stdPartials: [
       { "name": "navbar", "url": "./vsn/partials/parameter-navbar.html"},
-      { "name": "profileArea", "url": $env.server+"/partials/profile-area.html"},
-      { "name": "sidebar", "url": "./vsn/partials/sidebar.html"},
-      { "name": "toolbar", "url": "partials/toolbar.html"},
-      { "name": "titleArea", "url": $env.server+"/partials/title-area.html"},
+      { "name": "profileArea", "url": "/partials/profile-area.html"},
+      { "name": "sidebar", "url": "/partials/sidebar.html"},
+      { "name": "toolbar", "url": "/partials/toolbar.html"},
+      { "name": "titleArea", "url": "/partials/title-area.html"},
       { "name": "parameterListSect", "url": "./vsn/partials/parameter-list-sect.html"},
       { "name": "parameterCurrentSect", "url": "./vsn/partials/parameter-current-sect.html"}
     ],
     title: "Parameters"
   },
   partials: {
-    'loginSect':'',
     'parameterCurrentSect':'',
     'parameterListSect':'',
     'profileArea':'',
@@ -167,28 +166,26 @@ var ractive = new BaseRactive({
     ractive.select(parameter);
   },
   delete: function (obj) {
-    console.log('delete '+obj+'...');
-    var url = obj.links != undefined
-        ? obj.links.filter(function(d) { console.log('this:'+d);if (d['rel']=='self') return d;})[0].href
-        : obj._links.self.href;
-    $.ajax({
-        url: url,
-        type: 'DELETE',
-        success: completeHandler = function(data) {
-          ractive.fetch();
-          ractive.toggleResults();
-        }
+    ractive.srp.deleteParameter(ractive.get('current'))
+    .then(response => {
+      switch (response.status) {
+      case 204:
+        ractive.fetch();
+        ractive.toggleResults();
+        break;
+      default:
+        ractive.showMessage('Unable to delete the parameter ('+response.status+')');
+      }
     });
     return false; // cancel bubbling to prevent edit as well as delete
   },
-  fetch: function () {
+  fetch: function() {
     console.log('fetch...');
+    if (ractive.keycloak.token === undefined) return;
     ractive.set('saveObserver', false);
-    $.ajax({
-      dataType: "json",
-      url: ractive.getServer()+'/'+ractive.get('tenant.id')+'/parameters/',
-      crossDomain: true,
-      success: function( data ) {
+    ractive.srp.fetchParameters(ractive.get('tenant.id'))
+    .then(response => response.json()) // catch (e) { console.error('unable to parse response as JSON') } })
+    .then(data => {
         if (data['_embedded'] == undefined) {
           ractive.merge('parameters', data);
         }else{
@@ -199,7 +196,7 @@ var ractive = new BaseRactive({
         ractive.set('searchMatched',$('#parametersTable tbody tr:visible').length);
         ractive.set('saveObserver', true);
       }
-    });
+    );
   },
   filter: function(field,value) {
     console.log('filter: field '+field+' = '+value);
@@ -239,34 +236,44 @@ var ractive = new BaseRactive({
     }
     return uri;
   },
-  save: function () {
+  hideResults: function() {
+    $('#parametersTableToggle').addClass('kp-icon-caret-right').removeClass('kp-icon-caret-down');
+    $('#parametersTable').slideUp();
+    $('#currentSect').slideDown({ queue: true });
+  },
+  postSelect: function(parameter) {
+    ractive.set('saveObserver', false);
+    console.log('found parameter '+parameter);
+    ractive.set('current', parameter);
+    ractive.initControls();
+    // who knows why this is needed, but it is, at least for first time rendering
+    $('.autoNumeric').autoNumeric('update',{});
+    ractive.hideResults();
+    $('#currentSect').slideDown();
+    ractive.set('saveObserver',true);
+  },
+  save: function() {
     console.log('save parameter: '+ractive.get('current').name+'...');
     ractive.set('saveObserver',false);
     var id = ractive.uri(ractive.get('current'));
     console.log('  id: '+id+', so will '+(id === undefined ? 'POST' : 'PUT'));
     ractive.set('saveObserver',true);
-    if (document.getElementById('currentForm')==undefined) {
-      // loading... ignore
-    } else if(document.getElementById('currentForm').checkValidity()) {
+    if (document.getElementById('currentForm')==undefined) { /* loading... ignore */ }
+    else if(document.getElementById('currentForm').checkValidity()) {
       ractive.set('current.tenantId', ractive.get('tenant.id'));
-      $.ajax({
-        url: id === undefined ? ractive.getServer()+'/parameters/' : id,
-        type: id === undefined ? 'POST' : 'PUT',
-        contentType: 'application/json',
-        data: JSON.stringify(ractive.get('current')),
-        success: completeHandler = function(data, textStatus, jqXHR) {
-          console.log(jqXHR.status+': '+JSON.stringify(data));
-          var location = jqXHR.getResponseHeader('Location');
-          ractive.set('saveObserver',false);
-          if (location != undefined) ractive.set('current._links.self.href',location);
-          if (jqXHR.status == 201) {
-            ractive.set('currentIdx',ractive.get('parameters').push(ractive.get('current'))-1);
-          }
-          if (jqXHR.status == 204) ractive.splice('parameters',ractive.get('currentIdx'),1,ractive.get('current'));
-
-          ractive.showMessage('Parameter saved');
-          ractive.set('saveObserver',true);
+      ractive.srp.saveParameter(ractive.get('current'), ractive.get('tenant.id'))
+      .then(response => {
+        switch(response.status) {
+        case 201:
+          return ractive.set('currentIdx',ractive.get('parameters').push(ractive.get('current'))-1);
         }
+      })
+      .then(data => {
+        if (data !== undefined) ractive.set('current', data);
+        ractive.splice('parameters',ractive.get('currentIdx'),1,ractive.get('current'));
+        ractive.set('saveObserver', true);
+        $('.autoNumeric').autoNumeric('update');
+        ractive.showMessage('Parameter saved');
       });
     } else {
       console.warn('Cannot save yet as parameter is invalid');
@@ -277,31 +284,16 @@ var ractive = new BaseRactive({
   select: function(parameter) {
     console.log('select: '+JSON.stringify(parameter));
     ractive.set('saveObserver',false);
-	  // adapt between Spring Hateos and Spring Data Rest
-	  if (parameter['_links'] == undefined && parameter.links != undefined) {
-	    parameter._links = parameter.links;
-	    $.each(parameter.links, function(i,d) {
-        if (d.rel == 'self') parameter._links.self = { href:d.href };
-      });
-	  }
-	  if (parameter._links != undefined) {
-	    var url = parameter._links.self.href.indexOf('?')==-1 ? parameter._links.self.href : parameter._links.self.href.substr(0,parameter._links.self.href.indexOf('?')-1);
-	    console.log('loading detail for '+url);
-	    $.getJSON(ractive.getServer()+url,  function( data ) {
-        console.log('found parameter '+data);
-        ractive.set('current', data);
-        ractive.initControls();
-        // who knows why this is needed, but it is, at least for first time rendering
-        $('.autoNumeric').autoNumeric('update',{});
-        ractive.set('saveObserver',true);
-      });
+    var url = ractive.uri(parameter);
+    if (url == undefined) {
+      console.log('Skipping load as no uri.');
+      ractive.postSelect(parameter);
     } else {
-      console.log('Skipping load as no _links.'+parameter.name);
-      ractive.set('current', parameter);
-      ractive.set('saveObserver',true);
+      console.log('loading detail for '+url);
+      ractive.srp.fetchParameter(url)
+      .then(response => response.json())
+      .then(data => ractive.postSelect(data));
     }
-	  ractive.toggleResults();
-	  $('#currentSect').slideDown();
   },
   showActivityIndicator: function(msg, addClass) {
     document.body.style.cursor='progress';

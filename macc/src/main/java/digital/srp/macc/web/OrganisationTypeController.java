@@ -15,10 +15,12 @@
  ******************************************************************************/
 package digital.srp.macc.web;
 
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
+
 import java.io.IOException;
-import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.hibernate.ObjectNotFoundException;
@@ -28,7 +30,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.hateoas.Link;
+import org.springframework.hateoas.EntityModel;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -42,13 +44,11 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.fasterxml.jackson.annotation.JsonView;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import digital.srp.macc.model.OrganisationType;
 import digital.srp.macc.repositories.OrganisationTypeRepository;
-import digital.srp.macc.views.OrganisationTypeViews;
 
 /**
  * REST endpoint for accessing {@link OrganisationType}
@@ -118,9 +118,10 @@ public class OrganisationTypeController {
         orgType = organisationTypeRepo.save(orgType);
 
         HttpHeaders headers = new HttpHeaders();
-        headers.setLocation(new URI(getTenantUri(orgType)));
+        headers.setLocation(linkTo(methodOn(OrganisationTypeController.class)
+                .findById(tenantId, orgType.getId())).withSelfRel().toUri());
 
-        return new ResponseEntity(orgType, headers, HttpStatus.CREATED);
+        return new ResponseEntity(addLinks(tenantId, orgType), headers, HttpStatus.CREATED);
     }
 
     /**
@@ -129,13 +130,12 @@ public class OrganisationTypeController {
      * @return organisation types for that tenant.
      */
     @RequestMapping(value = "/", method = RequestMethod.GET)
-    @JsonView({ OrganisationTypeViews.Summary.class })
-    public @ResponseBody List<OrganisationType> listForTenant(
+    public @ResponseBody List<EntityModel<OrganisationType>> listForTenant(
             @PathVariable("tenantId") String tenantId,
             @RequestParam(value = "filter", required = false) String filter,
             @RequestParam(value = "page", required = false) Integer page,
             @RequestParam(value = "limit", required = false) Integer limit) {
-        LOGGER.info(String.format("List organisation types for tenant %1$s", tenantId));
+        LOGGER.info("List organisation types for tenant {}", tenantId);
 
         List<OrganisationType> list;
         if ("reportingType".equals(filter)) {
@@ -148,22 +148,21 @@ public class OrganisationTypeController {
         }
         LOGGER.info(String.format("Found %1$s organisation types", list.size()));
 
-        return addLinks(list);
+        return addLinks(tenantId, list);
     }
 
     /**
      * @return one organisation type with the provided id.
      */
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
-    @JsonView({ OrganisationTypeViews.Summary.class })
-    public @ResponseBody OrganisationType findById(
+    public @ResponseBody EntityModel<OrganisationType> findById(
             @PathVariable("tenantId") String tenantId,
             @PathVariable("id") Long orgTypeId) {
         LOGGER.info(String.format(
                 "Find organisation types for tenant %1$s with id %2$d",
                 tenantId, orgTypeId));
 
-        return addLinks(organisationTypeRepo.findById(orgTypeId)
+        return addLinks(tenantId, organisationTypeRepo.findById(orgTypeId)
                 .orElseThrow(() -> new ObjectNotFoundException(orgTypeId,
                         OrganisationType.class.getSimpleName())));
     }
@@ -175,9 +174,7 @@ public class OrganisationTypeController {
      * @status Comma separated list of status to include.
      * @return interventions for that tenant.
      */
-    @JsonView({ OrganisationTypeViews.Summary.class })
-    @RequestMapping(value = "/status/{status}", method = RequestMethod.GET)
-    public @ResponseBody List<OrganisationType> findByStatusForTenant(
+    public @ResponseBody List<EntityModel<OrganisationType>> findByStatusForTenant(
             @PathVariable("tenantId") String tenantId,
             @PathVariable("status") String status) {
         LOGGER.info(String.format(
@@ -188,7 +185,7 @@ public class OrganisationTypeController {
                 .findByStatusForTenant(tenantId, status);
         LOGGER.info(String.format("Found %1$s organisation types", list.size()));
 
-        return addLinks(list);
+        return addLinks(tenantId, list);
     }
 
     /**
@@ -230,21 +227,17 @@ public class OrganisationTypeController {
         organisationTypeRepo.save(orgType);
     }
 
-    private List<OrganisationType> addLinks(List<OrganisationType> orgTypes) {
-        for (OrganisationType orgType : orgTypes) {
-            addLinks(orgType);
+    protected List<EntityModel<OrganisationType>> addLinks(final String tenantId, final List<OrganisationType> list) {
+        ArrayList<EntityModel<OrganisationType>> entities = new ArrayList<EntityModel<OrganisationType>>();
+        for (OrganisationType answer : list) {
+            entities.add(addLinks(tenantId, answer));
         }
-        return orgTypes;
+        return entities;
     }
 
-    private OrganisationType addLinks(final OrganisationType orgType) {
-        return orgType.links(Collections.singletonList(
-                Link.of(String.format("/%1$s/organisation-types/%2$d",
-                        orgType.getTenantId(), orgType.getId()))));
-    }
-
-    private String getTenantUri(final OrganisationType orgType) {
-        return String.format("/%1$s/organisation-types/%2$s",
-                orgType.getTenantId(), orgType.getId());
+    protected EntityModel<OrganisationType> addLinks(final String tenantId, OrganisationType survey) {
+        return EntityModel.of(survey,
+                linkTo(methodOn(OrganisationTypeController.class).findById(tenantId, survey.getId()))
+                        .withSelfRel());
     }
 }

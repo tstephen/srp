@@ -15,8 +15,11 @@
  ******************************************************************************/
 package digital.srp.sreport.web;
 
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
+
 import java.io.IOException;
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -30,7 +33,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.hateoas.Link;
+import org.springframework.hateoas.EntityModel;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -45,14 +48,12 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import com.fasterxml.jackson.annotation.JsonView;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import digital.srp.sreport.api.SrpRoles;
 import digital.srp.sreport.api.exceptions.ObjectNotFoundException;
 import digital.srp.sreport.importers.WeightingFactorCsvImporter;
 import digital.srp.sreport.model.WeightingFactor;
-import digital.srp.sreport.model.views.WeightingFactorViews;
 import digital.srp.sreport.repositories.WeightingFactorRepository;
 
 /**
@@ -95,9 +96,8 @@ public class WeightingFactorController {
      */
     @RolesAllowed(SrpRoles.USER)
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
-    @JsonView(WeightingFactorViews.Detailed.class)
     @Transactional
-    public @ResponseBody WeightingFactor findById(
+    public @ResponseBody EntityModel<WeightingFactor> findById(
             @PathVariable("id") Long factorId) {
         LOGGER.info(String.format("findById %1$s", factorId));
 
@@ -112,23 +112,22 @@ public class WeightingFactorController {
      */
     @RolesAllowed(SrpRoles.USER)
     @RequestMapping(value = "/findByName/{name}", method = RequestMethod.GET)
-    @JsonView(WeightingFactorViews.Detailed.class)
     @Transactional
-    public @ResponseBody WeightingFactor findByName(
+    public @ResponseBody EntityModel<WeightingFactor> findByName(
             @PathVariable("name") String name) {
         LOGGER.info(String.format("findByName %1$s", name));
 
-        WeightingFactor factor = wfactorRepo.findByOrgType(name);
+        WeightingFactor factor = wfactorRepo.findByOrgType(name)
+                .orElseThrow(()-> new ObjectNotFoundException(WeightingFactor.class, name));
 
-        return factor;
+        return addLinks(factor);
     }
 
     /**
      * @return List if weighting factors, optionally paged.
      */
     @RequestMapping(value = "/", method = RequestMethod.GET)
-    @JsonView(WeightingFactorViews.Summary.class)
-    public @ResponseBody List<WeightingFactor> list(
+    public @ResponseBody List<EntityModel<WeightingFactor>> list(
             @RequestParam(value = "page", required = false) Integer page,
             @RequestParam(value = "limit", required = false) Integer limit) {
         LOGGER.info(String.format("List weighting factors"));
@@ -142,7 +141,7 @@ public class WeightingFactorController {
         }
         LOGGER.info(String.format("Found %1$s carbon factors", list.size()));
 
-        return list;
+        return addLinks(list);
     }
 
     /**
@@ -199,9 +198,17 @@ public class WeightingFactorController {
         wfactorRepo.deleteById(cfactorId);
     }
 
-    private WeightingFactor addLinks(WeightingFactor cfactor) {
-        return cfactor.links(Collections.singletonList(Link
-                .of(getClass().getAnnotation(RequestMapping.class).value()[0]
-                        + "/" + cfactor.id())));
+    protected List<EntityModel<WeightingFactor>> addLinks(List<WeightingFactor> factors) {
+        List<EntityModel<WeightingFactor>> entities = new ArrayList<EntityModel<WeightingFactor>>();
+        for (WeightingFactor wfactor : factors) {
+            entities.add(addLinks(wfactor));
+        }
+        return entities;
+    }
+
+    protected EntityModel<WeightingFactor> addLinks(WeightingFactor wfactor) {
+        return EntityModel.of(wfactor,
+                linkTo(methodOn(WeightingFactorController.class).findById(wfactor.id()))
+                        .withSelfRel());
     }
 }

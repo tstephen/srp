@@ -34,7 +34,7 @@ import digital.srp.sreport.model.Survey;
 public interface SurveyRepository extends CrudRepository<Survey, Long> {
 
     @Query("SELECT o FROM Survey o WHERE o.status != 'deleted' AND o.name = :name ORDER BY o.name ASC")
-    Survey findByName(@Param("name") String name);
+    <Optional>Survey findByName(@Param("name") String name);
 
     @Query("SELECT o FROM Survey o WHERE o.status != 'deleted' ORDER BY o.name ASC")
     List<Survey> findAll();

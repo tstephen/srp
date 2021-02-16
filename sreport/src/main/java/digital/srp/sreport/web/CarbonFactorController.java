@@ -15,8 +15,11 @@
  ******************************************************************************/
 package digital.srp.sreport.web;
 
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
+
 import java.io.IOException;
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -30,7 +33,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.hateoas.Link;
+import org.springframework.hateoas.EntityModel;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -46,14 +49,12 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import com.fasterxml.jackson.annotation.JsonView;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import digital.srp.sreport.api.SrpRoles;
 import digital.srp.sreport.api.exceptions.ObjectNotFoundException;
 import digital.srp.sreport.importers.CarbonFactorCsvImporter;
 import digital.srp.sreport.model.CarbonFactor;
-import digital.srp.sreport.model.views.CarbonFactorViews;
 import digital.srp.sreport.repositories.CarbonFactorRepository;
 
 /**
@@ -84,9 +85,8 @@ public class CarbonFactorController {
         for (CarbonFactor factor : factors) {
             // TODO this will not update with new values but only create non-existent factors
             if (existingFactors.contains(factor)) {
-                LOGGER.info(String.format(
-                        "Skip import of existing factor: %1$s for: %2$s",
-                        factor.name(), factor.applicablePeriod()));
+                LOGGER.info("Skip import of existing factor: {} for: {}",
+                        factor.name(), factor.applicablePeriod());
             } else {
                 factor.createdBy("Installer");
                 createInternal(factor);
@@ -101,11 +101,10 @@ public class CarbonFactorController {
      */
     @RolesAllowed(SrpRoles.USER)
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
-    @JsonView(CarbonFactorViews.Detailed.class)
     @Transactional
-    public @ResponseBody CarbonFactor findById(
+    public @ResponseBody EntityModel<CarbonFactor> findById(
             @PathVariable("id") Long cfactorId) {
-        LOGGER.info(String.format("findById %1$s", cfactorId));
+        LOGGER.info("findById {}", cfactorId);
 
         CarbonFactor cfactor = cfactorRepo.findById(cfactorId)
                 .orElseThrow(() -> new ObjectNotFoundException(CarbonFactor.class, cfactorId));
@@ -118,16 +117,15 @@ public class CarbonFactorController {
      */
     @RolesAllowed(SrpRoles.USER)
     @RequestMapping(value = "/findByName/{name}", method = RequestMethod.GET)
-    @JsonView(CarbonFactorViews.Detailed.class)
     @Transactional
-    public @ResponseBody List<CarbonFactor> findByName(
+    public @ResponseBody List<EntityModel<CarbonFactor>> findByName(
             @PathVariable("name") String name) {
         LOGGER.info("findByName {}", name);
 
         List<CarbonFactor> cfactors = cfactorRepo.findByName(name);
 
         LOGGER.info("  found {}", cfactors.size());
-        return cfactors;
+        return addLinks(cfactors);
     }
 
     /**
@@ -135,11 +133,10 @@ public class CarbonFactorController {
      */
     @RolesAllowed(SrpRoles.USER)
     @RequestMapping(value = "/", method = RequestMethod.GET)
-    @JsonView(CarbonFactorViews.Summary.class)
-    public @ResponseBody List<CarbonFactor> list(
+    public @ResponseBody List<EntityModel<CarbonFactor>> list(
             @RequestParam(value = "page", required = false) Integer page,
             @RequestParam(value = "limit", required = false) Integer limit) {
-        LOGGER.info(String.format("List carbon factors"));
+        LOGGER.info("List carbon factors");
 
         List<CarbonFactor> list;
         if (limit == null) {
@@ -148,9 +145,9 @@ public class CarbonFactorController {
             Pageable pageable = PageRequest.of(page == null ? 0 : page, limit);
             list = cfactorRepo.findPage(pageable);
         }
-        LOGGER.info(String.format("Found %1$s carbon factors", list.size()));
+        LOGGER.info("Found {} carbon factors", list.size());
 
-        return list;
+        return addLinks(list);
     }
 
     /**
@@ -206,9 +203,17 @@ public class CarbonFactorController {
         cfactorRepo.deleteById(cfactorId);
     }
 
-    private CarbonFactor addLinks(CarbonFactor cfactor) {
-        return cfactor.links(Collections.singletonList(Link
-                .of(getClass().getAnnotation(RequestMapping.class).value()[0]
-                        + "/" + cfactor.id())));
+    protected List<EntityModel<CarbonFactor>> addLinks(List<CarbonFactor> factors) {
+        List<EntityModel<CarbonFactor>> entities = new ArrayList<EntityModel<CarbonFactor>>();
+        for (CarbonFactor cfactor : factors) {
+            entities.add(addLinks(cfactor));
+        }
+        return entities;
+    }
+
+    protected EntityModel<CarbonFactor> addLinks(final CarbonFactor cFactor) {
+        return EntityModel.of(cFactor,
+                linkTo(methodOn(CarbonFactorController.class).findById(cFactor.id()))
+                        .withSelfRel());
     }
 }

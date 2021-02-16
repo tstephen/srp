@@ -16,6 +16,7 @@
 package digital.srp.macc.repositories;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
@@ -29,7 +30,7 @@ import digital.srp.macc.model.Intervention;
 public interface InterventionRepository extends CrudRepository<Intervention, Long> {
 
     @Query("SELECT c FROM Intervention c INNER JOIN c.interventionType it INNER JOIN c.organisationType ot WHERE it.name = :name")
-    Intervention findByName(@Param("name") String name);
+    Optional<Intervention> findByName(@Param("name") String name);
 
     @Query("SELECT c FROM Intervention c INNER JOIN c.interventionType it INNER JOIN c.organisationType ot WHERE c.tenantId = :tenantId ORDER BY it.name ASC, ot.name ASC")
     List<Intervention> findAllForTenant(@Param("tenantId") String tenantId);

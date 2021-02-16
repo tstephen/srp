@@ -1,6 +1,9 @@
 var $r = (function ($, ractive) {
   var me = {
     dirty: false,
+    srp: new SrpClient({
+      server: $env.server,
+    }),
     rtn: undefined
   };
   // var _org = 'RDR';
@@ -59,7 +62,9 @@ var $r = (function ($, ractive) {
       // if (_survey != undefined) $('#ORG_NAME').attr('list','orgs');
       _bindLists();
     });
-    $.getJSON(_server+'/sdu/organisation-types/?filter=reportingType', function(data) {
+    me.srp.fetchOrgTypes('sdu')
+    .then(response => response.json())
+    .then(data => {
       ractive.set('orgTypes', data);
       _bindLists();
     });
@@ -75,10 +80,12 @@ var $r = (function ($, ractive) {
       ractive.set('username', $r.getProfile().username);
     }
 
-    $.getJSON(_server+'/returns/findCurrentBySurveyNameAndOrg/'+_surveyName+'/'+$r.getProfileAttribute('org'), function(data) {
-      me.rtn = data;
-      if (_survey!=undefined) _fill(_survey);
-    });
+    me.srp.fetchReturn(_surveyName, $r.getProfileAttribute('org'))
+        .then(response => response.json())
+        .then(data => {
+          me.rtn = data;
+          if (_survey!=undefined) _fill(_survey);
+        })
   }
 
   function _fill(survey) {
@@ -378,7 +385,7 @@ var $r = (function ($, ractive) {
       return;
     }
     console.info('loadTenantConfig:'+tenant);
-    $.getJSON(ractive.getServer()+'/tenants/'+tenant+'.json', function(response) {
+    $.getJSON('https://api.knowprocess.com/tenants/'+tenant+'.json', function(response) {
       //console.log('... response: '+JSON.stringify(response));
       ractive.set('saveObserver', false);
       ractive.set('tenant', response);
@@ -424,9 +431,6 @@ var $r = (function ($, ractive) {
       ractive.fetch();
       _fetchReturn();
     }
-    $.each(me.rtn.links, function (i,d) {
-      if (d.rel=='self') me.rtn.selfRef = d.href;
-    });
 
     var response = answer.response;
     if (answer.question.type = 'radio' && Array.isArray(answer.response)) {
@@ -434,22 +438,16 @@ var $r = (function ($, ractive) {
     }
 
     $('.save-indicator').show();
-    return $.ajax({
-        url: me.rtn.selfRef+'/answers/'+answer.question.name+'/'+_period,
-        type: 'POST',
-        contentType: 'application/json',
-        data: JSON.stringify(response),
-        success: function(data, textStatus, jqXHR) {
-          console.log('updated ok');
+    me.srp.saveAnswer(me.rtn, answer, function(data) {
+      console.log('updated ok');
+      $('.save-indicator span').toggleClass('save-indicator-animation glyphicon-save glyphicon-saved');
+      setTimeout(function() {
+        $('.save-indicator').fadeOut(function() {
           $('.save-indicator span').toggleClass('save-indicator-animation glyphicon-save glyphicon-saved');
-          setTimeout(function() {
-            $('.save-indicator').fadeOut(function() {
-              $('.save-indicator span').toggleClass('save-indicator-animation glyphicon-save glyphicon-saved');
-            });
-          }, 3000);
-          $r.dirty = false;
-        }
-      });
+        });
+      }, 3000);
+      $r.dirty = false;
+    });
   }
 
   me.submit = function() {
@@ -492,6 +490,7 @@ var $r = (function ($, ractive) {
         }
       });
   };
+
   me.validate = function(ctrl) {
     console.info('validate '+ctrl.id);
     if (ctrl.getAttribute('list')!=undefined && ctrl.value != undefined && ctrl.value != '') {
@@ -586,20 +585,22 @@ $(document).ready(function() {
 
   $r.keycloak = Keycloak('/keycloak.json');
   $r.keycloak.init({ onLoad: 'login-required' })
-      .success(function(authenticated) {
+      .then(function(authenticated) {
     console.info(authenticated ? 'authenticated' : 'not authenticated');
+      if ($r['srp'] !== undefined) $r.srp.options.token = $r.keycloak.token;
+    // $r.srpOptions.token = $r.keycloak.token;
     // now safe to set and load questionnaire
     ractive.set('questionnaireDef',$env.server+'/surveys/findByName/'+$r.getSurveyName());
     localStorage['token'] = $r.keycloak.token; // used by questionnaire
 
-    $r.keycloak.loadUserProfile().success(function(profile) {
+    $r.keycloak.loadUserProfile().then(function(profile) {
       localStorage['profile'] = JSON.stringify(profile);
       $r.loginSuccessful();
-    }).error(function() {
-      alert('Failed to load user profile');
+    }).catch(function(e) {
+      alert('Failed to load user profile: '+e);
     });
-  }).error(function() {
-    console.error('failed to initialize');
+  }).catch(function(e) {
+    console.error('failed to initialize: '+e);
   });
 
 });

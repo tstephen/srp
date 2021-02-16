@@ -15,7 +15,10 @@
  ******************************************************************************/
 package digital.srp.sreport.web;
 
-import java.util.Collections;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
+
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.annotation.security.RolesAllowed;
@@ -26,7 +29,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.hateoas.Link;
+import org.springframework.hateoas.EntityModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -36,13 +39,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
-import com.fasterxml.jackson.annotation.JsonView;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import digital.srp.sreport.api.SrpRoles;
 import digital.srp.sreport.api.exceptions.ObjectNotFoundException;
 import digital.srp.sreport.model.SurveyCategory;
-import digital.srp.sreport.model.views.SurveyCategoryViews;
 import digital.srp.sreport.repositories.SurveyCategoryRepository;
 
 /**
@@ -66,9 +67,8 @@ public class SurveyCategoryController {
      */
     @RolesAllowed(SrpRoles.USER)
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
-    @JsonView(SurveyCategoryViews.Detailed.class)
     @Transactional
-    public @ResponseBody SurveyCategory findById(
+    public @ResponseBody EntityModel<SurveyCategory> findById(
             @PathVariable("id") Long catId) {
         LOGGER.info(String.format("findById %1$s", catId));
 
@@ -83,8 +83,7 @@ public class SurveyCategoryController {
      */
     @RolesAllowed(SrpRoles.USER)
     @RequestMapping(value = "/", method = RequestMethod.GET)
-    @JsonView(SurveyCategoryViews.Summary.class)
-    public @ResponseBody List<SurveyCategory> list(
+    public @ResponseBody List<EntityModel<SurveyCategory>> list(
             @RequestParam(value = "page", required = false) Integer page,
             @RequestParam(value = "limit", required = false) Integer limit) {
         LOGGER.info(String.format("List categories"));
@@ -98,7 +97,7 @@ public class SurveyCategoryController {
         }
         LOGGER.info(String.format("Found %1$s categories", list.size()));
 
-        return list;
+        return addLinks(list);
     }
 
     /**
@@ -112,8 +111,17 @@ public class SurveyCategoryController {
         catRepo.deleteById(catId);
     }
 
-    private SurveyCategory addLinks(SurveyCategory cat) {
-        return cat.links(Collections.singletonList(Link.of(
-                getClass().getAnnotation(RequestMapping.class).value()[0] + "/" + cat.id())));
+    protected List<EntityModel<SurveyCategory>> addLinks(List<SurveyCategory> categories) {
+        List<EntityModel<SurveyCategory>> entities = new ArrayList<EntityModel<SurveyCategory>>();
+        for (SurveyCategory cfactor : categories) {
+            entities.add(addLinks(cfactor));
+        }
+        return entities;
+    }
+
+    protected EntityModel<SurveyCategory> addLinks(SurveyCategory cat) {
+        return EntityModel.of(cat,
+                linkTo(methodOn(SurveyCategoryController.class).findById(cat.id()))
+                        .withSelfRel());
     }
 }

@@ -15,8 +15,6 @@
  ******************************************************************************/
 package digital.srp.server;
 
-import java.util.List;
-
 import org.apache.catalina.connector.Connector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,19 +25,12 @@ import org.springframework.boot.web.embedded.tomcat.TomcatServletWebServerFactor
 import org.springframework.boot.web.server.WebServerFactoryCustomizer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
-import org.springframework.hateoas.Link;
-import org.springframework.http.converter.HttpMessageConverter;
-import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
-import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.servlet.config.annotation.CorsRegistration;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import digital.srp.macc.MaccConfig;
-import digital.srp.server.model.mixins.SrpLinkMixIn;
 import digital.srp.sreport.internal.SReportConfiguration;
 
 @SpringBootApplication
@@ -59,6 +50,9 @@ public class SrpApplication {
 
     @Value("${srp.tomcat.ajp.scheme:http2}")
     String ajpScheme;
+
+    @Value("${srp.cors.allowedMethods:DELETE,GET,HEAD,POST,PUT}")
+    String corsMethods;
 
     @Value("${srp.cors.allowedOrigins:http://localhost:8000}")
     String corsOrigins;
@@ -93,9 +87,8 @@ public class SrpApplication {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
                 CorsRegistration reg = registry.addMapping("/**");
-                for(String url: corsOrigins.split(",")) {
-                    reg.allowedOrigins(url);
-                }
+                reg.allowedOrigins(corsOrigins.split(","));
+                reg.allowedMethods(corsMethods.split(","));
             }
 
             @Override
@@ -117,15 +110,6 @@ public class SrpApplication {
                         "/swagger-resources/configuration/security");
                 registry.addRedirectViewController("/api-docs/swagger-resources",
                         "/swagger-resources");
-            }
-            
-            @Override
-            public void configureMessageConverters(
-                    List<HttpMessageConverter<?>> converters) {
-                ObjectMapper objectMapper = Jackson2ObjectMapperBuilder.json()
-                        .mixIn(Link.class, SrpLinkMixIn.class)
-                        .build();
-                converters.add(new MappingJackson2HttpMessageConverter(objectMapper));
             }
         };
     }

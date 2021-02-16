@@ -15,6 +15,8 @@
  ******************************************************************************/
 package digital.srp.sreport.services;
 
+import java.util.Optional;
+
 import javax.persistence.NonUniqueResultException;
 
 import org.slf4j.Logger;
@@ -44,18 +46,18 @@ public class PersistentAnswerFactory implements AnswerFactory {
         LOGGER.info("Creating new derived answer '{}' for '{}' in '{}'",
                q.name(), rtn.org(), period);
         try {
-            Question existingQ = qRepo.findByName(q.name());
-            if (existingQ == null) {
+            Optional<Question> existingQ = qRepo.findByName(q.name());
+            if (!existingQ.isPresent()) {
                 LOGGER.info("Creating new question {} ", q.name());
                 // TODO tenant needs to be injected, e.g. via rtn.tenantId()
-                existingQ = qRepo.save(new Question().q(q).tenantId(TENANT_ID));
+                existingQ = Optional.of(qRepo.save(new Question().q(q).tenantId(TENANT_ID)));
             }
-            Answer answer = rtn.initAnswer(rtn, null, existingQ)
+            Answer answer = rtn.initAnswer(rtn, null, existingQ.get())
                     .applicablePeriod(period)
                     .derived(true);
             return answer;
         } catch (NonUniqueResultException e) {
-            LOGGER.error("looking for answer '%1$s' for '%2$s' in '%3$s'",
+            LOGGER.error("looking for answer '{}' for '{}' in '{}'",
                     q.name(), rtn.org(), period);
             throw e;
         }

@@ -140,12 +140,12 @@ var ractive = new BaseRactive({
       else return 'hidden';
     },
     stdPartials: [
-      { "name": "helpModal", "url": $env.server+"/partials/help-modal.html"},
+      { "name": "helpModal", "url": "/partials/help-modal.html"},
       { "name": "navbar", "url": "./vsn/partials/intervention-type-navbar.html"},
-      { "name": "profileArea", "url": $env.server+"/partials/profile-area.html"},
-      { "name": "sidebar", "url": "partials/sidebar.html"},
-      { "name": "toolbar", "url": "partials/toolbar.html"},
-      { "name": "titleArea", "url": $env.server+"/partials/title-area.html"},
+      { "name": "profileArea", "url": "/partials/profile-area.html"},
+      { "name": "sidebar", "url": "/partials/sidebar.html"},
+      { "name": "toolbar", "url": "/partials/toolbar.html"},
+      { "name": "titleArea", "url": "/partials/title-area.html"},
       { "name": "interventionTypeListSect", "url": "./vsn/partials/intervention-type-list-sect.html"},
       { "name": "interventionTypeCurrentSect", "url": "./vsn/partials/intervention-type-current-sect.html"}
     ],
@@ -155,7 +155,6 @@ var ractive = new BaseRactive({
     'helpModal':'',
     'interventionTypeCurrentSect':'',
     'interventionTypeListSect':'',
-    'loginSect':'',
     'profileArea':'',
     'sidebar':'',
     'titleArea':''
@@ -200,38 +199,36 @@ var ractive = new BaseRactive({
   },
   delete: function (obj) {
     console.log('delete '+obj+'...');
-    var url = obj.links != undefined
-        ? obj.links.filter(function(d) { console.log('this:'+d);if (d['rel']=='self') return d;})[0].href
-        : obj._links.self.href;
-    $.ajax({
-        url: url,
-        type: 'DELETE',
-        success: completeHandler = function(data) {
-          ractive.fetch();
-          ractive.toggleResults();
-        }
+    ractive.srp.deleteInterventionType(ractive.get('current'))
+    .then(response => {
+      switch (response.status) {
+      case 204:
+        ractive.fetch();
+        ractive.toggleResults();
+        break;
+      default:
+        ractive.showMessage('Unable to delete the intervention type ('+response.status+')');
+      }
     });
     return false; // cancel bubbling to prevent edit as well as delete
   },
   fetch: function () {
     console.log('fetch...');
+    if (ractive.keycloak.token === undefined) return;
     ractive.set('saveObserver', false);
-    $.ajax({
-      dataType: "json",
-      url: ractive.getServer()+'/'+ractive.get('tenant.id')+'/intervention-types/',
-      crossDomain: true,
-      success: function( data ) {
-        if (data['_embedded'] == undefined) {
-          ractive.merge('interventionTypes', data);
-        }else{
-          ractive.merge('interventionTypes', data['_embedded'].interventionTypes);
-        }
-        if (ractive.hasRole('admin')) $('.admin').show();
-        if (ractive.fetchCallbacks!=null) ractive.fetchCallbacks.fire();
-        ractive.set('searchMatched',$('#interventionTypesTable tbody tr:visible').length);
-        ractive.set('saveObserver', true);
+    ractive.srp.fetchInterventionTypes(ractive.get('tenant.id'))
+    .then(response => response.json()) // catch (e) { console.error('unable to parse response as JSON') } })
+    .then(data => {
+      if (data['_embedded'] == undefined) {
+        ractive.merge('interventionTypes', data);
+      } else {
+        ractive.merge('interventionTypes', data['_embedded'].interventionTypes);
       }
-    });
+      if (ractive.hasRole('admin')) $('.admin').show();
+      if (ractive.fetchCallbacks!=null) ractive.fetchCallbacks.fire();
+      ractive.set('searchMatched',$('#interventionTypesTable tbody tr:visible').length);
+      ractive.set('saveObserver', true);
+    })
   },
   filter: function(filter) {
     console.log('filter: '+JSON.stringify(filter));
@@ -300,6 +297,17 @@ var ractive = new BaseRactive({
   oninit: function() {
     console.log('oninit');
   },
+  postSelect: function(interventionType) {
+    ractive.set('saveObserver', false);
+    console.log('found interventionType '+interventionType);
+    ractive.set('current', interventionType);
+    ractive.initControls();
+    // who knows why this is needed, but it is, at least for first time rendering
+    $('.autoNumeric').autoNumeric('update',{});
+    ractive.hideResults();
+    $('#currentSect').slideDown();
+    ractive.set('saveObserver',true);
+  },
   save: function () {
     console.log('save interventionType: '+ractive.get('current').name+'...');
     ractive.set('saveObserver',false);
@@ -327,31 +335,27 @@ var ractive = new BaseRactive({
       delete tmp.interventionType;
       tmp.tenantId = ractive.get('tenant.id');
 //      console.log('ready to save interventionType'+JSON.stringify(tmp)+' ...');
-      $.ajax({
-        url: id === undefined ? ractive.getServer()+'/intervention-types' : id,
-        type: id === undefined ? 'POST' : 'PUT',
-        contentType: 'application/json',
-        data: JSON.stringify(tmp),
-        success: completeHandler = function(data, textStatus, jqXHR) {
-          console.log(jqXHR.status+': '+JSON.stringify(data));
-          var location = jqXHR.getResponseHeader('Location');
-          ractive.set('saveObserver',false);
-          if (location != undefined) ractive.set('current._links.self.href',location);
-          if (jqXHR.status == 201) {
-            ractive.set('currentIdx',ractive.get('interventionTypes').push(ractive.get('current'))-1);
-          }
-          if (jqXHR.status == 204) ractive.splice('interventionTypes',ractive.get('currentIdx'),1,ractive.get('current'));
-
-          $('.autoNumeric').autoNumeric('update');
-          ractive.showMessage('Intervention saved');
-          ractive.set('saveObserver',true);
-        }
-      });
+      ractive.srp.saveInterventionType(tmp, ractive.get('tenant.id'))
+          .then(response => {
+            ractive.set('saveObserver',false);
+            switch(response.status) {
+            case 201:
+              ractive.set('currentIdx',ractive.get('interventionTypes').push(ractive.get('current'))-1);
+              return response.json();
+            }
+          })
+          .then(data => {
+            if (data !== undefined) ractive.set('current', data);
+            ractive.splice('interventionTypes',ractive.get('currentIdx'),1,ractive.get('current'));
+            $('.autoNumeric').autoNumeric('update');
+            ractive.showMessage('Intervention saved');
+            ractive.set('saveObserver',true);
+          });
     } else {
       console.warn('Cannot save yet as interventionType is invalid');
       $('#currentForm :invalid').addClass('field-error');
       $('.autoNumeric').autoNumeric('update');
-      ractive.showMessage('Cannot save yet as interventionType is incomplete');
+      ractive.showMessage('Cannot save yet as Intervention Type is incomplete');
     }
   },
   saveRef: function () {
@@ -381,17 +385,15 @@ var ractive = new BaseRactive({
     console.log('select: '+JSON.stringify(interventionType));
     ractive.set('saveObserver',false);
     var url = ractive.tenantUri(interventionType);
-    console.log('loading detail for '+url);
-    $.getJSON(url,  function( data ) {
-      console.log('found interventionType '+data);
-      ractive.set('current', data);
-      ractive.initControls();
-      // who knows why this is needed, but it is, at least for first time rendering
-      $('.autoNumeric').autoNumeric('update',{});
-      ractive.toggleResults();
-      $('#currentSect').slideDown();
-      ractive.set('saveObserver',true);
-    });
+    if (url == undefined) {
+      console.log('Skipping load as no uri.');
+      ractive.postSelect(interventionType);
+    } else {
+      console.log('loading detail for '+url);
+      ractive.srp.fetchInterventionType(url)
+      .then(response => response.json())
+      .then(data => ractive.postSelect(data));
+    }
   },
   showActivityIndicator: function(msg, addClass) {
     document.body.style.cursor='progress';

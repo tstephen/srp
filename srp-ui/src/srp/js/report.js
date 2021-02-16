@@ -591,8 +591,8 @@ var ractive = new BaseRactive({
       else return 'hidden';
     },
     stdPartials: [
-      { "name": "sidebar", "url": "partials/sidebar.html"},
-      { "name": "toolbar", "url": "partials/toolbar.html"},
+      { "name": "sidebar", "url": "/partials/sidebar.html"},
+      { "name": "toolbar", "url": "/partials/toolbar.html"},
       { "name": "statusSect", "url": "/srp/vsn/partials/status-sect.html"}
     ],
   },

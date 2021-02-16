@@ -34,16 +34,10 @@ import javax.persistence.Table;
 import javax.persistence.Transient;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
-import javax.xml.bind.annotation.XmlElement;
-
-import org.springframework.hateoas.Link;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonView;
 
-import digital.srp.sreport.model.views.SurveyCategoryViews;
-import digital.srp.sreport.model.views.SurveyViews;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -67,38 +61,28 @@ public class SurveyCategory {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @JsonProperty
-    @JsonView({ SurveyCategoryViews.Summary.class, SurveyViews.Detailed.class })
     @Column(name = "id")
     private Long id;
 
     @NotNull
     @Size(max = 50)
     @JsonProperty
-    @JsonView({ SurveyCategoryViews.Summary.class, SurveyViews.Detailed.class })
     @Column(name = "name")
     private String name;
 
     @JsonProperty
-    @JsonView({ SurveyCategoryViews.Summary.class, SurveyViews.Detailed.class })
     @Column(name = "questions")
     @Lob
 //    @OneToMany(orphanRemoval=true, cascade = CascadeType.ALL, mappedBy = "category")
     private String questionNames;
 
     @Transient
-    @JsonView({ SurveyCategoryViews.Detailed.class, SurveyViews.Detailed.class })
     private List<Question> questions;
 
     @JsonProperty
     @JsonBackReference
     @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private Survey survey;
-
-    @Transient
-    @XmlElement(name = "link", namespace = Link.ATOM_NAMESPACE)
-    @JsonProperty("links")
-    @JsonView({ SurveyCategoryViews.Summary.class, SurveyViews.Detailed.class })
-    private List<Link> links;
 
     public SurveyCategory questionEnums(Q... questions) {
         questionEnums(Arrays.asList(questions));
@@ -160,14 +144,6 @@ public class SurveyCategory {
 
     public void setQuestionNames(String questionNames) {
         this.questionNames = questionNames;
-    }
-
-    public List<Link> getLinks() {
-        return links;
-    }
-
-    public void setLinks(List<Link> links) {
-        this.links = links;
     }
 
 //    public SurveyQuestion question(String qName) {

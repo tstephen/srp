@@ -39,7 +39,6 @@ import javax.persistence.TemporalType;
 import javax.persistence.Transient;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
-import javax.xml.bind.annotation.XmlElement;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,16 +47,12 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-import org.springframework.hateoas.Link;
+import org.springframework.hateoas.RepresentationModel;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonView;
 
 import digital.srp.sreport.api.MandatoryCurrentPeriodAnswersProvided;
 import digital.srp.sreport.internal.EntityAuditorListener;
-import digital.srp.sreport.model.views.AnswerViews;
-import digital.srp.sreport.model.views.HealthCheckViews;
-import digital.srp.sreport.model.views.SurveyReturnViews;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -73,7 +68,7 @@ import lombok.experimental.Accessors;
 @Accessors(fluent=true, chain = true)
 @Data
 @ToString(exclude = { "survey" })
-@EqualsAndHashCode(exclude = { "id", "survey", "revision", "created", "createdBy", "lastUpdated", "updatedBy" })
+@EqualsAndHashCode(callSuper = false, exclude = { "id", "survey", "revision", "created", "createdBy", "lastUpdated", "updatedBy" })
 @NoArgsConstructor
 @Entity
 /* For whatever reason AuditingEntityListener is not adding auditor, hence own listener as well */
@@ -82,21 +77,19 @@ import lombok.experimental.Accessors;
 // Take care that what is validated here must be provided by createBlankReturn
 //@MinimumPeriodsProvided(noPeriods = 4)
 @MandatoryCurrentPeriodAnswersProvided(requiredAnswers = {Q.ORG_CODE})
-public class SurveyReturn {
+public class SurveyReturn extends RepresentationModel<SurveyReturn>{
     private static final Logger LOGGER = LoggerFactory
             .getLogger(SurveyReturn.class);
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @JsonProperty
-    @JsonView(SurveyReturnViews.Summary.class)
     @Column(name = "id")
     private Long id;
 
     @NotNull
     @Size(max = 50)
     @JsonProperty
-    @JsonView({ AnswerViews.Detailed.class, HealthCheckViews.Summary.class, SurveyReturnViews.Summary.class })
     @Column(name = "name")
     private String name;
 
@@ -107,14 +100,12 @@ public class SurveyReturn {
     @NotNull
     @Size(max = 50)
     @JsonProperty
-    @JsonView({ AnswerViews.Detailed.class, HealthCheckViews.Summary.class, SurveyReturnViews.Summary.class })
     @Column(name = "org")
     private String org;
 
     @NotNull
     @Size(max = 50)
     @JsonProperty
-    @JsonView({ HealthCheckViews.Summary.class, SurveyReturnViews.Summary.class })
     @Column(name = "status")
     private String status = StatusType.Draft.name();
 
@@ -126,7 +117,6 @@ public class SurveyReturn {
     @NotNull
     @JsonProperty
     @Size(max = 20)
-    @JsonView({ HealthCheckViews.Summary.class, SurveyReturnViews.Summary.class })
     @Column(name = "applicable_period")
     private String applicablePeriod;
 
@@ -135,14 +125,12 @@ public class SurveyReturn {
      * allows for a re-statement if needed.
      */
     @JsonProperty
-    @JsonView({ HealthCheckViews.Summary.class, SurveyReturnViews.Summary.class })
     @Column(name = "revision")
     private Short revision = 1;
 
 
     @Temporal(TemporalType.TIMESTAMP)
     @JsonProperty
-    @JsonView(SurveyReturnViews.Summary.class)
     @Column(name = "submitted_date")
     private Date submittedDate;
 
@@ -150,53 +138,39 @@ public class SurveyReturn {
      * Username of submitter.
      */
     @JsonProperty
-    @JsonView(SurveyReturnViews.Summary.class)
     @Column(name = "submitted_by")
     private String submittedBy;
 
-    @Transient
-    @XmlElement(name = "link", namespace = Link.ATOM_NAMESPACE)
-    @JsonProperty("links")
-    @JsonView(SurveyReturnViews.Summary.class)
-    private List<Link> links;
-
     @JsonProperty
-    @JsonView(SurveyReturnViews.Summary.class)
     @Column(name = "created", nullable = false, updatable = false)
     @CreatedDate
     private Date created;
 
     @JsonProperty
-    @JsonView(SurveyReturnViews.Summary.class)
     @Column(name = "created_by")
     @CreatedBy
     private String createdBy;
 
     @JsonProperty
-    @JsonView(SurveyReturnViews.Summary.class)
     @Column(name = "last_updated")
     @LastModifiedDate
     private Date lastUpdated;
 
     @JsonProperty
-    @JsonView(SurveyReturnViews.Summary.class)
     @Column(name = "updated_by")
     @LastModifiedBy
     private String updatedBy;
 
     @JsonProperty
-    @JsonView({ AnswerViews.Detailed.class, SurveyReturnViews.Summary.class })
     @ManyToOne(fetch = FetchType.EAGER)
     private Survey survey;
 
     @JsonProperty
-    @JsonView(SurveyReturnViews.Detailed.class)
 //    @Transient
     @ManyToMany(cascade=CascadeType.ALL, fetch = FetchType.EAGER, mappedBy = "surveyReturns")
     private Set<Answer> answers;
 
     @JsonProperty
-    @JsonView(SurveyReturnViews.Summary.class)
     @Transient
     private Set<String> completeness;
 
@@ -358,14 +332,6 @@ public class SurveyReturn {
 
     public void setSubmittedBy(String submittedBy) {
         this.submittedBy = submittedBy;
-    }
-
-    public List<Link> getLinks() {
-        return links;
-    }
-
-    public void setLinks(List<Link> links) {
-        this.links = links;
     }
 
     public Date getCreated() {

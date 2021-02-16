@@ -86,19 +86,17 @@ var ractive = new BaseRactive({
       else return 'hidden';
     },
     stdPartials: [
-
       { "name": "navbar", "url": "/srp/vsn/partials/answer-navbar.html"},
-      { "name": "profileArea", "url": $env.server+"/partials/profile-area.html"},
-      { "name": "sidebar", "url": "partials/sidebar.html"},
-      { "name": "toolbar", "url": "partials/toolbar.html"},
-      { "name": "titleArea", "url": $env.server+"/partials/title-area.html"},
+      { "name": "profileArea", "url": "/partials/profile-area.html"},
+      { "name": "sidebar", "url": "/partials/sidebar.html"},
+      { "name": "toolbar", "url": "/partials/toolbar.html"},
+      { "name": "titleArea", "url": "/partials/title-area.html"},
       { "name": "answerCriteriaSect", "url": "/srp/vsn/partials/answer-criteria-sect.html"},
       { "name": "answerListSect", "url": "/srp/vsn/partials/answer-list-sect.html"}
     ],
     title: "SDU Return Explorer"
   },
   partials: {
-    loginSect:'',
     answerCriteriaSect:'',
     answerListSect:'',
     navbar: '',

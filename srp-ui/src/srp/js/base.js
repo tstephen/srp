@@ -23,6 +23,9 @@ var newLineRegEx = /\n/g;
  */
 var BaseRactive = Ractive.extend({
   CSRF_TOKEN: 'XSRF-TOKEN',
+  srp: new SrpClient({
+    server: $env.server,
+  }),
   addDataList: function(d, data) {
     $('datalist#'+d.name).remove();
     $('body').append('<datalist id="'+d.name+'">');
@@ -46,7 +49,7 @@ var BaseRactive = Ractive.extend({
     if (ractive.get('tenant')==undefined) return ;
     var tenant = ractive.get('tenant.id');
     if (tenant != undefined) {
-      $('head').append('<link href="'+ractive.getServer()+'/css/'+tenant+'-1.0.0.css" rel="stylesheet">');
+      $('head').append('<link href="/'+tenant+'/css/'+tenant+'-1.0.0.css" rel="stylesheet">');
       if (ractive.get('tenant.theme.logoUrl')!=undefined) {
         $('.navbar-brand').empty().append('<img src="'+ractive.get('tenant.theme.logoUrl')+'" alt="logo"/>');
       }
@@ -314,7 +317,7 @@ var BaseRactive = Ractive.extend({
     }
     if (tenant==undefined || tenant=='undefined') $auth.showLogin();
     console.info('loadTenantConfig:'+tenant);
-    $.getJSON(ractive.getServer()+'/tenants/'+tenant+'.json', function(response) {
+    $.getJSON('https://api.knowprocess.com/tenants/'+tenant+'.json', function(response) {
       //console.log('... response: '+JSON.stringify(response));
       ractive.set('saveObserver', false);
       ractive.set('tenant', response);
@@ -640,17 +643,18 @@ $(document).ready(function() {
   try {
     ractive.keycloak = Keycloak('/keycloak.json');
     ractive.keycloak.init({ onLoad: 'login-required' })
-        .success(function(authenticated) {
+    .then(function(authenticated) {
       console.info(authenticated ? 'authenticated' : 'not authenticated');
-      ractive.keycloak.loadUserProfile().success(function(profile) {
+      if (ractive['srp'] != undefined) ractive.srp.options.token = ractive.keycloak.token;
+      ractive.keycloak.loadUserProfile().then(function(profile) {
         localStorage['profile'] = JSON.stringify(profile);
         ractive.getProfile();
         ractive.fetch();
-      }).error(function() {
-        console.error('Failed to load user profile');
+      }).catch(function(e) {
+        console.error('Failed to load user profile: '+e);
       });
-    }).error(function() {
-      console.error('failed to initialize');
+    }).catch(function(e) {
+      console.error('failed to initialize: '+e);
     });
   } catch (e) {
     console.warn('no Keycloak, use legacy authentication');

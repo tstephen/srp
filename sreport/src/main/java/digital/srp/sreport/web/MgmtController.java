@@ -244,13 +244,15 @@ public class MgmtController {
     private Question findQ(Answer answer) {
         LOGGER.info("findQ {}", answer.question().q().name());
         try {
-            Question q = qRepo.findByName(answer.question().name());
-            if (q == null) {
+            Optional<Question> q = qRepo.findByName(answer.question().name());
+            if (!q.isPresent()) {
                 String msg = String.format("Missing question %1$s. You must create all questions before attempting to import returns that use them",
                         answer.question().q().name());
                 throw new IllegalStateException(msg);
             }
-            return q;
+            return q.get();
+        } catch (IllegalStateException e) {
+            throw e;
         } catch (Exception e) {
             String msg = String.format("Cannot read question %1$s because: %2$s",
                     answer.question().q().name(), e.getMessage());

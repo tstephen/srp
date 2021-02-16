@@ -26,12 +26,9 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
-import com.fasterxml.jackson.annotation.JsonView;
-
 import digital.srp.sreport.api.exceptions.FailedHealthCheckException;
 import digital.srp.sreport.api.exceptions.ObjectNotFoundException;
 import digital.srp.sreport.model.HealthCheck;
-import digital.srp.sreport.model.views.HealthCheckViews;
 
 @ControllerAdvice
 public class SReportExceptionHandler {
@@ -71,7 +68,6 @@ public class SReportExceptionHandler {
     }
 
     @ResponseStatus(HttpStatus.OK)
-    @JsonView(HealthCheckViews.Detailed.class)
     @ExceptionHandler(FailedHealthCheckException.class)
     public @ResponseBody HealthCheck handleFailedHealthException(
             FailedHealthCheckException e) {

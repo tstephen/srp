@@ -16,8 +16,10 @@
 package digital.srp.sreport.model;
 
 import lombok.Data;
+import lombok.experimental.Accessors;
 
 @Data
+@Accessors(chain=true)
 public class Criterion {
 
    private String field;

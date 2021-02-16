@@ -163,12 +163,12 @@ var ractive = new BaseRactive({
       else return 'hidden';
     },
     stdPartials: [
-      { "name": "helpModal", "url": $env.server+"/partials/help-modal.html"},
+      { "name": "helpModal", "url": "/partials/help-modal.html"},
       { "name": "navbar", "url": "./vsn/partials/intervention-navbar.html"},
-      { "name": "profileArea", "url": $env.server+"/partials/profile-area.html"},
-      { "name": "sidebar", "url": "partials/sidebar.html"},
-      { "name": "toolbar", "url": "partials/toolbar.html"},
-      { "name": "titleArea", "url": $env.server+"/partials/title-area.html"},
+      { "name": "profileArea", "url": "/partials/profile-area.html"},
+      { "name": "sidebar", "url": "/partials/sidebar.html"},
+      { "name": "toolbar", "url": "/partials/toolbar.html"},
+      { "name": "titleArea", "url": "/partials/title-area.html"},
       { "name": "interventionGridSect", "url": "./vsn/partials/intervention-grid-sect.html"},
       { "name": "interventionListSect", "url": "./vsn/partials/intervention-list-sect.html"},
       { "name": "interventionCurrentSect", "url": "./vsn/partials/intervention-current-sect.html"},
@@ -213,7 +213,6 @@ var ractive = new BaseRactive({
   partials: {
     profileArea: '',
     titleArea: '',
-    loginSect: '',
     interventionListSect: '',
     interventionCurrentSect: '',
     interventionTimeModal: '',
@@ -255,17 +254,16 @@ var ractive = new BaseRactive({
     ractive.select(intervention);
   },
   delete: function (obj) {
-    console.log('delete '+obj+'...');
-    var url = obj.links != undefined
-        ? obj.links.filter(function(d) { console.log('this:'+d);if (d['rel']=='self') return d;})[0].href
-        : obj._links.self.href;
-    $.ajax({
-        url: url,
-        type: 'DELETE',
-        success: completeHandler = function(data) {
-          ractive.fetch();
-          ractive.toggleResults();
-        }
+    ractive.srp.delete(ractive.get('current'))
+    .then(response => {
+      switch (response.status) {
+      case 204:
+        ractive.fetch();
+        ractive.toggleResults();
+        break;
+      default:
+        ractive.showMessage('Unable to delete the organisation type ('+response.status+')');
+      }
     });
     return false; // cancel bubbling to prevent edit as well as delete
   },
@@ -277,12 +275,11 @@ var ractive = new BaseRactive({
   },
   fetchInterventions: function() {
     console.log('fetchInterventions...');
+    if (ractive.keycloak.token === undefined) return;
     ractive.set('saveObserver', false);
-    $.ajax({
-      dataType: "json",
-      url: ractive.getServer()+'/'+ractive.get('tenant.id')+'/interventions/',
-      crossDomain: true,
-      success: function( data ) {
+    ractive.srp.fetchInterventions(ractive.get('tenant.id'))
+    .then(response => response.json()) // catch (e) { console.error('unable to parse response as JSON') } })
+    .then(data => {
         if (data['_embedded'] == undefined) {
           ractive.merge('interventions', data);
         }else{
@@ -292,8 +289,7 @@ var ractive = new BaseRactive({
         if (ractive.fetchCallbacks!=null) ractive.fetchCallbacks.fire();
         ractive.set('searchMatched',$('#interventionsTable tbody tr:visible').length);
         ractive.set('saveObserver', true);
-      }
-    });
+    })
   },
   fetchInterventionTypes: function () {
     console.log('fetchInterventionTypes...');

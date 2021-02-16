@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2015-2020 Tim Stephenson and contributors
+ * Copyright 2015-2021 Tim Stephenson and contributors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -148,12 +148,12 @@ var ractive = new BaseRactive({
       else return 'hidden';
     },
     stdPartials: [
-      { "name": "helpModal", "url": $env.server+"/partials/help-modal.html"},
+      { "name": "helpModal", "url": "/partials/help-modal.html"},
       { "name": "navbar", "url": "./vsn/partials/question-navbar.html"},
-      { "name": "profileArea", "url": $env.server+"/partials/profile-area.html"},
-      { "name": "sidebar", "url": "partials/sidebar.html"},
-      { "name": "toolbar", "url": "partials/toolbar.html"},
-      { "name": "titleArea", "url": $env.server+"/partials/title-area.html"},
+      { "name": "profileArea", "url": "/partials/profile-area.html"},
+      { "name": "sidebar", "url": "/partials/sidebar.html"},
+      { "name": "toolbar", "url": "/partials/toolbar.html"},
+      { "name": "titleArea", "url": "/partials/title-area.html"},
       { "name": "questionListSect", "url": "./vsn/partials/question-list-sect.html"},
       { "name": "questionCurrentSect", "url": "./vsn/partials/question-current-sect.html"}
     ],
@@ -161,7 +161,6 @@ var ractive = new BaseRactive({
   },
   partials: {
     'helpModal': '',
-    'loginSect': '',
     'profileArea': '',
     'questionListSect': '',
     'questionCurrentSect': '',
@@ -176,17 +175,16 @@ var ractive = new BaseRactive({
     ractive.select(question);
   },
   delete: function (obj) {
-    console.log('delete '+obj+'...');
-    var url = obj.links != undefined
-        ? obj.links.filter(function(d) { console.log('this:'+d);if (d['rel']=='self') return d;})[0].href
-        : obj._links.self.href;
-    $.ajax({
-        url: url,
-        type: 'DELETE',
-        success: completeHandler = function(data) {
-          ractive.fetch();
-          ractive.toggleResults();
-        }
+    ractive.srp.deleteQuestion(ractive.get('current'))
+    .then(response => {
+      switch (response.status) {
+      case 204:
+        ractive.fetch();
+        ractive.toggleResults();
+        break;
+      default:
+        ractive.showMessage('Unable to delete the organisation type ('+response.status+')');
+      }
     });
     return false; // cancel bubbling to prevent edit as well as delete
   },
@@ -198,12 +196,11 @@ var ractive = new BaseRactive({
   },
   fetch: function () {
     console.log('fetch...');
+    if (ractive.keycloak.token === undefined) return;
     ractive.set('saveObserver', false);
-    $.ajax({
-      dataType: "json",
-      url: ractive.getServer()+'/'+ractive.get('tenant.id')+'/questions/',
-      crossDomain: true,
-      success: function( data ) {
+    ractive.srp.fetchQuestions(ractive.get('tenant.id'))
+    .then(response => response.json()) // catch (e) { console.error('unable to parse response as JSON') } })
+    .then(data => {
         ractive.set('saveObserver', false);
         ractive.set('questions', data);
         if (ractive.hasRole('admin')) $('.admin').show();
@@ -211,7 +208,7 @@ var ractive = new BaseRactive({
         ractive.showSearchMatched();
         ractive.set('saveObserver', true);
       }
-    });
+    );
   },
   filter: function(filter) {
     console.log('filter: '+JSON.stringify(filter));
@@ -240,27 +237,22 @@ var ractive = new BaseRactive({
       tmp.tenantId = ractive.get('tenant.id');
       if (tmp.optionNames == undefined) tmp.optionNames = [];
       else if (typeof tmp.optionNames == 'string') tmp.optionNames = tmp.optionNames.split(',');
-//      console.log('ready to save question'+JSON.stringify(tmp)+' ...');
-      $.ajax({
-        url: id === undefined ? ractive.getServer()+'/'+tmp.tenantId+'/questions/' : id,
-        type: id === undefined ? 'POST' : 'PUT',
-        contentType: 'application/json',
-        data: JSON.stringify(tmp),
-        success: completeHandler = function(data, textStatus, jqXHR) {
-          console.log(jqXHR.status+': '+JSON.stringify(data));
-          var location = jqXHR.getResponseHeader('Location');
-          ractive.set('saveObserver',false);
-          if (location != undefined) ractive.set('current._links.self.href',location);
-          if (jqXHR.status == 201) {
-            ractive.set('currentIdx',ractive.get('questions').push(ractive.get('current'))-1);
-          }
-          if (jqXHR.status == 204) ractive.splice('questions',ractive.get('currentIdx'),1,ractive.get('current'));
-
-          $('.autoNumeric').autoNumeric('update');
-          ractive.showMessage('Question saved');
-          ractive.set('saveObserver',true);
-        }
-      });
+      ractive.srp.saveQuestion(tmp, ractive.get('tenant.id'))
+          .then(response => {
+            switch(response.status) {
+            case 201:
+              ractive.set('currentIdx',ractive.get('questions').push(ractive.get('current'))-1);
+              return response.json();
+            }
+          })
+          .then(data => {
+            ractive.set('saveObserver',false);
+            if (data !== undefined) ractive.set('current', data);
+            ractive.splice('questions',ractive.get('currentIdx'),1,ractive.get('current'));
+            ractive.set('saveObserver', true);
+            $('.autoNumeric').autoNumeric('update');
+            ractive.showMessage('Question saved');
+          });
     } else {
       console.warn('Cannot save yet as question is invalid');
       $('#currentForm :invalid').addClass('field-error');
@@ -278,16 +270,18 @@ var ractive = new BaseRactive({
       ractive.set('saveObserver',true);
     } else {
       console.log('loading detail for '+url);
-      $.getJSON(url,  function( data ) {
-        console.log('found question '+data);
+      ractive.srp.fetchQuestion(url)
+      .then(response => response.json())
+      .then(data => {
+        console.log('found question'+data);
         ractive.set('current', data);
         ractive.initControls();
         // who knows why this is needed, but it is, at least for first time rendering
         $('.autoNumeric').autoNumeric('update',{});
-        ractive.toggleResults();
+        ractive.hideResults();
         $('#currentSect').slideDown();
         ractive.set('saveObserver',true);
-      });
+      })
     }
   },
   showActivityIndicator: function(msg, addClass) {

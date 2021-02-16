@@ -35,7 +35,11 @@ public class QuestionService {
             .getLogger(QuestionService.class);
 
     @Autowired
-    protected QuestionRepository qRepo;
+    protected final QuestionRepository qRepo;
+
+    public QuestionService(final QuestionRepository questionRepo) {
+        this.qRepo = questionRepo;
+    }
 
     public void initQuestions() {
         LOGGER.info("initQuestions");

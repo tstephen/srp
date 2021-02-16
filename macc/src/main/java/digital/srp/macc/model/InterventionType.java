@@ -32,19 +32,14 @@ import javax.persistence.Transient;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
-import javax.xml.bind.annotation.XmlElement;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.hateoas.Link;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonView;
 
 import digital.srp.macc.maths.Finance;
-import digital.srp.macc.views.InterventionTypeViews;
-import digital.srp.macc.views.InterventionViews;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -71,74 +66,60 @@ public class InterventionType implements CsvSerializable {
     @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.AUTO)
     @JsonProperty
-    @JsonView({ InterventionTypeViews.Summary.class })
     private Long id;
 
     @JsonProperty
-    @JsonView({ InterventionTypeViews.Summary.class, InterventionViews.Summary.class })
     @NotNull
     @Column(name = "name")
     private String name;
 
     @JsonProperty
-    @JsonView({ InterventionTypeViews.Summary.class, InterventionViews.Summary.class })
     @Column(name = "description")
     @Lob
     private String description;
 
     @JsonProperty
-    @JsonView({ InterventionTypeViews.Summary.class })
     @Column(name = "existing")
     private boolean existing;
 
     @JsonProperty
-    @JsonView({ InterventionTypeViews.Summary.class, InterventionViews.Summary.class })
     @Column(name = "status")
     private String status;
 
     @JsonProperty
-    @JsonView({ InterventionTypeViews.Summary.class })
     @Column(name = "data_status")
     private String dataStatus;
 
     @JsonProperty
-    @JsonView({ InterventionTypeViews.Summary.class })
     @Column(name = "analysis_status")
     private String analysisStatus;
 
     @JsonProperty
-    @JsonView({ InterventionTypeViews.Summary.class })
     @Column(name = "strategic_focus")
     private String strategicFocus;
 
     @JsonProperty
-    @JsonView({ InterventionTypeViews.Summary.class })
     @Column(name = "tactical_driver")
     private String tacticalDriver;
 
     @JsonProperty
-    @JsonView({ InterventionTypeViews.Summary.class })
     @Column(name = "operational_sub_category")
     private String operationalSubCategory;
 
     @JsonProperty
-    @JsonView({ InterventionTypeViews.Summary.class, InterventionViews.Summary.class })
     @Column(name = "classification")
     private String classification;
 
     @JsonProperty
-    @JsonView({ InterventionTypeViews.Summary.class })
     @Column(name = "cross_organisation")
     private boolean crossOrganisation;
 
     @JsonProperty
-    @JsonView({ InterventionTypeViews.Summary.class })
     @Column(name = "note")
     @Lob
     private String note;
 
     @JsonProperty
-    @JsonView({ InterventionTypeViews.Summary.class })
     @Column(name = "client_note")
     @Lob
     private String clientNote;
@@ -147,7 +128,6 @@ public class InterventionType implements CsvSerializable {
      * The year this intervention's analysis was last updated.
      */
     @JsonProperty
-    @JsonView({ InterventionTypeViews.Summary.class, InterventionViews.Summary.class })
     @Min(1970)
     @Max(2099)
     @Column(name = "modelling_year")
@@ -157,7 +137,6 @@ public class InterventionType implements CsvSerializable {
      * Lifetime time (Years)
      */
     @JsonProperty
-    @JsonView({ InterventionTypeViews.Summary.class, InterventionViews.Summary.class })
     @Column(name = "LIFETIME", nullable = true)
     @NotNull
     private Short lifetime;
@@ -166,7 +145,6 @@ public class InterventionType implements CsvSerializable {
      * Lifetime time (Years)
      */
     @JsonProperty
-    @JsonView({ InterventionTypeViews.Summary.class })
     @Column(name = "LEAD_TIME")
     private int leadTime;
 
@@ -175,7 +153,6 @@ public class InterventionType implements CsvSerializable {
      * intervention.
      */
     @JsonProperty
-    @JsonView({ InterventionTypeViews.Summary.class, InterventionViews.Summary.class })
     @Min(value = 0)
     @Max(100)
     @Column(name = "UPTAKE", nullable = true)
@@ -183,7 +160,6 @@ public class InterventionType implements CsvSerializable {
     private Short uptake;
 
     @JsonProperty
-    @JsonView({ InterventionTypeViews.Summary.class, InterventionViews.Summary.class })
     @Min(value = 0)
     @Max(100)
     @Column(name = "SCALING", nullable = true)
@@ -194,14 +170,12 @@ public class InterventionType implements CsvSerializable {
      * Confidence factor for this intervention.
      */
     @JsonProperty
-    @JsonView({ InterventionTypeViews.Summary.class, InterventionViews.Summary.class })
     @Min(value = 0)
     @Max(100)
     @Column(name = "confidence")
     private Short confidence = 50;
 
     @JsonProperty
-    @JsonView({ InterventionTypeViews.Summary.class, InterventionViews.Detailed.class })
     @Column(name = "further_info")
     private String furtherInfo;
 
@@ -211,92 +185,75 @@ public class InterventionType implements CsvSerializable {
     private String overlappingInterventions;
 
     @JsonProperty
-    @JsonView({ InterventionTypeViews.Summary.class })
     @Transient
     private double costPerTonneCo2e;
 
     @JsonProperty
-    @JsonView({ InterventionTypeViews.Summary.class })
     @Column(name = "annual_cash_inflows")
     private BigDecimal annualCashInflows;
 
     @JsonProperty
-    @JsonView({ InterventionTypeViews.Summary.class })
     @Column(name = "annual_cash_inflowsts")
     @Lob
     private String annualCashInflowsTS;
 
     @JsonProperty
-    @JsonView({ InterventionTypeViews.Summary.class, InterventionViews.Detailed.class })
     @Column(name = "cash_outflows_up_front")
     private BigDecimal cashOutflowsUpFront;
 
     @JsonProperty
-    @JsonView({ InterventionTypeViews.Summary.class })
     @Column(name = "annual_cash_outflows")
     private BigDecimal annualCashOutflows;
 
     @JsonProperty
-    @JsonView({ InterventionTypeViews.Summary.class })
     @Column(name = "annual_cash_outflowsts")
     @Lob
     private String annualCashOutflowsTS;
 
     @JsonProperty
-    @JsonView({ InterventionTypeViews.Summary.class })
     @Transient
     private double totalNpv;
 
     @JsonProperty
-    @JsonView({ InterventionTypeViews.Summary.class })
     @Column(name = "TONNES_CO2E_SAVED_PA", nullable = true)
     private BigDecimal annualTonnesCo2eSaved;
 
     @JsonProperty
-    @JsonView({ InterventionTypeViews.Summary.class })
     @Column(name = "annual_tonnes_co2e_savedts")
     @Lob
     private String annualTonnesCo2eSavedTS;
 
     @JsonProperty
-    @JsonView({ InterventionTypeViews.Summary.class })
     @Basic
     @Column(name = "UNIT_GAS_SAVED_PA", nullable = true)
     private BigDecimal annualGasSaved;
 
     @JsonProperty
-    @JsonView({ InterventionTypeViews.Summary.class })
     @Column(name = "UNIT_ELEC_SAVED_PA", nullable = true)
     private BigDecimal annualElecSaved;
 
     @JsonProperty
-    @JsonView({ InterventionTypeViews.Summary.class })
     @Column(name = "TONNES_CO2E_SAVED", nullable = true)
     private Integer tonnesCo2eSaved;
 
     @JsonProperty
-    @JsonView({ InterventionTypeViews.Summary.class })
     @Column(name = "UNIT_COUNT", nullable = true)
     private Integer unitCount;
 
     @JsonProperty
-    @JsonView({ InterventionTypeViews.Summary.class })
     @Column(name = "UNIT", nullable = true)
     private String unit;
 
     @JsonProperty
-    @JsonView({ InterventionTypeViews.Summary.class })
     @Column(name = "UNIT_DESC", nullable = true)
     @Lob
     private String unitDescription;
 
     @JsonProperty
-    @JsonView({ InterventionTypeViews.Summary.class })
     @Column(name = "tenant_id")
     private String tenantId;
 
     @JsonProperty
-    @JsonView({ InterventionTypeViews.Summary.class, InterventionViews.Detailed.class })
     @Column(name = "TONNES_CO2E_SAVED_TY", nullable = true)
     @Transient
     private BigDecimal tonnesCo2eSavedTargetYear;
@@ -318,12 +275,6 @@ public class InterventionType implements CsvSerializable {
 
     @Value("${srp.interventions.baseurl:http://srp.digital/interventions}")
     private String furtherInfoBaseUrl;
-
-    @Transient
-    @XmlElement(name = "link", namespace = Link.ATOM_NAMESPACE)
-    @JsonProperty("links")
-    @JsonView({ InterventionTypeViews.Summary.class })
-    private List<Link> links;
 
     public InterventionType() {
         setTargetYear(new ModelParameter("targetYear", new BigDecimal(2020)));
@@ -353,56 +304,48 @@ public class InterventionType implements CsvSerializable {
     }
 
     @JsonProperty
-    @JsonView({ InterventionTypeViews.Summary.class })
     @Transient
     public List<BigDecimal> getAnnualCashOutflowsTimeSeries() {
         return new TimeSeries(annualCashOutflowsTS).asList();
     }
 
     @JsonProperty
-    @JsonView({ InterventionTypeViews.Summary.class })
     @Transient
     public void setAnnualCashOutflowsTimeSeries(List<BigDecimal> values) {
         annualCashOutflowsTS = TimeSeries.asString(values);
     }
 
     @JsonProperty
-    @JsonView({ InterventionTypeViews.Summary.class })
     @Transient
     public List<BigDecimal> getAnnualCashInflowsTimeSeries() {
         return new TimeSeries(annualCashInflowsTS).asList();
     }
 
     @JsonProperty
-    @JsonView({ InterventionTypeViews.Summary.class })
     @Transient
     public void setAnnualCashInflowsTimeSeries(List<BigDecimal> values) {
         annualCashInflowsTS = TimeSeries.asString(values);
     }
 
     @JsonProperty
-    @JsonView({ InterventionTypeViews.Summary.class })
     @Transient
     public List<BigDecimal> getAnnualTonnesCo2eSavedTimeSeries() {
         return new TimeSeries(annualTonnesCo2eSavedTS).asList();
     }
 
     @JsonProperty
-    @JsonView({ InterventionTypeViews.Summary.class })
     @Transient
     public void setAnnualTonnesCo2eSavedTimeSeries(List<BigDecimal> values) {
         annualTonnesCo2eSavedTS = TimeSeries.asString(values);
     }
 
     @JsonProperty
-    @JsonView({ InterventionTypeViews.Summary.class })
     public BigDecimal getCashOutflowsUpFront() {
         return cashOutflowsUpFront == null ? Finance.ZERO_BIG_DECIMAL
                 : cashOutflowsUpFront;
     }
 
     @JsonProperty
-    @JsonView({ InterventionTypeViews.Summary.class })
     public BigDecimal getCashOutflowsUpFrontNational() {
         return getCashOutflowsUpFront().multiply(getUptakeFactor()).divide(
                 getScaleFactor(), Finance.ROUND_MODE);
@@ -420,14 +363,12 @@ public class InterventionType implements CsvSerializable {
     }
 
     @JsonProperty
-    @JsonView({ InterventionTypeViews.Summary.class })
     public BigDecimal getAnnualCashOutflowsNationalTargetYear() {
         return getAnnualCashOutflows(getTargetYearIndex()).multiply(
                 getUptakeFactor()).divide(getScaleFactor(), Finance.ROUND_MODE);
     }
 
     @JsonProperty
-    @JsonView({ InterventionTypeViews.Summary.class })
     public BigDecimal getAnnualCashOutflowsTargetYear() {
         return getAnnualCashOutflows(getTargetYearIndex());
     }
@@ -452,14 +393,12 @@ public class InterventionType implements CsvSerializable {
     }
 
     @JsonProperty
-    @JsonView({ InterventionTypeViews.Summary.class })
     public BigDecimal getAnnualCashInflowsNationalTargetYear() {
         return getAnnualCashInflows(getTargetYearIndex()).multiply(
                 getUptakeFactor()).divide(getScaleFactor(), Finance.ROUND_MODE);
     }
 
     @JsonProperty
-    @JsonView({ InterventionTypeViews.Summary.class })
     public BigDecimal getAnnualCashInflowsTargetYear() {
         return getAnnualCashInflows(getTargetYearIndex());
     }
@@ -488,7 +427,6 @@ public class InterventionType implements CsvSerializable {
      *         terms.
      */
     @JsonProperty
-    @JsonView({ InterventionTypeViews.Summary.class })
     public Long getTotalCashOutflows() {
         try {
             BigDecimal total = new BigDecimal("0.00");
@@ -504,7 +442,6 @@ public class InterventionType implements CsvSerializable {
     }
 
     @JsonProperty
-    @JsonView({ InterventionTypeViews.Summary.class })
     public Long getTotalCashInflows() {
         try {
             BigDecimal total = new BigDecimal("0.00");
@@ -519,7 +456,6 @@ public class InterventionType implements CsvSerializable {
     }
 
     @JsonProperty
-    @JsonView({ InterventionTypeViews.Summary.class })
     public Long getMeanCashInflows() {
         try {
             return (long) Math.round((getTotalCashInflows() / getLifetime()));
@@ -534,7 +470,6 @@ public class InterventionType implements CsvSerializable {
      *         and not converted into today's prices.
      */
     @JsonProperty
-    @JsonView({ InterventionTypeViews.Summary.class })
     public BigDecimal getTargetYearSavings() {
         try {
             int yearIndex = getTargetYearIndex();
@@ -551,7 +486,6 @@ public class InterventionType implements CsvSerializable {
     }
 
     @JsonProperty
-    @JsonView({ InterventionTypeViews.Summary.class })
     public BigDecimal getTotalNpv() {
         try {
             BigDecimal ongoingFlows = new BigDecimal("0.00");
@@ -638,7 +572,6 @@ public class InterventionType implements CsvSerializable {
     }
 
     @JsonProperty
-    @JsonView({ InterventionTypeViews.Summary.class })
     public BigDecimal getTotalTonnesCo2eSaved() {
         if (annualTonnesCo2eSaved == null && annualTonnesCo2eSavedTS == null) {
             return Finance.ZERO_BIG_DECIMAL;
@@ -714,7 +647,6 @@ public class InterventionType implements CsvSerializable {
     }
 
     @JsonProperty
-    @JsonView({ InterventionTypeViews.Summary.class, InterventionViews.Detailed.class })
     public List<String> getOverlappingInterventionList() {
         if (overlappingInterventions == null
                 || overlappingInterventions.length() == 0) {
@@ -728,11 +660,6 @@ public class InterventionType implements CsvSerializable {
         overlappingInterventions = interventions.toString()
                 .substring(1, interventions.toString().length() - 1)
                 .replaceAll(", ", ",");
-    }
-
-    public InterventionType links(List<Link> links) {
-        setLinks(links);
-        return this;
     }
 
     public String toCsv() {

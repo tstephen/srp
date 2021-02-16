@@ -35,17 +35,15 @@ var ractive = new BaseRactive({
       }
     },
     stdPartials: [
-      
-      { "name": "profileArea", "url": $env.server+"/partials/profile-area.html"},
-      { "name": "sidebar", "url": "partials/sidebar.html"},
-      { "name": "toolbar", "url": "partials/toolbar.html"},
+      { "name": "profileArea", "url": "/partials/profile-area.html"},
+      { "name": "sidebar", "url": "/partials/sidebar.html"},
+      { "name": "toolbar", "url": "/partials/toolbar.html"},
       { "name": "supportBar", "url": $env.server+"/webjars/supportservices/3.0.0/partials/support-bar.html"},
-      { "name": "titleArea", "url": $env.server+"/partials/title-area.html"},
+      { "name": "titleArea", "url": "/partials/title-area.html"},
     ],
   },
   partials: {
     'helpModal': '',
-    'loginSect': '',
     'profileArea': '',
     'sidebar': '',
     'supportBar': '',

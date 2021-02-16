@@ -15,8 +15,13 @@
  ******************************************************************************/
 package digital.srp.macc.web;
 
-import java.util.Collections;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
+
+import java.util.ArrayList;
 import java.util.List;
+
+import javax.annotation.security.RolesAllowed;
 
 import org.hibernate.ObjectNotFoundException;
 import org.slf4j.Logger;
@@ -25,22 +30,22 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.hateoas.Link;
+import org.springframework.hateoas.EntityModel;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
-import com.fasterxml.jackson.annotation.JsonView;
-
 import digital.srp.macc.model.ModelParameter;
 import digital.srp.macc.repositories.ModelParameterRepository;
-import digital.srp.macc.views.ModelParameterViews;
 
 /**
  * REST endpoint for accessing {@link ModelParameter}
@@ -63,8 +68,7 @@ public class ModelParameterController {
      * @return messages for that tenant.
      */
     @RequestMapping(value = "/", method = RequestMethod.GET)
-    @JsonView(ModelParameterViews.Summary.class)
-    public @ResponseBody List<ModelParameter> listForTenant(
+    public @ResponseBody List<EntityModel<digital.srp.macc.model.ModelParameter>> listForTenant(
             @PathVariable("tenantId") String tenantId,
             @RequestParam(value = "page", required = false) Integer page,
             @RequestParam(value = "limit", required = false) Integer limit) {
@@ -79,18 +83,17 @@ public class ModelParameterController {
         }
         LOGGER.info(String.format("Found %1$s messages", list.size()));
 
-        return addLinks(list);
+        return addLinks(tenantId, list);
     }
 
     /**
      * @return The specified parameter.
      */
     @RequestMapping(value = "/{idOrName}", method = RequestMethod.GET)
-    @JsonView(ModelParameterViews.Detailed.class)
-    public @ResponseBody ModelParameter findById(
+    public @ResponseBody EntityModel<digital.srp.macc.model.ModelParameter> findById(
+            @PathVariable("tenantId") String tenantId,
             @PathVariable("idOrName") String param) {
         LOGGER.info(String.format("findById %1$s", param));
-
 
         ModelParameter parameter;
         try {
@@ -98,10 +101,31 @@ public class ModelParameterController {
                     .orElseThrow(() -> new ObjectNotFoundException(param,
                             ModelParameter.class.getSimpleName()));
         } catch (NumberFormatException e) {
-            parameter = modelParamRepo.findByName(param);
+            String msg = String.format("No parameter with name %1$s", param);
+            parameter = modelParamRepo.findByName(param)
+                    .orElseThrow(() -> new IllegalArgumentException(msg));
         }
 
-        return addLinks(parameter);
+        return addLinks(tenantId, parameter);
+    }
+
+    /**
+     * @return Location header for newly created parameter.
+     */
+    @RolesAllowed("admin")
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+    @ResponseStatus(value = HttpStatus.CREATED)
+    @RequestMapping(value = "/", method = RequestMethod.POST)
+    public @ResponseBody ResponseEntity<?> create(
+            @PathVariable("tenantId") String tenantId,
+            @RequestHeader String Authorization,
+            @RequestBody ModelParameter param) {
+
+        EntityModel<ModelParameter> model = addLinks(tenantId, modelParamRepo.save(param));
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setLocation(model.getLink("self").get().toUri());
+        return new ResponseEntity(headers, HttpStatus.CREATED);
     }
 
     /**
@@ -145,17 +169,18 @@ public class ModelParameterController {
         modelParamRepo.save(param);
     }
 
-    private List<ModelParameter> addLinks(List<ModelParameter> params) {
-        for (ModelParameter param : params) {
-            addLinks(param);
+    protected List<EntityModel<ModelParameter>> addLinks(final String tenantId, List<ModelParameter> params) {
+        List<EntityModel<ModelParameter>> entities = new ArrayList<EntityModel<ModelParameter>>();
+        for (ModelParameter rtn : params) {
+            entities.add(addLinks(tenantId, rtn));
         }
-        return params;
+        return entities;
     }
 
-    private ModelParameter addLinks(ModelParameter modelParameter) {
-        return modelParameter.links(Collections
-                .singletonList(Link.of(String.format("/%1$s/parameters/%2$d",
-                        modelParameter.getTenantId(),
-                        modelParameter.getId()))));
+    protected EntityModel<ModelParameter> addLinks(final String tenantId, final ModelParameter param) {
+        return EntityModel.of(param,
+                linkTo(methodOn(ModelParameterController.class)
+                        .findById(tenantId, String.valueOf(param.getId())))
+                                .withSelfRel());
     }
 }

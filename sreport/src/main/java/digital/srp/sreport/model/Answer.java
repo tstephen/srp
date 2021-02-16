@@ -18,7 +18,6 @@ package digital.srp.sreport.model;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -36,10 +35,8 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
-import javax.persistence.Transient;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
-import javax.xml.bind.annotation.XmlElement;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,15 +45,10 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-import org.springframework.hateoas.Link;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonView;
 
 import digital.srp.macc.maths.SignificantFiguresFormat;
-import digital.srp.sreport.model.views.AnswerViews;
-import digital.srp.sreport.model.views.QuestionViews;
-import digital.srp.sreport.model.views.SurveyReturnViews;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -83,25 +75,21 @@ public class Answer {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @JsonProperty
-    @JsonView({ AnswerViews.Summary.class, SurveyReturnViews.Detailed.class })
     @Column(name = "id")
     private Long id;
 
     @JsonProperty
-    @JsonView({ AnswerViews.Summary.class, SurveyReturnViews.Detailed.class })
     @Column(name = "response")
     private String response;
 
     @NotNull
     @JsonProperty
-    @JsonView({ AnswerViews.Summary.class, SurveyReturnViews.Detailed.class })
     @ManyToOne(fetch = FetchType.EAGER)
     private Question question;
 
     @NotNull
     @Size(max = 50)
     @JsonProperty
-    @JsonView({ AnswerViews.Summary.class, SurveyReturnViews.Detailed.class })
     @Column(name = "status")
     private String status = StatusType.Draft.name();
 
@@ -113,7 +101,6 @@ public class Answer {
     @NotNull
     @JsonProperty
     @Size(max = 20)
-    @JsonView({ AnswerViews.Summary.class, SurveyReturnViews.Detailed.class })
     @Column(name = "applicable_period")
     private String applicablePeriod;
 
@@ -122,7 +109,6 @@ public class Answer {
      * allows for a re-statement if needed.
      */
     @JsonProperty
-    @JsonView({ AnswerViews.Summary.class, SurveyReturnViews.Detailed.class })
     @Column(name = "revision")
     private Short revision = 1;
 
@@ -130,13 +116,11 @@ public class Answer {
      * True is we have calculated this answer on behalf of the user.
      */
     @JsonProperty
-    @JsonView({ AnswerViews.Detailed.class, SurveyReturnViews.Detailed.class })
     @Column(name = "derived")
     private boolean derived = false;
 
     @Temporal(TemporalType.TIMESTAMP)
     @JsonProperty
-    @JsonView({ AnswerViews.Detailed.class })
     @Column(name = "submitted_date")
     private Date submittedDate;
 
@@ -144,43 +128,30 @@ public class Answer {
      * Username of submitter.
      */
     @JsonProperty
-    @JsonView({ AnswerViews.Detailed.class })
     @Column(name = "submitted_by")
     private String submittedBy;
 
-    @JsonView({ AnswerViews.Detailed.class })
     @Column(name = "created", nullable = false, updatable = false)
     @CreatedDate
     private Date created;
 
-    @JsonView({ AnswerViews.Detailed.class })
     @Column(name = "created_by")
     @CreatedBy
     private String createdBy;
 
-    @JsonView({ AnswerViews.Detailed.class })
     @Column(name = "last_updated")
     @LastModifiedDate
     private Date lastUpdated;
 
-    @JsonView({ AnswerViews.Detailed.class })
     @Column(name = "updated_by")
     @LastModifiedBy
     private String updatedBy;
 
-    @JsonProperty
-    @JsonView({ AnswerViews.Detailed.class })
     @ManyToMany
     @JoinTable(name="SR_RETURN_ANSWER",
             joinColumns=@JoinColumn(name="answer_id", referencedColumnName="id"),
             inverseJoinColumns=@JoinColumn(name="survey_return_id", referencedColumnName="id"))
     private Set<SurveyReturn> surveyReturns;
-
-    @Transient
-    @XmlElement(name = "link", namespace = Link.ATOM_NAMESPACE)
-    @JsonProperty("links")
-    @JsonView({ AnswerViews.Summary.class, QuestionViews.Summary.class })
-    private List<Link> links;
 
     public Answer(long id, String response, Question q, StatusType status,
             String applicablePeriod, short revision, boolean derived,
@@ -346,14 +317,6 @@ public class Answer {
 
     public void setUpdatedBy(String updatedBy) {
         this.updatedBy = updatedBy;
-    }
-
-    public List<Link> getLinks() {
-        return links;
-    }
-
-    public void setLinks(List<Link> links) {
-        this.links = links;
     }
 
     @Override

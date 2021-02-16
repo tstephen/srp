@@ -16,6 +16,7 @@
 package digital.srp.macc.repositories;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
@@ -45,7 +46,7 @@ public interface OrganisationTypeRepository extends
     List<OrganisationType> findAllReportingTypeForTenant(@Param("tenantId") String tenantId);
 
     @Query("SELECT c FROM OrganisationType c WHERE c.tenantId = :tenantId AND name = :name")
-    OrganisationType findByName(@Param("tenantId") String tenantId,
+    Optional<OrganisationType> findByName(@Param("tenantId") String tenantId,
             @Param("name") String name);
 
 }

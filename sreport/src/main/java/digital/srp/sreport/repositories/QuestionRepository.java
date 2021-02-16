@@ -16,6 +16,7 @@
 package digital.srp.sreport.repositories;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
@@ -32,7 +33,7 @@ import digital.srp.sreport.model.Question;
 public interface QuestionRepository extends CrudRepository<Question, Long> {
 
     @Query("SELECT o FROM Question o WHERE o.name = :name")
-    Question findByName(@Param("name") String name);
+    Optional<Question> findByName(@Param("name") String name);
 
     @Query("SELECT o FROM Question o ORDER BY o.name ASC")
     List<Question> findAll();

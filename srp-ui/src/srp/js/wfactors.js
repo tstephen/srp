@@ -127,12 +127,12 @@ var ractive = new BaseRactive({
       else return 'hidden';
     },
     stdPartials: [
-      { "name": "helpModal", "url": $env.server+"/partials/help-modal.html"},
+      { "name": "helpModal", "url": "/partials/help-modal.html"},
       { "name": "navbar", "url": "./vsn/partials/wfactor-navbar.html"},
-      { "name": "profileArea", "url": $env.server+"/partials/profile-area.html"},
-      { "name": "sidebar", "url": "partials/sidebar.html"},
-      { "name": "toolbar", "url": "partials/toolbar.html"},
-      { "name": "titleArea", "url": $env.server+"/partials/title-area.html"},
+      { "name": "profileArea", "url": "/partials/profile-area.html"},
+      { "name": "sidebar", "url": "/partials/sidebar.html"},
+      { "name": "toolbar", "url": "/partials/toolbar.html"},
+      { "name": "titleArea", "url": "/partials/title-area.html"},
       { "name": "wfactorListSect", "url": "./vsn/partials/wfactor-list-sect.html"},
       { "name": "wfactorCurrentSect", "url": "./vsn/partials/wfactor-current-sect.html"}
     ],
@@ -156,17 +156,16 @@ var ractive = new BaseRactive({
     ractive.select(wfactor);
   },
   delete: function (obj) {
-    console.log('delete '+obj+'...');
-    var url = obj.links != undefined
-        ? obj.links.filter(function(d) { console.log('this:'+d);if (d['rel']=='self') return d;})[0].href
-        : obj._links.self.href;
-    $.ajax({
-        url: url,
-        type: 'DELETE',
-        success: completeHandler = function(data) {
-          ractive.fetch();
-          ractive.toggleResults();
-        }
+    ractive.srp.deleteWeightingFactor(ractive.get('current'))
+    .then(response => {
+      switch (response.status) {
+      case 204:
+        ractive.fetch();
+        ractive.toggleResults();
+        break;
+      default:
+        ractive.showMessage('Unable to delete the organisation type ('+response.status+')');
+      }
     });
     return false; // cancel bubbling to prevent edit as well as delete
   },
@@ -178,21 +177,19 @@ var ractive = new BaseRactive({
   },
   fetch: function () {
     console.log('fetch...');
+    if (ractive.keycloak.token === undefined) return;
     ractive.set('saveObserver', false);
-    $.ajax({
-      dataType: "json",
-      url: ractive.getServer()+'/wfactors/',
-      crossDomain: true,
-      success: function( data ) {
-        ractive.set('saveObserver', false);
-        ractive.set('wfactors', data);
-        if (ractive.hasRole('admin')) $('.admin').show();
-        if (ractive.fetchCallbacks!=null) ractive.fetchCallbacks.fire();
-        ractive.showResults();
-        ractive.showSearchMatched();
-        ractive.set('saveObserver', true);
-      }
-    });
+    ractive.srp.fetchWeightingFactors()
+    .then(response => response.json())
+    .then(data => {
+      ractive.set('saveObserver', false);
+      ractive.set('wfactors', data);
+      if (ractive.hasRole('admin')) $('.admin').show();
+      if (ractive.fetchCallbacks!=null) ractive.fetchCallbacks.fire();
+      ractive.showResults();
+      ractive.showSearchMatched();
+      ractive.set('saveObserver', true);
+    })
   },
   filter: function(filter) {
     console.log('filter: '+JSON.stringify(filter));
@@ -221,26 +218,20 @@ var ractive = new BaseRactive({
       tmp.tenantId = ractive.get('tenant.id');
       if (tmp.optionNames == undefined) tmp.optionNames = [];
       else if (typeof tmp.optionNames == 'string') tmp.optionNames = tmp.optionNames.split(',');
-//      console.log('ready to save wfactor'+JSON.stringify(tmp)+' ...');
-      $.ajax({
-        url: id === undefined ? ractive.getServer()+'/wfactors/' : id,
-        type: id === undefined ? 'POST' : 'PUT',
-        contentType: 'application/json',
-        data: JSON.stringify(tmp),
-        success: completeHandler = function(data, textStatus, jqXHR) {
-          console.log(jqXHR.status+': '+JSON.stringify(data));
-          var location = jqXHR.getResponseHeader('Location');
-          ractive.set('saveObserver',false);
-          if (location != undefined) ractive.set('current._links.self.href',location);
-          if (jqXHR.status == 201) {
-            ractive.set('currentIdx',ractive.get('wfactors').push(ractive.get('current'))-1);
-          }
-          if (jqXHR.status == 204) ractive.splice('wfactors',ractive.get('currentIdx'),1,ractive.get('current'));
-
-          $('.autoNumeric').autoNumeric('update');
-          ractive.showMessage('Record saved');
-          ractive.set('saveObserver',true);
+      ractive.srp.saveWeightingFactor(tmp, ractive.get('tenant.id'))
+      .then(response => {
+        switch(response.status) {
+        case 201:
+          ractive.set('currentIdx',ractive.get('wfactors').push(ractive.get('current'))-1);
+          return response.json();
         }
+      })
+      .then(data => {
+        if (data !== undefined) ractive.set('current', data);
+        ractive.splice('wfactors',ractive.get('currentIdx'),1,ractive.get('current'));
+        ractive.set('saveObserver', true);
+        $('.autoNumeric').autoNumeric('update');
+        ractive.showMessage('Weighting Factor saved');
       });
     } else {
       console.warn('Cannot save yet as wfactor is invalid');
@@ -259,7 +250,9 @@ var ractive = new BaseRactive({
       ractive.set('saveObserver',true);
     } else {
       console.log('loading detail for '+url);
-      $.getJSON(url,  function( data ) {
+      ractive.srp.fetchWeightingFactor(url)
+      .then(response => response.json())
+      .then(data => {
         console.log('found wfactor '+data);
         ractive.set('current', data);
         ractive.initControls();
@@ -268,7 +261,7 @@ var ractive = new BaseRactive({
         ractive.hideResults();
         $('#currentSect').slideDown();
         ractive.set('saveObserver',true);
-      });
+      })
     }
   },
   showActivityIndicator: function(msg, addClass) {

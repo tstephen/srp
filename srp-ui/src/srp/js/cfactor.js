@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2015-2020 Tim Stephenson and contributors
+ * Copyright 2015-2021 Tim Stephenson and contributors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -126,12 +126,12 @@ var ractive = new BaseRactive({
       else return 'hidden';
     },
     stdPartials: [
-      { "name": "helpModal", "url": $env.server+"/partials/help-modal.html"},
+      { "name": "helpModal", "url": "/partials/help-modal.html"},
       { "name": "navbar", "url": "/srp/vsn/partials/cfactor-navbar.html"},
-      { "name": "profileArea", "url": $env.server+"/partials/profile-area.html"},
-      { "name": "sidebar", "url": "partials/sidebar.html"},
-      { "name": "toolbar", "url": "partials/toolbar.html"},
-      { "name": "titleArea", "url": $env.server+"/partials/title-area.html"},
+      { "name": "profileArea", "url": "/partials/profile-area.html"},
+      { "name": "sidebar", "url": "/partials/sidebar.html"},
+      { "name": "toolbar", "url": "/partials/toolbar.html"},
+      { "name": "titleArea", "url": "/partials/title-area.html"},
       { "name": "cfactorListSect", "url": "/srp/vsn/partials/cfactor-list-sect.html"},
       { "name": "cfactorCurrentSect", "url": "/srp/vsn/partials/cfactor-current-sect.html"}
     ],
@@ -158,16 +158,16 @@ var ractive = new BaseRactive({
   },
   delete: function (obj) {
     console.log('delete '+obj+'...');
-    var url = obj.links != undefined
-        ? obj.links.filter(function(d) { console.log('this:'+d);if (d['rel']=='self') return d;})[0].href
-        : obj._links.self.href;
-    $.ajax({
-        url: url,
-        type: 'DELETE',
-        success: completeHandler = function(data) {
-          ractive.fetch();
-          ractive.toggleResults();
-        }
+    ractive.srp.deleteCarbonFactor(ractive.get('current'))
+    .then(response => {
+      switch (response.status) {
+      case 204:
+        ractive.fetch();
+        ractive.toggleResults();
+        break;
+      default:
+        ractive.showMessage('Unable to delete the Carbon factor ('+response.status+')');
+      }
     });
     return false; // cancel bubbling to prevent edit as well as delete
   },
@@ -179,21 +179,19 @@ var ractive = new BaseRactive({
   },
   fetch: function () {
     console.log('fetch...');
+    if (ractive.keycloak.token === undefined) return;
     ractive.set('saveObserver', false);
-    $.ajax({
-      dataType: "json",
-      url: ractive.getServer()+'/cfactors/',
-      crossDomain: true,
-      success: function( data ) {
-        ractive.set('saveObserver', false);
-        ractive.set('cfactors', data);
-        if (ractive.hasRole('admin')) $('.admin').show();
-        if (ractive.fetchCallbacks!=null) ractive.fetchCallbacks.fire();
-        ractive.showResults();
-        ractive.showSearchMatched();
-        ractive.set('saveObserver', true);
-      }
-    });
+    ractive.srp.fetchCarbonFactors()
+    .then(response => response.json())
+    .then(data => {
+      ractive.set('saveObserver', false);
+      ractive.set('cfactors', data);
+      if (ractive.hasRole('admin')) $('.admin').show();
+      if (ractive.fetchCallbacks!=null) ractive.fetchCallbacks.fire();
+      ractive.showResults();
+      ractive.showSearchMatched();
+      ractive.set('saveObserver', true);
+    })
   },
   filter: function(filter) {
     console.log('filter: '+JSON.stringify(filter));
@@ -209,6 +207,7 @@ var ractive = new BaseRactive({
     $('#currentSect').slideDown({ queue: true });
   },
   postSelect: function(cfactor) {
+    ractive.set('saveObserver',false);
     ractive.set('current', cfactor);
     ractive.initControls();
     // who knows why this is needed, but it is, at least for first time rendering
@@ -218,45 +217,35 @@ var ractive = new BaseRactive({
     ractive.set('saveObserver',true);
   },
   save: function () {
-    console.log('save cfactor: '+ractive.get('current').name+'...');
+    console.log('save carbonFactor: '+ractive.get('current.name')+'...');
     ractive.set('saveObserver',false);
-    var id = ractive.uri(ractive.get('current'));
-    console.log('  id: '+id+', so will '+(id === undefined ? 'POST' : 'PUT'));
-
-    ractive.set('saveObserver',true);
-    if (document.getElementById('currentForm')==undefined) {
-      // loading... ignore
-    } else if(document.getElementById('currentForm').checkValidity()) {
+    if (document.getElementById('currentForm')==undefined) { // loading... ignore
+      ractive.set('saveObserver',true);
+    } else if (document.getElementById('currentForm').checkValidity()) {
       var tmp = JSON.parse(JSON.stringify(ractive.get('current')));
       tmp.tenantId = ractive.get('tenant.id');
       if (tmp.optionNames == undefined) tmp.optionNames = [];
       else if (typeof tmp.optionNames == 'string') tmp.optionNames = tmp.optionNames.split(',');
-//      console.log('ready to save cfactor'+JSON.stringify(tmp)+' ...');
-      $.ajax({
-        url: id === undefined ? ractive.getServer()+'/cfactors/' : id,
-        type: id === undefined ? 'POST' : 'PUT',
-        contentType: 'application/json',
-        data: JSON.stringify(tmp),
-        success: completeHandler = function(data, textStatus, jqXHR) {
-          console.log(jqXHR.status+': '+JSON.stringify(data));
-          var location = jqXHR.getResponseHeader('Location');
-          ractive.set('saveObserver',false);
-          if (location != undefined) ractive.set('current._links.self.href',location);
-          if (jqXHR.status == 201) {
-            ractive.set('currentIdx',ractive.get('cfactors').push(ractive.get('current'))-1);
-          }
-          if (jqXHR.status == 204) ractive.splice('cfactors',ractive.get('currentIdx'),1,ractive.get('current'));
-
-          $('.autoNumeric').autoNumeric('update');
-          ractive.showMessage('Record saved');
-          ractive.set('saveObserver',true);
-        }
-      });
+      ractive.srp.saveCarbonFactor(tmp, ractive.get('tenant.id'))
+          .then(response => {
+            switch(response.status) {
+            case 201:
+              ractive.set('currentIdx',ractive.get('cfactors').push(ractive.get('current'))-1);
+              return response.json();
+            }
+          })
+          .then(data => {
+            if (data !== undefined) ractive.set('current', data);
+            ractive.splice('cfactors',ractive.get('currentIdx'),1,ractive.get('current'));
+            ractive.set('saveObserver', true);
+            $('.autoNumeric').autoNumeric('update');
+            ractive.showMessage('Carbon Factor saved');
+          });
     } else {
-      console.warn('Cannot save yet as cfactor is invalid');
+      console.warn('Cannot save yet as Carbon Factor is invalid');
       $('#currentForm :invalid').addClass('field-error');
-      $('.autoNumeric').autoNumeric('update');
-      ractive.showMessage('Cannot save yet as record is incomplete');
+      ractive.showMessage('Cannot save yet as Carbon Factor is incomplete');
+      ractive.set('saveObserver',true);
     }
   },
   select: function(cfactor) {
@@ -268,11 +257,12 @@ var ractive = new BaseRactive({
       ractive.postSelect(cfactor);
     } else {
       console.log('loading detail for '+url);
-      $.getJSON(url,  function( data ) {
+      ractive.srp.fetchCarbonFactor(url)
+      .then(response => response.json())
+      .then(data => {
         console.log('found cfactor '+data);
-        ractive.set('saveObserver',false);
         ractive.postSelect(data);
-      });
+      })
     }
   },
   showActivityIndicator: function(msg, addClass) {

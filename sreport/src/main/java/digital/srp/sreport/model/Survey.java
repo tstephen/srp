@@ -24,6 +24,7 @@ import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EntityListeners;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -32,7 +33,6 @@ import javax.persistence.Table;
 import javax.persistence.Transient;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
-import javax.xml.bind.annotation.XmlElement;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,14 +41,9 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-import org.springframework.hateoas.Link;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonView;
 
-import digital.srp.sreport.model.views.AnswerViews;
-import digital.srp.sreport.model.views.SurveyReturnViews;
-import digital.srp.sreport.model.views.SurveyViews;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -77,20 +72,17 @@ public class Survey {
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id")
     @JsonProperty
-    @JsonView(SurveyViews.Summary.class)
     private Long id;
 
     @NotNull
     @Size(max = 50)
     @JsonProperty
-    @JsonView({ AnswerViews.Detailed.class, SurveyReturnViews.Summary.class, SurveyViews.Summary.class })
     @Column(name = "name")
     private String name;
 
     @NotNull
     @Size(max = 50)
     @JsonProperty
-    @JsonView(SurveyViews.Summary.class)
     @Column(name = "status")
     private String status = "Draft";
 
@@ -102,20 +94,12 @@ public class Survey {
     @NotNull
     @Size(max = 20)
     @JsonProperty
-    @JsonView(SurveyViews.Summary.class)
     @Column(name = "applicable_period")
     private String applicablePeriod;
 
     @JsonProperty
-    @JsonView(SurveyViews.Detailed.class)
-    @OneToMany(orphanRemoval=true, cascade= CascadeType.ALL, mappedBy = "survey")
+    @OneToMany(orphanRemoval=true, cascade= CascadeType.ALL, fetch = FetchType.EAGER, mappedBy = "survey")
     private List<SurveyCategory> categories;
-
-    @Transient
-    @XmlElement(name = "link", namespace = Link.ATOM_NAMESPACE)
-    @JsonProperty("links")
-    @JsonView(SurveyViews.Summary.class)
-    private List<Link> links;
 
     @Column(name = "created", nullable = false, updatable = false)
     @CreatedDate
@@ -231,14 +215,6 @@ public class Survey {
 
     public void setApplicablePeriod(String applicablePeriod) {
         this.applicablePeriod = applicablePeriod;
-    }
-
-    public List<Link> getLinks() {
-        return links;
-    }
-
-    public void setLinks(List<Link> links) {
-        this.links = links;
     }
 
     public Date getCreated() {

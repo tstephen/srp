@@ -16,6 +16,7 @@
 package digital.srp.sreport.repositories;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
@@ -33,7 +34,7 @@ import digital.srp.sreport.model.WeightingFactor;
 public interface WeightingFactorRepository extends CrudRepository<WeightingFactor, Long> {
 
     @Query("SELECT o FROM WeightingFactor o WHERE o.orgType = :orgType ORDER BY o.orgType ASC")
-    WeightingFactor findByOrgType(@Param("orgType") String orgType);
+    Optional<WeightingFactor> findByOrgType(@Param("orgType") String orgType);
 
     @Query("SELECT o FROM WeightingFactor o ORDER BY o.orgType ASC")
     List<WeightingFactor> findAll();

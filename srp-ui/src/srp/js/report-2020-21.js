@@ -447,14 +447,9 @@ var ractive = new BaseRactive({
   },
   fetchSurvey: function() {
     console.info('fetchSurvey');
-    $.ajax({
-       type: 'GET',
-       url: ractive.getServer()+'/surveys/findByName/'+ractive.get('survey'),
-       dataType: 'json',
-       success: function(data, textStatus, jqxhr) {
-         console.log('success:'+data);
-         ractive.set('q', data);
-       }
+    ractive.srp.fetchSurvey(ractive.get('survey'), function(data) {
+      console.log('success:'+data);
+      ractive.set('q', data);
     });
   },
   fetchTable: function(ctrl) {

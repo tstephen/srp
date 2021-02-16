@@ -15,17 +15,18 @@
  ******************************************************************************/
 package digital.srp.sreport.web;
 
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
+
 import java.io.IOException;
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
 import javax.annotation.security.RolesAllowed;
-import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
 
 import org.slf4j.Logger;
@@ -34,22 +35,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.hateoas.Link;
-import org.springframework.http.HttpHeaders;
+import org.springframework.hateoas.EntityModel;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder;
-import org.springframework.web.util.UriComponentsBuilder;
-
-import com.fasterxml.jackson.annotation.JsonView;
+import org.springframework.web.bind.annotation.RestController;
 
 import digital.srp.sreport.api.Calculator;
 import digital.srp.sreport.api.SrpRoles;
@@ -62,7 +58,6 @@ import digital.srp.sreport.model.StatusType;
 import digital.srp.sreport.model.Survey;
 import digital.srp.sreport.model.SurveyCategory;
 import digital.srp.sreport.model.SurveyReturn;
-import digital.srp.sreport.model.views.SurveyReturnViews;
 import digital.srp.sreport.repositories.AnswerRepository;
 import digital.srp.sreport.repositories.QuestionRepository;
 import digital.srp.sreport.repositories.SurveyRepository;
@@ -71,11 +66,11 @@ import digital.srp.sreport.services.DefaultCompletenessValidator;
 import digital.srp.sreport.services.HistoricDataMerger;
 
 /**
- * REST web service for accessing returned returns.
+ * REST web service for accessing survey returns.
  *
  * @author Tim Stephenson
  */
-@Controller
+@RestController
 @RequestMapping(value = "/returns")
 public class SurveyReturnController {
 
@@ -133,15 +128,16 @@ public class SurveyReturnController {
      */
     @RolesAllowed(SrpRoles.USER)
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
-    @JsonView(SurveyReturnViews.Detailed.class)
     @Transactional
-    public @ResponseBody SurveyReturn findById(@PathVariable("id") Long returnId) {
-        LOGGER.info(String.format("findById %1$s", returnId));
+    public @ResponseBody EntityModel<SurveyReturn> findById(@PathVariable("id") Long returnId) {
+        LOGGER.info("findById {}", returnId);
 
         SurveyReturn rtn = returnRepo.findById(returnId)
                 .orElseThrow(()-> new ObjectNotFoundException(SurveyReturn.class, returnId));
         // use logger for force child load
-        LOGGER.info(String.format("Found return with id %1$d with status %2$s and containing %3$d answers", rtn.id(), rtn.status(), rtn.answers().size()));
+        LOGGER.info(String.format(
+                "Found return with id %1$d with status %2$s and containing %3$d answers",
+                rtn.id(), rtn.status(), rtn.answers().size()));
 
         return addLinks(rtn);
     }
@@ -153,15 +149,11 @@ public class SurveyReturnController {
      */
     @RolesAllowed(SrpRoles.USER)
     @RequestMapping(value = "/findBySurveyName/{surveyName}", method = RequestMethod.GET)
-    @JsonView(SurveyReturnViews.Detailed.class)
     @Transactional
-    public @ResponseBody List<SurveyReturn> findBySurvey(
+    public @ResponseBody List<EntityModel<SurveyReturn>> findBySurvey(
             @PathVariable("surveyName") String surveyName) {
-        LOGGER.info(String.format("findCurrentBySurvey %1$s", surveyName));
-
-        List<SurveyReturn> returns = returnRepo.findBySurveyName(surveyName);
-
-        return addLinks(returns);
+        LOGGER.info("findCurrentBySurvey {}", surveyName);
+        return addLinks(returnRepo.findBySurveyName(surveyName));
     }
 
     /**
@@ -171,18 +163,21 @@ public class SurveyReturnController {
      */
     @RolesAllowed(SrpRoles.USER)
     @RequestMapping(value = "/findBySurveyNameAndOrg/{surveyName}/{org}", method = RequestMethod.GET)
-    @JsonView(SurveyReturnViews.Detailed.class)
-    public @ResponseBody List<SurveyReturn> findBySurveyAndOrg(
+    public @ResponseBody List<EntityModel<SurveyReturn>> findEntityBySurveyAndOrg(
             @PathVariable("surveyName") String surveyName,
             @PathVariable("org") String org) {
-        LOGGER.info(String.format("findBySurveyAndOrg %1$s/%2$s", surveyName, org));
+        return addLinks(findBySurveyAndOrg(surveyName, org));
+    }
+
+    protected List<SurveyReturn> findBySurveyAndOrg(String surveyName, String org) {
+        LOGGER.info("findBySurveyAndOrg {}/{}", surveyName, org);
 
         List<SurveyReturn> returns = returnRepo.findBySurveyAndOrg(surveyName, org);
         if (returns.size()==0) {
             returns.add(createBlankReturn(surveyName, org, applicablePeriod(surveyName)));
         }
 
-        return addLinks(returns);
+        return returns;
     }
 
     protected String applicablePeriod(String surveyName) {
@@ -190,7 +185,7 @@ public class SurveyReturnController {
     }
 
     protected synchronized SurveyReturn createBlankReturn(String surveyName, String org, String period) {
-        LOGGER.info("createBlankReturn of {} for {}", surveyName, org);
+        LOGGER.info("createBlankReturn of {} for {}, {}", surveyName, org, period);
 
         try {
             Survey requested = surveyRepo.findByName(surveyName);
@@ -204,7 +199,7 @@ public class SurveyReturnController {
             importEricAnswers(surveyName, org);
             importLastYearIfExists(rtn);
 
-            return addLinks(rtn);
+            return rtn;
         } catch (NullPointerException e) {
             String msg = String.format(
                     "Unable to create blank return for %1$s of %2$s",
@@ -246,31 +241,32 @@ public class SurveyReturnController {
 
     @RolesAllowed(SrpRoles.USER)
     @RequestMapping(value = "/findCurrentBySurveyNameAndOrg/{surveyName}/{org}", method = RequestMethod.GET)
-    @JsonView(SurveyReturnViews.Detailed.class)
-    public @ResponseBody SurveyReturn findCurrentBySurveyNameAndOrg(
+    public @ResponseBody EntityModel<SurveyReturn> findCurrentEntityBySurveyNameAndOrg(
             @PathVariable("surveyName") String surveyName,
             @PathVariable("org") String org) {
-        LOGGER.info(String.format("findCurrentBySurveyNameAndOrg %1$s, %2$s", surveyName, org));
+        LOGGER.info("findCurrentBySurveyNameAndOrg {}, {}", surveyName, org);
 
+        return addLinks(validator
+                .validate(findCurrentBySurveyNameAndOrg(surveyName, org)));
+    }
+
+    protected SurveyReturn findCurrentBySurveyNameAndOrg(String surveyName, String org) {
         if (org.length() > 3) {
             org = lookupOrgCode(org);
         }
 
-        List<SurveyReturn> returns = findBySurveyAndOrg(surveyName, org);
-        SurveyReturn rtn = getLatestRevision(returns);
-
-        validator.validate(rtn);
-        return addLinks(rtn);
+        return getLatestRevision(findBySurveyAndOrg(surveyName, org));
     }
 
-    private SurveyReturn getLatestRevision(List<SurveyReturn> returns) {
-        if (returns.size() == 0) {
+    protected SurveyReturn getLatestRevision(List<SurveyReturn> list) {
+        if (list.size() == 0) {
             return null;
         }
-        returns.sort((r1,r2) -> r1.revision().compareTo(r2.revision()));
-        SurveyReturn rtn = returns.get(returns.size()-1);
+        list.sort((r1,r2) -> r1.revision().compareTo(r2.revision()));
+        SurveyReturn rtn = list.get(list.size()-1);
         LOGGER.info("Found {} returns for {},{} returning revision {} (id:{})",
-                returns.size(), rtn.survey().name(), rtn.org(), rtn.revision(), rtn.id());
+                list.size(), rtn.survey().name(), rtn.org(), rtn.revision(),
+                rtn.id());
         return rtn;
     }
 
@@ -283,14 +279,13 @@ public class SurveyReturnController {
     }
 
     @RequestMapping(value = "/importEric/{surveyName}/{org}", method = RequestMethod.GET)
-    @JsonView(SurveyReturnViews.Detailed.class)
     @Transactional
     public @ResponseBody SurveyReturn importEricAnswers(
             @PathVariable("surveyName") String surveyName,
             @PathVariable("org") String org) {
         long count = 0;
         long start = System.currentTimeMillis();
-        SurveyReturn trgtRtn  = findCurrentBySurveyNameAndOrg(surveyName, org);
+        SurveyReturn trgtRtn = getLatestRevision(returnRepo.findBySurveyAndOrg(surveyName, org));
 
         List<Survey> surveys = surveyRepo.findEricSurveys();
         for (Survey survey : surveys) {
@@ -298,7 +293,7 @@ public class SurveyReturnController {
         }
         LOGGER.info("Importing ERIC data added {} records and took {}ms", count, (System.currentTimeMillis()-start));
 
-        return findCurrentBySurveyNameAndOrg(surveyName, org);
+        return getLatestRevision(returnRepo.findBySurveyAndOrg(surveyName, org));
     }
 
     @RolesAllowed(SrpRoles.ADMIN)
@@ -334,11 +329,10 @@ public class SurveyReturnController {
      */
     @RolesAllowed(SrpRoles.ANALYST)
     @RequestMapping(value = "/", method = RequestMethod.GET)
-    @JsonView(SurveyReturnViews.Summary.class)
-    public @ResponseBody List<SurveyReturn> list(
+    public @ResponseBody List<EntityModel<SurveyReturn>> list(
             @RequestParam(value = "page", required = false) Integer page,
             @RequestParam(value = "limit", required = false) Integer limit) {
-        LOGGER.info(String.format("List returns"));
+        LOGGER.info("List returns");
 
         List<SurveyReturn> list;
         if (limit == null) {
@@ -347,7 +341,7 @@ public class SurveyReturnController {
             Pageable pageable = PageRequest.of(page == null ? 0 : page, limit);
             list = returnRepo.findPage(pageable);
         }
-        LOGGER.info(String.format("Found %1$s returns", list.size()));
+        LOGGER.info("Found {} returns", list.size());
 
         return addLinks(list);
     }
@@ -359,37 +353,14 @@ public class SurveyReturnController {
      */
     @RolesAllowed(SrpRoles.ANALYST)
     @RequestMapping(value = "/findByOrg/{org}", method = RequestMethod.GET)
-    @JsonView(SurveyReturnViews.Summary.class)
-    public @ResponseBody List<SurveyReturn> findByOrg(
+    public @ResponseBody List<EntityModel<SurveyReturn>> findByOrg(
             @PathVariable("org") String org) {
-        LOGGER.info(String.format("List returns for %1$s", org));
+        LOGGER.info("List returns for {}", org);
 
         List<SurveyReturn> list = returnRepo.findByOrg(org);
-        LOGGER.info(String.format("Found %1$s returns", list.size()));
+        LOGGER.info("Found {} returns", list.size());
 
         return addLinks(list);
-    }
-
-    /**
-     * @return The newly created survey return.
-     */
-    @RolesAllowed(SrpRoles.USER)
-    @SuppressWarnings({ "rawtypes", "unchecked" })
-    @ResponseStatus(value = HttpStatus.CREATED)
-    @RequestMapping(value = "/", method = RequestMethod.POST)
-    public @ResponseBody ResponseEntity<?> create(
-            @RequestBody SurveyReturn surveyReturn) {
-
-        returnRepo.save(surveyReturn);
-
-        UriComponentsBuilder builder = MvcUriComponentsBuilder
-                .fromController(getClass());
-        HashMap<String, String> vars = new HashMap<String, String>();
-        vars.put("id", surveyReturn.id().toString());
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.setLocation(builder.path("/{id}").buildAndExpand(vars).toUri());
-        return new ResponseEntity(headers, HttpStatus.CREATED);
     }
 
     /**
@@ -408,7 +379,9 @@ public class SurveyReturnController {
             @PathVariable("id") Long returnId,
             @PathVariable("q") String q,
             @RequestBody String updatedAns) {
-        SurveyReturn existing = findById(returnId);
+        SurveyReturn existing = returnRepo.findById(returnId)
+                .orElseThrow(()-> new ObjectNotFoundException(SurveyReturn.class, returnId));
+
         updateAnswer(existing, q, existing.applicablePeriod(), updatedAns);
     }
 
@@ -427,7 +400,10 @@ public class SurveyReturnController {
             @PathVariable("q") String q,
             @PathVariable("period") String period,
             @RequestBody String updatedAns) {
-        updateAnswer(findById(returnId), q, period, updatedAns);
+        SurveyReturn existing = returnRepo.findById(returnId)
+                .orElseThrow(()-> new ObjectNotFoundException(SurveyReturn.class, returnId));
+
+        updateAnswer(existing, q, period, updatedAns);
     }
 
     protected void updateAnswer(SurveyReturn rtn, String q,
@@ -502,13 +478,11 @@ public class SurveyReturnController {
      */
     @RolesAllowed(SrpRoles.USER)
     @RequestMapping(value = "/{returnId}/status/{status}", method = RequestMethod.POST, consumes = "application/json")
-    @JsonView(SurveyReturnViews.Detailed.class)
-    public @ResponseBody SurveyReturn setStatus(
+    public @ResponseBody EntityModel<SurveyReturn> setStatus(
             @PathVariable("returnId") Long returnId,
-            HttpServletRequest req,
-            @PathVariable("status") String status) {
-        LOGGER.info(String.format("Setting survey %1$s to status %2$s",
-                returnId, status));
+            @PathVariable("status") String status,
+            @RequestHeader("X-RunAs") String runAs) {
+        LOGGER.info("Setting survey {} to status {}", returnId, status);
 
         SurveyReturn survey = returnRepo.findById(returnId)
                 .orElseThrow(()-> new ObjectNotFoundException(SurveyReturn.class, returnId))
@@ -518,14 +492,14 @@ public class SurveyReturnController {
             publish(survey);
             break;
         case Submitted:
-            submit(survey, req.getHeader("X-RunAs"));
+            submit(survey, runAs);
             break;
         default:
             String msg = String.format("Setting return %1$d to %2$s is not allowed", returnId, status);
             throw new IllegalArgumentException(msg );
         }
 
-        return returnRepo.save(survey);
+        return addLinks(returnRepo.save(survey));
     }
 
     protected void submit(SurveyReturn survey, String submitter) {
@@ -562,16 +536,19 @@ public class SurveyReturnController {
         returnRepo.deleteById(returnId);
     }
 
-    private List<SurveyReturn> addLinks(List<SurveyReturn> returns) {
+    protected List<EntityModel<SurveyReturn>> addLinks(List<SurveyReturn> returns) {
+        List<EntityModel<SurveyReturn>> entities = new ArrayList<EntityModel<SurveyReturn>>();
         for (SurveyReturn rtn : returns) {
-            addLinks(rtn);
+            entities.add(addLinks(rtn));
         }
-        return returns;
+        return entities;
     }
 
-    private SurveyReturn addLinks(SurveyReturn rtn) {
-        return rtn.links(Collections.singletonList(Link.of(baseUrl
-                + getClass().getAnnotation(RequestMapping.class).value()[0]
-                + "/" + rtn.id())));
+    protected EntityModel<SurveyReturn> addLinks(SurveyReturn rtn) {
+        return EntityModel.of(rtn,
+                linkTo(methodOn(SurveyReturnController.class).findById(rtn.id())).withSelfRel()
+//                ,
+//                linkTo(methodOn(SurveyReturnController.class).list()).withRel("returns")
+                );
     }
 }

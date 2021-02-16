@@ -16,7 +16,6 @@
 package digital.srp.macc.model;
 
 import java.math.BigDecimal;
-import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -31,15 +30,10 @@ import javax.persistence.Transient;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
-import javax.xml.bind.annotation.XmlElement;
-
-import org.springframework.hateoas.Link;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonView;
 
 import digital.srp.macc.maths.Finance;
-import digital.srp.macc.views.InterventionViews;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -67,22 +61,18 @@ public class Intervention implements CsvSerializable {
     @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.AUTO)
     @JsonProperty
-    @JsonView({ InterventionViews.Summary.class })
     private Long id;
 
     // @JsonManagedReference
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "INTERVENTION_TYPE_ID")
-    @JsonView({ InterventionViews.Summary.class })
     private InterventionType interventionType;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "ORG_TYPE_ID")
-    @JsonView({ InterventionViews.Summary.class })
     private OrganisationType organisationType;
 
     @JsonProperty
-    @JsonView({ InterventionViews.Summary.class })
     @Min(value = 0)
     @Max(100)
     @Column(name = "SHARE", nullable = true)
@@ -90,15 +80,8 @@ public class Intervention implements CsvSerializable {
     private Float shareOfTotal;
 
     @JsonProperty
-    @JsonView({ InterventionViews.Summary.class })
     @Column(name = "tenant_id")
     private String tenantId;
-
-    @Transient
-    @XmlElement(name = "link", namespace = Link.ATOM_NAMESPACE)
-    @JsonProperty("links")
-    @JsonView({ InterventionViews.Summary.class })
-    private List<Link> links;
 
     public Intervention(InterventionType it, OrganisationType orgType) {
         setInterventionType(it);
@@ -111,7 +94,6 @@ public class Intervention implements CsvSerializable {
     }
 
     @JsonProperty
-    @JsonView({ InterventionViews.Detailed.class })
     public BigDecimal getAnnualGasSaved() {
         if (getInterventionType().getAnnualGasSaved() == null) {
             return Finance.ZERO_BIG_DECIMAL;
@@ -122,7 +104,6 @@ public class Intervention implements CsvSerializable {
     }
 
     @JsonProperty
-    @JsonView({ InterventionViews.Detailed.class })
     public BigDecimal getAnnualElecSaved() {
         if (getInterventionType().getAnnualElecSaved() == null) {
             return Finance.ZERO_BIG_DECIMAL;
@@ -133,14 +114,12 @@ public class Intervention implements CsvSerializable {
     }
 
     @JsonProperty
-    @JsonView({ InterventionViews.Detailed.class })
     public BigDecimal getAnnualTonnesCo2eSaved() {
         return getShareAsBigDecimal()
                 .multiply(getInterventionType().getAnnualTonnesCo2eSaved());
     }
 
     @JsonProperty
-    @JsonView({ InterventionViews.Detailed.class })
     public BigDecimal getAnnualCashOutflows() {
         if (getInterventionType().getAnnualCashOutflows() == null) {
             return Finance.ZERO_BIG_DECIMAL;
@@ -152,7 +131,6 @@ public class Intervention implements CsvSerializable {
     }
 
     @JsonProperty
-    @JsonView({ InterventionViews.Detailed.class })
     public BigDecimal getAnnualCashOutflows(int target) {
         if (getInterventionType().getAnnualCashOutflows() == null) {
             return Finance.ZERO_BIG_DECIMAL;
@@ -165,7 +143,6 @@ public class Intervention implements CsvSerializable {
     }
 
     @JsonProperty
-    @JsonView({ InterventionViews.Detailed.class })
     public BigDecimal getAnnualCashInflows() {
         return getShareAsBigDecimal()
                 .multiply(getInterventionType().getUptakeFactor())
@@ -173,7 +150,6 @@ public class Intervention implements CsvSerializable {
     }
 
     @JsonProperty
-    @JsonView({ InterventionViews.Detailed.class })
     public BigDecimal getAnnualCashInflows(int target) {
         if (getInterventionType().getAnnualCashInflows() == null) {
             return Finance.ZERO_BIG_DECIMAL;
@@ -185,7 +161,6 @@ public class Intervention implements CsvSerializable {
     }
 
     @JsonProperty
-    @JsonView({ InterventionViews.Detailed.class })
     public BigDecimal getCashOutflowUpFront() {
         return getShareAsBigDecimal()
                 .multiply(getInterventionType().getUptakeFactor())
@@ -193,14 +168,12 @@ public class Intervention implements CsvSerializable {
     }
 
     @JsonProperty
-    @JsonView({ InterventionViews.Detailed.class })
     public BigDecimal getTotalNpv() {
         return getShareAsBigDecimal().multiply(
                 getInterventionType().getTotalNpv());
     }
 
     @JsonProperty
-    @JsonView({ InterventionViews.Detailed.class })
     public Long getTonnesCo2eSavedTargetYear() {
         return getShareAsBigDecimal()
                 .multiply(getInterventionType().getUptakeFactor())
@@ -210,7 +183,6 @@ public class Intervention implements CsvSerializable {
     }
 
     @JsonProperty
-    @JsonView({ InterventionViews.Detailed.class })
     public Long getTargetYearSavings() {
         return getShareAsBigDecimal().multiply(
                 new BigDecimal(getInterventionType().getTargetYearSavings()
@@ -218,7 +190,6 @@ public class Intervention implements CsvSerializable {
     }
 
     @JsonProperty
-    @JsonView({ InterventionViews.Detailed.class })
     @Transient
     public BigDecimal getUnitCount() {
         Integer unitCount = getInterventionType().getUnitCount();
@@ -228,98 +199,80 @@ public class Intervention implements CsvSerializable {
 
     /** Convenience method to access intervention type's name. */
     @JsonProperty
-    @JsonView({ InterventionViews.Detailed.class })
     public String getName() {
         return getInterventionType().getName();
     }
 
     /** Convenience method to access intervention type's description. */
     @JsonProperty
-    @JsonView({ InterventionViews.Detailed.class })
     public String getDescription() {
         return getInterventionType().getDescription();
     }
 
     /** Convenience method to access intervention type's further info URL. */
     @JsonProperty
-    @JsonView({ InterventionViews.Detailed.class })
     public String getFurtherInfo() {
         return getInterventionType().getFurtherInfo();
     }
 
     /** Convenience method to access intervention type's unit. */
     @JsonProperty
-    @JsonView({ InterventionViews.Detailed.class })
     public String getUnit() {
         return getInterventionType().getUnit();
     }
 
     /** Convenience method to access intervention type's (aka national) unit count. */
     @JsonProperty
-    @JsonView({ InterventionViews.Detailed.class })
     public Integer getUnitCountNational() {
         return getInterventionType().getUnitCount();
     }
 
     /** Convenience method to access description of intervention type's unit. */
     @JsonProperty
-    @JsonView({ InterventionViews.Detailed.class })
     public String getUnitDescription() {
         return getInterventionType().getUnitDescription();
     }
 
     /** Convenience method to access description of intervention type's uptake. */
     @JsonProperty
-    @JsonView({ InterventionViews.Detailed.class })
     public Short getUptake() {
         return getInterventionType().getUptake();
     }
 
     /** Convenience method to access intervention type's data. */
     @JsonProperty
-    @JsonView({ InterventionViews.Detailed.class })
     public BigDecimal getCashOutflowsUpFrontNational() {
         return getInterventionType().getCashOutflowsUpFrontNational();
     }
 
     /** Convenience method to access intervention type's data. */
     @JsonProperty
-    @JsonView({ InterventionViews.Detailed.class })
     public BigDecimal getAnnualCashOutflowsNationalTargetYear() {
         return getInterventionType().getAnnualCashOutflowsNationalTargetYear();
     }
 
     /** Convenience method to access intervention type's data. */
     @JsonProperty
-    @JsonView({ InterventionViews.Detailed.class })
     public BigDecimal getAnnualCashInflowsNationalTargetYear() {
         return getInterventionType().getAnnualCashInflowsNationalTargetYear();
     }
 
     /** Convenience method to access intervention type's data. */
     @JsonProperty
-    @JsonView({ InterventionViews.Detailed.class })
     public BigDecimal getCostPerTonneCo2e() {
         return getInterventionType().getCostPerTonneCo2e();
     }
 
     /** Convenience method to access intervention type's data. */
     @JsonProperty
-    @JsonView({ InterventionViews.Detailed.class })
     public Short getConfidence() {
         return getInterventionType().getConfidence();
     }
 
     /** Convenience method to access intervention type's data. */
     @JsonProperty
-    @JsonView({ InterventionViews.Detailed.class })
     public String getSlug() {
         return getInterventionType().getSlug();
-    }
-
-    public Intervention links(List<Link> links) {
-        setLinks(links);
-        return this;
     }
 
     @Override

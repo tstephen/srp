@@ -15,10 +15,13 @@
  ******************************************************************************/
 package digital.srp.sreport.web;
 
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
+
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 
 import javax.annotation.security.RolesAllowed;
 import javax.persistence.EntityManager;
@@ -35,7 +38,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.hateoas.Link;
+import org.springframework.hateoas.EntityModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -46,7 +49,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
-import com.fasterxml.jackson.annotation.JsonView;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import digital.srp.sreport.api.SrpRoles;
@@ -58,7 +60,6 @@ import digital.srp.sreport.model.Q;
 import digital.srp.sreport.model.Question;
 import digital.srp.sreport.model.SurveyCategory;
 import digital.srp.sreport.model.SurveyReturn;
-import digital.srp.sreport.model.views.AnswerViews;
 import digital.srp.sreport.repositories.AnswerRepository;
 import digital.srp.sreport.repositories.QuestionRepository;
 import digital.srp.sreport.repositories.SurveyCategoryRepository;
@@ -102,16 +103,13 @@ public class AnswerController {
      */
     @RolesAllowed(SrpRoles.USER)
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
-    @JsonView(AnswerViews.Detailed.class)
     @Transactional
-    public @ResponseBody Answer findById(
+    public @ResponseBody EntityModel<Answer> findById(
             @PathVariable("id") Long answerId) {
-        LOGGER.info(String.format("findById %1$s", answerId));
+        LOGGER.info("findById {}", answerId);
 
-        Answer answer = answerRepo.findById(answerId)
-                .orElseThrow(() -> new ObjectNotFoundException(Answer.class, answerId));
-
-        return addLinks(answer);
+        return addLinks(answerRepo.findById(answerId)
+                .orElseThrow(() -> new ObjectNotFoundException(Answer.class, answerId)));
     }
 
     // TODO remove or require paging
@@ -120,11 +118,10 @@ public class AnswerController {
      */
     @RolesAllowed(SrpRoles.ADMIN)
     @RequestMapping(value = "/", method = RequestMethod.GET)
-    @JsonView(AnswerViews.Summary.class)
-    public @ResponseBody List<Answer> list(
+    public @ResponseBody List<EntityModel<Answer>> list(
             @RequestParam(value = "page", required = false) Integer page,
             @RequestParam(value = "limit", required = false) Integer limit) {
-        LOGGER.info(String.format("List answers"));
+        LOGGER.info("List answers");
 
         List<Answer> list;
         if (limit == null) {
@@ -133,10 +130,10 @@ public class AnswerController {
             Pageable pageable = PageRequest.of(page == null ? 0 : page, limit);
             list = answerRepo.findPage(pageable);
         }
-        LOGGER.info(String.format("Found %1$s answers", list.size()));
+        LOGGER.info("Found {} answers", list.size());
 
         addQuestionCategory(list);
-        return list;
+        return addLinks(list);
     }
 
     private void addQuestionCategory(List<Answer> list) {
@@ -157,8 +154,7 @@ public class AnswerController {
 
     @RolesAllowed(SrpRoles.ADMIN)
     @RequestMapping(value = "/findByCriteria", method = RequestMethod.POST)
-    @JsonView(AnswerViews.Detailed.class)
-    public @ResponseBody List<Answer> findByCriteria(
+    public @ResponseBody List<EntityModel<Answer>> findByCriteria(
             @RequestBody List<Criterion> criteria,
             @RequestParam(value = "page", required = false) Integer page,
             @RequestParam(value = "limit", required = false) Integer limit)
@@ -176,13 +172,13 @@ public class AnswerController {
         for (Criterion criterion : criteria) {
             switch (criterion.getField()) {
             case "category":
-                SurveyCategory category = catRepo.findByName(
+                Optional<SurveyCategory> category = catRepo.findByName(
                         criterion.getValue());
-
-                predicate = builder.and(
-                        predicate,
-                        questions.get("name").in(
-                                    ((Object[]) category.questionNames().split(","))));
+                if (category.isPresent()) {
+                    predicate = builder.and(predicate,
+                            questions.get("name").in(((Object[]) category.get()
+                                    .questionNames().split(","))));
+                }
                 break;
             case "org":
             case "organisation":
@@ -238,7 +234,7 @@ public class AnswerController {
             throw new ResultSetTooLargeException(criteria, list.size());
         } else {
             addQuestionCategory(list);
-            return list;
+            return addLinks(list);
         }
     }
 
@@ -258,12 +254,11 @@ public class AnswerController {
      */
     @RolesAllowed(SrpRoles.ADMIN)
     @RequestMapping(value = "/findByPeriod/{period}", method = RequestMethod.GET)
-    @JsonView(AnswerViews.Detailed.class)
-    public @ResponseBody List<Answer> findByPeriod(
+    public @ResponseBody List<EntityModel<Answer>> findByPeriod(
             @PathVariable("period") String period,
             @RequestParam(value = "page", required = false) Integer page,
             @RequestParam(value = "limit", required = false) Integer limit) {
-        LOGGER.info(String.format("List answers by period %1$s", period));
+        LOGGER.info("List answers by period {}", period);
 
         List<Answer> list;
         if (limit == null) {
@@ -272,10 +267,10 @@ public class AnswerController {
             Pageable pageable = PageRequest.of(page == null ? 0 : page, limit);
             list = answerRepo.findPageByPeriod(pageable, period);
         }
-        LOGGER.info(String.format("Found %1$s answers", list.size()));
+        LOGGER.info("Found {} answers", list.size());
 
         addQuestionCategory(list);
-        return list;
+        return addLinks(list);
     }
 
     /**
@@ -283,8 +278,7 @@ public class AnswerController {
      */
     @RolesAllowed(SrpRoles.USER)
     @RequestMapping(value = "/findByReturnPeriodAndQ/{rtn}/{period}/{q}", method = RequestMethod.GET)
-    @JsonView(AnswerViews.Detailed.class)
-    public @ResponseBody Answer findByReturnPeriodAndQ(
+    public @ResponseBody EntityModel<Answer> findByReturnPeriodAndQ(
             @PathVariable("rtn") Long rtnId,
             @PathVariable("period") String period,
             @PathVariable("q") String q) {
@@ -294,7 +288,8 @@ public class AnswerController {
         Answer a;
         switch (list.size()) {
         case 0:
-            Question question = qRepo.findByName(q);
+            Question question = qRepo.findByName(q)
+                    .orElseThrow(() -> new ObjectNotFoundException(Question.class, q));
             SurveyReturn rtn = rtnRepo.findById(rtnId)
                     .orElseThrow(() -> new ObjectNotFoundException(SurveyReturn.class, rtnId));
             a = new Answer().question(question).addSurveyReturn(rtn)
@@ -313,7 +308,7 @@ public class AnswerController {
             break;
         }
 
-        return a;
+        return addLinks(a);
     }
 
     /**
@@ -327,9 +322,17 @@ public class AnswerController {
         answerRepo.deleteById(answerId);
     }
 
-    private Answer addLinks(Answer answer) {
-        return answer.links(Collections.singletonList(Link
-                .of(getClass().getAnnotation(RequestMapping.class).value()[0]
-                        + "/" + answer.id())));
+    protected List<EntityModel<Answer>> addLinks(final List<Answer> list) {
+        ArrayList<EntityModel<Answer>> entities = new ArrayList<EntityModel<Answer>>();
+        for (Answer answer : list) {
+            entities.add(addLinks(answer));
+        }
+        return entities;
+    }
+
+    protected EntityModel<Answer> addLinks(final Answer answer) {
+        return EntityModel.of(answer,
+                linkTo(methodOn(AnswerController.class).findById(answer.id()))
+                        .withSelfRel());
     }
 }

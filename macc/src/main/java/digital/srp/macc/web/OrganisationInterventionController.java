@@ -16,20 +16,17 @@
 package digital.srp.macc.web;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.hateoas.Link;
+import org.springframework.hateoas.EntityModel;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
-
-import com.fasterxml.jackson.annotation.JsonView;
 
 import digital.srp.macc.model.Intervention;
 import digital.srp.macc.model.InterventionType;
@@ -38,7 +35,6 @@ import digital.srp.macc.model.OrganisationType;
 import digital.srp.macc.repositories.InterventionRepository;
 import digital.srp.macc.repositories.InterventionTypeRepository;
 import digital.srp.macc.repositories.OrganisationTypeRepository;
-import digital.srp.macc.views.OrganisationInterventionViews;
 
 /**
  * REST endpoint for accessing {@link OrganisationIntervention}
@@ -62,15 +58,13 @@ public class OrganisationInterventionController {
     private OrganisationTypeRepository orgTypeRepo;
 
     /**
-     * @return Just the plan with the specified id.
+     * @return The default plan default for org type.
      */
     @RequestMapping(value = "/plan/{orgTypeName}", method = RequestMethod.GET)
-    @JsonView(OrganisationInterventionViews.Detailed.class)
     public @ResponseBody List<OrganisationIntervention> getPlan(
             @PathVariable("orgTypeName") String orgTypeName,
             @PathVariable("tenantId") String tenantId) {
-        LOGGER.info(String.format("Find default plan for org type %1$s",
-                orgTypeName));
+        LOGGER.info("Find default plan org type {}", orgTypeName);
 
         List<Intervention> interventions = interventionRepo
                 .findByStatusForTenantAndOrgType(tenantId, "green", orgTypeName);
@@ -100,8 +94,10 @@ public class OrganisationInterventionController {
             @PathVariable("tenantId") String tenantId) {
         LOGGER.info("Find default plan for commissioners");
 
-        OrganisationType orgType = orgTypeRepo.findByName(tenantId,
-                "Clinical Commissioning Groups");
+        OrganisationType orgType = orgTypeRepo
+                .findByName(tenantId, "Clinical Commissioning Groups")
+                .orElseThrow(
+                        () -> new IllegalArgumentException("No data for CCGs"));
 
         List<InterventionType> interventionTypes = interventionTypeRepo
                 .findByStatusForTenantAndCommissioners(tenantId, "green");
@@ -127,9 +123,8 @@ public class OrganisationInterventionController {
         return orgInterventions;
     }
 
-    private OrganisationIntervention addLinks(OrganisationIntervention oi) {
-        return oi.links(Collections
-                .singletonList(Link.of(String.format("/%1$s/organisation-interventions/%2$d",
-                        oi.getTenantId(), oi.getId()))));
+    private EntityModel<OrganisationIntervention> addLinks(OrganisationIntervention oi) {
+        // TODO link to both org and intvn
+        return EntityModel.of(oi);
     }
 }

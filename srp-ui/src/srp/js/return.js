@@ -389,7 +389,7 @@ var $r = (function ($, ractive, $auth) {
     }
     if (tenant==undefined || tenant=='undefined') $auth.showLogin();
     console.info('loadTenantConfig:'+tenant);
-    $.getJSON(ractive.getServer()+'/tenants/'+tenant+'.json', function(response) {
+    $.getJSON('https://api.knowprocess.com/tenants/'+tenant+'.json', function(response) {
       //console.log('... response: '+JSON.stringify(response));
       ractive.set('saveObserver', false);
       ractive.set('tenant', response);
@@ -552,12 +552,12 @@ var $r = (function ($, ractive, $auth) {
   ractive.set('stdPartials', [
       { "name": "questionnaire", "url": "/questionnaire/partials/questionnaire.html"},
       { "name": "questionnaireContact", "url": "/questionnaire/partials/questionnaire-contact.html"},
-      { "name": "sidebar", "url": "partials/sidebar.html"},
-      { "name": "toolbar", "url": "partials/toolbar.html"}
+      { "name": "sidebar", "url": "/partials/sidebar.html"},
+      { "name": "toolbar", "url": "/partials/toolbar.html"}
     ])
   ractive.loadStandardPartials(ractive.get('stdPartials'));
 
-  $('head').append('<link href="'+_server+'/css/sdu-1.0.0.css" rel="stylesheet">');
+  $('head').append('<link href="/sdu/css/sdu-1.0.0.css" rel="stylesheet">');
   $('head').append('<link rel="icon" type="image/png" href="/srp/images/icon/sdu-icon-16x16.png">');
 
   // set and load questionnaire

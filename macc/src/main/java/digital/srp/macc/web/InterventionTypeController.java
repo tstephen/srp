@@ -15,10 +15,15 @@
  ******************************************************************************/
 package digital.srp.macc.web;
 
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
+
 import java.io.IOException;
 import java.io.StringReader;
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.List;
+
+import javax.annotation.security.RolesAllowed;
 
 import org.hibernate.ObjectNotFoundException;
 import org.slf4j.Logger;
@@ -27,11 +32,14 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.hateoas.Link;
+import org.springframework.hateoas.EntityModel;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -39,14 +47,12 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.fasterxml.jackson.annotation.JsonView;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import digital.srp.macc.internal.CsvImporter;
 import digital.srp.macc.model.InterventionType;
 import digital.srp.macc.repositories.InterventionTypeRepository;
-import digital.srp.macc.views.InterventionTypeViews;
 
 /**
  * REST endpoint for accessing {@link InterventionType}
@@ -132,12 +138,31 @@ public class InterventionTypeController {
     }
 
     /**
+     * @return Location header for newly created intervention type.
+     */
+    @RolesAllowed("admin")
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+    @ResponseStatus(value = HttpStatus.CREATED)
+    @RequestMapping(value = "/", method = RequestMethod.POST)
+    public @ResponseBody ResponseEntity<?> create(
+            @PathVariable("tenantId") String tenantId,
+            @RequestHeader String Authorization,
+            @RequestBody InterventionType param) {
+
+        EntityModel<InterventionType> model = addLinks(tenantId, interventionTypeRepo.save(param));
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setLocation(model.getLink("self").get().toUri());
+        return new ResponseEntity(headers, HttpStatus.CREATED);
+    }
+
+    /**
      * Return just the interventions for a specific tenant.
      *
      * @return interventions for that tenant.
      */
     @RequestMapping(value = "/", method = RequestMethod.GET, produces = "application/json")
-    public @ResponseBody List<InterventionType> listForTenant(
+    public @ResponseBody List<EntityModel<InterventionType>> listForTenant(
             @PathVariable("tenantId") String tenantId,
             @RequestParam(value = "page", required = false) Integer page,
             @RequestParam(value = "limit", required = false) Integer limit) {
@@ -153,24 +178,24 @@ public class InterventionTypeController {
         }
         LOGGER.info(String.format("Found %1$s intervention types", list.size()));
 
-        return addLinks(list);
+        return addLinks(tenantId, list);
     }
 
     /**
      * @return The specified intervention type.
      */
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
-    @JsonView(InterventionTypeViews.Detailed.class)
-    public @ResponseBody InterventionType findById(
+    public @ResponseBody EntityModel<InterventionType> findById(
+            @PathVariable("tenantId") String tenantId,
             @PathVariable("id") Long interventionTypeId) {
-        LOGGER.info(String.format("findById %1$s", interventionTypeId));
+        LOGGER.info("findById {}", interventionTypeId);
 
         InterventionType intvnType = interventionTypeRepo
                 .findById(interventionTypeId).orElseThrow(
                         () -> new ObjectNotFoundException(interventionTypeId,
                                 InterventionType.class.getSimpleName()));
 
-        return addLinks(intvnType);
+        return addLinks(tenantId, intvnType);
     }
 
     /**
@@ -178,14 +203,12 @@ public class InterventionTypeController {
      *
      * @return interventionTypes for that tenant.
      */
-    @JsonView(InterventionTypeViews.Detailed.class)
     @RequestMapping(value = "/", method = RequestMethod.GET, produces = "text/csv")
     public @ResponseBody List<InterventionType> exportAsCsv(
             @PathVariable("tenantId") String tenantId,
             @RequestParam(value = "page", required = false) Integer page,
             @RequestParam(value = "limit", required = false) Integer limit) {
-        LOGGER.info(String.format("Export interventions for tenant %1$s",
-                tenantId));
+        LOGGER.info("Export interventions for tenant {}", tenantId);
 
         List<InterventionType> list;
         if (limit == null) {
@@ -194,8 +217,8 @@ public class InterventionTypeController {
             Pageable pageable = PageRequest.of(page == null ? 0 : page, limit);
             list = interventionTypeRepo.findPageForTenant(tenantId, pageable);
         }
-        LOGGER.info(String.format("Found %1$s interventions", list.size()));
 
+        LOGGER.info("Found {} interventions", list.size());
         return list;
     }
 
@@ -206,20 +229,17 @@ public class InterventionTypeController {
      * @status Comma separated list of status to include.
      * @return interventions for that tenant.
      */
-    @JsonView(InterventionTypeViews.Summary.class)
     @RequestMapping(value = "/status/{status}", method = RequestMethod.GET)
-    public @ResponseBody List<InterventionType> findByStatusForTenant(
+    public @ResponseBody List<EntityModel<InterventionType>> findByStatusForTenant(
             @PathVariable("tenantId") String tenantId,
             @PathVariable("status") String status) {
-        LOGGER.info(String.format(
-                "List interventions for tenant %1$s with status %2$s",
-                tenantId, status));
+        LOGGER.info("List interventions for tenant {} with status {}", tenantId, status);
 
         List<InterventionType> list = interventionTypeRepo
                 .findByStatusForTenant(tenantId, status);
-        LOGGER.info(String.format("Found %1$s interventions", list.size()));
+        LOGGER.info("Found {} interventions", list.size());
 
-        return addLinks(list);
+        return addLinks(tenantId, list);
     }
 
     /**
@@ -240,17 +260,17 @@ public class InterventionTypeController {
         interventionTypeRepo.save(intvnType);
     }
 
-    private List<InterventionType> addLinks(
-            final List<InterventionType> interventionTypes) {
-        for (InterventionType intType : interventionTypes) {
-            addLinks(intType);
+    protected List<EntityModel<InterventionType>> addLinks(final String tenantId, final List<InterventionType> intvnTypes) {
+        List<EntityModel<InterventionType>> entities = new ArrayList<EntityModel<InterventionType>>();
+        for (InterventionType rtn : intvnTypes) {
+            entities.add(addLinks(tenantId, rtn));
         }
-        return interventionTypes;
+        return entities;
     }
 
-    private InterventionType addLinks(final InterventionType type) {
-        return type.links(Collections
-                .singletonList(Link.of(String.format("/%1$s/intervention-types/%2$d",
-                        type.getTenantId(), type.getId()))));
+    protected EntityModel<InterventionType> addLinks(final String tenantId, final InterventionType interventionType) {
+        return EntityModel.of(interventionType,
+                linkTo(methodOn(InterventionTypeController.class).findById(tenantId, interventionType.getId()))
+                        .withSelfRel());
     }
 }

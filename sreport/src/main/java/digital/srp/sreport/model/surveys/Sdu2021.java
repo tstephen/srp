@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 import digital.srp.sreport.model.Q;
+import digital.srp.sreport.model.StatusType;
 import digital.srp.sreport.model.Survey;
 import digital.srp.sreport.model.SurveyCategory;
 
@@ -296,7 +297,8 @@ public class Sdu2021 implements SurveyFactory {
                 .name("Qualitative")
                 .questionEnums(SduQuestions.QUALITATIVE_QS);
 
-        Survey survey = new Survey().name(ID).status("Draft")
+        Survey survey = new Survey().name(ID)
+                .status(StatusType.Published.name())
                 .applicablePeriod(PERIOD)
                 .categories(catOrg, catPolicy, catPerf, catSize,
                         catFinancial, catElec, catThermal,
