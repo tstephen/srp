@@ -23,6 +23,8 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.annotation.PostConstruct;
+
 import org.hibernate.ObjectNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,6 +49,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import digital.srp.macc.importers.OrganisationTypeCsvImporter;
 import digital.srp.macc.model.OrganisationType;
 import digital.srp.macc.repositories.OrganisationTypeRepository;
 
@@ -63,13 +66,32 @@ public class OrganisationTypeController {
             .getLogger(OrganisationTypeController.class);
 
     @Autowired
-    private OrganisationTypeRepository organisationTypeRepo;
+    protected OrganisationTypeRepository organisationTypeRepo;
 
     @Autowired
-    private ObjectMapper objectMapper;
+    protected ObjectMapper objectMapper;
+
+    @PostConstruct
+    protected void init() throws IOException {
+        LOGGER.info("init");
+        List<OrganisationType> orgTypes = new OrganisationTypeCsvImporter().readOrganisationTypes();
+
+        int added = 0;
+        // TODO this will not update with new values but only create non-existent records
+        for (OrganisationType orgType : orgTypes) {
+            if (organisationTypeRepo.findByName(orgType.getTenantId(), orgType.getName()).isPresent()) {
+                LOGGER.info("Skip import of existing org type: {}",
+                        orgType.getName());
+            } else {
+                organisationTypeRepo.save(orgType);
+                added++;
+            }
+        }
+        LOGGER.info("init complete: organisation types added {}", added);
+    }
 
     /**
-     * Imports JSON representation of organistion types.
+     * Imports JSON representation of organisation types.
      *
      * <p>
      * This is a handy link: http://shancarter.github.io/mr-data-converter/
@@ -146,7 +168,7 @@ public class OrganisationTypeController {
             Pageable pageable = PageRequest.of(page == null ? 0 : page, limit);
             list = organisationTypeRepo.findPageForTenant(tenantId, pageable);
         }
-        LOGGER.info(String.format("Found %1$s organisation types", list.size()));
+        LOGGER.info("Found {} organisation types", list.size());
 
         return addLinks(tenantId, list);
     }
@@ -240,4 +262,5 @@ public class OrganisationTypeController {
                 linkTo(methodOn(OrganisationTypeController.class).findById(tenantId, survey.getId()))
                         .withSelfRel());
     }
+
 }

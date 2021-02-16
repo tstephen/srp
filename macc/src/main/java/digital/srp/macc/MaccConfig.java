@@ -19,19 +19,16 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
-import org.springframework.boot.autoconfigure.http.HttpMessageConverters;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.data.rest.core.config.RepositoryRestConfiguration;
-import org.springframework.http.converter.HttpMessageConverter;
 
 import digital.srp.macc.model.Intervention;
 import digital.srp.macc.model.InterventionType;
 import digital.srp.macc.model.OrganisationType;
 import digital.srp.macc.repositories.InterventionTypeRepository;
-import digital.srp.macc.web.internal.CsvConverter;
 
 @Configuration
 @ComponentScan(basePackages = { "digital.srp.macc" })
@@ -47,12 +44,6 @@ public class MaccConfig {
         config.exposeIdsFor(Intervention.class, InterventionType.class,
                 OrganisationType.class);
     }
-
-//    @Bean
-//    public HttpMessageConverters customConverters() {
-//        HttpMessageConverter<?> interventionCsv = new CsvConverter();
-//        return new HttpMessageConverters(interventionCsv);
-//    }
 
     @Bean
     public CommandLineRunner init(

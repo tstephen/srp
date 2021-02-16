@@ -1,0 +1,12 @@
+id,name,annual_energy_use,annual_mileage,annual_turnover,floor_area,no_inpatients,no_patient_interactions,no_staff,typical_journey_distance,sector,tenant_id,count,icon,no_inhalers_prescribed,commissioner,status,reporting_type
+1,Acute Trust,0,0,0,0,0,0,0,0,NHS,sdu,136,acute-trust,0,false,Green,true
+2,GP Surgery,0,0,0,0,0,0,0,0,NHS,sdu,7793,doctor,0,false,Green,false
+3,Dentist,0,0,0,0,0,0,0,0,NHS,sdu,8764,dentist,0,false,Green,false
+4,Community,0,0,0,0,0,0,0,0,NHS,sdu,13,community,0,false,Green,true
+5,Mental Health,0,0,0,0,0,0,0,0,NHS,sdu,50,mental-health,0,false,Green,true
+6,Ambulance,0,0,0,0,0,0,0,0,NHS,sdu,9,ambulance,0,false,Amber,true
+7,Specialist,0,0,0,0,0,0,0,0,NHS,sdu,17,specialist,0,false,Green,false
+8,Adult Social Care,0,0,0,0,0,0,0,0,Social Care,sdu,152,care,0,false,Green,false
+9,Public Health,0,0,0,0,0,0,0,0,Public Health,sdu,1,public-health,0,false,Red,false
+10,Dept and ALB,0,0,0,0,0,0,0,0,Public Health,sdu,20,department,0,false,Red,false
+11,Clinical Commissioning Group,0,0,0,0,0,0,0,0,NHS,sdu,209,department,0,true,Green,true

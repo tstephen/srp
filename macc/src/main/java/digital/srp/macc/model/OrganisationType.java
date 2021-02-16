@@ -33,6 +33,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
 
 /**
  * A segmentation of all the organisations in the NHS, public health and social
@@ -45,6 +46,7 @@ import lombok.NoArgsConstructor;
 @Table(name = "TR_ORG_TYPE")
 @NoArgsConstructor
 @AllArgsConstructor
+@Accessors(chain = true)
 public class OrganisationType {
 
     @Id
