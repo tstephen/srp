@@ -31,12 +31,14 @@ import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import digital.srp.macc.maths.Finance;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
 
 /**
  * An action or related set of actions aimed at providing Carbon Abatement or
@@ -49,6 +51,7 @@ import lombok.NoArgsConstructor;
 @Table(name = "TR_INTVN")
 @NoArgsConstructor
 @AllArgsConstructor
+@Accessors(chain = true)
 public class Intervention implements CsvSerializable {
 
     private static final long serialVersionUID = -4380531011333907658L;
@@ -63,11 +66,11 @@ public class Intervention implements CsvSerializable {
     @JsonProperty
     private Long id;
 
-    // @JsonManagedReference
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "INTERVENTION_TYPE_ID")
     private InterventionType interventionType;
 
+    @JsonManagedReference
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "ORG_TYPE_ID")
     private OrganisationType organisationType;

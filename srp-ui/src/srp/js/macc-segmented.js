@@ -141,7 +141,7 @@ var ractive = new BaseRactive({
     ractive.set('saveObserver', false);
     $.ajax({
       dataType: "json",
-      url: ractive.getServer()+'/'+ractive.get('tenant.id')+'/organisation-types/status/green?projection=complete',
+      url: ractive.getServer()+'/'+ractive.get('tenant.id')+'/organisation-types/status/green',
       crossDomain: true,
       success: function( data ) {
         if (data['_embedded'] == undefined) {

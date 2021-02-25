@@ -29,8 +29,13 @@ import digital.srp.macc.model.Intervention;
 @RepositoryRestResource(path = "interventions")
 public interface InterventionRepository extends CrudRepository<Intervention, Long> {
 
-    @Query("SELECT c FROM Intervention c INNER JOIN c.interventionType it INNER JOIN c.organisationType ot WHERE it.name = :name")
-    Optional<Intervention> findByName(@Param("name") String name);
+    @Query("SELECT c FROM Intervention c "
+            + "INNER JOIN c.interventionType it INNER JOIN c.organisationType ot "
+            + "WHERE it.tenantId = :tenantId "
+            + "AND it.name = :intvnName  AND ot.name = :orgTypeName")
+    Optional<Intervention> findByOrganisationTypeAndInterventionTypeNames(
+            @Param("tenantId") String tenantId,
+            @Param("intvnName") String intvnName, @Param("orgTypeName") String orgTypeName);
 
     @Query("SELECT c FROM Intervention c INNER JOIN c.interventionType it INNER JOIN c.organisationType ot WHERE c.tenantId = :tenantId ORDER BY it.name ASC, ot.name ASC")
     List<Intervention> findAllForTenant(@Param("tenantId") String tenantId);

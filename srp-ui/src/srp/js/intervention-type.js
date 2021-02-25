@@ -13,10 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *******************************************************************************/
-var EASING_DURATION = 500;
-fadeOutInterventions = true;
-var newLineRegEx = /\n/g;
-
 var ractive = new BaseRactive({
   el: 'container',
   lazy: true,

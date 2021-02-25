@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2015-2020 Tim Stephenson and contributors
+ * Copyright 2015-2021 Tim Stephenson and contributors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,10 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *******************************************************************************/
-var EASING_DURATION = 500;
-fadeOutOrganisationTypes = true;
-var newLineRegEx = /\n/g;
-
 var ractive = new BaseRactive({
   el: 'container',
   lazy: true,

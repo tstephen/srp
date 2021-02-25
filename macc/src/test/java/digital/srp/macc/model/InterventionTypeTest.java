@@ -156,9 +156,9 @@ public class InterventionTypeTest {
         interventionType.setAnnualElecSaved(new BigDecimal("5120000.00"));
 
         assertEquals(new BigDecimal("349315.29").longValue(), interventionType
-                .getAnnualCashInflows(0).longValue());
+                .getAnnualCashInflow(0).longValue());
         assertEquals(new BigDecimal("373822.98").longValue(), interventionType
-                .getAnnualCashInflows(1).longValue());
+                .getAnnualCashInflow(1).longValue());
 
         long npvUsing = interventionType.getTotalNpv().longValue();
         System.out.println("  total NPV without future energy prices: "

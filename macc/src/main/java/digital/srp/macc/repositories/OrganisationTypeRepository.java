@@ -34,18 +34,17 @@ public interface OrganisationTypeRepository extends
     List<OrganisationType> findAllForTenant(@Param("tenantId") String tenantId);
 
     @Query("SELECT c FROM OrganisationType c WHERE c.tenantId = :tenantId ORDER BY c.name ASC")
-    List<OrganisationType> findPageForTenant(
-            @Param("tenantId") String tenantId,
-            Pageable pageable);
+    List<OrganisationType> findPageForTenant(@Param("tenantId") String tenantId, Pageable pageable);
 
-    @Query("SELECT c FROM OrganisationType c WHERE c.status IN (:status) AND c.tenantId = :tenantId ORDER BY c.name ASC")
+    @Query("SELECT c FROM OrganisationType c "
+            + "WHERE LOWER(c.status) IN (:status) AND c.tenantId = :tenantId ORDER BY c.name ASC")
     List<OrganisationType> findByStatusForTenant(
             @Param("tenantId") String tenantId, @Param("status") String status);
 
     @Query("SELECT c FROM OrganisationType c WHERE c.reportingType = true AND c.tenantId = :tenantId ORDER BY c.name ASC")
     List<OrganisationType> findAllReportingTypeForTenant(@Param("tenantId") String tenantId);
 
-    @Query("SELECT c FROM OrganisationType c WHERE c.tenantId = :tenantId AND name = :name")
+    @Query("SELECT c FROM OrganisationType c WHERE c.name = :name AND c.tenantId = :tenantId")
     Optional<OrganisationType> findByName(@Param("tenantId") String tenantId,
             @Param("name") String name);
 

@@ -22,11 +22,14 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.annotation.PostConstruct;
+
 import org.hibernate.ObjectNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.hateoas.EntityModel;
@@ -44,8 +47,11 @@ import org.springframework.web.multipart.MultipartFile;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import digital.srp.macc.importers.InterventionCsvImporter;
 import digital.srp.macc.model.Intervention;
 import digital.srp.macc.repositories.InterventionRepository;
+import digital.srp.macc.repositories.InterventionTypeRepository;
+import digital.srp.macc.repositories.OrganisationTypeRepository;
 
 /**
  * REST endpoint for accessing {@link Interventions}
@@ -54,16 +60,44 @@ import digital.srp.macc.repositories.InterventionRepository;
  */
 @Controller
 @RequestMapping(value = "/{tenantId}/interventions")
+@DependsOn({"organisationTypeController", "interventionTypeController"})
 public class InterventionController {
 
     private static final Logger LOGGER = LoggerFactory
             .getLogger(InterventionController.class);
 
     @Autowired
-    private InterventionRepository interventionRepo;
+    protected InterventionRepository interventionRepo;
+
+    @Autowired
+    protected OrganisationTypeRepository orgTypeRepo;
+
+    @Autowired
+    protected InterventionTypeRepository intvnTypeRepo;
 
     @Autowired
     private ObjectMapper objectMapper;
+
+    @PostConstruct
+    protected void init() throws IOException {
+        LOGGER.info("init");
+        List<Intervention> intvns = new InterventionCsvImporter(intvnTypeRepo, orgTypeRepo).readInterventions();
+
+        int added = 0;
+        // TODO this will not update with new values but only create non-existent records
+        for (Intervention intvn : intvns) {
+            if (interventionRepo.findByOrganisationTypeAndInterventionTypeNames(
+                    intvn.getTenantId(), intvn.getName(), intvn.getOrganisationType().getName()).isPresent()) {
+                LOGGER.info("Skip import of existing intervention {} {}",
+                        intvn.getOrganisationType().getName(),
+                        intvn.getInterventionType().getName());
+            } else {
+                interventionRepo.save(intvn);
+                added++;
+            }
+        }
+        LOGGER.info("init complete: interventions added {}", added);
+    }
 
     /**
      * Imports JSON representation of interventions.
@@ -196,6 +230,7 @@ public class InterventionController {
      */
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
     public @ResponseBody EntityModel<digital.srp.macc.model.Intervention> findById(
+            @PathVariable("tenantId") String tenantId,
             @PathVariable("id") Long interventionId) {
         LOGGER.info(String.format("findById %1$s", interventionId));
 
@@ -216,7 +251,8 @@ public class InterventionController {
 
     protected EntityModel<Intervention> addLinks(Intervention intvn) {
         return EntityModel.of(intvn,
-                linkTo(methodOn(InterventionController.class).findById(intvn.getId()))
-                        .withSelfRel());
+                linkTo(methodOn(InterventionController.class)
+                        .findById(intvn.getTenantId(), intvn.getId()))
+                                .withSelfRel());
     }
 }

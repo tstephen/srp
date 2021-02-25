@@ -194,8 +194,9 @@ public class OrganisationTypeController {
      *
      * @param tenantId
      * @status Comma separated list of status to include.
-     * @return interventions for that tenant.
+     * @return organisation types for that tenant.
      */
+    @RequestMapping(value = "/status/{status}", method = RequestMethod.GET)
     public @ResponseBody List<EntityModel<OrganisationType>> findByStatusForTenant(
             @PathVariable("tenantId") String tenantId,
             @PathVariable("status") String status) {
@@ -204,7 +205,7 @@ public class OrganisationTypeController {
                 tenantId, status));
 
         List<OrganisationType> list = organisationTypeRepo
-                .findByStatusForTenant(tenantId, status);
+                .findByStatusForTenant(tenantId, status.toLowerCase());
         LOGGER.info(String.format("Found %1$s organisation types", list.size()));
 
         return addLinks(tenantId, list);

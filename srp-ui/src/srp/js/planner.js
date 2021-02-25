@@ -251,7 +251,7 @@ var ractive = new BaseRactive({
       }
       delete tmp.characteristics;
       $.ajax({
-        url: ractive.getServer()+'/msg/'+ractive.get('tenant.id')+'/srp.abatementplan.json',
+        url: 'https://api.knowprocess.com/msg/'+ractive.get('tenant.id')+'/srp.abatementplan.json',
         type: 'POST',
         data: { json: JSON.stringify(tmp) },
         success: completeHandler = function(data) {

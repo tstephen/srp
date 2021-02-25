@@ -30,21 +30,30 @@ import digital.srp.macc.model.InterventionType;
 public interface InterventionTypeRepository extends
         CrudRepository<InterventionType, Long> {
 
-    Optional<InterventionType> findByName(@Param("name") String name);
+    @Query("SELECT c FROM InterventionType c "
+            + "WHERE c.name = :name AND c.tenantId = :tenantId "
+            + "ORDER BY c.name ASC")
+    Optional<InterventionType> findByName(
+            @Param("tenantId") String tenantId, @Param("name") String name);
 
-    @Query("SELECT c FROM InterventionType c WHERE c.tenantId = :tenantId ORDER BY c.name ASC")
+    @Query("SELECT c FROM InterventionType c WHERE c.tenantId = :tenantId "
+            + "ORDER BY c.name ASC")
     List<InterventionType> findAllForTenant(@Param("tenantId") String tenantId);
 
-    @Query("SELECT c FROM InterventionType c WHERE c.tenantId = :tenantId ORDER BY c.name ASC")
+    @Query("SELECT c FROM InterventionType c WHERE c.tenantId = :tenantId "
+            + "ORDER BY c.name ASC")
     List<InterventionType> findPageForTenant(
-            @Param("tenantId") String tenantId,
-            Pageable pageable);
+            @Param("tenantId") String tenantId, Pageable pageable);
 
-    @Query("SELECT it FROM InterventionType it WHERE it.status IN (:status) AND it.tenantId = :tenantId ORDER BY it.name ASC")
+    @Query("SELECT it FROM InterventionType it "
+            + "WHERE LOWER(it.status) IN (:status) AND it.tenantId = :tenantId "
+            + "ORDER BY it.name ASC")
     List<InterventionType> findByStatusForTenant(
             @Param("tenantId") String tenantId, @Param("status") String status);
 
-    @Query("SELECT it FROM InterventionType it WHERE LOWER(it.status) IN (:status) AND it.tenantId = :tenantId AND it.crossOrganisation = TRUE ORDER BY it.name ASC")
+    @Query("SELECT it FROM InterventionType it "
+            + "WHERE LOWER(it.status) IN (:status) AND it.tenantId = :tenantId "
+            + "AND it.crossOrganisation = TRUE ORDER BY it.name ASC")
     List<InterventionType> findByStatusForTenantAndCommissioners(
             @Param("tenantId") String tenantId, @Param("status") String status);
 

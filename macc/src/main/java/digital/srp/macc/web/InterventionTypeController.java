@@ -20,9 +20,11 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 import java.io.IOException;
 import java.io.StringReader;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.annotation.PostConstruct;
 import javax.annotation.security.RolesAllowed;
 
 import org.hibernate.ObjectNotFoundException;
@@ -50,6 +52,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import digital.srp.macc.importers.InterventionTypeCsvImporter;
 import digital.srp.macc.internal.CsvImporter;
 import digital.srp.macc.model.InterventionType;
 import digital.srp.macc.repositories.InterventionTypeRepository;
@@ -67,10 +70,29 @@ public class InterventionTypeController {
             .getLogger(InterventionTypeController.class);
 
     @Autowired
-    private InterventionTypeRepository interventionTypeRepo;
+    protected InterventionTypeRepository interventionTypeRepo;
 
     @Autowired
     private ObjectMapper objectMapper;
+
+    @PostConstruct
+    protected void init() throws IOException {
+        LOGGER.info("init");
+        List<InterventionType> orgTypes = new InterventionTypeCsvImporter().readInterventionTypes();
+
+        int added = 0;
+        // TODO this will not update with new values but only create non-existent records
+        for (InterventionType orgType : orgTypes) {
+            if (interventionTypeRepo.findByName(orgType.getTenantId(), orgType.getName()).isPresent()) {
+                LOGGER.info("Skip import of existing org type: {}",
+                        orgType.getName());
+            } else {
+                interventionTypeRepo.save(orgType);
+                added++;
+            }
+        }
+        LOGGER.info("init complete: organisation types added {}", added);
+    }
 
     /**
      * Imports JSON representation of interventions.
@@ -182,20 +204,28 @@ public class InterventionTypeController {
     }
 
     /**
+     * @param idOrName database id:Long or name:String
      * @return The specified intervention type.
+     * @throws UnsupportedEncodingException
+     * @throws ObjectNotFoundException
      */
-    @RequestMapping(value = "/{id}", method = RequestMethod.GET)
-    public @ResponseBody EntityModel<InterventionType> findById(
+    @RequestMapping(value = "/{idOrName}", method = RequestMethod.GET)
+    public @ResponseBody EntityModel<InterventionType> findByIdOrName(
             @PathVariable("tenantId") String tenantId,
-            @PathVariable("id") Long interventionTypeId) {
-        LOGGER.info("findById {}", interventionTypeId);
+            @PathVariable("idOrName") String idOrName) {
+        LOGGER.info("findByIdOrName {}", idOrName);
 
-        InterventionType intvnType = interventionTypeRepo
-                .findById(interventionTypeId).orElseThrow(
-                        () -> new ObjectNotFoundException(interventionTypeId,
-                                InterventionType.class.getSimpleName()));
-
-        return addLinks(tenantId, intvnType);
+        try {
+            return addLinks(tenantId, interventionTypeRepo
+                    .findById(Long.parseLong(idOrName)).orElseThrow(
+                            () -> new ObjectNotFoundException(idOrName,
+                                    InterventionType.class.getSimpleName())));
+        } catch (NumberFormatException e) {
+            return addLinks(tenantId, interventionTypeRepo
+                    .findByName(tenantId, idOrName)
+                    .orElseThrow(() -> new ObjectNotFoundException(idOrName,
+                                    InterventionType.class.getSimpleName())));
+        }
     }
 
     /**
@@ -268,9 +298,11 @@ public class InterventionTypeController {
         return entities;
     }
 
-    protected EntityModel<InterventionType> addLinks(final String tenantId, final InterventionType interventionType) {
-        return EntityModel.of(interventionType,
-                linkTo(methodOn(InterventionTypeController.class).findById(tenantId, interventionType.getId()))
-                        .withSelfRel());
+    protected EntityModel<InterventionType> addLinks(final String tenantId,
+            final InterventionType interventionType) {
+        return EntityModel.of(interventionType, linkTo(
+                methodOn(InterventionTypeController.class)
+                        .findByIdOrName(tenantId, interventionType.getId().toString()))
+                                .withSelfRel());
     }
 }

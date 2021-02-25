@@ -42,6 +42,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import digital.srp.macc.maths.Finance;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.experimental.Accessors;
 
 /**
  * An action or related set of actions aimed at providing Carbon Abatement or
@@ -53,6 +54,7 @@ import lombok.Data;
 @Entity
 @Table(name = "TR_INTVN_TYPE")
 @AllArgsConstructor
+@Accessors(chain = true)
 public class InterventionType implements CsvSerializable {
 
     private static final String DEFAULT_FURTHER_INFO_BASE_URL = "http://srp.digital/interventions";
@@ -291,6 +293,10 @@ public class InterventionType implements CsvSerializable {
                 "0.471625378,0.4033756698,0.3900141326,0.3664321951,0.3264792461,0.2875202196,0.2647940548,0.2254603806,0.2367575244,0.2218887201,0.1972458379,0.1950581396,0.1636321693,0.1430514555,0.1379336593,0.1301656179,0.122843638,0.1056435916,0.104390507,0.086765916,0.0850489651,0.0742383586,0.0664869042,0.0674138255,0.0629367669,0.0559701421,0.0554960843,0.0493361816,0.0436137087,0.0442696444,0.0403077739,0.0373145099,0.0377322418,0.0341612201,0.0338541865"));
     }
 
+    public String getAnalysisStatus() {
+        return analysisStatus;
+    }
+
     /** A sanitised version of the name for use as an identifier. */
     public String getSlug() {
         return getName().toLowerCase().replaceAll("[\\s-&/]", "_");
@@ -373,7 +379,7 @@ public class InterventionType implements CsvSerializable {
         return getAnnualCashOutflows(getTargetYearIndex());
     }
 
-    public BigDecimal getAnnualCashInflows(int year) {
+    protected BigDecimal getAnnualCashInflow(int year) {
         if (annualGasSaved != null || annualElecSaved != null) {
             BigDecimal fromGas = annualGasSaved == null ? Finance.ZERO_BIG_DECIMAL
                     : getAnnualCashInflowsFromGas(year);
@@ -394,16 +400,16 @@ public class InterventionType implements CsvSerializable {
 
     @JsonProperty
     public BigDecimal getAnnualCashInflowsNationalTargetYear() {
-        return getAnnualCashInflows(getTargetYearIndex()).multiply(
+        return getAnnualCashInflow(getTargetYearIndex()).multiply(
                 getUptakeFactor()).divide(getScaleFactor(), Finance.ROUND_MODE);
     }
 
     @JsonProperty
     public BigDecimal getAnnualCashInflowsTargetYear() {
-        return getAnnualCashInflows(getTargetYearIndex());
+        return getAnnualCashInflow(getTargetYearIndex());
     }
 
-    public BigDecimal getAnnualCashInflowsFromGas(int year) {
+    protected BigDecimal getAnnualCashInflowsFromGas(int year) {
         if (gasPrice == null) {
             throw new IllegalStateException(
                     "Must inject gasPrice before calling getAnnualCashInflowsFromGas");
@@ -412,7 +418,7 @@ public class InterventionType implements CsvSerializable {
                 .divide(new BigDecimal(100)).multiply(annualGasSaved);
     }
 
-    public BigDecimal getAnnualCashInflowsFromElec(int year) {
+    protected BigDecimal getAnnualCashInflowsFromElec(int year) {
         if (elecPrice == null) {
             throw new IllegalStateException(
                     "Must inject elecPrice before calling getAnnualCashInflowsFromElec");
@@ -446,7 +452,7 @@ public class InterventionType implements CsvSerializable {
         try {
             BigDecimal total = new BigDecimal("0.00");
             for (int i = 0; i < getLifetime(); i++) {
-                total = total.add(getAnnualCashInflows(i));
+                total = total.add(getAnnualCashInflow(i));
             }
             return total.multiply(getUptakeFactor()).longValue();
         } catch (NullPointerException e) {
@@ -473,7 +479,7 @@ public class InterventionType implements CsvSerializable {
     public BigDecimal getTargetYearSavings() {
         try {
             int yearIndex = getTargetYearIndex();
-            BigDecimal inflows = getAnnualCashInflows(yearIndex).multiply(
+            BigDecimal inflows = getAnnualCashInflow(yearIndex).multiply(
                     getUptakeFactor());
             BigDecimal outflows = getAnnualCashOutflows(yearIndex).multiply(
                     getUptakeFactor());
@@ -491,8 +497,8 @@ public class InterventionType implements CsvSerializable {
             BigDecimal ongoingFlows = new BigDecimal("0.00");
             for (int i = 0; i < getLifetime(); i++) {
                 BigDecimal inflows = new BigDecimal("0.00");
-                if (getAnnualCashInflows(i).longValue() > 0) {
-                    inflows = getAnnualCashInflows(i).multiply(
+                if (getAnnualCashInflow(i).longValue() > 0) {
+                    inflows = getAnnualCashInflow(i).multiply(
                             getUptakeFactor());
                 }
                 BigDecimal outflows = getAnnualCashOutflows(i).multiply(
@@ -515,7 +521,7 @@ public class InterventionType implements CsvSerializable {
         }
     }
 
-    public BigDecimal getTonnesCo2eSavedFromGasInYear(int year) {
+    protected BigDecimal getTonnesCo2eSavedFromGasInYear(int year) {
         if (gasCIntensity == null) {
             throw new IllegalStateException(
                     "Must inject gasCIntensity before calling getTonnesCo2eSavedFromGasInYear");
@@ -525,7 +531,7 @@ public class InterventionType implements CsvSerializable {
                         new BigDecimal(1000), Finance.ROUND_MODE));
     }
 
-    public BigDecimal getTonnesCo2eSavedFromElecInYear(int year) {
+    protected BigDecimal getTonnesCo2eSavedFromElecInYear(int year) {
         if (elecCIntensity == null) {
             throw new IllegalStateException(
                     "Must inject elecCIntensity before calling getTonnesCo2eSavedFromElecInYear");
@@ -598,7 +604,7 @@ public class InterventionType implements CsvSerializable {
 
     @JsonProperty
     public BigDecimal getCostPerTonneCo2e() {
-        if (costPerTonneCo2e == 0) {
+        if (costPerTonneCo2e == 0 && getTotalTonnesCo2eSaved().compareTo(BigDecimal.ZERO) > 0) {
             return getTotalNpv().divide(getTotalTonnesCo2eSaved(),
                     Finance.ROUND_MODE);
         } else {

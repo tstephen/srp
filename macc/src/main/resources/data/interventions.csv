@@ -1,0 +1,196 @@
+id,share,tenant_id,intervention_type_id,org_type_name
+529,36.2,sdu,Active staff travel,Acute Trust
+536,0,sdu,Active staff travel,Adult Social Care
+534,1.82,sdu,Active staff travel,Ambulance
+532,2.81,sdu,Active staff travel,Community
+533,9.42,sdu,Active staff travel,Mental Health
+549,61.86,sdu,Biomass boilers,Acute Trust
+556,9.89,sdu,Biomass boilers,Adult Social Care
+554,0.79,sdu,Biomass boilers,Ambulance
+552,1.54,sdu,Biomass boilers,Community
+553,8.58,sdu,Biomass boilers,Mental Health
+559,53.48,sdu,Boiler plant optimisation,Acute Trust
+566,14.07,sdu,Boiler plant optimisation,Adult Social Care
+564,0.68,sdu,Boiler plant optimisation,Ambulance
+562,1.33,sdu,Boiler plant optimisation,Community
+563,7.42,sdu,Boiler plant optimisation,Mental Health
+569,56.74,sdu,Boiler replacement,Acute Trust
+576,12.45,sdu,Boiler replacement,Adult Social Care
+574,0.73,sdu,Boiler replacement,Ambulance
+572,1.41,sdu,Boiler replacement,Community
+573,7.87,sdu,Boiler replacement,Mental Health
+579,55.39,sdu,"Building fabric - glazing, insulation & draft proofing",Acute Trust
+586,13.12,sdu,"Building fabric - glazing, insulation & draft proofing",Adult Social Care
+584,0.71,sdu,"Building fabric - glazing, insulation & draft proofing",Ambulance
+582,1.38,sdu,"Building fabric - glazing, insulation & draft proofing",Community
+583,7.68,sdu,"Building fabric - glazing, insulation & draft proofing",Mental Health
+599,79.4,sdu,Building Management System (BMS) - new systems,Acute Trust
+606,0,sdu,Building Management System (BMS) - new systems,Adult Social Care
+604,1.69,sdu,Building Management System (BMS) - new systems,Ambulance
+602,2,sdu,Building Management System (BMS) - new systems,Community
+603,12.83,sdu,Building Management System (BMS) - new systems,Mental Health
+589,79.4,sdu,Building Management System (BMS) - optimisation of existing systems,Acute Trust
+596,0,sdu,Building Management System (BMS) - optimisation of existing systems,Adult Social Care
+594,1.69,sdu,Building Management System (BMS) - optimisation of existing systems,Ambulance
+592,2,sdu,Building Management System (BMS) - optimisation of existing systems,Community
+593,12.83,sdu,Building Management System (BMS) - optimisation of existing systems,Mental Health
+619,100,sdu,Combined Heat and Power (CHP),Acute Trust
+626,0,sdu,Combined Heat and Power (CHP),Adult Social Care
+624,0,sdu,Combined Heat and Power (CHP),Ambulance
+622,0,sdu,Combined Heat and Power (CHP),Community
+623,0,sdu,Combined Heat and Power (CHP),Mental Health
+629,79.4,sdu,Decentralisation of hot water boilers,Acute Trust
+636,0,sdu,Decentralisation of hot water boilers,Adult Social Care
+634,1.69,sdu,Decentralisation of hot water boilers,Ambulance
+632,2,sdu,Decentralisation of hot water boilers,Community
+633,12.83,sdu,Decentralisation of hot water boilers,Mental Health
+639,100,sdu,District heating,Acute Trust
+646,0,sdu,District heating,Adult Social Care
+644,0,sdu,District heating,Ambulance
+642,0,sdu,District heating,Community
+643,0,sdu,District heating,Mental Health
+649,0,sdu,Driver training for fuel efficiency and safety,Acute Trust
+656,48.61,sdu,Driver training for fuel efficiency and safety,Adult Social Care
+654,13.1,sdu,Driver training for fuel efficiency and safety,Ambulance
+652,7.14,sdu,Driver training for fuel efficiency and safety,Community
+653,31.15,sdu,Driver training for fuel efficiency and safety,Mental Health
+659,67.09,sdu,Dry recycling of general waste,Acute Trust
+666,5.03,sdu,Dry recycling of general waste,Adult Social Care
+664,2.31,sdu,Dry recycling of general waste,Ambulance
+662,3.35,sdu,Dry recycling of general waste,Community
+663,15.93,sdu,Dry recycling of general waste,Mental Health
+759,0,sdu,Effective use of long-acting injections,Acute Trust
+766,0,sdu,Effective use of long-acting injections,Adult Social Care
+764,0,sdu,Effective use of long-acting injections,Ambulance
+762,0,sdu,Effective use of long-acting injections,Community
+763,100,sdu,Effective use of long-acting injections,Mental Health
+889,72.23,sdu,Furniture reuse scheme,Acute Trust
+896,0,sdu,Furniture reuse scheme,Adult Social Care
+894,2.48,sdu,Furniture reuse scheme,Ambulance
+892,3.61,sdu,Furniture reuse scheme,Community
+893,17.16,sdu,Furniture reuse scheme,Mental Health
+679,63,sdu,Heating upgrade,Acute Trust
+686,9.33,sdu,Heating upgrade,Adult Social Care
+684,0.81,sdu,Heating upgrade,Ambulance
+682,1.57,sdu,Heating upgrade,Community
+683,8.74,sdu,Heating upgrade,Mental Health
+609,0,sdu,High efficiency chillers,Acute Trust
+616,0,sdu,High efficiency chillers,Adult Social Care
+614,0,sdu,High efficiency chillers,Ambulance
+612,0,sdu,High efficiency chillers,Community
+613,0,sdu,High efficiency chillers,Mental Health
+699,53.39,sdu,Lighting - controls,Acute Trust
+706,13.34,sdu,Lighting - controls,Adult Social Care
+704,1.13,sdu,Lighting - controls,Ambulance
+702,1.34,sdu,Lighting - controls,Community
+703,8.63,sdu,Lighting - controls,Mental Health
+709,54.76,sdu,Lighting - high efficiency,Acute Trust
+716,0.47,sdu,Lighting - high efficiency,Adult Social Care
+714,1.16,sdu,Lighting - high efficiency,Ambulance
+712,1.38,sdu,Lighting - high efficiency,Community
+713,8.85,sdu,Lighting - high efficiency,Mental Health
+719,69.63,sdu,Optimising office electrical equipment,Acute Trust
+726,5.01,sdu,Optimising office electrical equipment,Adult Social Care
+724,1.48,sdu,Optimising office electrical equipment,Ambulance
+722,1.75,sdu,Optimising office electrical equipment,Community
+723,11.25,sdu,Optimising office electrical equipment,Mental Health
+739,0,sdu,Prescribing non-propellant inhalers for asthma,Acute Trust
+746,0,sdu,Prescribing non-propellant inhalers for asthma,Adult Social Care
+744,0,sdu,Prescribing non-propellant inhalers for asthma,Ambulance
+742,0,sdu,Prescribing non-propellant inhalers for asthma,Community
+743,0,sdu,Prescribing non-propellant inhalers for asthma,Mental Health
+899,96.2,sdu,Psychiatric liaison,Acute Trust
+906,0,sdu,Psychiatric liaison,Adult Social Care
+904,0,sdu,Psychiatric liaison,Ambulance
+902,3.8,sdu,Psychiatric liaison,Community
+903,0,sdu,Psychiatric liaison,Mental Health
+769,0,sdu,Rapid Response and Supported Discharge Teams,Acute Trust
+776,0,sdu,Rapid Response and Supported Discharge Teams,Adult Social Care
+774,0,sdu,Rapid Response and Supported Discharge Teams,Ambulance
+772,0,sdu,Rapid Response and Supported Discharge Teams,Community
+773,0,sdu,Rapid Response and Supported Discharge Teams,Mental Health
+749,0,sdu,Reablement,Acute Trust
+756,0,sdu,Reablement,Adult Social Care
+754,0,sdu,Reablement,Ambulance
+752,0,sdu,Reablement,Community
+753,0,sdu,Reablement,Mental Health
+689,0,sdu,Reducing fuel poverty through referrals for home insulation,Acute Trust
+696,0,sdu,Reducing fuel poverty through referrals for home insulation,Adult Social Care
+694,0,sdu,Reducing fuel poverty through referrals for home insulation,Ambulance
+692,0,sdu,Reducing fuel poverty through referrals for home insulation,Community
+693,0,sdu,Reducing fuel poverty through referrals for home insulation,Mental Health
+729,26.4,sdu,Reducing medicine waste,Acute Trust
+736,0.11,sdu,Reducing medicine waste,Adult Social Care
+734,0.03,sdu,Reducing medicine waste,Ambulance
+732,0.05,sdu,Reducing medicine waste,Community
+733,1.08,sdu,Reducing medicine waste,Mental Health
+779,0,sdu,Reducing social isolation in older people,Acute Trust
+786,0,sdu,Reducing social isolation in older people,Adult Social Care
+784,0,sdu,Reducing social isolation in older people,Ambulance
+782,0,sdu,Reducing social isolation in older people,Community
+783,0,sdu,Reducing social isolation in older people,Mental Health
+539,80.12,sdu,Reducing waste anaesthetic gases (non-ambulance),Acute Trust
+546,0,sdu,Reducing waste anaesthetic gases (non-ambulance),Adult Social Care
+544,16.15,sdu,Reducing waste anaesthetic gases (non-ambulance),Ambulance
+542,0,sdu,Reducing waste anaesthetic gases (non-ambulance),Community
+543,0,sdu,Reducing waste anaesthetic gases (non-ambulance),Mental Health
+789,0,sdu,Smoking cessation,Acute Trust
+796,0,sdu,Smoking cessation,Adult Social Care
+794,0,sdu,Smoking cessation,Ambulance
+792,0,sdu,Smoking cessation,Community
+793,0,sdu,Smoking cessation,Mental Health
+799,57.93,sdu,Solar - photovoltaic,Acute Trust
+806,11.02,sdu,Solar - photovoltaic,Adult Social Care
+804,1.23,sdu,Solar - photovoltaic,Ambulance
+802,1.46,sdu,Solar - photovoltaic,Community
+803,9.36,sdu,Solar - photovoltaic,Mental Health
+809,61.7,sdu,Solar - thermal,Acute Trust
+816,9.97,sdu,Solar - thermal,Adult Social Care
+814,0.79,sdu,Solar - thermal,Ambulance
+812,1.54,sdu,Solar - thermal,Community
+813,8.56,sdu,Solar - thermal,Mental Health
+669,70.31,sdu,Staff energy awareness & behaviour change,Acute Trust
+676,5.2,sdu,Staff energy awareness & behaviour change,Adult Social Care
+674,1.18,sdu,Staff energy awareness & behaviour change,Ambulance
+672,1.76,sdu,Staff energy awareness & behaviour change,Community
+673,10.52,sdu,Staff energy awareness & behaviour change,Mental Health
+519,0,sdu,Sugar reduction in soft drinks,Acute Trust
+526,0,sdu,Sugar reduction in soft drinks,Adult Social Care
+524,0,sdu,Sugar reduction in soft drinks,Ambulance
+522,0,sdu,Sugar reduction in soft drinks,Community
+523,0,sdu,Sugar reduction in soft drinks,Mental Health
+819,72.23,sdu,Teleconferencing,Acute Trust
+826,0,sdu,Teleconferencing,Adult Social Care
+824,2.48,sdu,Teleconferencing,Ambulance
+822,3.61,sdu,Teleconferencing,Community
+823,17.16,sdu,Teleconferencing,Mental Health
+829,61.96,sdu,Telehealth/Telecare for long term conditions,Acute Trust
+836,13.43,sdu,Telehealth/Telecare for long term conditions,Adult Social Care
+834,0,sdu,Telehealth/Telecare for long term conditions,Ambulance
+832,2.44,sdu,Telehealth/Telecare for long term conditions,Community
+833,0,sdu,Telehealth/Telecare for long term conditions,Mental Health
+839,79.4,sdu,Temperature set points - '1 degree C',Acute Trust
+846,0,sdu,Temperature set points - '1 degree C',Adult Social Care
+844,1.69,sdu,Temperature set points - '1 degree C',Ambulance
+842,2,sdu,Temperature set points - '1 degree C',Community
+843,12.83,sdu,Temperature set points - '1 degree C',Mental Health
+849,93.02,sdu,Theatre kits in hospitals - reducing packaging,Acute Trust
+856,0,sdu,Theatre kits in hospitals - reducing packaging,Adult Social Care
+854,0,sdu,Theatre kits in hospitals - reducing packaging,Ambulance
+852,0,sdu,Theatre kits in hospitals - reducing packaging,Community
+853,0,sdu,Theatre kits in hospitals - reducing packaging,Mental Health
+859,36.2,sdu,Travel planning,Acute Trust
+866,8.1,sdu,Travel planning,Adult Social Care
+864,1.82,sdu,Travel planning,Ambulance
+862,2.81,sdu,Travel planning,Community
+863,9.42,sdu,Travel planning,Mental Health
+869,79.4,sdu,Variable speed drives,Acute Trust
+876,0,sdu,Variable speed drives,Adult Social Care
+874,1.69,sdu,Variable speed drives,Ambulance
+872,2,sdu,Variable speed drives,Community
+873,12.83,sdu,Variable speed drives,Mental Health
+879,0,sdu,Voltage optimisation,Acute Trust
+886,0,sdu,Voltage optimisation,Adult Social Care
+884,0,sdu,Voltage optimisation,Ambulance
+882,0,sdu,Voltage optimisation,Community
+883,0,sdu,Voltage optimisation,Mental Health

@@ -28,6 +28,7 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import lombok.AllArgsConstructor;
@@ -132,6 +133,7 @@ public class OrganisationType {
     @Column(name = "tenant_id")
     private String tenantId;
 
+    @JsonBackReference
     @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "ORG_TYPE_ID")
     private List<Intervention> applicableInterventions;
