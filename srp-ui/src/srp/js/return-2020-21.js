@@ -328,14 +328,13 @@ var $r = (function ($, ractive) {
   }
 
   me.loginSuccessful = function() {
-    ractive.fetch();
+    ractive.fetch(); // delegate to questionnaire to fetch survey
     if (me.rtn == undefined) _fetchReturn();
     if (ractive.get('orgTypes') == undefined) _fetchLists();
     _showQuestionnaire();
   }
 
   function _showQuestionnaire() {
-    if (_survey == undefined) _fetchReturn();
     $('section.questionnaire').slideDown();
     ractive.set('q.activeCategory',0);
   }
@@ -554,11 +553,11 @@ var $r = (function ($, ractive) {
   ractive.fetchCallbacks.add(_showQuestionnaire);
   ractive.toggleSidebar = function() {
     console.info('toggleSidebar');
-    $('.toolbar-left').toggle(EASING_DURATION);
+    $('.toolbar-left').toggle(ractive.get('easingDuration'));
   }
   ractive.toggleSubMenu = function(entry) {
     console.info('toggleSubMenu');
-    $(entry.nextElementSibling).toggle(EASING_DURATION);
+    $(entry.nextElementSibling).toggle(ractive.get('easingDuration'));
   }
 
   try { _isIE = navigator.userAgent.match(/trident/i)!=null; } catch (e) {

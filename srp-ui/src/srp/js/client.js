@@ -133,14 +133,12 @@ function SrpClient(o) {
     });
   }
 
-  me.fetchSurvey = function(surveyName, successHandler) {
-    fetch(me.options.server+'/surveys/findByName/'+surveyName, {
+  me.fetchSurvey = function(surveyName) {
+    return fetch(me.options.server+'/surveys/findByName/'+surveyName, {
       "headers": commonHeaders(),
       "method": "GET",
       "mode": "cors"
-    })
-    .then(response => response.json())
-    .then(data => successHandler(data));
+    });
   }
 
   me.fetchWeightingFactor = function(uri) {

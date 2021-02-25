@@ -447,7 +447,9 @@ var ractive = new BaseRactive({
   },
   fetchSurvey: function() {
     console.info('fetchSurvey');
-    ractive.srp.fetchSurvey(ractive.get('survey'), function(data) {
+    ractive.srp.fetchSurvey(ractive.get('survey'))
+    .then(response => response.json())
+    .then(data => {
       console.log('success:'+data);
       ractive.set('q', data);
     });

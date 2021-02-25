@@ -62,9 +62,8 @@ public class SurveyService {
     public void initSurvey(Survey expected) {
         Survey survey = surveyRepo.findByName(expected.name());
         if (survey == null) {
-            LOGGER.warn(String.format(
-                    "Could not find expected survey %1$s, attempt to create",
-                    expected));
+            LOGGER.warn("Could not find expected survey {}, attempt to create",
+                    expected);
             expected = surveyRepo.save(expected);
         } else {
             LOGGER.debug("Expected survey {} found, checking categories",
@@ -86,10 +85,11 @@ public class SurveyService {
             for (String qName : cat.getQuestionNames().split(",")) {
                 Optional<Question> q = questionRepo.findByName(qName);
                 if (!q.isPresent()) {
-                    LOGGER.error("Need to init question: '{}'", qName);
+                    LOGGER.error("Need to init question: '{}' for '{}'", qName, expected.name());
                     missingQs.add(qName);
+                } else {
+                    cat.questions().add(q.get());
                 }
-                cat.questions().add(q.get());
             }
         }
         if (missingQs.size() > 0) {
