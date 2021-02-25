@@ -73,9 +73,9 @@ public class SurveyCategory {
     @JsonProperty
     @Column(name = "questions")
     @Lob
-//    @OneToMany(orphanRemoval=true, cascade = CascadeType.ALL, mappedBy = "category")
     private String questionNames;
 
+    @JsonProperty
     @Transient
     private List<Question> questions;
 
@@ -145,39 +145,4 @@ public class SurveyCategory {
     public void setQuestionNames(String questionNames) {
         this.questionNames = questionNames;
     }
-
-//    public SurveyQuestion question(String qName) {
-//        for (SurveyQuestion q : questions) {
-//            if (qName.equals(q.name())) {
-//                return q;
-//            }
-//        }
-//        return null;
-//    }
-//
-//    public boolean equivalent(Object obj) {
-//        if (this == obj)
-//            return true;
-//        if (obj == null)
-//            return false;
-//        if (getClass() != obj.getClass())
-//            return false;
-//        SurveyCategory other = (SurveyCategory) obj;
-//        if (name == null) {
-//            if (other.name != null)
-//                return false;
-//        } else if (!name.equals(other.name))
-//            return false;
-//        if (questions == null) {
-//            if (other.questions != null)
-//                return false;
-//        } else if (!questions.equals(other.questions))
-//            return false;
-//        if (surveyId == null) {
-//            if (other.surveyId != null)
-//                return false;
-//        } else if (!surveyId.equals(other.surveyId))
-//            return false;
-//        return true;
-//    }
 }
