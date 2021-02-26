@@ -23,7 +23,6 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.Lob;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 import javax.validation.constraints.Size;
@@ -71,7 +70,7 @@ public class ModelParameter {
 
     @JsonProperty
     @Column(name = "valuets")
-    @Lob
+    @Size(max=200)
     private String valueTS;
 
     @JsonProperty

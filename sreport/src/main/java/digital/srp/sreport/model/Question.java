@@ -24,7 +24,6 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.Lob;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 import javax.validation.constraints.NotNull;
@@ -56,7 +55,7 @@ public class Question {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @JsonProperty
-    @Column(name = "id", columnDefinition = "int(11) NOT NULL")
+    @Column(name = "id")
     protected Long id;
 
     @Transient
@@ -78,7 +77,7 @@ public class Question {
 
     @JsonProperty
     @Column(name = "hint")
-    @Lob
+    @Size(max=2000)
     protected String hint;
 
     @JsonProperty

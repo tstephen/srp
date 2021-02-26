@@ -26,12 +26,12 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.Lob;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -77,7 +77,7 @@ public class InterventionType implements CsvSerializable {
 
     @JsonProperty
     @Column(name = "description")
-    @Lob
+    @Size(max=2000)
     private String description;
 
     @JsonProperty
@@ -118,12 +118,12 @@ public class InterventionType implements CsvSerializable {
 
     @JsonProperty
     @Column(name = "note")
-    @Lob
+    @Size(max=2000)
     private String note;
 
     @JsonProperty
     @Column(name = "client_note")
-    @Lob
+    @Size(max=2000)
     private String clientNote;
 
     /**
@@ -183,7 +183,7 @@ public class InterventionType implements CsvSerializable {
 
     @Basic
     @Column(name = "overlapping_interventions")
-    @Lob
+    @Size(max=500)
     private String overlappingInterventions;
 
     @JsonProperty
@@ -196,7 +196,7 @@ public class InterventionType implements CsvSerializable {
 
     @JsonProperty
     @Column(name = "annual_cash_inflowsts")
-    @Lob
+    @Size(max=200)
     private String annualCashInflowsTS;
 
     @JsonProperty
@@ -209,7 +209,7 @@ public class InterventionType implements CsvSerializable {
 
     @JsonProperty
     @Column(name = "annual_cash_outflowsts")
-    @Lob
+    @Size(max=200)
     private String annualCashOutflowsTS;
 
     @JsonProperty
@@ -222,7 +222,7 @@ public class InterventionType implements CsvSerializable {
 
     @JsonProperty
     @Column(name = "annual_tonnes_co2e_savedts")
-    @Lob
+    @Size(max=500)
     private String annualTonnesCo2eSavedTS;
 
     @JsonProperty
@@ -248,7 +248,7 @@ public class InterventionType implements CsvSerializable {
 
     @JsonProperty
     @Column(name = "UNIT_DESC", nullable = true)
-    @Lob
+    @Size(max=200)
     private String unitDescription;
 
     @JsonProperty

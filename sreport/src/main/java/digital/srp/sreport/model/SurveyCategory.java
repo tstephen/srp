@@ -28,7 +28,6 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Transient;
@@ -72,7 +71,7 @@ public class SurveyCategory {
 
     @JsonProperty
     @Column(name = "questions")
-    @Lob
+    @Size(max=1000)
     private String questionNames;
 
     @JsonProperty
