@@ -94,6 +94,10 @@
       <artifactId>sreport</artifactId>
       <version>${srp.version}</version>
     </dependency>
+    <dependency>
+      <groupId>org.postgresql</groupId>
+      <artifactId>postgresql</artifactId>
+    </dependency>
   </dependencies>
   
   <dependencyManagement>
