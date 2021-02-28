@@ -20,6 +20,7 @@ import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 import javax.transaction.Transactional;
@@ -925,7 +926,7 @@ public class Cruncher extends AbstractEmissionsService
                             mileageWttFactor,
                             getAnswer(period, rtn, Q.CAR_MILES_PETROL).responseAsOptional())
                     .get());
-        } catch (IllegalStateException e) {
+        } catch (NoSuchElementException | IllegalStateException e) {
             // almost certainly OK since these are newer questions
             LOGGER.warn(e.getMessage());
         }
