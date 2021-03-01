@@ -148,7 +148,7 @@ var BaseRactive = Ractive.extend({
   hasRole: function(role) {
     //console.info('hasRole: ' + role);
     try {
-      return (ractive.keycloak.realm == 'srp' && ractive.keycloak.hasRealmRole(role));
+      return (ractive.keycloak.hasRealmRole(role));
     } catch (e) {
       console.warn('No keycloak, using legacy authentication');
       return this.hasRoleLegacy(role);
