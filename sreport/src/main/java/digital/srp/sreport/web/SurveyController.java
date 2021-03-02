@@ -28,6 +28,7 @@ import javax.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.hateoas.EntityModel;
@@ -61,6 +62,7 @@ import digital.srp.sreport.services.SurveyService;
  */
 @Controller
 @RequestMapping(value = "/surveys")
+@DependsOn({"questionController"})
 public class SurveyController {
 
     private static final Logger LOGGER = LoggerFactory
