@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name}}-configmap
+  namespace: default
+data:
+  SERVER_SERVLET_CONTEXT_PATH: {{ .Values.rest.contextPath | quote }}
+  KEYCLOAK_REALM: {{ .Values.keycloak.realm | quote }}
+  KEYCLOAK_AUTH-SERVER-URL: {{ .Values.keycloak.authServerUrl | quote }}
+  KEYCLOAK_RESOURCE: {{ .Values.keycloak.resource | quote }}
+  KEYCLOAK_ENABLED: {{ .Values.keycloak.enabled | quote }}
+  {{- if and .Values.database.datasourceDriverClassName .Values.database.datasourceUrl }}
+  SPRING_DATASOURCE_DRIVER-CLASS-NAME: {{ .Values.database.datasourceDriverClassName | quote }}
+  SPRING_DATASOURCE_URL: {{ .Values.database.datasourceUrl | quote }}
+  {{- end }}
+  SPRING_JPA_HIBERNATE_DDL-AUTO: "update"
+  SPRING_JPA_SHOW-SQL: "true"
+  SPRING_JPA_PROPERTIES_HIBERNATE_FORMAT_SQL: "true"
