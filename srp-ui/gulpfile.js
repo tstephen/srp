@@ -1,8 +1,8 @@
 var del         = require('del');
 var log         = require('fancy-log');
 var gulp        = require('gulp');
+var babel       = require('gulp-babel');
 var jshint      = require('gulp-jshint');
-var uglify      = require('gulp-uglify');
 var cleanCSS    = require('gulp-clean-css');
 var minimist    = require('minimist');
 var replace     = require('gulp-replace');
@@ -36,10 +36,10 @@ gulp.task('scripts', function() {
   //gulp.src([ 'src/sw.js' ])
   //    .pipe(gulp.dest(buildDir));
   return gulp.src([
-    'src/srp/js/**/*.js', '!src/srp/js/**/toast.js'
+    'src/srp/js/**/*.js', '!src/srp/js/**/toast.js', '!src/srp/js/**/*.min.js'
   ])
-  .pipe(config.js.uglify ? uglify({ mangle: true }) : through2.obj())
   .pipe(replace('/vsn/', '/'+vsn+'/'))
+  .pipe(config.js.minify ? babel({ presets: [ ["minify", { "builtIns": false }] ] }) : through2.obj())
   .pipe(gulp.dest(buildDir+'/srp/'+vsn+'/js'));
 });
 
