@@ -101,7 +101,6 @@ public class AnswerController {
     /**
      * @return The specified answer.
      */
-    @RolesAllowed(SrpRoles.USER)
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
     @Transactional
     public @ResponseBody EntityModel<Answer> findById(
@@ -276,7 +275,6 @@ public class AnswerController {
     /**
      * @return answer to the given question for the specified return and period.
      */
-    @RolesAllowed(SrpRoles.USER)
     @RequestMapping(value = "/findByReturnPeriodAndQ/{rtn}/{period}/{q}", method = RequestMethod.GET)
     public @ResponseBody EntityModel<Answer> findByReturnPeriodAndQ(
             @PathVariable("rtn") Long rtnId,

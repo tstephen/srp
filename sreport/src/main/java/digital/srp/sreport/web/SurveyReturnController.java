@@ -126,7 +126,6 @@ public class SurveyReturnController {
      *
      * @return the specified survey.
      */
-    @RolesAllowed(SrpRoles.USER)
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
     @Transactional
     public @ResponseBody EntityModel<SurveyReturn> findById(@PathVariable("id") Long returnId) {
@@ -147,7 +146,6 @@ public class SurveyReturnController {
      *
      * @return returns. May be more than one because occasionally returns are restated. .
      */
-    @RolesAllowed(SrpRoles.USER)
     @RequestMapping(value = "/findBySurveyName/{surveyName}", method = RequestMethod.GET)
     @Transactional
     public @ResponseBody List<EntityModel<SurveyReturn>> findBySurvey(
@@ -161,7 +159,6 @@ public class SurveyReturnController {
      *
      * @return returns. May be more than one because occasionally returns are restated.
      */
-    @RolesAllowed(SrpRoles.USER)
     @RequestMapping(value = "/findBySurveyNameAndOrg/{surveyName}/{org}", method = RequestMethod.GET)
     public @ResponseBody List<EntityModel<SurveyReturn>> findEntityBySurveyAndOrg(
             @PathVariable("surveyName") String surveyName,
@@ -225,12 +222,21 @@ public class SurveyReturnController {
             for (Q q : cat.questionEnums()) {
                 if (!rtn.answer(rtn.applicablePeriod(), q).isPresent()) {
                     Optional<Question> question = findQuestion(q.name());
+                    LOGGER.debug("Return {}/{} contains {}? {}",
+                            rtn.applicablePeriod(), rtn.org(), q, question.isPresent());
                     Answer answer = new Answer()
                             .question(question.orElseThrow(() -> new ObjectNotFoundException(Q.class, q)))
                             .addSurveyReturn(rtn)
                             .applicablePeriod(requested.applicablePeriod());
                     if (q.equals(Q.ORG_CODE)) {
                         answer.response(rtn.org());
+                    }
+                    if (LOGGER.isDebugEnabled()) {
+                        for (Answer a : rtn.answers()) {
+                            LOGGER.debug("  creating answer to {} in {}/{}",
+                                    a.question().name(), rtn.applicablePeriod(),
+                                    rtn.org());
+                        }
                     }
                     rtn.answers().add(answer);
                 }
@@ -239,7 +245,6 @@ public class SurveyReturnController {
         returnRepo.save(rtn);
     }
 
-    @RolesAllowed(SrpRoles.USER)
     @RequestMapping(value = "/findCurrentBySurveyNameAndOrg/{surveyName}/{org}", method = RequestMethod.GET)
     public @ResponseBody EntityModel<SurveyReturn> findCurrentEntityBySurveyNameAndOrg(
             @PathVariable("surveyName") String surveyName,
@@ -372,7 +377,6 @@ public class SurveyReturnController {
      * @param q The name of the question this answer belongs to.
      *
      */
-    @RolesAllowed(SrpRoles.USER)
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
     @RequestMapping(value = "/{id}/answers/{q}", method = RequestMethod.POST, consumes = "application/json")
     public @ResponseBody void updateCurrentAnswer(
@@ -392,7 +396,6 @@ public class SurveyReturnController {
      * @param q The name of the question this answer belongs to.
      * @param period The period of this answer, if omitted the period of the return is assumed.
      */
-    @RolesAllowed(SrpRoles.USER)
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
     @RequestMapping(value = "/{id}/answers/{q}/{period}", method = RequestMethod.POST, consumes = "application/json")
     public @ResponseBody void updateAnswer(
@@ -439,7 +442,6 @@ public class SurveyReturnController {
     /**
      * Re-stating a return preserves the existing one and saves the updates as a new revision.
      */
-    @RolesAllowed(SrpRoles.USER)
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
     @RequestMapping(value = "/{id}/restate", method = RequestMethod.POST, consumes = { "application/json" })
     @Transactional
@@ -476,7 +478,6 @@ public class SurveyReturnController {
      * Change the status the return has reached.
      * @return The updated return
      */
-    @RolesAllowed(SrpRoles.USER)
     @RequestMapping(value = "/{returnId}/status/{status}", method = RequestMethod.POST, consumes = "application/json")
     public @ResponseBody EntityModel<SurveyReturn> setStatus(
             @PathVariable("returnId") Long returnId,

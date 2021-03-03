@@ -94,7 +94,6 @@ public class SurveyController {
     /**
      * @return The specified survey.
      */
-    @RolesAllowed(SrpRoles.USER)
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
     @Transactional
     public @ResponseBody EntityModel<Survey> findById(
@@ -113,7 +112,6 @@ public class SurveyController {
     /**
      * @return The specified survey.
      */
-    @RolesAllowed(SrpRoles.USER)
     @RequestMapping(value = "/findByName/{name}", method = RequestMethod.GET)
     public @ResponseBody EntityModel<Survey> findByName(
             @PathVariable("name") String name) {

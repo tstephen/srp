@@ -94,7 +94,6 @@ public class WeightingFactorController {
     /**
      * @return The specified weighting factor.
      */
-    @RolesAllowed(SrpRoles.USER)
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
     @Transactional
     public @ResponseBody EntityModel<WeightingFactor> findById(
@@ -110,7 +109,6 @@ public class WeightingFactorController {
     /**
      * @return The specified weighting factor.
      */
-    @RolesAllowed(SrpRoles.USER)
     @RequestMapping(value = "/findByName/{name}", method = RequestMethod.GET)
     @Transactional
     public @ResponseBody EntityModel<WeightingFactor> findByName(

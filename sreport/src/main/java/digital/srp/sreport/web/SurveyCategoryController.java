@@ -65,7 +65,6 @@ public class SurveyCategoryController {
     /**
      * @return The specified category.
      */
-    @RolesAllowed(SrpRoles.USER)
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
     @Transactional
     public @ResponseBody EntityModel<SurveyCategory> findById(
@@ -81,7 +80,6 @@ public class SurveyCategoryController {
     /**
      * @return categories.
      */
-    @RolesAllowed(SrpRoles.USER)
     @RequestMapping(value = "/", method = RequestMethod.GET)
     public @ResponseBody List<EntityModel<SurveyCategory>> list(
             @RequestParam(value = "page", required = false) Integer page,
