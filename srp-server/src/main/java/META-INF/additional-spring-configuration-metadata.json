@@ -1,5 +1,22 @@
-{"properties": [{
-  "name": "srp.cors.allowed-origins",
-  "type": "java.lang.String",
-  "description": "Comma-separated list of URLs that may make CORS requests (no wildcards)"
-}]}
+{"properties": [
+  {
+    "name": "srp.cors.allowed-origins",
+    "type": "java.lang.String",
+    "description": "Comma-separated list of URLs that may make CORS requests (no wildcards)"
+  },
+  {
+    "name": "srp.cors.allowed-methods",
+    "type": "java.lang.String",
+    "description": "Comma-separated list of HTTP methods allowed in CORS requests (default: DELETE,GET,HEAD,POST,PUT)"
+  },
+  {
+    "name": "srp.cors.allowed-headers",
+    "type": "java.lang.String",
+    "description": "Comma-separated list of Headers allowed in CORS requests (defaults to *)"
+  },
+  {
+    "name": "srp.cors.allow-credentials",
+    "type": "java.lang.Boolean",
+    "description": "Control whether CORS requests may include credentials"
+  }
+]}

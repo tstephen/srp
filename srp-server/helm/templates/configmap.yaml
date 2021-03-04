@@ -13,6 +13,19 @@ data:
   SPRING_DATASOURCE_DRIVER-CLASS-NAME: {{ .Values.database.datasourceDriverClassName | quote }}
   SPRING_DATASOURCE_URL: {{ .Values.database.datasourceUrl | quote }}
   {{- end }}
-  SPRING_JPA_HIBERNATE_DDL-AUTO: "update"
-  SPRING_JPA_SHOW-SQL: "true"
-  SPRING_JPA_PROPERTIES_HIBERNATE_FORMAT_SQL: "true"
+  SPRING_JPA_HIBERNATE_DDL-AUTO: {{ .Values.jpa.hibernate.ddlAuto | quote }}
+  SPRING_JPA_SHOW-SQL: {{ .Values.jpa.showSql | quote }}
+  SPRING_JPA_PROPERTIES_HIBERNATE_FORMAT_SQL: {{ .Values.jpa.properties.hibernate.formatSql | quote }}
+  SRP_APPLICATION_BASE-URI: {{ .Values.srp.application.baseUri | quote }}
+  {{- if and .Values.srp.cors.allowedOrigins }}
+  SRP_CORS_ALLOWED-ORIGINS: {{ .Values.srp.cors.allowedOrigins | quote }}
+  {{- end }}
+  {{- if and .Values.srp.cors.allowedMethods }}
+  SRP_CORS_ALLOWED-METHODS: {{ .Values.srp.cors.allowedMethods | quote }}
+  {{- end }}
+  {{- if and .Values.srp.cors.allowedHeaders }}
+  SRP_CORS_ALLOWED-HEADERS: {{ .Values.srp.cors.allowedHeaders | quote }}
+  {{- end }}
+  {{- if and .Values.srp.cors.allowCredentials }}
+  SRP_CORS_ALLOW-CREDENTIALS: {{ .Values.srp.cors.allowCredentials | quote }}
+  {{- end }}

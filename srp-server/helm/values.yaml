@@ -96,6 +96,20 @@ database:
   datasourceUrl: jdbc:postgresql://kp-postgres-postgresql:5432/srp
   #datasourceUrl: jdbc:postgresql://kp-postgres-postgresql:5432/srp?currentSchema=srp
 
+jpa:
+  hibernate:
+    ddlAuto: "update"
+  properties:
+    hibernate:
+      formatSql: "false"
+  showSql: "false"
+
+srp:
+  application:
+    baseUri: "https://v3.srp.digital"
+  cors:
+    allowedOrigins: "http://localhost:8000,https://srp.digital"
+
 rest:
   javaOpts:
   contextPath: "/"

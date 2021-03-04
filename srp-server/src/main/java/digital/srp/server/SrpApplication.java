@@ -51,11 +51,17 @@ public class SrpApplication {
     @Value("${srp.tomcat.ajp.scheme:http2}")
     String ajpScheme;
 
-    @Value("${srp.cors.allowedMethods:DELETE,GET,HEAD,POST,PUT}")
+    @Value("${srp.cors.allowed-methods:DELETE,GET,HEAD,POST,PUT}")
     String corsMethods;
 
-    @Value("${srp.cors.allowedOrigins:http://localhost:8000}")
+    @Value("${srp.cors.allowed-origins:http://localhost:8000}")
     String corsOrigins;
+
+    @Value("${srp.cors.allowed-headers:*}")
+    String corsHeaders;
+
+    @Value("${srp.cors.allow-credentials:false}")
+    boolean corsAllowCredentials;
 
     @Bean
     public WebServerFactoryCustomizer<TomcatServletWebServerFactory> servletContainer() {
@@ -86,9 +92,16 @@ public class SrpApplication {
         return new WebMvcConfigurer() {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
+                LOGGER.info("CORS configuration:");
+                LOGGER.info("  allowed origins: {}", corsOrigins);
+                LOGGER.info("  allowed methods: {}", corsMethods);
+                LOGGER.info("  allowed headers: {}", corsHeaders);
+                LOGGER.info("  allow credentials: {}", corsAllowCredentials);
                 CorsRegistration reg = registry.addMapping("/**");
                 reg.allowedOrigins(corsOrigins.split(","));
                 reg.allowedMethods(corsMethods.split(","));
+                reg.allowedHeaders(corsHeaders.split(","));
+                reg.allowCredentials(corsAllowCredentials);
             }
 
             @Override
