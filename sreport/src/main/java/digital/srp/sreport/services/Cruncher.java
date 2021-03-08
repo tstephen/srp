@@ -53,9 +53,9 @@ public class Cruncher extends AbstractEmissionsService
     protected static final BigDecimal RAIL_PER_MILE = new BigDecimal("0.3000");
     protected static final BigDecimal TAXI_PER_MILE = new BigDecimal("2.8300");
 
-    protected final List<CarbonFactor> cfactors;
+    protected List<CarbonFactor> cfactors;
 
-    protected final List<WeightingFactor> wfactors;
+    protected List<WeightingFactor> wfactors;
 
     @Autowired
     protected HealthChecker healthChecker;
@@ -69,10 +69,20 @@ public class Cruncher extends AbstractEmissionsService
     @Autowired
     protected WasteEmissionsService wasteEmissionsService;
 
-    public Cruncher(final List<CarbonFactor> cfactors2,
+    public Cruncher() {
+    }
+
+    protected Cruncher(final List<CarbonFactor> cfactors2,
+            final List<WeightingFactor> wfactors2) {
+        this();
+        init(cfactors2, wfactors2);
+    }
+
+    public Cruncher init(final List<CarbonFactor> cfactors2,
             final List<WeightingFactor> wfactors2) {
         this.cfactors = cfactors2;
         this.wfactors = wfactors2;
+        return this;
     }
 
     /**

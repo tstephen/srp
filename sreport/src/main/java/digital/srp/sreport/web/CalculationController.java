@@ -15,14 +15,18 @@
  ******************************************************************************/
 package digital.srp.sreport.web;
 
+import java.io.IOException;
+import java.util.List;
 import java.util.Set;
 
+import javax.annotation.PostConstruct;
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -30,13 +34,17 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import digital.srp.sreport.api.Calculator;
 import digital.srp.sreport.api.exceptions.ObjectNotFoundException;
 import digital.srp.sreport.internal.PeriodUtil;
+import digital.srp.sreport.model.CarbonFactor;
 import digital.srp.sreport.model.SurveyReturn;
+import digital.srp.sreport.model.WeightingFactor;
 import digital.srp.sreport.repositories.AnswerRepository;
+import digital.srp.sreport.repositories.CarbonFactorRepository;
 import digital.srp.sreport.repositories.QuestionRepository;
 import digital.srp.sreport.repositories.SurveyReturnRepository;
+import digital.srp.sreport.repositories.WeightingFactorRepository;
+import digital.srp.sreport.services.Cruncher;
 import digital.srp.sreport.services.HealthChecker;
 
 /**
@@ -46,13 +54,14 @@ import digital.srp.sreport.services.HealthChecker;
  */
 @Controller
 @RequestMapping(value = "/calculations")
+@DependsOn({ "carbonFactorController", "weightingFactorController" })
 public class CalculationController {
 
     private static final Logger LOGGER = LoggerFactory
             .getLogger(CalculationController.class);
 
     @Autowired
-    protected Calculator cruncher;
+    protected Cruncher cruncher;
 
     @Autowired
     protected HealthChecker healthCheck;
@@ -69,6 +78,21 @@ public class CalculationController {
     @Autowired
     protected SurveyReturnController surveyReturnController;
 
+    @Autowired
+    protected CarbonFactorRepository cfactorRepo;
+
+    @Autowired
+    protected WeightingFactorRepository wfactorRepo;
+
+    @PostConstruct
+    protected void init() throws IOException {
+        LOGGER.info("init cache of factors");
+        List<CarbonFactor> cFactors = cfactorRepo.findAll();
+        List<WeightingFactor> wFactors = wfactorRepo.findAll();
+        LOGGER.info("  found {} cfactors and {} wfactors",
+                cFactors.size(), wFactors.size());
+        cruncher.init(cFactors, wFactors);
+    }
     /**
      * Run all calculations based on the return inputs.
      * @return return including latest calculations.
@@ -76,7 +100,7 @@ public class CalculationController {
     @RequestMapping(value = "/{returnId}", method = RequestMethod.POST)
     public @ResponseBody EntityModel<SurveyReturn> calculate(
             @PathVariable("returnId") Long returnId) {
-        LOGGER.info(String.format("Running calculations for %1$s", returnId));
+        LOGGER.info("Running calculations for {}", returnId);
 
         SurveyReturn rtn = returnRepo.findById(returnId)
                 .orElseThrow(() -> new ObjectNotFoundException(SurveyReturn.class, returnId));
@@ -93,7 +117,7 @@ public class CalculationController {
     public @ResponseBody EntityModel<SurveyReturn> calculate(
             @PathVariable("surveyName") String surveyName,
             @PathVariable("org") String org) {
-        LOGGER.info(String.format("Running calculations for %1$s %2$s", surveyName, org));
+        LOGGER.info("Running calculations for {} {} ", surveyName, org);
 
         SurveyReturn rtn = surveyReturnController.findCurrentBySurveyNameAndOrg(surveyName, org);
         calculate(rtn, PeriodUtil.periodsSinceInc(rtn.applicablePeriod(), "2007-08"));
