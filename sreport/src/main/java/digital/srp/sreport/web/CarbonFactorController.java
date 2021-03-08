@@ -31,6 +31,8 @@ import javax.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -41,6 +43,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder;
@@ -169,6 +172,28 @@ public class CarbonFactorController {
     protected void createInternal(CarbonFactor cfactor) {
         cfactor.created(new Date());
         cfactor = cfactorRepo.save(cfactor);
+    }
+
+    /**
+     * @return list of Carbon factors, optionally paged.
+     */
+    @RolesAllowed(SrpRoles.ADMIN)
+    @RequestMapping(value = "/", method = RequestMethod.GET)
+    public @ResponseBody List<EntityModel<CarbonFactor>> list(
+            @RequestParam(value = "page", required = false) Integer page,
+            @RequestParam(value = "limit", required = false) Integer limit) {
+        LOGGER.info("List Carbon factors");
+
+        List<CarbonFactor> list;
+        if (limit == null) {
+            list = cfactorRepo.findAll();
+        } else {
+            Pageable pageable = PageRequest.of(page == null ? 0 : page, limit);
+            list = cfactorRepo.findPage(pageable);
+        }
+
+        LOGGER.info("Found {} Carbon factors", list.size());
+        return addLinks(list);
     }
 
     /**
