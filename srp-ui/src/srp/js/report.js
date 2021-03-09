@@ -615,8 +615,7 @@ var ractive = new BaseRactive({
       crossDomain: true,
       headers: {
         "X-Requested-With": "XMLHttpRequest",
-        "X-Authorization": "Bearer "+ractive.keycloak.token,
-        "Authorization": "Bearer "+ractive.keycloak.token,
+        "X-Authorization": "Bearer "+localStorage['token'],
         "Cache-Control": "no-cache"
       },
       success: ractive.fetchSuccessHandler
@@ -651,8 +650,7 @@ var ractive = new BaseRactive({
       crossDomain: true,
       headers: {
         "X-Requested-With": "XMLHttpRequest",
-        "X-Authorization": "Bearer "+ractive.keycloak.token,
-        "Authorization": "Bearer "+ractive.keycloak.token,
+        "X-Authorization": "Bearer "+localStorage['token'],
         "Cache-Control": "no-cache"
       },
       success: ractive.fetchSuccessHandler
@@ -667,8 +665,7 @@ var ractive = new BaseRactive({
       crossDomain: true,
       headers: {
         "X-Requested-With": "XMLHttpRequest",
-        "X-Authorization": "Bearer "+ractive.keycloak.token,
-        "Authorization": "Bearer "+ractive.keycloak.token,
+        "X-Authorization": "Bearer "+localStorage['token'],
         "Cache-Control": "no-cache"
       },
       success: ractive.fetchSuccessHandler
@@ -687,8 +684,7 @@ var ractive = new BaseRactive({
       crossDomain: true,
       headers: {
         "X-Requested-With": "XMLHttpRequest",
-        "X-Authorization": "Bearer "+ractive.keycloak.token,
-        "Authorization": "Bearer "+ractive.keycloak.token,
+        "X-Authorization": "Bearer "+localStorage['token'],
         "Cache-Control": "no-cache"
       },
       success: function( data ) {
@@ -732,8 +728,7 @@ var ractive = new BaseRactive({
           crossDomain: true,
           headers: {
             "X-Requested-With": "XMLHttpRequest",
-            "X-Authorization": "Bearer "+ractive.keycloak.token,
-            "Authorization": "Bearer "+ractive.keycloak.token,
+            "X-Authorization": "Bearer "+localStorage['token'],
             "Cache-Control": "no-cache"
           },
           success: function( data ) {
@@ -870,8 +865,7 @@ var ractive = new BaseRactive({
       crossDomain: true,
       headers: {
         "X-Requested-With": "XMLHttpRequest",
-        "X-Authorization": "Bearer "+ractive.keycloak.token,
-        "Authorization": "Bearer "+ractive.keycloak.token,
+        "X-Authorization": "Bearer "+localStorage['token'],
         "Cache-Control": "no-cache"
       },
       success: function( data ) {
