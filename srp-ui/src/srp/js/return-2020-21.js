@@ -377,23 +377,6 @@ var $r = (function ($, ractive) {
     return _surveyName;
   },
 
-
-  /*me.loadTenantConfig = function(tenant) {
-    if ($r.getProfile() == undefined) {
-      console.info('skip tenant load while logging in');
-      return;
-    }
-    console.info('loadTenantConfig:'+tenant);
-    $.getJSON('https://api.knowprocess.com/tenants/'+tenant+'.json', function(response) {
-      //console.log('... response: '+JSON.stringify(response));
-      ractive.set('saveObserver', false);
-      ractive.set('tenant', response);
-      ractive.applyBranding();
-      ractive.initAutoComplete();
-      ractive.set('saveObserver', true);
-    });
-  }*/
-
   me.moveNext = function() {
     console.info('_moveNext');
     var currentYear = parseInt(_period.substring(0,4));

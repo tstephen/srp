@@ -389,7 +389,7 @@ var $r = (function ($, ractive, $auth) {
     }
     if (tenant==undefined || tenant=='undefined') $auth.showLogin();
     console.info('loadTenantConfig:'+tenant);
-    $.getJSON('https://api.knowprocess.com/tenants/'+tenant+'.json', function(response) {
+    $.getJSON('https://cloud.knowprocess.com/tenants/'+tenant+'/'+tenant+'.json', function(response) {
       //console.log('... response: '+JSON.stringify(response));
       ractive.set('saveObserver', false);
       ractive.set('tenant', response);

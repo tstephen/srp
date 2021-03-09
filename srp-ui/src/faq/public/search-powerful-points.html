@@ -64,7 +64,7 @@
       ractive.set('server', $env.server);
       ractive.set('tenant', { id: 'powerfulpoints' });
       $('.input-group .kp-icon-caret-down').click(ractive.toggleSearchOptions); 
-      $.getJSON($env.server+'/tenants/powerfulpoints.json',function(data) {
+      $.getJSON('https://cloud.knowprocess.com/tenants/sdu/powerful-points.json',function(data) {
         ractive.set('tenant', data);
         var status = Array.findBy('name','faqStatus',ractive.get('tenant.typeaheadControls'));
         ractive.addDataList(status, status.values);

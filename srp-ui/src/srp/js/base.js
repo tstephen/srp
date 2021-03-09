@@ -317,7 +317,7 @@ var BaseRactive = Ractive.extend({
     }
     if (tenant==undefined || tenant=='undefined') $auth.showLogin();
     console.info('loadTenantConfig:'+tenant);
-    $.getJSON('https://api.knowprocess.com/tenants/'+tenant+'.json', function(response) {
+    $.getJSON('https://cloud.knowprocess.com/tenants/'+tenant+'/'+tenant+'.json', function(response) {
       //console.log('... response: '+JSON.stringify(response));
       ractive.set('saveObserver', false);
       ractive.set('tenant', response);
@@ -771,7 +771,7 @@ Array.prototype.clean = function(deleteValue) {
 /**
  * @return The first array element whose 'k' field equals 'v'.
  */
-Array.findBy = function(k,v,arr) {
+Array.prototype.findBy = function(k,v,arr) {
   for (idx in arr) {
     if (arr[idx][k]==v) return arr[idx];
     else if ('selfRef'==k && arr[idx][k] != undefined && arr[idx][k].endsWith(v)) return arr[idx];
@@ -780,26 +780,13 @@ Array.findBy = function(k,v,arr) {
 /**
  * @return All  array elements whose 'k' field equals 'v'.
  */
-Array.findAll = function(k,v,arr) {
+Array.prototype.findAll = function(k,v,arr) {
   var retArr = [];
   for (idx in arr) {
     if (arr[idx][k]==v) retArr.push(arr[idx]);
     else if ('selfRef'==k && arr[idx][k] != undefined && arr[idx][k].endsWith(v)) return retArr.push(arr[idx]);
   }
   return retArr;
-}
-Array.uniq = function(fieldName, arr) {
-  // console.info('uniq');
-  list = '';
-  for (idx in arr) {
-    if (idx(arr[idx],fieldName) != undefined
-        && list.indexOf(idx(arr[idx],fieldName)) == -1) {
-      if (list != '')
-        list += ','
-      list += idx(arr[idx],fieldName);
-    }
-  }
-  return list;
 }
 Array.prototype.uniq = function() {
   return this.sort().filter(function(el,i,a){if(i==a.indexOf(el))return 1;return 0});

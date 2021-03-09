@@ -64,7 +64,7 @@
       ractive.set('server', $env.server);
       ractive.set('tenant', { id: 'casestudies' });
       $('.input-group .kp-icon-caret-down').click(ractive.toggleSearchOptions); 
-      $.getJSON($env.server+'/tenants/casestudies.json',function(data) {
+      $.getJSON('https://cloud.knowprocess.com/tenants/sdu/case-studies.json',function(data) {
         ractive.set('tenant', data);
         var status = Array.findBy('name','faqStatus',ractive.get('tenant.typeaheadControls'));
         ractive.addDataList(status, status.values);
