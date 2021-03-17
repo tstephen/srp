@@ -4,6 +4,15 @@ Sustainable Resource Planning
 Release History
 ---------------
 
+2.4.2 - 17 Mar 21 - 
+
+  - couple of dependabot upgrades
+  - integrate jacoco code quality analysis
+
+2.4.1 - 19 Nov 20 - e9e4cbb4a94fc92566ebffeca8bfc6a91c7799df
+
+  - fix eclass and labels
+
 2.4.0 - 02 Nov 20 (belatedly build release for 2019-20)
 
   - #10 Paper spend is referred to on the report as Spend Q5 but not captured

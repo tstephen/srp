@@ -1,0 +1,349 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Answer.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Sustainability Reporting</a> &gt; <a href="index.source.html" class="el_package">digital.srp.sreport.model</a> &gt; <span class="el_source">Answer.java</span></div><h1>Answer.java</h1><pre class="source lang-java linenums">package digital.srp.sreport.model;
+
+import java.math.BigDecimal;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.EntityListeners;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
+import javax.persistence.Transient;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
+import javax.xml.bind.annotation.XmlElement;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.data.annotation.CreatedBy;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedBy;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+import org.springframework.hateoas.Link;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonView;
+
+import digital.srp.macc.maths.SignificantFiguresFormat;
+import digital.srp.sreport.model.views.AnswerViews;
+import digital.srp.sreport.model.views.QuestionViews;
+import digital.srp.sreport.model.views.SurveyReturnViews;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
+
+
+/**
+ * A single question's response.
+ *
+ * @author Tim Stephenson
+ */
+@Accessors(fluent=true)
+<span class="pc" id="L56">@Data</span>
+<span class="pc bpc" id="L57" title="60 of 106 branches missed.">@EqualsAndHashCode(exclude = { &quot;id&quot;, &quot;surveyReturns&quot; })</span>
+<span class="fc" id="L58">@NoArgsConstructor</span>
+@Entity
+@EntityListeners(AuditingEntityListener.class)
+@Table(name= &quot;SR_ANSWER&quot;)
+public class Answer {
+
+<span class="fc" id="L64">    private static final Logger LOGGER = LoggerFactory</span>
+<span class="fc" id="L65">            .getLogger(Answer.class);</span>
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    @JsonProperty
+    @JsonView({ AnswerViews.Summary.class, SurveyReturnViews.Detailed.class })
+    @Column(name = &quot;id&quot;)
+<span class="fc" id="L72">    private Long id;</span>
+
+    @JsonProperty
+    @JsonView({ AnswerViews.Summary.class, SurveyReturnViews.Detailed.class })
+    @Column(name = &quot;response&quot;)
+    private String response;
+
+    @NotNull
+    @JsonProperty
+    @JsonView({ AnswerViews.Summary.class, SurveyReturnViews.Detailed.class })
+    @ManyToOne(fetch = FetchType.EAGER)
+<span class="fc" id="L83">    private Question question;</span>
+
+<span class="fc" id="L85">    @NotNull</span>
+    @Size(max = 50)
+    @JsonProperty
+    @JsonView({ AnswerViews.Summary.class, SurveyReturnViews.Detailed.class })
+    @Column(name = &quot;status&quot;)
+<span class="fc" id="L90">    private String status = StatusType.Draft.name();</span>
+
+    /**
+     * Period this answer applies to.
+     *
+     * &lt;p&gt;For example: calendar or financial year, quarter etc.
+     */
+    @NotNull
+    @JsonProperty
+    @Size(max = 20)
+    @JsonView({ AnswerViews.Summary.class, SurveyReturnViews.Detailed.class })
+    @Column(name = &quot;applicable_period&quot;)
+<span class="fc" id="L102">    private String applicablePeriod;</span>
+
+    /**
+     * Typically there will be one revision of a survey submitted but this
+     * allows for a re-statement if needed.
+     */
+<span class="fc" id="L108">    @JsonProperty</span>
+    @JsonView({ AnswerViews.Summary.class, SurveyReturnViews.Detailed.class })
+    @Column(name = &quot;revision&quot;)
+<span class="fc" id="L111">    private Short revision = 1;</span>
+
+    /**
+     * True is we have calculated this answer on behalf of the user.
+     */
+<span class="fc" id="L116">    @JsonProperty</span>
+    @JsonView({ AnswerViews.Detailed.class, SurveyReturnViews.Detailed.class })
+    @Column(name = &quot;derived&quot;)
+<span class="fc" id="L119">    private boolean derived = false;</span>
+
+    @Temporal(TemporalType.TIMESTAMP)
+    @JsonProperty
+    @JsonView({ AnswerViews.Detailed.class })
+    @Column(name = &quot;submitted_date&quot;)
+<span class="fc" id="L125">    private Date submittedDate;</span>
+
+    /**
+     * Username of submitter.
+     */
+    @JsonProperty
+    @JsonView({ AnswerViews.Detailed.class })
+    @Column(name = &quot;submitted_by&quot;)
+<span class="fc" id="L133">    private String submittedBy;</span>
+
+    @JsonView({ AnswerViews.Detailed.class })
+    @Column(name = &quot;created&quot;, nullable = false, updatable = false)
+    @CreatedDate
+<span class="fc" id="L138">    private Date created;</span>
+
+    @JsonView({ AnswerViews.Detailed.class })
+    @Column(name = &quot;created_by&quot;)
+    @CreatedBy
+<span class="fc" id="L143">    private String createdBy;</span>
+
+    @JsonView({ AnswerViews.Detailed.class })
+    @Column(name = &quot;last_updated&quot;)
+    @LastModifiedDate
+<span class="fc" id="L148">    private Date lastUpdated;</span>
+
+    @JsonView({ AnswerViews.Detailed.class })
+    @Column(name = &quot;updated_by&quot;)
+    @LastModifiedBy
+<span class="fc" id="L153">    private String updatedBy;</span>
+
+    @JsonProperty
+    @JsonView({ AnswerViews.Detailed.class })
+    @ManyToMany
+    @JoinTable(name=&quot;SR_RETURN_ANSWER&quot;,
+            joinColumns=@JoinColumn(name=&quot;answer_id&quot;, referencedColumnName=&quot;id&quot;),
+            inverseJoinColumns=@JoinColumn(name=&quot;survey_return_id&quot;, referencedColumnName=&quot;id&quot;))
+    private Set&lt;SurveyReturn&gt; surveyReturns;
+
+    @Transient
+    @XmlElement(name = &quot;link&quot;, namespace = Link.ATOM_NAMESPACE)
+    @JsonProperty(&quot;links&quot;)
+    @JsonView({ AnswerViews.Summary.class, QuestionViews.Summary.class })
+<span class="fc" id="L167">    private List&lt;Link&gt; links;</span>
+
+    public Answer(long id, String response, Question q, StatusType status,
+            String applicablePeriod, short revision, boolean derived,
+            Date submittedDate, String submittedBy, Date created,
+            String createdBy, Date lastUpdated, String updatedBy) {
+<span class="fc" id="L173">        this();</span>
+<span class="fc" id="L174">        id(id).response(response).question(q).status(status.name())</span>
+<span class="fc" id="L175">                .applicablePeriod(applicablePeriod).revision(revision)</span>
+<span class="fc" id="L176">                .derived(derived).submittedDate(submittedDate)</span>
+<span class="fc" id="L177">                .submittedBy(submittedBy).created(created).createdBy(createdBy)</span>
+<span class="fc" id="L178">                .lastUpdated(lastUpdated).updatedBy(updatedBy);</span>
+<span class="fc" id="L179">    }</span>
+
+    public String response3sf() {
+<span class="fc" id="L182">        return SignificantFiguresFormat.getInstance().format(responseAsBigDecimal());</span>
+    }
+
+    public Answer question(Question q) {
+<span class="fc" id="L186">        question = q;</span>
+<span class="fc" id="L187">        return this;</span>
+    }
+
+    public Answer question(Q q) {
+<span class="fc" id="L191">        question = new Question().name(q.name());</span>
+<span class="fc" id="L192">        return this;</span>
+    }
+
+    public String response() {
+<span class="fc" id="L196">        return typeConversion(response);</span>
+    }
+
+    public BigDecimal responseAsBigDecimal() {
+        try {
+<span class="fc bfc" id="L201" title="All 4 branches covered.">            return response == null || response.trim().length() == 0</span>
+                    ? BigDecimal.ZERO : new BigDecimal(response);
+<span class="nc" id="L203">        } catch (NumberFormatException e) {</span>
+<span class="nc" id="L204">            LOGGER.warn(&quot;Cannot parse BigDecimal from {} for answer id {}&quot;, response, id);</span>
+<span class="nc" id="L205">            return BigDecimal.ZERO;</span>
+        }
+    }
+
+    public Answer response(String response) {
+<span class="fc" id="L210">        this.response = typeConversion(response);</span>
+<span class="fc" id="L211">        return this;</span>
+    }
+
+    private String typeConversion(String response) {
+        // TODO l10n of decimal separator
+        try {
+<span class="fc" id="L217">            String tmp = response.replaceAll(&quot;,&quot;, &quot;&quot;);</span>
+<span class="fc" id="L218">            Double.parseDouble(tmp);</span>
+<span class="fc" id="L219">            response = tmp;</span>
+<span class="fc" id="L220">        } catch (NullPointerException | NumberFormatException e) {</span>
+            ; // ok
+<span class="fc" id="L222">        }</span>
+<span class="fc" id="L223">        return response;</span>
+    }
+
+    public Answer response(BigDecimal decimal) {
+<span class="fc" id="L227">        response = decimal.toPlainString();</span>
+<span class="fc" id="L228">        return this;</span>
+    }
+
+    public Set&lt;SurveyReturn&gt; surveyReturns() {
+<span class="pc bpc" id="L232" title="1 of 2 branches missed.">        if (surveyReturns==null) {</span>
+<span class="fc" id="L233">            surveyReturns = new HashSet&lt;SurveyReturn&gt;();</span>
+        }
+<span class="fc" id="L235">        return surveyReturns;</span>
+    }
+
+    public Answer addSurveyReturn(SurveyReturn rtn) {
+<span class="fc" id="L239">        surveyReturns().add(rtn);</span>
+<span class="fc" id="L240">        return this;</span>
+    }
+
+    public Long getId() {
+<span class="fc" id="L244">        return id;</span>
+    }
+
+    public void setId(Long id) {
+<span class="fc" id="L248">        this.id = id;</span>
+<span class="fc" id="L249">    }</span>
+
+    public String getResponse() {
+<span class="fc" id="L252">        return response;</span>
+    }
+
+    public void setResponse(String response) {
+<span class="fc" id="L256">        this.response = response;</span>
+<span class="fc" id="L257">    }</span>
+
+    public String getStatus() {
+<span class="fc" id="L260">        return status;</span>
+    }
+
+    public void setStatus(String status) {
+<span class="fc" id="L264">        this.status = status;</span>
+<span class="fc" id="L265">    }</span>
+
+    public String getApplicablePeriod() {
+<span class="fc" id="L268">        return applicablePeriod;</span>
+    }
+
+    public void setApplicablePeriod(String applicablePeriod) {
+<span class="fc" id="L272">        this.applicablePeriod = applicablePeriod;</span>
+<span class="fc" id="L273">    }</span>
+
+    public Short getRevision() {
+<span class="fc" id="L276">        return revision;</span>
+    }
+
+    public void setRevision(Short revision) {
+<span class="nc" id="L280">        this.revision = revision;</span>
+<span class="nc" id="L281">    }</span>
+
+    public Date getSubmittedDate() {
+<span class="fc" id="L284">        return submittedDate;</span>
+    }
+
+    public void setSubmittedDate(Date submittedDate) {
+<span class="nc" id="L288">        this.submittedDate = submittedDate;</span>
+<span class="nc" id="L289">    }</span>
+
+    public String getSubmittedBy() {
+<span class="fc" id="L292">        return submittedBy;</span>
+    }
+
+    public void setSubmittedBy(String submittedBy) {
+<span class="nc" id="L296">        this.submittedBy = submittedBy;</span>
+<span class="nc" id="L297">    }</span>
+
+    public Date getCreated() {
+<span class="fc" id="L300">        return created;</span>
+    }
+
+    public void setCreated(Date created) {
+<span class="nc" id="L304">        this.created = created;</span>
+<span class="nc" id="L305">    }</span>
+
+    public String getCreatedBy() {
+<span class="fc" id="L308">        return createdBy;</span>
+    }
+
+    public void setCreatedBy(String createdBy) {
+<span class="nc" id="L312">        this.createdBy = createdBy;</span>
+<span class="nc" id="L313">    }</span>
+
+    public Date getLastUpdated() {
+<span class="fc" id="L316">        return lastUpdated;</span>
+    }
+
+    public void setLastUpdated(Date lastUpdated) {
+<span class="nc" id="L320">        this.lastUpdated = lastUpdated;</span>
+<span class="nc" id="L321">    }</span>
+
+    public String getUpdatedBy() {
+<span class="fc" id="L324">        return updatedBy;</span>
+    }
+
+    public void setUpdatedBy(String updatedBy) {
+<span class="nc" id="L328">        this.updatedBy = updatedBy;</span>
+<span class="nc" id="L329">    }</span>
+
+    public List&lt;Link&gt; getLinks() {
+<span class="fc" id="L332">        return links;</span>
+    }
+
+    public void setLinks(List&lt;Link&gt; links) {
+<span class="nc" id="L336">        this.links = links;</span>
+<span class="nc" id="L337">    }</span>
+
+    @Override
+    public String toString() {
+<span class="nc" id="L341">        return String.format(</span>
+                &quot;Answer [id=%s, response=%s, question=%s, status=%s, applicablePeriod=%s, revision=%s, derived=%s, submittedDate=%s, submittedBy=%s, created=%s, createdBy=%s, lastUpdated=%s, updatedBy=%s]&quot;,
+<span class="nc" id="L343">                id, response, question.name(), status, applicablePeriod, revision,</span>
+<span class="nc" id="L344">                derived, submittedDate, submittedBy, created, createdBy,</span>
+                lastUpdated, updatedBy);
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.2.201808211720</span></div></body></html>

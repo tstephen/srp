@@ -1,0 +1,252 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>InterventionTypeController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Marginal Abatement Cost Curves</a> &gt; <a href="index.source.html" class="el_package">digital.srp.macc.web</a> &gt; <span class="el_source">InterventionTypeController.java</span></div><h1>InterventionTypeController.java</h1><pre class="source lang-java linenums">/*******************************************************************************
+ * Copyright 2015, 2017 Tim Stephenson and contributors
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *******************************************************************************/
+package digital.srp.macc.web;
+
+import java.io.IOException;
+import java.io.StringReader;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.hateoas.Link;
+import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.multipart.MultipartFile;
+
+import com.fasterxml.jackson.annotation.JsonView;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import digital.srp.macc.internal.CsvImporter;
+import digital.srp.macc.model.InterventionType;
+import digital.srp.macc.repositories.InterventionTypeRepository;
+import digital.srp.macc.views.InterventionTypeViews;
+
+/**
+ * REST endpoint for accessing {@link InterventionType}
+ *
+ * @author Tim Stephenson
+ */
+@Controller
+@RequestMapping(value = &quot;/{tenantId}/intervention-types&quot;)
+<span class="nc" id="L57">public class InterventionTypeController {</span>
+
+<span class="nc" id="L59">    private static final Logger LOGGER = LoggerFactory</span>
+<span class="nc" id="L60">            .getLogger(InterventionTypeController.class);</span>
+
+    @Autowired
+    private InterventionTypeRepository interventionTypeRepo;
+
+    @Autowired
+    private ObjectMapper objectMapper;
+
+    /**
+     * Imports JSON representation of interventions.
+     *
+     * &lt;p&gt;
+     * This is a handy link: http://shancarter.github.io/mr-data-converter/
+     *
+     * @param file
+     *            A file posted in a multi-part request
+     * @return The meta data of the added model
+     * @throws IOException
+     *             If cannot parse the JSON.
+     */
+    @RequestMapping(value = &quot;/upload&quot;, method = RequestMethod.POST)
+    public @ResponseBody Iterable&lt;InterventionType&gt; handleFileUpload(
+            @PathVariable(&quot;tenantId&quot;) String tenantId,
+            @RequestParam(value = &quot;file&quot;, required = true) MultipartFile file)
+            throws IOException {
+<span class="nc" id="L85">        LOGGER.info(String</span>
+<span class="nc" id="L86">                .format(&quot;Uploading interventions for: %1$s&quot;, tenantId));</span>
+<span class="nc" id="L87">        String content = new String(file.getBytes());</span>
+
+<span class="nc" id="L89">        List&lt;InterventionType&gt; list = objectMapper.readValue(content,</span>
+<span class="nc" id="L90">                new TypeReference&lt;List&lt;InterventionType&gt;&gt;() {</span>
+                });
+<span class="nc" id="L92">        LOGGER.info(String.format(&quot;  found %1$d interventions&quot;, list.size()));</span>
+<span class="nc bnc" id="L93" title="All 2 branches missed.">        for (InterventionType message : list) {</span>
+<span class="nc" id="L94">            message.setTenantId(tenantId);</span>
+<span class="nc" id="L95">        }</span>
+
+<span class="nc" id="L97">        Iterable&lt;InterventionType&gt; result = interventionTypeRepo.save(list);</span>
+<span class="nc" id="L98">        LOGGER.info(&quot;  saved.&quot;);</span>
+<span class="nc" id="L99">        return result;</span>
+    }
+
+    /**
+     * Imports CSV representation of intervention types.
+     *
+     * @param file
+     *            A file posted in a multi-part request
+     * @return The meta data of the added model
+     * @throws IOException
+     *             If cannot parse the CSV.
+     */
+    @RequestMapping(value = &quot;/uploadcsv&quot;, method = RequestMethod.POST)
+    public @ResponseBody Iterable&lt;InterventionType&gt; handleCsvFileUpload(
+            @PathVariable(&quot;tenantId&quot;) String tenantId,
+            @RequestParam(value = &quot;file&quot;, required = true) MultipartFile file)
+            throws IOException {
+<span class="nc" id="L116">        LOGGER.info(String.format(&quot;Uploading CSV interventionTypes for: %1$s&quot;,</span>
+                tenantId));
+<span class="nc" id="L118">        String content = new String(file.getBytes());</span>
+<span class="nc" id="L119">        List&lt;InterventionType&gt; list = new CsvImporter().readInterventionTypes(</span>
+                new StringReader(
+<span class="nc" id="L121">                content), content.substring(0, content.indexOf('\n'))</span>
+<span class="nc" id="L122">                .split(&quot;,&quot;));</span>
+<span class="nc" id="L123">        LOGGER.info(String.format(&quot;  found %1$d interventionTypes&quot;, list.size()));</span>
+<span class="nc bnc" id="L124" title="All 2 branches missed.">        for (InterventionType interventionType : list) {</span>
+<span class="nc" id="L125">            interventionType.setTenantId(tenantId);</span>
+<span class="nc" id="L126">        }</span>
+
+<span class="nc" id="L128">        Iterable&lt;InterventionType&gt; result = interventionTypeRepo.save(list);</span>
+<span class="nc" id="L129">        LOGGER.info(&quot;  saved.&quot;);</span>
+<span class="nc" id="L130">        return result;</span>
+    }
+
+    /**
+     * Return just the interventions for a specific tenant.
+     *
+     * @return interventions for that tenant.
+     */
+    @RequestMapping(value = &quot;/&quot;, method = RequestMethod.GET, produces = &quot;application/json&quot;)
+    public @ResponseBody List&lt;InterventionType&gt; listForTenant(
+            @PathVariable(&quot;tenantId&quot;) String tenantId,
+            @RequestParam(value = &quot;page&quot;, required = false) Integer page,
+            @RequestParam(value = &quot;limit&quot;, required = false) Integer limit) {
+<span class="nc" id="L143">        LOGGER.info(String.format(&quot;List interventions for tenant %1$s&quot;,</span>
+                tenantId));
+
+        List&lt;InterventionType&gt; list;
+<span class="nc bnc" id="L147" title="All 2 branches missed.">        if (limit == null) {</span>
+<span class="nc" id="L148">            list = interventionTypeRepo.findAllForTenant(tenantId);</span>
+        } else {
+<span class="nc bnc" id="L150" title="All 2 branches missed.">            Pageable pageable = new PageRequest(page == null ? 0 : page, limit);</span>
+<span class="nc" id="L151">            list = interventionTypeRepo.findPageForTenant(tenantId, pageable);</span>
+        }
+<span class="nc" id="L153">        LOGGER.info(String.format(&quot;Found %1$s intervention types&quot;, list.size()));</span>
+
+<span class="nc" id="L155">        return addLinks(list);</span>
+    }
+
+    /**
+     * @return The specified intervention type.
+     */
+    @RequestMapping(value = &quot;/{id}&quot;, method = RequestMethod.GET)
+    @JsonView(InterventionTypeViews.Detailed.class)
+    public @ResponseBody InterventionType findById(
+            @PathVariable(&quot;id&quot;) Long interventionTypeId) {
+<span class="nc" id="L165">        LOGGER.info(String.format(&quot;findById %1$s&quot;, interventionTypeId));</span>
+
+<span class="nc" id="L167">        InterventionType interventionType = interventionTypeRepo.findOne(interventionTypeId);</span>
+
+<span class="nc" id="L169">        return addLinks(interventionType);</span>
+    }
+
+    /**
+     * Export all interventionTypes for the tenant.
+     *
+     * @return interventionTypes for that tenant.
+     */
+    @JsonView(InterventionTypeViews.Detailed.class)
+    @RequestMapping(value = &quot;/&quot;, method = RequestMethod.GET, produces = &quot;text/csv&quot;)
+    public @ResponseBody List&lt;InterventionType&gt; exportAsCsv(
+            @PathVariable(&quot;tenantId&quot;) String tenantId,
+            @RequestParam(value = &quot;page&quot;, required = false) Integer page,
+            @RequestParam(value = &quot;limit&quot;, required = false) Integer limit) {
+<span class="nc" id="L183">        LOGGER.info(String.format(&quot;Export interventions for tenant %1$s&quot;,</span>
+                tenantId));
+
+        List&lt;InterventionType&gt; list;
+<span class="nc bnc" id="L187" title="All 2 branches missed.">        if (limit == null) {</span>
+<span class="nc" id="L188">            list = interventionTypeRepo.findAllForTenant(tenantId);</span>
+        } else {
+<span class="nc bnc" id="L190" title="All 2 branches missed.">            Pageable pageable = new PageRequest(page == null ? 0 : page, limit);</span>
+<span class="nc" id="L191">            list = interventionTypeRepo.findPageForTenant(tenantId, pageable);</span>
+        }
+<span class="nc" id="L193">        LOGGER.info(String.format(&quot;Found %1$s interventions&quot;, list.size()));</span>
+
+<span class="nc" id="L195">        return list;</span>
+    }
+
+    /**
+     * Return just the matching interventions for a specific tenant.
+     *
+     * @param tenantId
+     * @status Comma separated list of status to include.
+     * @return interventions for that tenant.
+     */
+    @JsonView(InterventionTypeViews.Summary.class)
+    @RequestMapping(value = &quot;/status/{status}&quot;, method = RequestMethod.GET)
+    public @ResponseBody List&lt;InterventionType&gt; findByStatusForTenant(
+            @PathVariable(&quot;tenantId&quot;) String tenantId,
+            @PathVariable(&quot;status&quot;) String status) {
+<span class="nc" id="L210">        LOGGER.info(String.format(</span>
+                &quot;List interventions for tenant %1$s with status %2$s&quot;,
+                tenantId, status));
+
+<span class="nc" id="L214">        List&lt;InterventionType&gt; list = interventionTypeRepo</span>
+<span class="nc" id="L215">                .findByStatusForTenant(tenantId, status);</span>
+<span class="nc" id="L216">        LOGGER.info(String.format(&quot;Found %1$s interventions&quot;, list.size()));</span>
+
+<span class="nc" id="L218">        return addLinks(list);</span>
+    }
+
+    /**
+     * Update an existing intervention type.
+     */
+    @ResponseStatus(value = HttpStatus.NO_CONTENT)
+    @RequestMapping(value = &quot;/{id}&quot;, method = RequestMethod.PUT, consumes = { &quot;application/json&quot; })
+    public @ResponseBody void update(@PathVariable(&quot;tenantId&quot;) String tenantId,
+            @PathVariable(&quot;id&quot;) Long interventionTypeId,
+            @RequestBody InterventionType updatedIntvnType) {
+<span class="nc" id="L229">        InterventionType intvnType = interventionTypeRepo.findOne(interventionTypeId);</span>
+
+<span class="nc" id="L231">        BeanUtils.copyProperties(updatedIntvnType, intvnType, &quot;id&quot;);</span>
+<span class="nc" id="L232">        intvnType.setTenantId(tenantId);</span>
+<span class="nc" id="L233">        interventionTypeRepo.save(intvnType);</span>
+<span class="nc" id="L234">    }</span>
+
+    private List&lt;InterventionType&gt; addLinks(
+            final List&lt;InterventionType&gt; interventionTypes) {
+<span class="nc bnc" id="L238" title="All 2 branches missed.">        for (InterventionType intType : interventionTypes) {</span>
+<span class="nc" id="L239">            addLinks(intType);</span>
+<span class="nc" id="L240">        }</span>
+<span class="nc" id="L241">        return interventionTypes;</span>
+    }
+
+    private InterventionType addLinks(final InterventionType interventionType) {
+<span class="nc" id="L245">        List&lt;Link&gt; links = new ArrayList&lt;Link&gt;();</span>
+<span class="nc" id="L246">        links.add(new Link(String.format(&quot;/%1$s/intervention-types/%2$d&quot;, interventionType.getTenantId(), interventionType.getId())));</span>
+
+<span class="nc" id="L248">        interventionType.setLinks(links);</span>
+<span class="nc" id="L249">        return interventionType;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.2.201808211720</span></div></body></html>

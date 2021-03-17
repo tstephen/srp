@@ -1,0 +1,753 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>InterventionType.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Marginal Abatement Cost Curves</a> &gt; <a href="index.source.html" class="el_package">digital.srp.macc.model</a> &gt; <span class="el_source">InterventionType.java</span></div><h1>InterventionType.java</h1><pre class="source lang-java linenums">/*******************************************************************************
+ * Copyright 2015, 2017 Tim Stephenson and contributors
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *******************************************************************************/
+package digital.srp.macc.model;
+
+import java.math.BigDecimal;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+
+import javax.persistence.Basic;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Lob;
+import javax.persistence.Table;
+import javax.persistence.Transient;
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
+import javax.xml.bind.annotation.XmlElement;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.hateoas.Link;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonView;
+
+import digital.srp.macc.maths.Finance;
+import digital.srp.macc.views.InterventionTypeViews;
+import digital.srp.macc.views.InterventionViews;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+
+/**
+ * An action or related set of actions aimed at providing Carbon Abatement or
+ * other sustainability benefit.
+ *
+ * @author Tim Stephenson
+ */
+<span class="pc bnc" id="L57" title="All 354 branches missed.">@Data</span>
+@Entity
+@Table(name = &quot;TR_INTVN_TYPE&quot;)
+<span class="nc" id="L60">@AllArgsConstructor</span>
+public class InterventionType implements CsvSerializable {
+
+    private static final String DEFAULT_FURTHER_INFO_BASE_URL = &quot;http://srp.digital/interventions&quot;;
+
+    private static final long serialVersionUID = -7820188383611260653L;
+
+<span class="fc" id="L67">    private static final Logger LOGGER = LoggerFactory</span>
+<span class="fc" id="L68">            .getLogger(InterventionType.class);</span>
+
+    @Id
+    @Column(name = &quot;id&quot;)
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    @JsonProperty
+    @JsonView({ InterventionTypeViews.Summary.class })
+<span class="fc" id="L75">    private Long id;</span>
+
+    @JsonProperty
+    @JsonView({ InterventionTypeViews.Summary.class, InterventionViews.Summary.class })
+    @NotNull
+    @Column(name = &quot;name&quot;)
+<span class="fc" id="L81">    private String name;</span>
+
+    @JsonProperty
+    @JsonView({ InterventionTypeViews.Summary.class, InterventionViews.Summary.class })
+    @Column(name = &quot;description&quot;)
+    @Lob
+<span class="fc" id="L87">    private String description;</span>
+
+    @JsonProperty
+    @JsonView({ InterventionTypeViews.Summary.class })
+    @Column(name = &quot;existing&quot;)
+<span class="fc" id="L92">    private boolean existing;</span>
+
+    @JsonProperty
+    @JsonView({ InterventionTypeViews.Summary.class, InterventionViews.Summary.class })
+    @Column(name = &quot;status&quot;)
+<span class="fc" id="L97">    private String status;</span>
+
+    @JsonProperty
+    @JsonView({ InterventionTypeViews.Summary.class })
+    @Column(name = &quot;data_status&quot;)
+<span class="fc" id="L102">    private String dataStatus;</span>
+
+    @JsonProperty
+    @JsonView({ InterventionTypeViews.Summary.class })
+    @Column(name = &quot;analysis_status&quot;)
+<span class="fc" id="L107">    private String analysisStatus;</span>
+
+    @JsonProperty
+    @JsonView({ InterventionTypeViews.Summary.class })
+    @Column(name = &quot;strategic_focus&quot;)
+<span class="fc" id="L112">    private String strategicFocus;</span>
+
+    @JsonProperty
+    @JsonView({ InterventionTypeViews.Summary.class })
+    @Column(name = &quot;tactical_driver&quot;)
+<span class="fc" id="L117">    private String tacticalDriver;</span>
+
+    @JsonProperty
+    @JsonView({ InterventionTypeViews.Summary.class })
+    @Column(name = &quot;operational_sub_category&quot;)
+<span class="fc" id="L122">    private String operationalSubCategory;</span>
+
+    @JsonProperty
+    @JsonView({ InterventionTypeViews.Summary.class, InterventionViews.Summary.class })
+    @Column(name = &quot;classification&quot;)
+<span class="fc" id="L127">    private String classification;</span>
+
+    @JsonProperty
+    @JsonView({ InterventionTypeViews.Summary.class })
+    @Column(name = &quot;cross_organisation&quot;)
+<span class="fc" id="L132">    private boolean crossOrganisation;</span>
+
+    @JsonProperty
+    @JsonView({ InterventionTypeViews.Summary.class })
+    @Column(name = &quot;note&quot;)
+    @Lob
+<span class="fc" id="L138">    private String note;</span>
+
+    @JsonProperty
+    @JsonView({ InterventionTypeViews.Summary.class })
+    @Column(name = &quot;client_note&quot;)
+    @Lob
+<span class="fc" id="L144">    private String clientNote;</span>
+
+    /**
+     * The year this intervention's analysis was last updated.
+     */
+    @JsonProperty
+    @JsonView({ InterventionTypeViews.Summary.class, InterventionViews.Summary.class })
+    @Min(1970)
+    @Max(2099)
+    @Column(name = &quot;modelling_year&quot;)
+    private int modellingYear;
+
+    /**
+     * Lifetime time (Years)
+     */
+    @JsonProperty
+    @JsonView({ InterventionTypeViews.Summary.class, InterventionViews.Summary.class })
+    @Column(name = &quot;LIFETIME&quot;, nullable = true)
+    @NotNull
+<span class="fc" id="L163">    private Short lifetime;</span>
+
+    /**
+     * Lifetime time (Years)
+     */
+    @JsonProperty
+    @JsonView({ InterventionTypeViews.Summary.class })
+    @Column(name = &quot;LEAD_TIME&quot;)
+<span class="fc" id="L171">    private int leadTime;</span>
+
+    /**
+     * Percentage of suitable organisations predicted to employ this
+     * intervention.
+     */
+    @JsonProperty
+    @JsonView({ InterventionTypeViews.Summary.class, InterventionViews.Summary.class })
+    @Min(value = 0)
+    @Max(100)
+    @Column(name = &quot;UPTAKE&quot;, nullable = true)
+    @NotNull
+<span class="fc" id="L183">    private Short uptake;</span>
+
+    @JsonProperty
+    @JsonView({ InterventionTypeViews.Summary.class, InterventionViews.Summary.class })
+    @Min(value = 0)
+    @Max(100)
+    @Column(name = &quot;SCALING&quot;, nullable = true)
+    @NotNull
+<span class="fc" id="L191">    private Float scaling;</span>
+
+    /**
+     * Confidence factor for this intervention.
+     */
+<span class="pc" id="L196">    @JsonProperty</span>
+    @JsonView({ InterventionTypeViews.Summary.class, InterventionViews.Summary.class })
+    @Min(value = 0)
+    @Max(100)
+    @Column(name = &quot;confidence&quot;)
+<span class="pc" id="L201">    private Short confidence = 50;</span>
+
+    @JsonProperty
+    @JsonView({ InterventionTypeViews.Summary.class, InterventionViews.Detailed.class })
+    @Column(name = &quot;further_info&quot;)
+    private String furtherInfo;
+
+    @Basic
+    @Column(name = &quot;overlapping_interventions&quot;)
+    @Lob
+<span class="fc" id="L211">    private String overlappingInterventions;</span>
+
+    @JsonProperty
+    @JsonView({ InterventionTypeViews.Summary.class })
+    @Transient
+    private double costPerTonneCo2e;
+
+    @JsonProperty
+    @JsonView({ InterventionTypeViews.Summary.class })
+    @Column(name = &quot;annual_cash_inflows&quot;)
+<span class="fc" id="L221">    private BigDecimal annualCashInflows;</span>
+
+    @JsonProperty
+    @JsonView({ InterventionTypeViews.Summary.class })
+    @Column(name = &quot;annual_cash_inflowsts&quot;)
+    @Lob
+<span class="fc" id="L227">    private String annualCashInflowsTS;</span>
+
+    @JsonProperty
+    @JsonView({ InterventionTypeViews.Summary.class, InterventionViews.Detailed.class })
+    @Column(name = &quot;cash_outflows_up_front&quot;)
+    private BigDecimal cashOutflowsUpFront;
+
+    @JsonProperty
+    @JsonView({ InterventionTypeViews.Summary.class })
+    @Column(name = &quot;annual_cash_outflows&quot;)
+<span class="fc" id="L237">    private BigDecimal annualCashOutflows;</span>
+
+    @JsonProperty
+    @JsonView({ InterventionTypeViews.Summary.class })
+    @Column(name = &quot;annual_cash_outflowsts&quot;)
+    @Lob
+<span class="fc" id="L243">    private String annualCashOutflowsTS;</span>
+
+    @JsonProperty
+    @JsonView({ InterventionTypeViews.Summary.class })
+    @Transient
+    private double totalNpv;
+
+    @JsonProperty
+    @JsonView({ InterventionTypeViews.Summary.class })
+    @Column(name = &quot;TONNES_CO2E_SAVED_PA&quot;, nullable = true)
+<span class="fc" id="L253">    private BigDecimal annualTonnesCo2eSaved;</span>
+
+    @JsonProperty
+    @JsonView({ InterventionTypeViews.Summary.class })
+    @Column(name = &quot;annual_tonnes_co2e_savedts&quot;)
+    @Lob
+<span class="fc" id="L259">    private String annualTonnesCo2eSavedTS;</span>
+
+    @JsonProperty
+    @JsonView({ InterventionTypeViews.Summary.class })
+    @Basic
+    @Column(name = &quot;UNIT_GAS_SAVED_PA&quot;, nullable = true)
+<span class="fc" id="L265">    private BigDecimal annualGasSaved;</span>
+
+    @JsonProperty
+    @JsonView({ InterventionTypeViews.Summary.class })
+    @Column(name = &quot;UNIT_ELEC_SAVED_PA&quot;, nullable = true)
+<span class="fc" id="L270">    private BigDecimal annualElecSaved;</span>
+
+    @JsonProperty
+    @JsonView({ InterventionTypeViews.Summary.class })
+    @Column(name = &quot;TONNES_CO2E_SAVED&quot;, nullable = true)
+    private Integer tonnesCo2eSaved;
+
+    @JsonProperty
+    @JsonView({ InterventionTypeViews.Summary.class })
+    @Column(name = &quot;UNIT_COUNT&quot;, nullable = true)
+<span class="fc" id="L280">    private Integer unitCount;</span>
+
+    @JsonProperty
+    @JsonView({ InterventionTypeViews.Summary.class })
+    @Column(name = &quot;UNIT&quot;, nullable = true)
+<span class="fc" id="L285">    private String unit;</span>
+
+    @JsonProperty
+    @JsonView({ InterventionTypeViews.Summary.class })
+    @Column(name = &quot;UNIT_DESC&quot;, nullable = true)
+    @Lob
+<span class="fc" id="L291">    private String unitDescription;</span>
+
+    @JsonProperty
+    @JsonView({ InterventionTypeViews.Summary.class })
+    @Column(name = &quot;tenant_id&quot;)
+<span class="fc" id="L296">    private String tenantId;</span>
+
+    @JsonProperty
+    @JsonView({ InterventionTypeViews.Summary.class, InterventionViews.Detailed.class })
+    @Column(name = &quot;TONNES_CO2E_SAVED_TY&quot;, nullable = true)
+    @Transient
+    private BigDecimal tonnesCo2eSavedTargetYear;
+
+    @Transient
+<span class="fc" id="L305">    private ModelParameter targetYear;</span>
+
+    @Transient
+<span class="fc" id="L308">    private ModelParameter gasPrice;</span>
+
+    @Transient
+<span class="fc" id="L311">    private ModelParameter gasCIntensity;</span>
+
+    @Transient
+<span class="fc" id="L314">    private ModelParameter elecPrice;</span>
+
+    @Transient
+<span class="fc" id="L317">    private ModelParameter elecCIntensity;</span>
+
+    @Value(&quot;${srp.interventions.baseurl:http://srp.digital/interventions}&quot;)
+    private String furtherInfoBaseUrl;
+
+    @Transient
+    @XmlElement(name = &quot;link&quot;, namespace = Link.ATOM_NAMESPACE)
+    @JsonProperty(&quot;links&quot;)
+    @JsonView({ InterventionTypeViews.Summary.class })
+<span class="fc" id="L326">    private List&lt;Link&gt; links;</span>
+
+<span class="fc" id="L328">    public InterventionType() {</span>
+<span class="fc" id="L329">        setTargetYear(new ModelParameter(&quot;targetYear&quot;, new BigDecimal(2020)));</span>
+<span class="fc" id="L330">        setGasPrice(new ModelParameter(</span>
+                &quot;gasPrice&quot;,
+                &quot;2.630438796,2.6758257306,2.6927658257,2.704685584,2.8355425019,2.9457682014,3.055993901,3.1662,3.2764,3.3867,3.4393483324,3.4393483324,3.4393483324,3.44938211,3.4443652212,3.4443652212,3.4443652212,3.4443652212,3.4443652212,3.4443652212,3.4443652212,3.4443652212,3.4443652212,3.4443652212,3.4443652212,3.4443652212,3.4443652212,3.4443652212,3.4443652212,3.4443652212,3.4443652212,3.4443652212,3.4443652212,3.4443652212,3.4443652212&quot;));
+<span class="fc" id="L333">        setGasCIntensity(new ModelParameter(&quot;gasCIntensity&quot;,</span>
+<span class="fc" id="L334">                BigDecimal.valueOf(0.2093).setScale(8)));</span>
+<span class="fc" id="L335">        setElecPrice(new ModelParameter(</span>
+                &quot;elecPrice&quot;,
+                &quot;10.778497544,11.3254211661,11.2764200234,11.9594510085,12.4989878402,13.0661699331,13.3246184308,13.5857994648,14.4215706393,14.994396824,15.0842780665,15.1942317008,14.7130438837,14.6465132209,14.7868165098,14.7868165098,14.7868165098,14.7868165098,14.7868165098,14.7868165098,14.7868165098,14.7868165098,14.7868165098,14.7868165098,14.7868165098,14.7868165098,14.7868165098,14.7868165098,14.7868165098,14.7868165098,14.7868165098,14.7868165098,14.7868165098,14.7868165098,14.7868165098&quot;));
+<span class="fc" id="L338">        setElecCIntensity(new ModelParameter(</span>
+                &quot;elecCIntensity&quot;,
+                &quot;0.471625378,0.4033756698,0.3900141326,0.3664321951,0.3264792461,0.2875202196,0.2647940548,0.2254603806,0.2367575244,0.2218887201,0.1972458379,0.1950581396,0.1636321693,0.1430514555,0.1379336593,0.1301656179,0.122843638,0.1056435916,0.104390507,0.086765916,0.0850489651,0.0742383586,0.0664869042,0.0674138255,0.0629367669,0.0559701421,0.0554960843,0.0493361816,0.0436137087,0.0442696444,0.0403077739,0.0373145099,0.0377322418,0.0341612201,0.0338541865&quot;));
+<span class="fc" id="L341">    }</span>
+
+    /** A sanitised version of the name for use as an identifier. */
+    public String getSlug() {
+<span class="nc" id="L345">        return getName().toLowerCase().replaceAll(&quot;[\\s-&amp;/]&quot;, &quot;_&quot;);</span>
+    }
+
+    public int getModellingYear() {
+<span class="fc bfc" id="L349" title="All 2 branches covered.">        if (modellingYear == 0) {</span>
+<span class="fc" id="L350">            modellingYear = 2015;</span>
+        }
+<span class="fc" id="L352">        return modellingYear;</span>
+    }
+
+    @JsonProperty
+    @JsonView({ InterventionTypeViews.Summary.class })
+    @Transient
+    public List&lt;BigDecimal&gt; getAnnualCashOutflowsTimeSeries() {
+<span class="fc" id="L359">        return new TimeSeries(annualCashOutflowsTS).asList();</span>
+    }
+
+    @JsonProperty
+    @JsonView({ InterventionTypeViews.Summary.class })
+    @Transient
+    public void setAnnualCashOutflowsTimeSeries(List&lt;BigDecimal&gt; values) {
+<span class="nc" id="L366">        annualCashOutflowsTS = TimeSeries.asString(values);</span>
+<span class="nc" id="L367">    }</span>
+
+    @JsonProperty
+    @JsonView({ InterventionTypeViews.Summary.class })
+    @Transient
+    public List&lt;BigDecimal&gt; getAnnualCashInflowsTimeSeries() {
+<span class="fc" id="L373">        return new TimeSeries(annualCashInflowsTS).asList();</span>
+    }
+
+    @JsonProperty
+    @JsonView({ InterventionTypeViews.Summary.class })
+    @Transient
+    public void setAnnualCashInflowsTimeSeries(List&lt;BigDecimal&gt; values) {
+<span class="nc" id="L380">        annualCashInflowsTS = TimeSeries.asString(values);</span>
+<span class="nc" id="L381">    }</span>
+
+    @JsonProperty
+    @JsonView({ InterventionTypeViews.Summary.class })
+    @Transient
+    public List&lt;BigDecimal&gt; getAnnualTonnesCo2eSavedTimeSeries() {
+<span class="fc" id="L387">        return new TimeSeries(annualTonnesCo2eSavedTS).asList();</span>
+    }
+
+    @JsonProperty
+    @JsonView({ InterventionTypeViews.Summary.class })
+    @Transient
+    public void setAnnualTonnesCo2eSavedTimeSeries(List&lt;BigDecimal&gt; values) {
+<span class="nc" id="L394">        annualTonnesCo2eSavedTS = TimeSeries.asString(values);</span>
+<span class="nc" id="L395">    }</span>
+
+    @JsonProperty
+    @JsonView({ InterventionTypeViews.Summary.class })
+    public BigDecimal getCashOutflowsUpFront() {
+<span class="fc bfc" id="L400" title="All 2 branches covered.">        return cashOutflowsUpFront == null ? Finance.ZERO_BIG_DECIMAL</span>
+                : cashOutflowsUpFront;
+    }
+
+    @JsonProperty
+    @JsonView({ InterventionTypeViews.Summary.class })
+    public BigDecimal getCashOutflowsUpFrontNational() {
+<span class="fc" id="L407">        return getCashOutflowsUpFront().multiply(getUptakeFactor()).divide(</span>
+<span class="fc" id="L408">                getScaleFactor(), Finance.ROUND_MODE);</span>
+    }
+
+    public BigDecimal getAnnualCashOutflows(int year) {
+<span class="fc bfc" id="L412" title="All 2 branches covered.">        if (getAnnualCashOutflowsTimeSeries() != null</span>
+<span class="fc bfc" id="L413" title="All 2 branches covered.">                &amp;&amp; getAnnualCashOutflowsTimeSeries().size() &gt; year) {</span>
+<span class="fc" id="L414">            return getAnnualCashOutflowsTimeSeries().get(year);</span>
+<span class="fc bfc" id="L415" title="All 2 branches covered.">        } else if (annualCashOutflows == null) {</span>
+<span class="fc" id="L416">            return Finance.ZERO_BIG_DECIMAL;</span>
+        } else {
+<span class="fc" id="L418">            return annualCashOutflows;</span>
+        }
+    }
+
+    @JsonProperty
+    @JsonView({ InterventionTypeViews.Summary.class })
+    public BigDecimal getAnnualCashOutflowsNationalTargetYear() {
+<span class="fc" id="L425">        return getAnnualCashOutflows(getTargetYearIndex()).multiply(</span>
+<span class="fc" id="L426">                getUptakeFactor()).divide(getScaleFactor(), Finance.ROUND_MODE);</span>
+    }
+
+    @JsonProperty
+    @JsonView({ InterventionTypeViews.Summary.class })
+    public BigDecimal getAnnualCashOutflowsTargetYear() {
+<span class="nc" id="L432">        return getAnnualCashOutflows(getTargetYearIndex());</span>
+    }
+
+    public BigDecimal getAnnualCashInflows(int year) {
+<span class="fc bfc" id="L436" title="All 4 branches covered.">        if (annualGasSaved != null || annualElecSaved != null) {</span>
+<span class="fc bfc" id="L437" title="All 2 branches covered.">            BigDecimal fromGas = annualGasSaved == null ? Finance.ZERO_BIG_DECIMAL</span>
+<span class="fc" id="L438">                    : getAnnualCashInflowsFromGas(year);</span>
+<span class="fc bfc" id="L439" title="All 2 branches covered.">            BigDecimal fromElec = annualElecSaved == null ? Finance.ZERO_BIG_DECIMAL</span>
+<span class="fc" id="L440">                    : getAnnualCashInflowsFromElec(year);</span>
+<span class="fc" id="L441">            return fromGas.add(fromElec);</span>
+<span class="fc bfc" id="L442" title="All 2 branches covered.">        } else if (getAnnualCashInflowsTimeSeries() != null</span>
+<span class="fc bfc" id="L443" title="All 2 branches covered.">                &amp;&amp; getAnnualCashOutflowsTimeSeries().size() &gt;= year) {</span>
+<span class="fc" id="L444">            return getAnnualCashInflowsTimeSeries().get(year);</span>
+<span class="fc bfc" id="L445" title="All 2 branches covered.">        } else if (annualCashInflows == null) {</span>
+<span class="fc" id="L446">            return Finance.ZERO_BIG_DECIMAL;</span>
+<span class="fc bfc" id="L447" title="All 2 branches covered.">        } else if (getLeadTime() &gt; year) {</span>
+<span class="fc" id="L448">            return Finance.ZERO_BIG_DECIMAL;</span>
+        } else {
+<span class="fc" id="L450">            return annualCashInflows;</span>
+        }
+    }
+
+    @JsonProperty
+    @JsonView({ InterventionTypeViews.Summary.class })
+    public BigDecimal getAnnualCashInflowsNationalTargetYear() {
+<span class="fc" id="L457">        return getAnnualCashInflows(getTargetYearIndex()).multiply(</span>
+<span class="fc" id="L458">                getUptakeFactor()).divide(getScaleFactor(), Finance.ROUND_MODE);</span>
+    }
+
+    @JsonProperty
+    @JsonView({ InterventionTypeViews.Summary.class })
+    public BigDecimal getAnnualCashInflowsTargetYear() {
+<span class="nc" id="L464">        return getAnnualCashInflows(getTargetYearIndex());</span>
+    }
+
+    public BigDecimal getAnnualCashInflowsFromGas(int year) {
+<span class="pc bpc" id="L468" title="1 of 2 branches missed.">        if (gasPrice == null) {</span>
+<span class="nc" id="L469">            throw new IllegalStateException(</span>
+                    &quot;Must inject gasPrice before calling getAnnualCashInflowsFromGas&quot;);
+        }
+<span class="fc" id="L472">        return gasPrice.getValueTimeSeries().get(year)</span>
+<span class="fc" id="L473">                .divide(new BigDecimal(100)).multiply(annualGasSaved);</span>
+    }
+
+    public BigDecimal getAnnualCashInflowsFromElec(int year) {
+<span class="pc bpc" id="L477" title="1 of 2 branches missed.">        if (elecPrice == null) {</span>
+<span class="nc" id="L478">            throw new IllegalStateException(</span>
+                    &quot;Must inject elecPrice before calling getAnnualCashInflowsFromElec&quot;);
+        }
+<span class="fc" id="L481">        return elecPrice.getValueTimeSeries().get(year)</span>
+<span class="fc" id="L482">                .divide(new BigDecimal(100), Finance.ROUND_MODE)</span>
+<span class="fc" id="L483">                .multiply(annualElecSaved);</span>
+    }
+
+    /**
+     * @return Total of all cash outflows adjusted for uptake in future value
+     *         terms.
+     */
+    @JsonProperty
+    @JsonView({ InterventionTypeViews.Summary.class })
+    public Long getTotalCashOutflows() {
+        try {
+<span class="fc" id="L494">            BigDecimal total = new BigDecimal(&quot;0.00&quot;);</span>
+<span class="fc bfc" id="L495" title="All 2 branches covered.">            for (int i = 0; i &lt; getLifetime(); i++) {</span>
+<span class="fc" id="L496">                total = total.add(getAnnualCashOutflows(i));</span>
+            }
+<span class="fc" id="L498">            total = total.add(cashOutflowsUpFront);</span>
+<span class="fc" id="L499">            return total.multiply(getUptakeFactor()).longValue();</span>
+<span class="fc" id="L500">        } catch (NullPointerException e) {</span>
+<span class="fc" id="L501">            LOGGER.error(&quot;NullPointerException in getTotalNpv&quot;, e);</span>
+<span class="fc" id="L502">            return 0l;</span>
+        }
+    }
+
+    @JsonProperty
+    @JsonView({ InterventionTypeViews.Summary.class })
+    public Long getTotalCashInflows() {
+        try {
+<span class="fc" id="L510">            BigDecimal total = new BigDecimal(&quot;0.00&quot;);</span>
+<span class="fc bfc" id="L511" title="All 2 branches covered.">            for (int i = 0; i &lt; getLifetime(); i++) {</span>
+<span class="fc" id="L512">                total = total.add(getAnnualCashInflows(i));</span>
+            }
+<span class="fc" id="L514">            return total.multiply(getUptakeFactor()).longValue();</span>
+<span class="nc" id="L515">        } catch (NullPointerException e) {</span>
+<span class="nc" id="L516">            LOGGER.error(&quot;NullPointerException in getTotalNpv&quot;, e);</span>
+<span class="nc" id="L517">            return 0l;</span>
+        }
+    }
+
+    @JsonProperty
+    @JsonView({ InterventionTypeViews.Summary.class })
+    public Long getMeanCashInflows() {
+        try {
+<span class="fc" id="L525">            return (long) Math.round((getTotalCashInflows() / getLifetime()));</span>
+<span class="nc" id="L526">        } catch (NullPointerException e) {</span>
+<span class="nc" id="L527">            LOGGER.error(&quot;NullPointerException in getTotalNpv&quot;, e);</span>
+<span class="nc" id="L528">            return 0l;</span>
+        }
+    }
+
+    /**
+     * @return simple outflows - inflows in target year, excluding capital costs
+     *         and not converted into today's prices.
+     */
+    @JsonProperty
+    @JsonView({ InterventionTypeViews.Summary.class })
+    public BigDecimal getTargetYearSavings() {
+        try {
+<span class="fc" id="L540">            int yearIndex = getTargetYearIndex();</span>
+<span class="fc" id="L541">            BigDecimal inflows = getAnnualCashInflows(yearIndex).multiply(</span>
+<span class="fc" id="L542">                    getUptakeFactor());</span>
+<span class="fc" id="L543">            BigDecimal outflows = getAnnualCashOutflows(yearIndex).multiply(</span>
+<span class="fc" id="L544">                    getUptakeFactor());</span>
+
+<span class="fc" id="L546">            return outflows.subtract(inflows);</span>
+<span class="nc" id="L547">        } catch (NullPointerException e) {</span>
+<span class="nc" id="L548">            LOGGER.error(&quot;NullPointerException in getTargetYearSavings&quot;, e);</span>
+<span class="nc" id="L549">            return Finance.ZERO_BIG_DECIMAL;</span>
+        }
+    }
+
+    @JsonProperty
+    @JsonView({ InterventionTypeViews.Summary.class })
+    public BigDecimal getTotalNpv() {
+        try {
+<span class="fc" id="L557">            BigDecimal ongoingFlows = new BigDecimal(&quot;0.00&quot;);</span>
+<span class="fc bfc" id="L558" title="All 2 branches covered.">            for (int i = 0; i &lt; getLifetime(); i++) {</span>
+<span class="fc" id="L559">                BigDecimal inflows = new BigDecimal(&quot;0.00&quot;);</span>
+<span class="fc bfc" id="L560" title="All 2 branches covered.">                if (getAnnualCashInflows(i).longValue() &gt; 0) {</span>
+<span class="fc" id="L561">                    inflows = getAnnualCashInflows(i).multiply(</span>
+<span class="fc" id="L562">                            getUptakeFactor());</span>
+                }
+<span class="fc" id="L564">                BigDecimal outflows = getAnnualCashOutflows(i).multiply(</span>
+<span class="fc" id="L565">                        getUptakeFactor());</span>
+                // System.out.println(&quot;  &quot; + i + &quot;: in=&quot; + inflows +
+                // &quot;, out=&quot;
+                // + outflows);
+<span class="fc" id="L569">                BigDecimal npv = Finance.presentValue(</span>
+<span class="fc" id="L570">                        outflows.subtract(inflows), i + 1, 0.035);</span>
+                // System.out.println(&quot;  npv:&quot; + npv);
+<span class="fc" id="L572">                ongoingFlows = ongoingFlows.add(npv);</span>
+            }
+<span class="fc" id="L574">            BigDecimal upFront = getUptakeFactor().multiply(</span>
+<span class="fc" id="L575">                    getCashOutflowsUpFront());</span>
+<span class="fc" id="L576">            return upFront.add(ongoingFlows).divide(getScaleFactor(),</span>
+                    Finance.ROUND_MODE);
+<span class="nc" id="L578">        } catch (NullPointerException e) {</span>
+<span class="nc" id="L579">            LOGGER.error(&quot;NullPointerException in getTotalNpv&quot;, e);</span>
+<span class="nc" id="L580">            return Finance.ZERO_BIG_DECIMAL;</span>
+        }
+    }
+
+    public BigDecimal getTonnesCo2eSavedFromGasInYear(int year) {
+<span class="pc bpc" id="L585" title="1 of 2 branches missed.">        if (gasCIntensity == null) {</span>
+<span class="nc" id="L586">            throw new IllegalStateException(</span>
+                    &quot;Must inject gasCIntensity before calling getTonnesCo2eSavedFromGasInYear&quot;);
+        }
+<span class="fc bfc" id="L589" title="All 2 branches covered.">        return annualGasSaved == null ? Finance.ZERO_BIG_DECIMAL</span>
+<span class="fc" id="L590">                : annualGasSaved.multiply(gasCIntensity.getValueAsBigDecimal().divide(</span>
+                        new BigDecimal(1000), Finance.ROUND_MODE));
+    }
+
+    public BigDecimal getTonnesCo2eSavedFromElecInYear(int year) {
+<span class="pc bpc" id="L595" title="1 of 2 branches missed.">        if (elecCIntensity == null) {</span>
+<span class="nc" id="L596">            throw new IllegalStateException(</span>
+                    &quot;Must inject elecCIntensity before calling getTonnesCo2eSavedFromElecInYear&quot;);
+        }
+<span class="fc bfc" id="L599" title="All 2 branches covered.">        return annualElecSaved == null ? Finance.ZERO_BIG_DECIMAL</span>
+<span class="fc" id="L600">                : annualElecSaved.multiply(</span>
+<span class="fc" id="L601">                        elecCIntensity.getValueTimeSeries().get(year)).divide(</span>
+                        new BigDecimal(1000), Finance.ROUND_MODE);
+    }
+
+    public BigDecimal getTonnesCo2eSavedTargetYear() {
+        try {
+<span class="fc bfc" id="L607" title="All 4 branches covered.">            if (annualGasSaved != null || annualElecSaved != null) {</span>
+<span class="fc" id="L608">                BigDecimal tonnesCo2eSavedTY = getTonnesCo2eSavedFromGasInYear(</span>
+<span class="fc" id="L609">                        getTargetYearIndex()).add(</span>
+<span class="fc" id="L610">                        getTonnesCo2eSavedFromElecInYear(getTargetYearIndex()));</span>
+<span class="fc" id="L611">                return tonnesCo2eSavedTY.multiply(getUptakeFactor())</span>
+<span class="fc" id="L612">                        .divideToIntegralValue(getScaleFactor());</span>
+            } else {
+<span class="fc" id="L614">                BigDecimal tonnes = getAnnualTonnesCo2eSaved();</span>
+<span class="fc bfc" id="L615" title="All 2 branches covered.">                if (tonnes == null) {</span>
+<span class="fc" id="L616">                    int idx = getTargetYearIndex();</span>
+<span class="fc" id="L617">                    tonnes = getAnnualTonnesCo2eSavedTimeSeries().get(idx);</span>
+                }
+<span class="fc" id="L619">                return tonnes.multiply(getUptakeFactor().divide(</span>
+<span class="fc" id="L620">                        getScaleFactor(), Finance.ROUND_MODE));</span>
+            }
+<span class="nc" id="L622">        } catch (NullPointerException e) {</span>
+<span class="nc" id="L623">            LOGGER.error(&quot;NullPointerException in getTonnesCo2eSavedTargetYear&quot;);</span>
+<span class="nc" id="L624">            return new BigDecimal(0);</span>
+        }
+    }
+
+    public int getTargetYearIndex() {
+<span class="fc" id="L629">        return Integer.parseInt(targetYear.getValue()) - getModellingYear() - 1;</span>
+    }
+
+    public Long getTonnesCo2eSaved() {
+<span class="pc bpc" id="L633" title="1 of 2 branches missed.">        if (tonnesCo2eSaved == null) {</span>
+<span class="fc" id="L634">            return 0l;</span>
+        } else {
+<span class="nc" id="L636">            return (long) Math.round(tonnesCo2eSaved);</span>
+        }
+    }
+
+    @JsonProperty
+    @JsonView({ InterventionTypeViews.Summary.class })
+    public BigDecimal getTotalTonnesCo2eSaved() {
+<span class="pc bpc" id="L643" title="1 of 4 branches missed.">        if (annualTonnesCo2eSaved == null &amp;&amp; annualTonnesCo2eSavedTS == null) {</span>
+<span class="nc" id="L644">            return Finance.ZERO_BIG_DECIMAL;</span>
+<span class="fc bfc" id="L645" title="All 2 branches covered.">        } else if (annualTonnesCo2eSaved == null) {</span>
+<span class="fc" id="L646">            BigDecimal total = new BigDecimal(0.0f);</span>
+<span class="fc bfc" id="L647" title="All 2 branches covered.">            for (BigDecimal tonnes : getAnnualTonnesCo2eSavedTimeSeries()) {</span>
+<span class="fc" id="L648">                total = total.add(tonnes);</span>
+<span class="fc" id="L649">            }</span>
+<span class="fc" id="L650">            return total.multiply(getUptakeFactor());</span>
+<span class="fc bfc" id="L651" title="All 4 branches covered.">        } else if (this.annualGasSaved != null || this.annualElecSaved != null) {</span>
+<span class="fc" id="L652">            BigDecimal tonnes = new BigDecimal(0.0f);</span>
+<span class="fc bfc" id="L653" title="All 2 branches covered.">            for (int i = 0; i &lt; getLifetime(); i++) {</span>
+<span class="fc" id="L654">                BigDecimal fromGas = getTonnesCo2eSavedFromGasInYear(i);</span>
+<span class="fc" id="L655">                BigDecimal fromElec = getTonnesCo2eSavedFromElecInYear(i);</span>
+<span class="fc" id="L656">                tonnes = tonnes.add(fromGas).add(fromElec);</span>
+            }
+<span class="fc" id="L658">            return tonnes.multiply(getUptakeFactor().divide(getScaleFactor(),</span>
+                    Finance.ROUND_MODE));
+        } else {
+<span class="fc" id="L661">            return getAnnualTonnesCo2eSaved().multiply(</span>
+<span class="fc" id="L662">                    getUptakeFactor().multiply(new BigDecimal(getLifetime())));</span>
+        }
+    }
+
+    @JsonProperty
+    public BigDecimal getCostPerTonneCo2e() {
+<span class="pc bpc" id="L668" title="1 of 2 branches missed.">        if (costPerTonneCo2e == 0) {</span>
+<span class="fc" id="L669">            return getTotalNpv().divide(getTotalTonnesCo2eSaved(),</span>
+                    Finance.ROUND_MODE);
+        } else {
+<span class="nc" id="L672">            return new BigDecimal(costPerTonneCo2e);</span>
+        }
+    }
+
+    public String toCsvHeader() {
+<span class="nc" id="L677">        return &quot;Internal Id,Intervention Type,Organisation Type,&quot;</span>
+                + &quot;Annual Cash Inflows,Annual Cash Inflows Time Series,Mean Cash Inflows,&quot;
+                + &quot;Annual Cash Outflows,Annual Cash Outflows Time Series,&quot;
+                + &quot;Total NPV,&quot;
+                + &quot;Annual Tonnes CO2e Saved,Annual Tonnes Co2e Saved Time Series,&quot;
+                + &quot;Total Tonnes CO2e Saved,Tonnes CO2e Saved Target Year,&quot;
+                + &quot;Cost Per Tonne CO2e&quot;;
+    }
+
+    public BigDecimal getScaleFactor() {
+<span class="pc bpc" id="L687" title="1 of 2 branches missed.">        return scaling == null ? null : new BigDecimal(</span>
+<span class="fc" id="L688">                scaling.floatValue() / 100);</span>
+    }
+
+    public BigDecimal getUptakeFactor() {
+<span class="pc bpc" id="L692" title="1 of 2 branches missed.">        return uptake == null ? null</span>
+<span class="fc" id="L693">                : new BigDecimal(uptake.floatValue() / 100);</span>
+    }
+
+    public String getFurtherInfoBaseUrl() {
+<span class="fc bfc" id="L697" title="All 2 branches covered.">        if (furtherInfoBaseUrl == null) {</span>
+<span class="fc" id="L698">            furtherInfoBaseUrl = DEFAULT_FURTHER_INFO_BASE_URL;</span>
+        }
+<span class="fc bfc" id="L700" title="All 2 branches covered.">        if (!furtherInfoBaseUrl.endsWith(&quot;/&quot;)) {</span>
+<span class="fc" id="L701">            furtherInfoBaseUrl += &quot;/&quot;;</span>
+        }
+<span class="fc" id="L703">        return furtherInfoBaseUrl;</span>
+    }
+
+    public String getFurtherInfo() {
+<span class="pc bpc" id="L707" title="1 of 2 branches missed.">        if (furtherInfo == null) {</span>
+<span class="fc" id="L708">            return getFurtherInfoBaseUrl()</span>
+<span class="fc" id="L709">                    + getName().toLowerCase().replaceAll(&quot;[ '\&quot;()/]&quot;, &quot;-&quot;)</span>
+<span class="fc" id="L710">                            .replaceAll(&quot;---&quot;, &quot;-&quot;);</span>
+        } else {
+<span class="nc" id="L712">            return furtherInfo;</span>
+        }
+    }
+
+    @JsonProperty
+    @JsonView({ InterventionTypeViews.Summary.class, InterventionViews.Detailed.class })
+    public List&lt;String&gt; getOverlappingInterventionList() {
+<span class="nc bnc" id="L719" title="All 2 branches missed.">        if (overlappingInterventions == null</span>
+<span class="nc bnc" id="L720" title="All 2 branches missed.">                || overlappingInterventions.length() == 0) {</span>
+<span class="nc" id="L721">            return Collections.emptyList();</span>
+        } else {
+<span class="nc" id="L723">            return Arrays.asList(overlappingInterventions.split(&quot;,&quot;));</span>
+        }
+    }
+
+    public void setOverlappingInterventionList(List&lt;String&gt; interventions) {
+<span class="nc" id="L728">        overlappingInterventions = interventions.toString()</span>
+<span class="nc" id="L729">                .substring(1, interventions.toString().length() - 1)</span>
+<span class="nc" id="L730">                .replaceAll(&quot;, &quot;, &quot;,&quot;);</span>
+<span class="nc" id="L731">    }</span>
+
+    public String toCsv() {
+<span class="nc bnc" id="L734" title="All 2 branches missed.">        return String</span>
+<span class="nc" id="L735">                .format(&quot;%s,\&quot;%s\&quot;,\&quot;%s\&quot;,%s,%s,%s,\&quot;%s\&quot;,%s,%s,\&quot;%s\&quot;,%s,%s,%s&quot;,</span>
+                        id, name, annualCashInflows,
+                        annualCashInflowsTS == null ? &quot;&quot;
+<span class="nc" id="L738">                                : getAnnualCashInflowsTimeSeries(),</span>
+<span class="nc bnc" id="L739" title="All 2 branches missed.">                        getMeanCashInflows() == null ? &quot;&quot;</span>
+<span class="nc bnc" id="L740" title="All 2 branches missed.">                                : getMeanCashInflows(), annualCashOutflows,</span>
+                        annualCashOutflowsTS == null ? &quot;&quot;
+<span class="nc" id="L742">                                : getAnnualCashOutflowsTimeSeries(),</span>
+<span class="nc bnc" id="L743" title="All 2 branches missed.">                        getTotalNpv(), annualTonnesCo2eSaved,</span>
+                        annualTonnesCo2eSavedTS == null ? &quot;&quot;
+<span class="nc" id="L745">                                : getAnnualTonnesCo2eSavedTimeSeries(),</span>
+<span class="nc" id="L746">                        getTotalTonnesCo2eSaved(),</span>
+<span class="nc bnc" id="L747" title="All 2 branches missed.">                        getTonnesCo2eSavedTargetYear() == null ? &quot;&quot;</span>
+<span class="nc" id="L748">                                : getTonnesCo2eSavedTargetYear(),</span>
+<span class="nc" id="L749">                        getCostPerTonneCo2e());</span>
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.2.201808211720</span></div></body></html>

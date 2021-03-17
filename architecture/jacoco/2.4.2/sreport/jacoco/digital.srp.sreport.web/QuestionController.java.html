@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>QuestionController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Sustainability Reporting</a> &gt; <a href="index.source.html" class="el_package">digital.srp.sreport.web</a> &gt; <span class="el_source">QuestionController.java</span></div><h1>QuestionController.java</h1><pre class="source lang-java linenums">package digital.srp.sreport.web;
+
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.transaction.Transactional;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.hateoas.Link;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder;
+
+import com.fasterxml.jackson.annotation.JsonView;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import digital.srp.sreport.internal.NullAwareBeanUtils;
+import digital.srp.sreport.model.Question;
+import digital.srp.sreport.model.views.QuestionViews;
+import digital.srp.sreport.repositories.QuestionRepository;
+
+/**
+ * REST web service for accessing questions.
+ *
+ * @author Tim Stephenson
+ */
+@Controller
+@RequestMapping(value = &quot;/{tenantId}/questions&quot;)
+<span class="fc" id="L45">public class QuestionController {</span>
+
+<span class="fc" id="L47">    private static final Logger LOGGER = LoggerFactory</span>
+<span class="fc" id="L48">            .getLogger(QuestionController.class);</span>
+
+    @Autowired
+    protected ObjectMapper objectMapper;
+
+    @Autowired
+    protected  QuestionRepository questionRepo;
+
+    /**
+     * @return the created question.
+     */
+    @ResponseStatus(value = HttpStatus.CREATED)
+    @RequestMapping(value = &quot;/&quot;, method = RequestMethod.POST)
+    public @ResponseBody ResponseEntity&lt;?&gt; create(
+            @PathVariable(&quot;tenantId&quot;) String tenantId,
+            @RequestBody Question question) {
+<span class="nc" id="L64">        question.tenantId(tenantId);</span>
+
+<span class="nc" id="L66">        questionRepo.save(question);</span>
+
+<span class="nc" id="L68">        Map&lt;String, String&gt; vars = new HashMap&lt;String, String&gt;();</span>
+<span class="nc" id="L69">        vars.put(&quot;id&quot;, question.id().toString());</span>
+<span class="nc" id="L70">        vars.put(&quot;tenantId&quot;, tenantId);</span>
+<span class="nc" id="L71">        return getCreatedResponseEntity(&quot;/{id}&quot;, vars );</span>
+    }
+
+    protected ResponseEntity&lt;Object&gt; getCreatedResponseEntity(String path, Map&lt;String, String&gt; vars) {
+<span class="nc" id="L75">        URI location = MvcUriComponentsBuilder.fromController(getClass()).path(path).buildAndExpand(vars).toUri();</span>
+<span class="nc" id="L76">        HttpHeaders headers = new HttpHeaders();</span>
+<span class="nc" id="L77">        headers.setLocation(location);</span>
+<span class="nc" id="L78">        return new ResponseEntity&lt;Object&gt;(headers, HttpStatus.CREATED);</span>
+    }
+
+    /**
+     * @return The specified question.
+     */
+    @RequestMapping(value = &quot;/{id}&quot;, method = RequestMethod.GET)
+    @JsonView(QuestionViews.Detailed.class)
+    @Transactional
+    public @ResponseBody Question findById(
+            @PathVariable(&quot;tenantId&quot;) String tenantId,
+            @PathVariable(&quot;id&quot;) Long questionId) {
+<span class="nc" id="L90">        LOGGER.info(String.format(&quot;findById %1$s&quot;, questionId));</span>
+
+<span class="nc" id="L92">        Question question = questionRepo.findOne(questionId);</span>
+
+<span class="nc" id="L94">        return addLinks(question);</span>
+    }
+
+    /**
+     * @return The specified question.
+     */
+    @RequestMapping(value = &quot;/findByName/{name}&quot;, method = RequestMethod.GET)
+    @JsonView(QuestionViews.Detailed.class)
+    @Transactional
+    public @ResponseBody Question findByName(
+            @PathVariable(&quot;tenantId&quot;) String tenantId,
+            @PathVariable(&quot;name&quot;) String name) {
+<span class="nc" id="L106">        LOGGER.info(String.format(&quot;findByName %1$s&quot;, name));</span>
+
+<span class="nc" id="L108">        Question question = questionRepo.findByName(name);</span>
+        // use logger for force child load
+<span class="nc" id="L110">        LOGGER.info(String.format(&quot;Found question with id %1$d named %2$s&quot;, </span>
+<span class="nc" id="L111">                question.id(), question.name()));</span>
+
+<span class="nc" id="L113">        return question;</span>
+    }
+
+    /**
+     * @return a list of questions, optionally paged.
+     */
+    @RequestMapping(value = &quot;/&quot;, method = RequestMethod.GET)
+    @JsonView(QuestionViews.Summary.class)
+    public @ResponseBody List&lt;Question&gt; list(
+            @PathVariable(&quot;tenantId&quot;) String tenantId,
+            @RequestParam(value = &quot;page&quot;, required = false) Integer page,
+            @RequestParam(value = &quot;limit&quot;, required = false) Integer limit) {
+<span class="nc" id="L125">        LOGGER.info(String.format(&quot;List questions&quot;));</span>
+
+        List&lt;Question&gt; list;
+<span class="nc bnc" id="L128" title="All 2 branches missed.">        if (limit == null) {</span>
+<span class="nc" id="L129">            list = questionRepo.findAll();</span>
+        } else {
+<span class="nc bnc" id="L131" title="All 2 branches missed.">            Pageable pageable = new PageRequest(page == null ? 0 : page, limit);</span>
+<span class="nc" id="L132">            list = questionRepo.findPage(pageable);</span>
+        }
+<span class="nc" id="L134">        LOGGER.info(String.format(&quot;Found %1$s questions&quot;, list.size()));</span>
+
+<span class="nc" id="L136">        return addLinks(list);</span>
+    }
+
+    /**
+     * Update an existing question.
+     */
+    @ResponseStatus(value = HttpStatus.NO_CONTENT)
+    @RequestMapping(value = &quot;/{id}&quot;, method = RequestMethod.PUT, consumes = { &quot;application/json&quot; })
+    public @ResponseBody void update(@PathVariable(&quot;tenantId&quot;) String tenantId,
+            @PathVariable(&quot;id&quot;) Long questionId,
+            @RequestBody Question updatedQuestion) {
+<span class="nc" id="L147">        Question question = questionRepo.findOne(questionId);</span>
+
+<span class="nc" id="L149">        NullAwareBeanUtils.copyNonNullProperties(updatedQuestion, question, &quot;id&quot;);</span>
+
+<span class="nc" id="L151">        questionRepo.save(question);</span>
+<span class="nc" id="L152">    }</span>
+
+    /**
+     * Delete an existing question.
+     */
+    @ResponseStatus(value = HttpStatus.NO_CONTENT)
+    @RequestMapping(value = &quot;/{id}&quot;, method = RequestMethod.DELETE)
+    public @ResponseBody void delete(
+            @PathVariable(&quot;tenantId&quot;) String tenantId,
+            @PathVariable(&quot;id&quot;) Long questionId) {
+<span class="nc" id="L162">        questionRepo.delete(questionId);</span>
+<span class="nc" id="L163">    }</span>
+
+    private List&lt;Question&gt; addLinks(final List&lt;Question&gt; list) {
+<span class="nc bnc" id="L166" title="All 2 branches missed.">        for (Question question : list) {</span>
+<span class="nc" id="L167">            question = addLinks(question);</span>
+<span class="nc" id="L168">        }</span>
+<span class="nc" id="L169">        return list;</span>
+    }
+
+    private Question addLinks(Question question) {
+<span class="nc" id="L173">        List&lt;Link&gt; links = new ArrayList&lt;Link&gt;();</span>
+<span class="nc" id="L174">        links.add(new Link(getClass().getAnnotation(RequestMapping.class).value()[0].replace(&quot;{tenantId}&quot;, question.tenantId()) + &quot;/&quot; + question.id()));</span>
+
+<span class="nc" id="L176">        return question.links(links);</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.2.201808211720</span></div></body></html>
