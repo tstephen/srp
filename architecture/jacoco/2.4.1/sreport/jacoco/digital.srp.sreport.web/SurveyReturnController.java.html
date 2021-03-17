@@ -1,0 +1,540 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>SurveyReturnController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Sustainability Reporting</a> &gt; <a href="index.source.html" class="el_package">digital.srp.sreport.web</a> &gt; <span class="el_source">SurveyReturnController.java</span></div><h1>SurveyReturnController.java</h1><pre class="source lang-java linenums">package digital.srp.sreport.web;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+
+import javax.annotation.PostConstruct;
+import javax.servlet.http.HttpServletRequest;
+import javax.transaction.Transactional;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.hateoas.Link;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder;
+import org.springframework.web.util.UriComponentsBuilder;
+
+import com.fasterxml.jackson.annotation.JsonView;
+
+import digital.srp.sreport.api.Calculator;
+import digital.srp.sreport.api.exceptions.ObjectNotFoundException;
+import digital.srp.sreport.internal.PeriodUtil;
+import digital.srp.sreport.model.Answer;
+import digital.srp.sreport.model.Q;
+import digital.srp.sreport.model.Question;
+import digital.srp.sreport.model.StatusType;
+import digital.srp.sreport.model.Survey;
+import digital.srp.sreport.model.SurveyCategory;
+import digital.srp.sreport.model.SurveyReturn;
+import digital.srp.sreport.model.views.SurveyReturnViews;
+import digital.srp.sreport.repositories.AnswerRepository;
+import digital.srp.sreport.repositories.QuestionRepository;
+import digital.srp.sreport.repositories.SurveyRepository;
+import digital.srp.sreport.repositories.SurveyReturnRepository;
+import digital.srp.sreport.services.DefaultCompletenessValidator;
+import digital.srp.sreport.services.HistoricDataMerger;
+
+/**
+ * REST web service for accessing returned returns.
+ *
+ * @author Tim Stephenson
+ */
+@Controller
+@RequestMapping(value = &quot;/returns&quot;)
+<span class="fc" id="L64">public class SurveyReturnController {</span>
+
+<span class="fc" id="L66">    private static final Logger LOGGER = LoggerFactory</span>
+<span class="fc" id="L67">            .getLogger(SurveyReturnController.class);</span>
+
+    @Value(&quot;${kp.application.base-uri:http://localhost:8080}&quot;)
+    protected String baseUrl;
+
+    @Autowired
+    protected Calculator cruncher;
+
+    @Autowired
+    protected HistoricDataMerger historicDataMerger;
+
+    @Autowired
+    protected SurveyRepository surveyRepo;
+
+    @Autowired
+    protected SurveyReturnRepository returnRepo;
+
+    @Autowired
+    protected QuestionRepository qRepo;
+
+    protected List&lt;Question&gt; questions;
+
+    @Autowired
+    protected AnswerRepository answerRepo;
+
+<span class="fc" id="L92">    @Autowired</span>
+    protected DefaultCompletenessValidator validator = new DefaultCompletenessValidator();
+
+    @PostConstruct
+    protected void init() throws IOException {
+<span class="fc" id="L97">        questions = qRepo.findAll();</span>
+<span class="fc" id="L98">        LOGGER.info(&quot;Cached {} questions&quot;, questions.size());</span>
+<span class="fc" id="L99">    }</span>
+
+    /**
+     * Return a single survey return with the specified id.
+     *
+     * @return the specified survey.
+     */
+    @RequestMapping(value = &quot;/{id}&quot;, method = RequestMethod.GET)
+    @JsonView(SurveyReturnViews.Detailed.class)
+    @Transactional
+    public @ResponseBody SurveyReturn findById(@PathVariable(&quot;id&quot;) Long returnId) {
+<span class="nc" id="L110">        LOGGER.info(String.format(&quot;findById %1$s&quot;, returnId));</span>
+
+<span class="nc" id="L112">        SurveyReturn rtn = returnRepo.findOne(returnId);</span>
+<span class="nc bnc" id="L113" title="All 2 branches missed.">        if (rtn == null) {</span>
+<span class="nc" id="L114">            throw new ObjectNotFoundException(SurveyReturn.class, returnId);</span>
+        }
+        // use logger for force child load
+<span class="nc" id="L117">        LOGGER.info(String.format(&quot;Found return with id %1$d with status %2$s and containing %3$d answers&quot;, rtn.id(), rtn.status(), rtn.answers().size()));</span>
+
+<span class="nc" id="L119">        return addLinks(rtn);</span>
+    }
+
+    /**
+     * Returns matching the specified survey and organisation.
+     *
+     * @return returns. May be more than one because occasionally returns are restated. .
+     */
+    @RequestMapping(value = &quot;/findBySurveyName/{surveyName}&quot;, method = RequestMethod.GET)
+    @JsonView(SurveyReturnViews.Detailed.class)
+    @Transactional
+    public @ResponseBody List&lt;SurveyReturn&gt; findBySurvey(
+            @PathVariable(&quot;surveyName&quot;) String surveyName) {
+<span class="nc" id="L132">        LOGGER.info(String.format(&quot;findCurrentBySurvey %1$s&quot;, surveyName));</span>
+
+<span class="nc" id="L134">        List&lt;SurveyReturn&gt; returns = returnRepo.findBySurveyName(surveyName);</span>
+
+<span class="nc" id="L136">        return addLinks(returns);</span>
+    }
+
+    /**
+     * Returns matching the specified survey and organisation.
+     *
+     * @return returns. May be more than one because occasionally returns are restated.
+     */
+    @RequestMapping(value = &quot;/findBySurveyNameAndOrg/{surveyName}/{org}&quot;, method = RequestMethod.GET)
+    @JsonView(SurveyReturnViews.Detailed.class)
+    public @ResponseBody List&lt;SurveyReturn&gt; findBySurveyAndOrg(
+            @PathVariable(&quot;surveyName&quot;) String surveyName,
+            @PathVariable(&quot;org&quot;) String org) {
+<span class="nc" id="L149">        LOGGER.info(String.format(&quot;findBySurveyAndOrg %1$s/%2$s&quot;, surveyName, org));</span>
+
+<span class="nc" id="L151">        List&lt;SurveyReturn&gt; returns = returnRepo.findBySurveyAndOrg(surveyName, org);</span>
+<span class="nc bnc" id="L152" title="All 2 branches missed.">        if (returns.size()==0) {</span>
+<span class="nc" id="L153">            returns.add(createBlankReturn(surveyName, org, applicablePeriod(surveyName)));</span>
+        }
+
+<span class="nc" id="L156">        return addLinks(returns);</span>
+    }
+
+    protected String applicablePeriod(String surveyName) {
+<span class="fc" id="L160">        return surveyName.substring(surveyName.indexOf('-')+1);</span>
+    }
+
+    protected synchronized SurveyReturn createBlankReturn(String surveyName, String org, String period) {
+<span class="nc" id="L164">        LOGGER.info(&quot;createBlankReturn of {} for {}&quot;, surveyName, org);</span>
+
+        try {
+<span class="nc" id="L167">            Survey requested = surveyRepo.findByName(surveyName);</span>
+<span class="nc" id="L168">            SurveyReturn rtn = new SurveyReturn()</span>
+<span class="nc" id="L169">                    .name(String.format(&quot;%1$s-%2$s&quot;, requested.name(), org))</span>
+<span class="nc" id="L170">                    .survey(requested)</span>
+<span class="nc" id="L171">                    .org(org)</span>
+<span class="nc" id="L172">                    .applicablePeriod(requested.applicablePeriod())</span>
+<span class="nc" id="L173">                    .answers(new HashSet&lt;Answer&gt;());</span>
+<span class="nc" id="L174">            ensureInitialized(requested, rtn);</span>
+<span class="nc" id="L175">            importEricAnswers(surveyName, org);</span>
+<span class="nc" id="L176">            importLastYearIfExists(rtn);</span>
+
+<span class="nc" id="L178">            return addLinks(rtn);</span>
+<span class="nc" id="L179">        } catch (NullPointerException e) {</span>
+<span class="nc" id="L180">            String msg = String.format(</span>
+                    &quot;Unable to create blank return for %1$s of %2$s&quot;,
+                    surveyName, org);
+<span class="nc" id="L183">            LOGGER.error(msg);</span>
+<span class="nc" id="L184">            LOGGER.error(&quot;  have {} surveys currently&quot;, surveyRepo.count());</span>
+<span class="nc bnc" id="L185" title="All 2 branches missed.">            for (Survey s : surveyRepo.findAll()) {</span>
+<span class="nc" id="L186">                LOGGER.error(&quot;  {}: {}&quot;, s.id(), s.name());</span>
+<span class="nc" id="L187">            }</span>
+<span class="nc" id="L188">            throw new IllegalStateException(msg);</span>
+        }
+    }
+
+    private void importLastYearIfExists(SurveyReturn rtn) {
+<span class="nc" id="L193">        String srcPeriod = PeriodUtil.previous(rtn.survey().applicablePeriod());</span>
+<span class="nc" id="L194">        String srcRtnName = String.format(&quot;SDU-%1$s-%2$s&quot;, srcPeriod, rtn.org());</span>
+<span class="nc" id="L195">        importFromOtherReturn(srcRtnName, rtn);</span>
+<span class="nc" id="L196">    }</span>
+
+    protected void ensureInitialized(Survey requested, SurveyReturn rtn) {
+<span class="fc bfc" id="L199" title="All 2 branches covered.">        for (SurveyCategory cat : requested.categories()) {</span>
+<span class="fc bfc" id="L200" title="All 2 branches covered.">            for (Q q : cat.questionEnums()) {</span>
+<span class="pc bpc" id="L201" title="1 of 2 branches missed.">                if (!rtn.answer(rtn.applicablePeriod(), q).isPresent()) {</span>
+<span class="nc" id="L202">                    Optional&lt;Question&gt; question = findQuestion(q.name());</span>
+<span class="nc" id="L203">                    Answer answer = new Answer()</span>
+<span class="nc" id="L204">                            .question(question.orElseThrow(() -&gt; new ObjectNotFoundException(Q.class, q)))</span>
+<span class="nc" id="L205">                            .addSurveyReturn(rtn)</span>
+<span class="nc" id="L206">                            .applicablePeriod(requested.applicablePeriod());</span>
+<span class="nc bnc" id="L207" title="All 2 branches missed.">                    if (q.equals(Q.ORG_CODE)) {</span>
+<span class="nc" id="L208">                        answer.response(rtn.org());</span>
+                    }
+<span class="nc" id="L210">                    rtn.answers().add(answer);</span>
+                }
+<span class="fc" id="L212">            }</span>
+<span class="fc" id="L213">        }</span>
+<span class="fc" id="L214">        returnRepo.save(rtn);</span>
+<span class="fc" id="L215">    }</span>
+
+    @RequestMapping(value = &quot;/findCurrentBySurveyNameAndOrg/{surveyName}/{org}&quot;, method = RequestMethod.GET)
+    @JsonView(SurveyReturnViews.Detailed.class)
+    public @ResponseBody SurveyReturn findCurrentBySurveyNameAndOrg(
+            @PathVariable(&quot;surveyName&quot;) String surveyName,
+            @PathVariable(&quot;org&quot;) String org) {
+<span class="nc" id="L222">        LOGGER.info(String.format(&quot;findCurrentBySurveyNameAndOrg %1$s, %2$s&quot;, surveyName, org));</span>
+
+<span class="nc bnc" id="L224" title="All 2 branches missed.">        if (org.length() &gt; 3) {</span>
+<span class="nc" id="L225">            org = lookupOrgCode(org);</span>
+        }
+
+<span class="nc" id="L228">        List&lt;SurveyReturn&gt; returns = findBySurveyAndOrg(surveyName, org);</span>
+<span class="nc" id="L229">        SurveyReturn rtn = getLatestRevision(returns);</span>
+
+<span class="nc" id="L231">        validator.validate(rtn);</span>
+<span class="nc" id="L232">        return addLinks(rtn);</span>
+    }
+
+    private SurveyReturn getLatestRevision(List&lt;SurveyReturn&gt; returns) {
+<span class="nc bnc" id="L236" title="All 2 branches missed.">        if (returns.size() == 0) {</span>
+<span class="nc" id="L237">            return null;</span>
+        }
+<span class="nc" id="L239">        returns.sort((r1,r2) -&gt; r1.revision().compareTo(r2.revision()));</span>
+<span class="nc" id="L240">        SurveyReturn rtn = returns.get(returns.size()-1);</span>
+<span class="nc" id="L241">        LOGGER.info(&quot;Found {} returns for {},{} returning revision {} (id:{})&quot;,</span>
+<span class="nc" id="L242">                returns.size(), rtn.survey().name(), rtn.org(), rtn.revision(), rtn.id());</span>
+<span class="nc" id="L243">        return rtn;</span>
+    }
+
+    private String lookupOrgCode(String orgName) {
+<span class="nc" id="L247">        List&lt;Answer&gt; answer = answerRepo.findByOrgName(orgName);</span>
+<span class="nc bnc" id="L248" title="All 2 branches missed.">        if (answer.size() == 0) {</span>
+<span class="nc" id="L249">            throw new ObjectNotFoundException(SurveyReturn.class, orgName);</span>
+        }
+<span class="nc" id="L251">        return answer.get(0).surveyReturns().iterator().next().org();</span>
+    }
+
+    @RequestMapping(value = &quot;/importEric/{surveyName}/{org}&quot;, method = RequestMethod.GET)
+    @JsonView(SurveyReturnViews.Detailed.class)
+    @Transactional
+    public @ResponseBody SurveyReturn importEricAnswers(
+            @PathVariable(&quot;surveyName&quot;) String surveyName,
+            @PathVariable(&quot;org&quot;) String org) {
+<span class="nc" id="L260">        long count = 0;</span>
+<span class="nc" id="L261">        long start = System.currentTimeMillis();</span>
+<span class="nc" id="L262">        SurveyReturn trgtRtn  = findCurrentBySurveyNameAndOrg(surveyName, org);</span>
+
+<span class="nc" id="L264">        List&lt;Survey&gt; surveys = surveyRepo.findEricSurveys();</span>
+<span class="nc bnc" id="L265" title="All 2 branches missed.">        for (Survey survey : surveys) {</span>
+<span class="nc" id="L266">            count += importFromOtherReturn(survey.name(), trgtRtn);</span>
+<span class="nc" id="L267">        }</span>
+<span class="nc" id="L268">        LOGGER.info(&quot;Importing ERIC data added {} records and took {}ms&quot;, count, (System.currentTimeMillis()-start));</span>
+
+<span class="nc" id="L270">        return findCurrentBySurveyNameAndOrg(surveyName, org);</span>
+    }
+
+    @RequestMapping(value = &quot;/import/{sourceReturnName}/{targetReturnName}&quot;, method = RequestMethod.POST)
+    @ResponseStatus(HttpStatus.OK)
+    @Transactional
+    public void importFromOtherReturn(
+            @PathVariable(&quot;sourceReturnName&quot;) String srcRtnName,
+            @PathVariable(&quot;targetReturnName&quot;) String trgtRtnName) {
+<span class="nc" id="L279">        SurveyReturn trgtRtn = getLatestRevision(returnRepo.findByName(trgtRtnName));</span>
+<span class="nc" id="L280">        importFromOtherReturn(srcRtnName, trgtRtn);</span>
+<span class="nc" id="L281">    }</span>
+
+    @Transactional
+    protected long importFromOtherReturn(String srcRtnName, SurveyReturn trgtRtn) {
+<span class="nc" id="L285">        long count = 0;</span>
+<span class="nc" id="L286">        long start = System.currentTimeMillis();</span>
+<span class="nc" id="L287">        SurveyReturn rtn = getLatestRevision(returnRepo.findByName(srcRtnName));</span>
+<span class="nc" id="L288">        Optional&lt;SurveyReturn&gt; srcRtn = Optional.ofNullable(rtn);</span>
+<span class="nc bnc" id="L289" title="All 2 branches missed.">        if (srcRtn.isPresent()) {</span>
+<span class="nc" id="L290">            Set&lt;Answer&gt; answersToImport = answerRepo.findAnswersToImport(trgtRtn.id(), srcRtn.get().id());</span>
+<span class="nc" id="L291">            LOGGER.info(&quot;Found {} answers to import from {} to {}&quot;, answersToImport.size(), srcRtnName, trgtRtn.id());</span>
+<span class="nc" id="L292">            count += historicDataMerger.merge(answersToImport, trgtRtn);</span>
+<span class="nc" id="L293">            LOGGER.info(&quot;Importing from {} added {} records and took {}ms&quot;, srcRtnName, count, (System.currentTimeMillis()-start));</span>
+<span class="nc" id="L294">        } else {</span>
+<span class="nc" id="L295">            LOGGER.warn(&quot;No return {} found to import from for {} ({})&quot;, srcRtnName, trgtRtn.name(), trgtRtn.id());</span>
+        }
+<span class="nc" id="L297">        return count;</span>
+    }
+
+    /**
+     * Return a list of survey returns, optionally paged.
+     *
+     * @return survey returns.
+     */
+    @RequestMapping(value = &quot;/&quot;, method = RequestMethod.GET)
+    @JsonView(SurveyReturnViews.Summary.class)
+    public @ResponseBody List&lt;SurveyReturn&gt; list(
+            @RequestParam(value = &quot;page&quot;, required = false) Integer page,
+            @RequestParam(value = &quot;limit&quot;, required = false) Integer limit) {
+<span class="nc" id="L310">        LOGGER.info(String.format(&quot;List returns&quot;));</span>
+
+        List&lt;SurveyReturn&gt; list;
+<span class="nc bnc" id="L313" title="All 2 branches missed.">        if (limit == null) {</span>
+<span class="nc" id="L314">            list = returnRepo.findAll();</span>
+        } else {
+<span class="nc bnc" id="L316" title="All 2 branches missed.">            Pageable pageable = new PageRequest(page == null ? 0 : page, limit);</span>
+<span class="nc" id="L317">            list = returnRepo.findPage(pageable);</span>
+        }
+<span class="nc" id="L319">        LOGGER.info(String.format(&quot;Found %1$s returns&quot;, list.size()));</span>
+
+<span class="nc" id="L321">        return addLinks(list);</span>
+    }
+
+    /**
+     * Return a list of survey returns for a single organisation.
+     *
+     * @return survey returns.
+     */
+    @RequestMapping(value = &quot;/findByOrg/{org}&quot;, method = RequestMethod.GET)
+    @JsonView(SurveyReturnViews.Summary.class)
+    public @ResponseBody List&lt;SurveyReturn&gt; findByOrg(
+            @PathVariable(&quot;org&quot;) String org) {
+<span class="nc" id="L333">        LOGGER.info(String.format(&quot;List returns for %1$s&quot;, org));</span>
+
+<span class="nc" id="L335">        List&lt;SurveyReturn&gt; list = returnRepo.findByOrg(org);</span>
+<span class="nc" id="L336">        LOGGER.info(String.format(&quot;Found %1$s returns&quot;, list.size()));</span>
+
+<span class="nc" id="L338">        return addLinks(list);</span>
+    }
+
+    /**
+     * Create a new survey response.
+     *
+     * @return
+     */
+    @SuppressWarnings({ &quot;rawtypes&quot;, &quot;unchecked&quot; })
+    @ResponseStatus(value = HttpStatus.CREATED)
+    @RequestMapping(value = &quot;/&quot;, method = RequestMethod.POST)
+    public @ResponseBody ResponseEntity&lt;?&gt; create(
+            @RequestBody SurveyReturn surveyReturn) {
+
+<span class="nc" id="L352">        returnRepo.save(surveyReturn);</span>
+
+<span class="nc" id="L354">        UriComponentsBuilder builder = MvcUriComponentsBuilder</span>
+<span class="nc" id="L355">                .fromController(getClass());</span>
+<span class="nc" id="L356">        HashMap&lt;String, String&gt; vars = new HashMap&lt;String, String&gt;();</span>
+<span class="nc" id="L357">        vars.put(&quot;id&quot;, surveyReturn.id().toString());</span>
+
+<span class="nc" id="L359">        HttpHeaders headers = new HttpHeaders();</span>
+<span class="nc" id="L360">        headers.setLocation(builder.path(&quot;/{id}&quot;).buildAndExpand(vars).toUri());</span>
+<span class="nc" id="L361">        return new ResponseEntity(headers, HttpStatus.CREATED);</span>
+    }
+
+    /**
+     * Update an existing return with a single answer.
+     *
+     * &lt;p&gt;The period of the return is assumed.
+     *
+     * @param returnId The return this answer belongs to.
+     * @param q The name of the question this answer belongs to.
+     *
+     */
+    @ResponseStatus(value = HttpStatus.NO_CONTENT)
+    @RequestMapping(value = &quot;/{id}/answers/{q}&quot;, method = RequestMethod.POST, consumes = &quot;application/json&quot;)
+    public @ResponseBody void updateCurrentAnswer(
+            @PathVariable(&quot;id&quot;) Long returnId,
+            @PathVariable(&quot;q&quot;) String q,
+            @RequestBody String updatedAns) {
+<span class="nc" id="L379">        SurveyReturn existing = findById(returnId);</span>
+<span class="nc" id="L380">        updateAnswer(existing, q, existing.applicablePeriod(), updatedAns);</span>
+<span class="nc" id="L381">    }</span>
+
+    /**
+     * Update an existing return with a single answer.
+     *
+     * @param returnId The return this answer belongs to.
+     * @param q The name of the question this answer belongs to.
+     * @param period The period of this answer, if omitted the period of the return is assumed.
+     */
+    @ResponseStatus(value = HttpStatus.NO_CONTENT)
+    @RequestMapping(value = &quot;/{id}/answers/{q}/{period}&quot;, method = RequestMethod.POST, consumes = &quot;application/json&quot;)
+    public @ResponseBody void updateAnswer(
+            @PathVariable(&quot;id&quot;) Long returnId,
+            @PathVariable(&quot;q&quot;) String q,
+            @PathVariable(&quot;period&quot;) String period,
+            @RequestBody String updatedAns) {
+<span class="nc" id="L397">        updateAnswer(findById(returnId), q, period, updatedAns);</span>
+<span class="nc" id="L398">    }</span>
+
+    protected void updateAnswer(SurveyReturn rtn, String q,
+            String period, String updatedAns) {
+<span class="nc" id="L402">        LOGGER.info(&quot;Updating answer to {} for {} in {} to {}&quot;, q, rtn.org(), period, updatedAns);</span>
+<span class="nc" id="L403">        Optional&lt;Answer&gt; answer = rtn.answer(period, Q.valueOf(q));</span>
+<span class="nc bnc" id="L404" title="All 2 branches missed.">        if (answer.isPresent()) {</span>
+<span class="nc" id="L405">            answer.get().response(updatedAns).derived(false);</span>
+        } else {
+<span class="nc" id="L407">            LOGGER.warn(&quot;Creating new answer to {} for {} in {}&quot;, q, rtn.org(), period);</span>
+<span class="nc" id="L408">            Optional&lt;Question&gt; existingQ = findQuestion(q);</span>
+<span class="nc bnc" id="L409" title="All 2 branches missed.">            if (existingQ.isPresent()) {</span>
+<span class="nc" id="L410">                rtn.initAnswer(rtn, period, existingQ.get())</span>
+<span class="nc" id="L411">                        .response(updatedAns).derived(false);</span>
+            } else {
+<span class="nc" id="L413">                throw new ObjectNotFoundException(Question.class, q);</span>
+            }
+        }
+<span class="nc" id="L416">        DefaultCompletenessValidator validator = new DefaultCompletenessValidator() ;</span>
+<span class="nc" id="L417">        validator.validate(rtn);</span>
+<span class="nc" id="L418">        returnRepo.save(rtn);</span>
+<span class="nc" id="L419">    }</span>
+
+    protected Optional&lt;Question&gt; findQuestion(String q) {
+<span class="nc bnc" id="L422" title="All 2 branches missed.">        for (Question question : questions) {</span>
+<span class="nc bnc" id="L423" title="All 2 branches missed.">            if (q.equals(question.q().name())) {</span>
+<span class="nc" id="L424">                return Optional.of(question);</span>
+            }
+<span class="nc" id="L426">        }</span>
+<span class="nc" id="L427">        return Optional.empty();</span>
+    }
+
+    /**
+     * Re-stating a return preserves the existing one and saves the updates as a new revision.
+     */
+    @ResponseStatus(value = HttpStatus.NO_CONTENT)
+    @RequestMapping(value = &quot;/{id}/restate&quot;, method = RequestMethod.POST, consumes = { &quot;application/json&quot; })
+    @Transactional
+    public @ResponseBody void restate(
+            @PathVariable(&quot;id&quot;) Long returnId) {
+<span class="nc" id="L438">        SurveyReturn existing = returnRepo.findOne(returnId);</span>
+<span class="nc" id="L439">        existing.status(StatusType.Superseded.name());</span>
+<span class="nc bnc" id="L440" title="All 2 branches missed.">        for (Answer a : existing.answers()) {</span>
+<span class="nc" id="L441">            a.status(StatusType.Superseded.name());</span>
+<span class="nc" id="L442">        }</span>
+<span class="nc" id="L443">        returnRepo.save(existing);</span>
+
+<span class="nc" id="L445">        SurveyReturn restatedRtn = new SurveyReturn()</span>
+<span class="nc" id="L446">                .name(existing.name())</span>
+<span class="nc" id="L447">                .org(existing.org())</span>
+<span class="nc" id="L448">                .status(StatusType.Draft.name())</span>
+<span class="nc" id="L449">                .applicablePeriod(existing.applicablePeriod())</span>
+<span class="nc" id="L450">                .revision(new Integer(existing.revision()+1).shortValue())</span>
+<span class="nc" id="L451">                .survey(existing.survey());</span>
+<span class="nc bnc" id="L452" title="All 2 branches missed.">        for (Answer a : existing.answers()) {</span>
+<span class="nc" id="L453">            restatedRtn.answers().add(new Answer()</span>
+<span class="nc" id="L454">                    .applicablePeriod(a.applicablePeriod())</span>
+<span class="nc" id="L455">                    .revision(new Integer(a.revision()+1).shortValue())</span>
+<span class="nc" id="L456">                    .status(StatusType.Draft.name())</span>
+<span class="nc" id="L457">                    .response(a.response())</span>
+<span class="nc" id="L458">                    .question(a.question())</span>
+<span class="nc" id="L459">                    .addSurveyReturn(restatedRtn));</span>
+<span class="nc" id="L460">        }</span>
+<span class="nc" id="L461">        returnRepo.save(restatedRtn);</span>
+<span class="nc" id="L462">    }</span>
+
+    /**
+     * Change the status the return has reached.
+     * @return
+     */
+    @RequestMapping(value = &quot;/{returnId}/status/{status}&quot;, method = RequestMethod.POST, consumes = &quot;application/json&quot;)
+    @JsonView(SurveyReturnViews.Detailed.class)
+    public @ResponseBody SurveyReturn setStatus(
+            @PathVariable(&quot;returnId&quot;) Long returnId,
+            HttpServletRequest req,
+            @PathVariable(&quot;status&quot;) String status) {
+<span class="nc" id="L474">        LOGGER.info(String.format(&quot;Setting survey %1$s to status %2$s&quot;,</span>
+                returnId, status));
+
+<span class="nc" id="L477">        SurveyReturn survey = returnRepo.findOne(returnId).status(status);</span>
+<span class="nc bnc" id="L478" title="All 3 branches missed.">        switch (StatusType.valueOf(status)) {</span>
+        case Published:
+<span class="nc" id="L480">            publish(survey);</span>
+<span class="nc" id="L481">            break;</span>
+        case Submitted:
+<span class="nc" id="L483">            submit(survey, req.getHeader(&quot;X-RunAs&quot;));</span>
+<span class="nc" id="L484">            break;</span>
+        default:
+<span class="nc" id="L486">            String msg = String.format(&quot;Setting return %1$d to %2$s is not allowed&quot;, returnId, status);</span>
+<span class="nc" id="L487">            throw new IllegalArgumentException(msg );</span>
+        }
+
+<span class="nc" id="L490">        return returnRepo.save(survey);</span>
+    }
+
+    protected void submit(SurveyReturn survey, String submitter) {
+<span class="nc" id="L494">        survey.updatedBy(submitter);</span>
+<span class="nc" id="L495">        survey.submittedBy(submitter);</span>
+<span class="nc" id="L496">        survey.submittedDate(new Date());</span>
+<span class="nc" id="L497">        survey.status(StatusType.Submitted.name());</span>
+<span class="nc bnc" id="L498" title="All 2 branches missed.">        for (Answer a : survey.answers()) {</span>
+            // Cannot overwrite published answers without calling restate
+<span class="nc bnc" id="L500" title="All 4 branches missed.">            if (!a.status().equals(StatusType.Published.name()) &amp;&amp; !a.status().equals(StatusType.Superseded.name())) {</span>
+<span class="nc" id="L501">                a.setStatus(StatusType.Submitted.name());</span>
+            } else {
+<span class="nc" id="L503">                LOGGER.warn(&quot;Cannot set status of answer {} to {} because it's been published or superseded&quot;, a.id(), a.status());</span>
+            }
+<span class="nc" id="L505">        }</span>
+<span class="nc" id="L506">    }</span>
+
+    protected void publish(SurveyReturn survey) {
+<span class="nc" id="L509">        survey.status(StatusType.Published.name());</span>
+<span class="nc bnc" id="L510" title="All 2 branches missed.">        for (Answer a : survey.answers()) {</span>
+<span class="nc" id="L511">            a.setStatus(StatusType.Published.name());</span>
+<span class="nc" id="L512">        }</span>
+<span class="nc" id="L513">    }</span>
+
+    /**
+     * Delete an existing return.
+     */
+    @ResponseStatus(value = HttpStatus.NO_CONTENT)
+    @RequestMapping(value = &quot;/{id}&quot;, method = RequestMethod.DELETE)
+    @Transactional
+    public @ResponseBody void delete(
+            @PathVariable(&quot;id&quot;) Long returnId) {
+<span class="nc" id="L523">        returnRepo.delete(returnId);</span>
+<span class="nc" id="L524">    }</span>
+
+    private List&lt;SurveyReturn&gt; addLinks(List&lt;SurveyReturn&gt; returns) {
+<span class="nc bnc" id="L527" title="All 2 branches missed.">        for (SurveyReturn rtn : returns) {</span>
+<span class="nc" id="L528">            addLinks(rtn);</span>
+<span class="nc" id="L529">        }</span>
+<span class="nc" id="L530">        return returns;</span>
+    }
+
+    private SurveyReturn addLinks(SurveyReturn rtn) {
+<span class="nc" id="L534">        List&lt;Link&gt; links = new ArrayList&lt;Link&gt;();</span>
+<span class="nc" id="L535">        links.add(new Link(baseUrl+getClass().getAnnotation(RequestMapping.class).value()[0] + &quot;/&quot; + rtn.id()));</span>
+
+<span class="nc" id="L537">        return rtn.links(links);</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.2.201808211720</span></div></body></html>

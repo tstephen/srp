@@ -1,0 +1,293 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>SurveyController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Sustainability Reporting</a> &gt; <a href="index.source.html" class="el_package">digital.srp.sreport.web</a> &gt; <span class="el_source">SurveyController.java</span></div><h1>SurveyController.java</h1><pre class="source lang-java linenums">package digital.srp.sreport.web;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.transaction.Transactional;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.hateoas.Link;
+import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
+
+import com.fasterxml.jackson.annotation.JsonView;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import digital.srp.sreport.model.Q;
+import digital.srp.sreport.model.Survey;
+import digital.srp.sreport.model.SurveyCategory;
+import digital.srp.sreport.model.SurveyReturn;
+import digital.srp.sreport.model.views.SurveyReturnViews;
+import digital.srp.sreport.model.views.SurveyViews;
+import digital.srp.sreport.repositories.QuestionRepository;
+import digital.srp.sreport.repositories.SurveyCategoryRepository;
+import digital.srp.sreport.repositories.SurveyRepository;
+import digital.srp.sreport.repositories.SurveyReturnRepository;
+
+/**
+ * REST web service for accessing surveys.
+ * 
+ * @author Tim Stephenson
+ */
+@Controller
+@RequestMapping(value = &quot;/surveys&quot;)
+<span class="fc" id="L45">public class SurveyController {</span>
+
+<span class="fc" id="L47">    private static final Logger LOGGER = LoggerFactory</span>
+<span class="fc" id="L48">            .getLogger(SurveyController.class);</span>
+
+    @Autowired 
+    protected ObjectMapper objectMapper;
+    
+    @Autowired
+    protected  SurveyRepository surveyRepo;
+
+    @Autowired
+    protected  SurveyCategoryRepository catRepo;
+    
+    @Autowired
+    protected  QuestionRepository questionRepo;
+    
+    @Autowired
+    protected  SurveyReturnRepository returnRepo;
+    
+    /**
+     * Return just the specified survey.
+     * 
+     * @return The specified survey.
+     */
+    @RequestMapping(value = &quot;/{id}&quot;, method = RequestMethod.GET)
+    @JsonView(SurveyViews.Detailed.class)
+    @Transactional
+    public @ResponseBody Survey findById(
+            @PathVariable(&quot;id&quot;) Long surveyId) {
+<span class="nc" id="L75">        LOGGER.info(String.format(&quot;findById %1$s&quot;, surveyId));</span>
+
+<span class="nc" id="L77">        Survey survey = surveyRepo.findOne(surveyId);</span>
+        // use logger for force child load
+<span class="nc" id="L79">        LOGGER.info(String.format(&quot;Found survey with id %1$d named %2$s and with %3$d categories of questions&quot;, survey.id(), survey.name(), survey.categories().size()));</span>
+
+<span class="nc" id="L81">        return addLinks(survey);</span>
+    }
+
+    /**
+     * Return just the specified survey.
+     * 
+     * @return The specified survey.
+     */
+    @RequestMapping(value = &quot;/findByName/{name}&quot;, method = RequestMethod.GET)
+    @JsonView(SurveyViews.Detailed.class)
+    public @ResponseBody Survey findByName(
+            @PathVariable(&quot;name&quot;) String name) {
+<span class="nc" id="L93">        LOGGER.info(String.format(&quot;findByName %1$s&quot;, name));</span>
+
+<span class="nc" id="L95">        Survey survey = surveyRepo.findByName(name);</span>
+        // use logger for force child load
+<span class="nc" id="L97">        LOGGER.info(String.format(&quot;Found survey with id %1$d named %2$s and with %3$d categories totalling %4$d questions&quot;, </span>
+<span class="nc" id="L98">                survey.id(), survey.name(), survey.categories().size(),</span>
+<span class="nc" id="L99">                survey.questionCodes().size()));</span>
+
+        // TODO fetch all questions to optimise db access?
+//        List&lt;SurveyQuestion&gt; surveyQuestions = qRepo.findBySurvey(survey.name());
+<span class="nc bnc" id="L103" title="All 2 branches missed.">        for (SurveyCategory cat : survey.categories()) {</span>
+<span class="nc bnc" id="L104" title="All 2 branches missed.">            for (Q q : cat.questionEnums()) {</span>
+<span class="nc" id="L105">                cat.questions().add(questionRepo.findByName(q.name()));</span>
+<span class="nc" id="L106">            }</span>
+<span class="nc" id="L107">        }</span>
+        
+<span class="nc" id="L109">        return survey;</span>
+    }
+    
+    /**
+     * Return a list of surveys, optionally paged.
+     * 
+     * @return surveys.
+     */
+    @RequestMapping(value = &quot;/&quot;, method = RequestMethod.GET)
+    @JsonView(SurveyViews.Summary.class)
+    public @ResponseBody List&lt;Survey&gt; list(
+            @RequestParam(value = &quot;page&quot;, required = false) Integer page,
+            @RequestParam(value = &quot;limit&quot;, required = false) Integer limit) {
+<span class="nc" id="L122">        LOGGER.info(String.format(&quot;List surveys&quot;));</span>
+
+        List&lt;Survey&gt; list;
+<span class="nc bnc" id="L125" title="All 2 branches missed.">        if (limit == null) {</span>
+<span class="nc" id="L126">            list = surveyRepo.findAll();</span>
+        } else {
+<span class="nc bnc" id="L128" title="All 2 branches missed.">            Pageable pageable = new PageRequest(page == null ? 0 : page, limit);</span>
+<span class="nc" id="L129">            list = surveyRepo.findPage(pageable);</span>
+        }
+<span class="nc" id="L131">        LOGGER.info(String.format(&quot;Found %1$s surveys&quot;, list.size()));</span>
+
+<span class="nc" id="L133">        return list;</span>
+    }
+    
+    /**
+     * Return a list of survey returns, optionally paged.
+     * 
+     * @return survey returns.
+     */
+    @RequestMapping(value = &quot;/{id}/returns&quot;, method = RequestMethod.GET)
+    @JsonView(SurveyReturnViews.Summary.class)
+    public @ResponseBody List&lt;SurveyReturn&gt; listReturns(
+            @PathVariable(&quot;id&quot;) Long surveyId,
+            @RequestParam(value = &quot;page&quot;, required = false) Integer page,
+            @RequestParam(value = &quot;limit&quot;, required = false) Integer limit) {
+<span class="nc" id="L147">        LOGGER.info(String.format(&quot;List returns&quot;));</span>
+
+        List&lt;SurveyReturn&gt; list;
+<span class="nc bnc" id="L150" title="All 2 branches missed.">        if (limit == null) {</span>
+<span class="nc" id="L151">            list = returnRepo.findBySurvey(surveyId);</span>
+        } else {
+<span class="nc bnc" id="L153" title="All 2 branches missed.">            Pageable pageable = new PageRequest(page == null ? 0 : page, limit);</span>
+<span class="nc" id="L154">            list = returnRepo.findPageBySurvey(surveyId, pageable);</span>
+        }
+<span class="nc" id="L156">        LOGGER.info(String.format(&quot;Found %1$s returns&quot;, list.size()));</span>
+
+<span class="nc" id="L158">        return list;</span>
+    }
+
+    /**
+     * Create a new survey.
+     * 
+     * @return
+     */
+//    @SuppressWarnings({ &quot;rawtypes&quot;, &quot;unchecked&quot; })
+//    @ResponseStatus(value = HttpStatus.CREATED)
+//    @RequestMapping(value = &quot;/&quot;, method = RequestMethod.POST)
+//    public @ResponseBody ResponseEntity&lt;?&gt; create(
+//            @RequestBody Survey survey) {
+//
+//        createInternal(survey);
+//
+//        UriComponentsBuilder builder = MvcUriComponentsBuilder
+//                .fromController(getClass());
+//        HashMap&lt;String, String&gt; vars = new HashMap&lt;String, String&gt;();
+//        vars.put(&quot;id&quot;, survey.id().toString());
+//
+//        HttpHeaders headers = new HttpHeaders();
+//        headers.setLocation(builder.path(&quot;/{id}&quot;).buildAndExpand(vars).toUri());
+//        return new ResponseEntity(headers, HttpStatus.CREATED);
+//    }
+
+//    @Transactional
+//    protected void createInternal(Survey survey) {
+////        ArrayList&lt;SurveyCategory&gt; newCats = new ArrayList&lt;SurveyCategory&gt;(survey.categories().size());
+//        for (SurveyCategory cat : survey.categories()) {
+//            if (cat.name()==null) {
+//                System.err.println(&quot;No name for cat : &quot;+cat);
+//            }
+//            cat.survey(survey);
+////            SurveyCategory foundCat = catRepo.findOne(cat.id());
+////            if (foundCat == null) {
+////                catRepo.save(cat);
+////                ArrayList&lt;SurveyQuestion&gt; newQs = new ArrayList&lt;SurveyQuestion&gt;(cat.questions().size());
+//                for (SurveyQuestion q : cat.questions()) {
+////                    SurveyQuestion foundQ = qRepo.findOne(q.id());
+////                    if (foundQ == null) {
+//                        q.category(cat);
+////                        newQs.add(qRepo.save(q));
+////                    } else {
+////                        newQs.add(foundQ);
+////                    }
+//                }
+////                cat.questions(newQs);
+////                newCats.add(catRepo.save(cat));
+////            } else {
+////                newCats.add(foundCat);
+////            }
+//        }
+////        survey.categories(newCats);
+////        for (SurveyQuestion q : survey.questions()) {
+////            qRepo.save(q);
+////        }
+//        survey = surveyRepo.save(survey);
+//    }
+
+    /**
+     * Update an existing survey.
+     */
+//    @ResponseStatus(value = HttpStatus.NO_CONTENT)
+//    @RequestMapping(value = &quot;/{idOrName}&quot;, method = RequestMethod.PUT, consumes = { &quot;application/json&quot; })
+//    @Transactional
+//    public @ResponseBody void update(
+//            @PathVariable(&quot;idOrName&quot;) String idOrName,
+//            @RequestBody Survey updatedSurvey) {
+//        
+//        Survey survey = null;
+//        try {
+//            Long surveyId = Long.parseLong(idOrName);
+//            survey = surveyRepo.findOne(surveyId);
+//        } catch (NumberFormatException e) {
+//            LOGGER.info(&quot;Cannot parse survey id from '{}', assume it's a name&quot;, idOrName);
+//            survey = surveyRepo.findByName(idOrName);
+//        }
+//        LOGGER.info(&quot;Updated survey '{}' has {} questions, compared to {}&quot;, 
+//                idOrName, updatedSurvey.questions().size(), survey.questions().size());
+//        
+//        for (SurveyCategory uCat : updatedSurvey.categories()) {
+//            SurveyCategory cat = survey.category(uCat.name());
+//            if (cat == null) {
+//                uCat.survey(survey);
+//                cat = catRepo.save(uCat);
+//                survey.categories().add(cat);
+//            }
+//            for (SurveyQuestion uq : uCat.questions()) {
+//                SurveyQuestion q = survey.question(uq.name());
+//                if (q == null) {
+//                    uq.category(cat);
+//                    q = qRepo.save(uq);
+//                    cat.questions().add(q);
+//                } else {
+//                    q.category(cat).hint(uq.hint()).label(uq.label()).required(uq.required()).type(uq.type()).unit(uq.unit());
+//                }
+//            }
+//        }
+//        LOGGER.info(&quot;... survey now has {} questions&quot;, survey.questions().size());
+//
+//        surveyRepo.save(survey);
+//    }
+
+    /**
+     * Change the status the survey has reached.
+     */
+    @RequestMapping(value = &quot;/{surveyId}/status&quot;, method = RequestMethod.POST, consumes = &quot;application/json&quot;)
+    public @ResponseBody void setStatus(
+            @PathVariable(&quot;surveyId&quot;) Long surveyId,
+            @RequestBody String status) {
+<span class="nc" id="L269">        LOGGER.info(String.format(&quot;Setting survey %1$s to status %2$s&quot;,</span>
+                surveyId, status));
+
+<span class="nc" id="L272">        Survey survey = surveyRepo.findOne(surveyId).status(status);</span>
+<span class="nc" id="L273">        surveyRepo.save(survey);</span>
+<span class="nc" id="L274">    }</span>
+
+    /**
+     * Delete an existing survey.
+     */
+    @ResponseStatus(value = HttpStatus.NO_CONTENT)
+    @RequestMapping(value = &quot;/{id}&quot;, method = RequestMethod.DELETE)
+    @Transactional
+    public @ResponseBody void delete(@PathVariable(&quot;id&quot;) Long surveyId) {
+<span class="nc" id="L283">        surveyRepo.delete(surveyId);</span>
+<span class="nc" id="L284">    }</span>
+
+    private Survey addLinks(Survey survey) {
+<span class="nc" id="L287">        List&lt;Link&gt; links = new ArrayList&lt;Link&gt;();</span>
+<span class="nc" id="L288">        links.add(new Link(getClass().getAnnotation(RequestMapping.class).value()[0] + &quot;/&quot; + survey.id()));</span>
+        
+<span class="nc" id="L290">        return survey.links(links);</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.2.201808211720</span></div></body></html>

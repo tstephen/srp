@@ -1,0 +1,1348 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Cruncher.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Sustainability Reporting</a> &gt; <a href="index.source.html" class="el_package">digital.srp.sreport.services</a> &gt; <span class="el_source">Cruncher.java</span></div><h1>Cruncher.java</h1><pre class="source lang-java linenums">package digital.srp.sreport.services;
+
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Optional;
+
+import javax.transaction.Transactional;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
+
+import digital.srp.sreport.api.Calculator;
+import digital.srp.sreport.api.exceptions.ObjectNotFoundException;
+import digital.srp.sreport.internal.PeriodUtil;
+import digital.srp.sreport.model.Answer;
+import digital.srp.sreport.model.CarbonFactor;
+import digital.srp.sreport.model.CarbonFactors;
+import digital.srp.sreport.model.Q;
+import digital.srp.sreport.model.SurveyReturn;
+import digital.srp.sreport.model.WeightingFactor;
+import digital.srp.sreport.model.WeightingFactors;
+import digital.srp.sreport.model.surveys.SduQuestions;
+import digital.srp.sreport.model.surveys.SurveyFactory;
+
+@Component
+public class Cruncher implements digital.srp.sreport.model.surveys.SduQuestions, Calculator {
+<span class="fc" id="L31">    private static final BigDecimal ONE_THOUSAND = new BigDecimal(&quot;1000.000000&quot;);</span>
+
+<span class="fc" id="L33">    private static final Logger LOGGER = LoggerFactory</span>
+<span class="fc" id="L34">            .getLogger(Cruncher.class);</span>
+
+<span class="fc" id="L36">    protected static final BigDecimal ONE_HUNDRED = new BigDecimal(&quot;100.000000&quot;);</span>
+
+<span class="fc" id="L38">    protected static final BigDecimal m2km = new BigDecimal(&quot;1.60934&quot;);</span>
+
+<span class="fc" id="L40">    protected static final BigDecimal BUS_PER_MILE = new BigDecimal(&quot;0.1200&quot;);</span>
+<span class="fc" id="L41">    protected static final BigDecimal RAIL_PER_MILE = new BigDecimal(&quot;0.3000&quot;);</span>
+<span class="fc" id="L42">    protected static final BigDecimal TAXI_PER_MILE = new BigDecimal(&quot;2.8300&quot;);</span>
+
+    protected final List&lt;CarbonFactor&gt; cfactors;
+
+    protected final List&lt;WeightingFactor&gt; wfactors;
+
+<span class="fc" id="L48">    private int divisionScale = 2;</span>
+
+    public Cruncher(final List&lt;CarbonFactor&gt; cfactors2,
+<span class="fc" id="L51">            final List&lt;WeightingFactor&gt; wfactors2) {</span>
+<span class="fc" id="L52">        this.cfactors = cfactors2;</span>
+<span class="fc" id="L53">        this.wfactors = wfactors2;</span>
+<span class="fc" id="L54">    }</span>
+
+    /**
+     * @see digital.srp.sreport.api.Calculator#calculate(digital.srp.sreport.model.SurveyReturn, int, AnswerFactory)
+     */
+    @Override
+    public synchronized SurveyReturn calculate(SurveyReturn rtn, int yearsToCalc, AnswerFactory answerFactory) {
+<span class="fc" id="L61">        long start = System.currentTimeMillis();</span>
+<span class="fc" id="L62">        ensureInitialised(rtn, yearsToCalc, answerFactory);</span>
+<span class="fc" id="L63">        LOGGER.info(&quot;Calculating for {} in {}&quot;, rtn.org(), rtn.applicablePeriod());</span>
+<span class="fc" id="L64">        List&lt;String&gt; periods = PeriodUtil.fillBackwards(rtn.applicablePeriod(), yearsToCalc);</span>
+<span class="fc bfc" id="L65" title="All 2 branches covered.">        for (String period : periods) {</span>
+<span class="fc" id="L66">            calcEnergyConsumption(period, rtn);</span>
+
+<span class="fc" id="L68">            calcScope1(period, rtn);</span>
+<span class="fc" id="L69">            calcScope2(period, rtn);</span>
+<span class="fc" id="L70">            calcScope3(period, rtn);</span>
+
+            try {
+<span class="pc bpc" id="L73" title="1 of 2 branches missed.">                if (isEClassUser(rtn)) {</span>
+<span class="fc" id="L74">                    calcCarbonProfileEClassMethod(period, rtn);</span>
+                } else {
+<span class="nc" id="L76">                    calcCarbonProfileSduMethod(period, rtn);</span>
+                }
+<span class="fc" id="L78">            } catch (IllegalStateException | ObjectNotFoundException e) {</span>
+<span class="fc" id="L79">                LOGGER.error(e.getMessage());</span>
+<span class="nc" id="L80">            } catch (Exception e) {</span>
+<span class="nc" id="L81">                LOGGER.error(e.getMessage());</span>
+<span class="fc" id="L82">            }</span>
+
+<span class="fc" id="L84">            sumAnswers(period, rtn, Q.SCOPE_1, SduQuestions.SCOPE_1_HDRS);</span>
+<span class="fc" id="L85">            sumAnswers(period, rtn, Q.SCOPE_2, SduQuestions.SCOPE_2_HDRS);</span>
+<span class="fc" id="L86">            sumAnswers(period, rtn, Q.SCOPE_3, SduQuestions.SCOPE_3_HDRS);</span>
+<span class="fc" id="L87">            sumAnswers(period, rtn, Q.SCOPE_ALL, Q.SCOPE_1, Q.SCOPE_2,</span>
+                    Q.SCOPE_3);
+
+<span class="fc" id="L90">            crunchEnergyCostChange(period, rtn);</span>
+
+<span class="fc" id="L92">            crunchSocialValue(period, rtn);</span>
+<span class="fc" id="L93">            crunchSocialInvestmentRecorded(period, rtn);</span>
+
+<span class="fc" id="L95">            calcBenchmarking(period, rtn);</span>
+<span class="fc" id="L96">        }</span>
+<span class="fc" id="L97">        rtn.setLastUpdated(new Date());</span>
+<span class="fc" id="L98">        LOGGER.warn(&quot;Calculations took {}ms&quot;, (System.currentTimeMillis() - start));</span>
+<span class="fc" id="L99">        return rtn;</span>
+    }
+
+    protected void calcEnergyConsumption(String period, SurveyReturn rtn) {
+<span class="fc" id="L103">        sumAnswers(period, rtn, Q.TOTAL_ENERGY, SduQuestions.ENERGY_HDRS);</span>
+<span class="fc" id="L104">        BigDecimal noStaff = getAnswerForPeriodWithFallback(period, rtn, Q.NO_STAFF).responseAsBigDecimal();</span>
+        try {
+<span class="fc" id="L106">            getAnswer(period, rtn, Q.TOTAL_ENERGY_BY_WTE).response(</span>
+<span class="fc" id="L107">                    getAnswer(period, rtn, Q.TOTAL_ENERGY).responseAsBigDecimal().divide(noStaff, RoundingMode.HALF_UP));</span>
+<span class="nc" id="L108">        } catch (ArithmeticException e) {</span>
+<span class="nc" id="L109">            LOGGER.warn(&quot;Insufficient data to calculate energy by WTE&quot;);</span>
+<span class="fc" id="L110">        }</span>
+<span class="fc" id="L111">    }</span>
+
+    // TODO replace with validator and/or health checker
+    protected void ensureInitialised(SurveyReturn rtn, int yearsToCalc, AnswerFactory answerFactory) {
+<span class="fc" id="L115">        LOGGER.info(&quot;Ensuring questions initialised for {} in {} and {} years prior&quot;, rtn.org(), rtn.applicablePeriod(),</span>
+<span class="fc" id="L116">                yearsToCalc - 1);</span>
+<span class="fc" id="L117">        List&lt;String&gt; periods = PeriodUtil.fillBackwards(rtn.applicablePeriod(),</span>
+                yearsToCalc);
+
+<span class="fc" id="L120">        SurveyFactory fact = SurveyFactory.getInstance(rtn.survey().name());</span>
+<span class="fc" id="L121">        Q[] requiredQs = fact.getQs();</span>
+
+<span class="fc bfc" id="L123" title="All 2 branches covered.">        for (String period : periods) {</span>
+<span class="fc bfc" id="L124" title="All 2 branches covered.">            for (Q q : requiredQs) {</span>
+<span class="fc" id="L125">                Optional&lt;Answer&gt; optional = rtn.answer(period, q);</span>
+<span class="fc bfc" id="L126" title="All 2 branches covered.">                if (!optional.isPresent()) {</span>
+<span class="fc" id="L127">                    LOGGER.warn(&quot;Correcting missing answer: {} in {} for {}&quot;, q, period, rtn.org());</span>
+<span class="fc" id="L128">                    answerFactory.addAnswer(rtn, period, q);</span>
+                }
+            }
+<span class="fc" id="L131">        }</span>
+<span class="fc" id="L132">    }</span>
+
+    boolean isEClassUser(SurveyReturn rtn) {
+        // Intentional use of rtn period. If EClass user in current year
+        // calculate all years on that basis
+<span class="fc" id="L137">        Optional&lt;Answer&gt; answer = rtn.answer(rtn.applicablePeriod(), Q.ECLASS_USER);</span>
+<span class="fc bfc" id="L138" title="All 2 branches covered.">        if (answer.isPresent()) {</span>
+<span class="fc" id="L139">            LOGGER.info(&quot;Checking {} to see if {} is E-Class user in {}&quot;,</span>
+<span class="fc" id="L140">                    answer.get().response(), rtn.org(), rtn.applicablePeriod());</span>
+<span class="pc bpc" id="L141" title="1 of 2 branches missed.">            return Boolean.parseBoolean(answer.get().response())</span>
+<span class="pc bnc" id="L142" title="All 2 branches missed.">                    || SduQuestions.ANALYSE_BY_E_CLASS.equals(answer.get().response());</span>
+        } else {
+<span class="fc" id="L144">            LOGGER.info(&quot;{} NOT E-Class user in {}&quot;, rtn.org(), rtn.applicablePeriod());</span>
+<span class="fc" id="L145">            return false;</span>
+        }
+    }
+
+    protected void calcBenchmarking(String period, SurveyReturn rtn) {
+<span class="fc" id="L150">        Answer totalEnergyCo2eA = sumAnswers(period, rtn, Q.TOTAL_ENERGY_CO2E, Q.OWNED_BUILDINGS,</span>
+                Q.NET_ELEC_CO2E, Q.SCOPE_3_BIOMASS_WTT);
+<span class="fc" id="L152">        BigDecimal totalEnergyCo2e = totalEnergyCo2eA.responseAsBigDecimal();</span>
+
+        // SCOPE_3_TRAVEL already calculated
+<span class="fc" id="L155">        BigDecimal totalTravelCo2e = BigDecimal.ZERO;</span>
+        try {
+<span class="fc" id="L157">            totalTravelCo2e = getAnswer(period, rtn, Q.SCOPE_3_TRAVEL).responseAsBigDecimal();</span>
+<span class="pc" id="L158">        } catch (Exception e) { }</span>
+
+<span class="fc" id="L160">        Answer totalProcurementCo2eA = sumAnswers(period, rtn, Q.TOTAL_PROCUREMENT_CO2E, Q.PROCUREMENT_CO2E,</span>
+                Q.ANAESTHETIC_GASES_CO2E, Q.SCOPE_3_WASTE, Q.SCOPE_3_WATER, Q.CAPITAL_CO2E);
+<span class="fc" id="L162">        BigDecimal totalProcurementCo2e = totalProcurementCo2eA.responseAsBigDecimal();</span>
+
+        // CORE CO2E
+<span class="fc" id="L165">        BigDecimal totalCoreCo2e = sumAnswers(period, rtn,</span>
+                Q.TOTAL_CORE_CO2E,
+                Q.ANAESTHETIC_GASES_CO2E,
+                /* water and waste */
+                Q.WASTE_AND_WATER_CO2E,
+                /* all travel excepting individual citizens (patients, visitors and staff) */
+                Q.BIZ_MILEAGE_CO2E,
+                /* All energy */
+                // TODO this is more complete than totalEnergyCo2e already calculated above????
+                Q.LEASED_ASSETS_ENERGY_USE,
+                Q.NET_ELEC_CO2E, Q.NET_THERMAL_ENERGY_CO2E,
+                Q.OWNED_BUILDINGS_COAL,
+                Q.OWNED_BUILDINGS_OIL,
+                Q.OWNED_BUILDINGS_GAS,
+<span class="fc" id="L179">                Q.OTHER_AOI_CORE).responseAsBigDecimal();</span>
+
+        BigDecimal totalCommissioningCo2e;
+<span class="fc bfc" id="L182" title="All 2 branches covered.">        if (isEClassUser(rtn)) {</span>
+<span class="fc" id="L183">            totalCommissioningCo2e = sumAnswers(period, rtn,</span>
+                    Q.TOTAL_COMMISSIONING_CO2E,
+<span class="fc" id="L185">                    Q.PURCHASED_HEALTHCARE_CO2E).responseAsBigDecimal();</span>
+        } else {
+<span class="fc" id="L187">            totalCommissioningCo2e = sumAnswers(period, rtn,</span>
+                    Q.TOTAL_COMMISSIONING_CO2E,
+<span class="fc" id="L189">                    Q.COMMISSIONING_CO2E).responseAsBigDecimal();</span>
+        }
+
+
+<span class="fc" id="L193">        BigDecimal totalCommunityCo2e = sumAnswers(period, rtn,</span>
+                Q.TOTAL_COMMUNITY_CO2E,
+                Q.STAFF_COMMUTE_MILES_CO2E,
+<span class="fc" id="L196">                Q.PATIENT_AND_VISITOR_MILEAGE_CO2E).responseAsBigDecimal();</span>
+
+        BigDecimal totalProcurement2017Co2e;
+<span class="fc bfc" id="L199" title="All 2 branches covered.">        if (isEClassUser(rtn)) {</span>
+<span class="fc" id="L200">            totalProcurement2017Co2e = sumAnswers(period, rtn,</span>
+                    Q.TOTAL_PROCUREMENT_2017_CO2E,
+                    Q.PROVISIONS_CO2E,
+                    Q.STAFF_CLOTHING_CO2E,
+                    Q.PATIENTS_CLOTHING_AND_FOOTWEAR_CO2E,
+                    Q.PHARMA_BLOOD_PROD_AND_MED_GASES_CO2E,
+                    Q.DRESSINGS_CO2E,
+                    Q.MEDICAL_AND_SURGICAL_EQUIPT_CO2E,
+                    Q.PATIENTS_APPLIANCES_CO2E,
+                    Q.CHEMICALS_AND_REAGENTS_CO2E,
+                    Q.DENTAL_AND_OPTICAL_EQUIPT_CO2E,
+                    Q.LAB_EQUIPT_AND_SVCS_CO2E,
+                    Q.HOTEL_EQUIPT_MATERIALS_AND_SVCS_CO2E,
+                    Q.BLDG_AND_ENG_PROD_AND_SVCS_CO2E,
+                    Q.GARDENING_AND_FARMING_CO2E,
+                    Q.FURNITURE_FITTINGS_CO2E,
+                    Q.HARDWARE_CROCKERY_CO2E,
+                    Q.BEDDING_LINEN_AND_TEXTILES_CO2E,
+                    Q.OFFICE_EQUIPT_TELCO_COMPUTERS_AND_STATIONERY_CO2E,
+                    Q.REC_EQUIPT_AND_SOUVENIRS_CO2E,
+                    Q.CONSULTING_SVCS_AND_EXPENSES_CO2E,
+<span class="fc" id="L221">                    Q.PHARMA_CO2E).responseAsBigDecimal();</span>
+        } else {
+<span class="fc" id="L223">            totalProcurement2017Co2e = sumAnswers(period, rtn,</span>
+                    Q.TOTAL_PROCUREMENT_2017_CO2E,
+                    Q.CAPITAL_CO2E,
+                    Q.BIZ_SVCS_CO2E,
+                    Q.CONSTRUCTION_CO2E,
+                    Q.CATERING_CO2E,
+                    Q.FREIGHT_CO2E,
+                    Q.ICT_CO2E,
+                    Q.CHEM_AND_GAS_CO2E,
+                    Q.MED_INSTR_CO2E,
+                    Q.OTHER_MANUFACTURED_CO2E,
+                    /* #203 drop as no Carbon factor Q.OTHER_PROCUREMENT_CO2E */
+                    Q.PAPER_AND_CARD_CO2E,
+<span class="fc" id="L236">                    Q.PHARMA_CO2E).responseAsBigDecimal();</span>
+        }
+
+<span class="fc" id="L239">        Answer totalCo2eA = sumAnswers(period, rtn, Q.TOTAL_CO2E,</span>
+                Q.TOTAL_CORE_CO2E,
+                Q.TOTAL_COMMUNITY_CO2E, Q.TOTAL_PROCUREMENT_2017_CO2E,
+                Q.TOTAL_COMMISSIONING_CO2E);
+<span class="fc" id="L243">        BigDecimal totalCo2e = totalCo2eA.responseAsBigDecimal();</span>
+
+<span class="fc" id="L245">        benchmarkPerMetric(period, rtn, totalEnergyCo2e, totalTravelCo2e,</span>
+                totalProcurementCo2e, totalCoreCo2e, totalCommissioningCo2e,
+                totalCommunityCo2e, totalProcurement2017Co2e, totalCo2e,
+<span class="fc" id="L248">                getAnswerForPeriodWithFallback(period, rtn, Q.POPULATION).responseAsBigDecimal(),</span>
+                &quot;population&quot;);
+<span class="fc" id="L250">        benchmarkPerMetric(period, rtn, totalEnergyCo2e, totalTravelCo2e,</span>
+                totalProcurementCo2e, totalCoreCo2e, totalCommissioningCo2e,
+                totalCommunityCo2e, totalProcurement2017Co2e, totalCo2e,
+<span class="fc" id="L253">                getAnswerForPeriodWithFallback(period, rtn, Q.FLOOR_AREA).responseAsBigDecimal(),</span>
+                &quot;floorArea&quot;);
+<span class="fc" id="L255">        benchmarkPerMetric(period, rtn, totalEnergyCo2e, totalTravelCo2e,</span>
+                totalProcurementCo2e, totalCoreCo2e, totalCommissioningCo2e,
+                totalCommunityCo2e, totalProcurement2017Co2e, totalCo2e,
+<span class="fc" id="L258">                getAnswerForPeriodWithFallback(period, rtn, Q.NO_STAFF).responseAsBigDecimal(),</span>
+                &quot;noStaff&quot;);
+<span class="fc" id="L260">        benchmarkPerMetric(period, rtn, totalEnergyCo2e, totalTravelCo2e,</span>
+                totalProcurementCo2e, totalCoreCo2e, totalCommissioningCo2e,
+                totalCommunityCo2e, totalProcurement2017Co2e, totalCo2e,
+<span class="fc" id="L263">                getAnswerForPeriodWithFallback(period, rtn, Q.OCCUPIED_BEDS).responseAsBigDecimal(),</span>
+                &quot;occupiedBeds&quot;);
+<span class="fc" id="L265">        benchmarkPerMetric(period, rtn, totalEnergyCo2e, totalTravelCo2e,</span>
+                totalProcurementCo2e, totalCoreCo2e, totalCommissioningCo2e,
+                totalCommunityCo2e, totalProcurement2017Co2e, totalCo2e,
+<span class="fc" id="L268">                getAnswerForPeriodWithFallback(period, rtn, Q.NO_PATIENT_CONTACTS).responseAsBigDecimal(),</span>
+                &quot;patientContacts&quot;);
+<span class="fc" id="L270">        benchmarkPerMetric(period, rtn, totalEnergyCo2e, totalTravelCo2e,</span>
+                totalProcurementCo2e, totalCoreCo2e, totalCommissioningCo2e,
+                totalCommunityCo2e, totalProcurement2017Co2e, totalCo2e,
+<span class="fc" id="L273">                getAnswerForPeriodWithFallback(period, rtn, Q.OP_EX).responseAsBigDecimal(),</span>
+                &quot;opex&quot;);
+
+        try {
+<span class="fc" id="L277">            getAnswer(period, rtn, Q.CORE_CO2E_PCT)</span>
+<span class="fc" id="L278">                    .derived(true)</span>
+<span class="fc" id="L279">                    .response(totalCoreCo2e.divide(totalCo2e, RoundingMode.HALF_UP).multiply(ONE_HUNDRED));</span>
+<span class="fc" id="L280">        } catch (ArithmeticException | IllegalStateException e) {</span>
+<span class="fc" id="L281">            LOGGER.warn(&quot;Insufficient data to calculate core CO2E percentage for {} in {}&quot;, rtn.org(), period);</span>
+<span class="fc" id="L282">        }</span>
+        try {
+<span class="fc" id="L284">            getAnswer(period, rtn, Q.ENERGY_CO2E_PCT)</span>
+<span class="fc" id="L285">                    .derived(true)</span>
+<span class="fc" id="L286">                    .response(totalEnergyCo2e.divide(totalCo2e, RoundingMode.HALF_UP).multiply(ONE_HUNDRED));</span>
+<span class="fc" id="L287">        } catch (ArithmeticException | IllegalStateException e) {</span>
+<span class="fc" id="L288">            LOGGER.warn(&quot;Insufficient data to calculate energy CO2E percentage for {} in {}&quot;, rtn.org(), period);</span>
+<span class="fc" id="L289">        }</span>
+        try {
+<span class="fc" id="L291">            getAnswer(period, rtn, Q.COMMISSIONING_CO2E_PCT)</span>
+<span class="fc" id="L292">                    .derived(true)</span>
+<span class="fc" id="L293">                    .response(totalCommissioningCo2e.divide(totalCo2e, RoundingMode.HALF_UP)</span>
+<span class="fc" id="L294">                                .multiply(ONE_HUNDRED));</span>
+<span class="fc" id="L295">        } catch (ArithmeticException | IllegalStateException e) {</span>
+<span class="fc" id="L296">            LOGGER.warn(&quot;Insufficient data to calculate commissioning CO2E percentage for {} in {}&quot;, rtn.org(), period);</span>
+<span class="fc" id="L297">        }</span>
+        try {
+<span class="fc" id="L299">            getAnswer(period, rtn, Q.COMMUNITY_CO2E_PCT)</span>
+<span class="fc" id="L300">                    .derived(true)</span>
+<span class="fc" id="L301">                    .response(totalCommunityCo2e.divide(totalCo2e, RoundingMode.HALF_UP)</span>
+<span class="fc" id="L302">                        .multiply(ONE_HUNDRED));</span>
+<span class="fc" id="L303">        } catch (ArithmeticException | IllegalStateException e) {</span>
+<span class="fc" id="L304">            LOGGER.warn(&quot;Insufficient data to calculate community CO2E percentage for {} in {}&quot;, rtn.org(), period);</span>
+<span class="fc" id="L305">        }</span>
+        try {
+<span class="fc" id="L307">            getAnswer(period, rtn, Q.PROCUREMENT_CO2E_PCT)</span>
+<span class="fc" id="L308">                    .derived(true)</span>
+<span class="fc" id="L309">                    .response(totalProcurementCo2e.divide(totalCo2e, RoundingMode.HALF_UP)</span>
+<span class="fc" id="L310">                        .multiply(ONE_HUNDRED));</span>
+<span class="fc" id="L311">        } catch (ArithmeticException | IllegalStateException e) {</span>
+<span class="fc" id="L312">            LOGGER.warn(&quot;Insufficient data to calculate procurement CO2E percentage for {} in {}&quot;, rtn.org(), period);</span>
+<span class="fc" id="L313">        }</span>
+
+        try {
+<span class="fc" id="L316">            getAnswer(period, rtn, Q.PROCUREMENT_2017_CO2E_PCT)</span>
+<span class="fc" id="L317">                    .derived(true)</span>
+<span class="fc" id="L318">                    .response(totalProcurement2017Co2e.divide(totalCo2e, RoundingMode.HALF_UP)</span>
+<span class="fc" id="L319">                        .multiply(ONE_HUNDRED));</span>
+<span class="fc" id="L320">        } catch (ArithmeticException | IllegalStateException e) {</span>
+<span class="fc" id="L321">            LOGGER.warn(&quot;Insufficient data to calculate procurement 2017 CO2E percentage for {} in {}&quot;, rtn.org(), period);</span>
+<span class="fc" id="L322">        }</span>
+        try {
+<span class="fc" id="L324">            getAnswer(period, rtn, Q.TRAVEL_CO2E_PCT)</span>
+<span class="fc" id="L325">                    .derived(true)</span>
+<span class="fc" id="L326">                    .response(totalTravelCo2e.divide(totalCo2e, RoundingMode.HALF_UP)</span>
+<span class="fc" id="L327">                        .multiply(ONE_HUNDRED));</span>
+<span class="fc" id="L328">        } catch (ArithmeticException | IllegalStateException e) {</span>
+<span class="fc" id="L329">            LOGGER.warn(&quot;Insufficient data to calculate travel CO2E percentage for {} in {}&quot;, rtn.org(), period);</span>
+<span class="fc" id="L330">        }</span>
+<span class="fc" id="L331">    }</span>
+
+    protected void benchmarkPerMetric(String period, SurveyReturn rtn,
+            BigDecimal totalEnergyCo2e, BigDecimal totalTravelCo2e,
+            BigDecimal totalProcurementCo2e, BigDecimal totalCoreCo2e,
+            BigDecimal totalCommissioningCo2e, BigDecimal totalCommunityCo2e,
+            BigDecimal totalProcurement2017Co2e, BigDecimal totalCo2e,
+            BigDecimal metric, String metricName) {
+        try {
+<span class="fc" id="L340">            getAnswer(period, rtn, getTargetQ(&quot;TOTAL_CO2E&quot;,metricName)).derived(true).response(</span>
+                    totalCo2e // change tonnes to kgs
+<span class="fc" id="L342">                            .multiply(ONE_THOUSAND)</span>
+<span class="fc" id="L343">                            .divide(metric, RoundingMode.HALF_UP));</span>
+<span class="fc" id="L344">            getAnswer(period, rtn, getTargetQ(&quot;TOTAL_CORE_CO2E&quot;,metricName))</span>
+<span class="fc" id="L345">                    .derived(true)</span>
+<span class="fc" id="L346">                    .response(totalCoreCo2e // change tonnes to kgs</span>
+<span class="fc" id="L347">                            .multiply(ONE_THOUSAND)</span>
+<span class="fc" id="L348">                            .divide(metric, RoundingMode.HALF_UP));</span>
+<span class="nc" id="L349">            getAnswer(period, rtn, getTargetQ(&quot;TOTAL_ENERGY_CO2E&quot;,metricName))</span>
+<span class="nc" id="L350">                    .derived(true)</span>
+<span class="nc" id="L351">                    .response(totalEnergyCo2e // change tonnes to kgs</span>
+<span class="nc" id="L352">                            .multiply(ONE_THOUSAND)</span>
+<span class="nc" id="L353">                            .divide(metric, RoundingMode.HALF_UP));</span>
+<span class="nc" id="L354">            getAnswer(period, rtn, getTargetQ(&quot;TOTAL_COMMUNITY_CO2E&quot;,metricName))</span>
+<span class="nc" id="L355">                    .derived(true)</span>
+<span class="nc" id="L356">                    .response(totalCommunityCo2e // change tonnes to kgs</span>
+<span class="nc" id="L357">                            .multiply(ONE_THOUSAND)</span>
+<span class="nc" id="L358">                            .divide(metric, RoundingMode.HALF_UP));</span>
+<span class="nc" id="L359">            getAnswer(period, rtn, getTargetQ(&quot;TOTAL_PROCUREMENT_2017_CO2E&quot;,metricName))</span>
+<span class="nc" id="L360">                    .derived(true)</span>
+<span class="nc" id="L361">                    .response(totalProcurement2017Co2e // change tonnes to kgs</span>
+<span class="nc" id="L362">                            .multiply(ONE_THOUSAND)</span>
+<span class="nc" id="L363">                            .divide(metric, RoundingMode.HALF_UP));</span>
+<span class="nc" id="L364">            getAnswer(period, rtn, getTargetQ(&quot;TOTAL_COMMISSIONING_CO2E&quot;,metricName))</span>
+<span class="nc" id="L365">                    .derived(true)</span>
+<span class="nc" id="L366">                    .response(totalCommissioningCo2e // change tonnes to kgs</span>
+<span class="nc" id="L367">                            .multiply(ONE_THOUSAND)</span>
+<span class="nc" id="L368">                            .divide(metric, RoundingMode.HALF_UP));</span>
+<span class="nc" id="L369">            getAnswer(period, rtn, getTargetQ(&quot;TOTAL_TRAVEL_CO2E&quot;,metricName))</span>
+<span class="nc" id="L370">                    .derived(true)</span>
+<span class="nc" id="L371">                    .response(totalTravelCo2e // change tonnes to kgs</span>
+<span class="nc" id="L372">                            .multiply(ONE_THOUSAND)</span>
+<span class="nc" id="L373">                            .divide(metric, RoundingMode.HALF_UP));</span>
+<span class="nc" id="L374">            getAnswer(period, rtn, getTargetQ(&quot;TOTAL_PROCUREMENT_CO2E&quot;,metricName))</span>
+<span class="nc" id="L375">                    .derived(true)</span>
+<span class="nc" id="L376">                    .response(totalProcurementCo2e // change tonnes to kgs</span>
+<span class="nc" id="L377">                            .multiply(ONE_THOUSAND)</span>
+<span class="nc" id="L378">                            .divide(metric, RoundingMode.HALF_UP));</span>
+<span class="fc" id="L379">        } catch (ArithmeticException e) {</span>
+<span class="fc" id="L380">            LOGGER.warn(&quot;Unable to calculate CO2e by {} due to insuffient data. Cause: {}&quot;,</span>
+<span class="fc" id="L381">                    metricName, e.getMessage());</span>
+<span class="fc" id="L382">        } catch (IllegalStateException e) {</span>
+<span class="fc" id="L383">            LOGGER.error(&quot;Unable to calculate CO2e by {}. Cause: {}&quot;,</span>
+<span class="fc" id="L384">                    metricName, e.getMessage());</span>
+<span class="pc" id="L385">        }</span>
+<span class="fc" id="L386">    }</span>
+
+    protected Q getTargetQ(String string, String metricName) {
+        String suffix;
+<span class="pc bpc" id="L390" title="1 of 7 branches missed.">        switch(metricName) {</span>
+        case &quot;floorArea&quot;:
+<span class="fc" id="L392">            suffix = &quot;_BY_FLOOR&quot;;break;</span>
+        case &quot;noStaff&quot;:
+<span class="fc" id="L394">            suffix = &quot;_BY_WTE&quot;;break;</span>
+        case &quot;occupiedBeds&quot;:
+<span class="fc" id="L396">            suffix = &quot;_BY_BEDS&quot;;break;</span>
+        case &quot;opex&quot;:
+<span class="fc" id="L398">            suffix = &quot;_BY_OPEX&quot;;break;</span>
+        case &quot;patientContacts&quot;:
+<span class="fc" id="L400">            suffix = &quot;_BY_PATIENT_CONTACT&quot;;break;</span>
+        case &quot;population&quot;:
+<span class="fc" id="L402">            suffix = &quot;_BY_POP&quot;;break;</span>
+        default:
+<span class="nc" id="L404">            suffix = &quot;&quot;;</span>
+        }
+<span class="fc" id="L406">        return Q.valueOf(string+suffix);</span>
+    }
+
+    protected void calcScope3(String period, SurveyReturn rtn) {
+        // TODO move leased assets here
+<span class="fc" id="L411">        crunchScope3Travel(period, rtn);</span>
+<span class="fc" id="L412">        crunchScope3Water(period, rtn);</span>
+<span class="fc" id="L413">        crunchScope3Waste(period, rtn);</span>
+<span class="fc" id="L414">        crunchScope3BiomassWtt(period, rtn);</span>
+<span class="fc" id="L415">        crunchScope3Biomass(period, rtn);</span>
+<span class="fc" id="L416">        crunchScope3EnergyWtt(period, rtn);</span>
+<span class="fc" id="L417">        crunchPaperCo2e(period, rtn);</span>
+<span class="fc" id="L418">    }</span>
+
+    protected void crunchScope3EnergyWtt(String period, SurveyReturn rtn) {
+        // TODO Auto-generated method stub
+
+<span class="fc" id="L423">    }</span>
+
+    protected void crunchScope3Water(String period, SurveyReturn rtn) {
+        try {
+            // If necessary estimate waste water as 0% of incoming
+<span class="fc" id="L428">            BigDecimal wasteWater = getAnswer(period,rtn, Q.WASTE_WATER).responseAsBigDecimal();</span>
+<span class="pc bpc" id="L429" title="1 of 4 branches missed.">            if (wasteWater == null || wasteWater.equals(BigDecimal.ZERO)</span>
+<span class="pc bpc" id="L430" title="1 of 2 branches missed.">                    || getAnswer(period,rtn, Q.WASTE_WATER).derived()) {</span>
+<span class="fc" id="L431">                getAnswer(period,rtn, Q.WASTE_WATER)</span>
+<span class="fc" id="L432">                        .derived(true)</span>
+<span class="fc" id="L433">                        .response(rtn.answerResponseAsBigDecimal(period, Q.WATER_VOL).multiply(new BigDecimal(&quot;0.80&quot;)));</span>
+            }
+
+            // Treasury row 57: Water Use
+<span class="fc" id="L437">            CarbonFactor cFactor = cFactor(CarbonFactors.WATER_SUPPLY, period);</span>
+<span class="fc" id="L438">            BigDecimal waterUseCo2e = rtn.answerResponseAsBigDecimal(period, Q.WATER_VOL)</span>
+<span class="fc" id="L439">                    .multiply(cFactor.value())</span>
+<span class="fc" id="L440">                    .divide(ONE_THOUSAND, divisionScale, RoundingMode.HALF_UP);</span>
+<span class="fc" id="L441">            getAnswer(period,rtn, Q.WATER_CO2E).response(waterUseCo2e);</span>
+            try {
+<span class="fc" id="L443">                BigDecimal noStaff = getAnswerForPeriodWithFallback(period, rtn, Q.NO_STAFF).responseAsBigDecimal();</span>
+<span class="fc" id="L444">                getAnswer(period,rtn, Q.WATER_VOL_BY_WTE).derived(true).response(rtn.answerResponseAsBigDecimal(period, Q.WATER_VOL).divide(noStaff));</span>
+<span class="fc" id="L445">            } catch (IllegalStateException | NullPointerException | ArithmeticException e) {</span>
+<span class="fc" id="L446">                LOGGER.warn(&quot;Insufficient data to calculate water use by WTE for {} in {}&quot;, rtn.org(), period);</span>
+<span class="fc" id="L447">            }</span>
+
+            // Treasury row 58: Water Treatment
+<span class="fc" id="L450">            cFactor = cFactor(CarbonFactors.WATER_TREATMENT, period);</span>
+<span class="fc" id="L451">            BigDecimal waterTreatmentCo2e = rtn.answerResponseAsBigDecimal(period, Q.WASTE_WATER)</span>
+<span class="fc" id="L452">                    .multiply(cFactor.value())</span>
+<span class="fc" id="L453">                    .divide(ONE_THOUSAND, divisionScale, RoundingMode.HALF_UP);</span>
+<span class="fc" id="L454">            getAnswer(period,rtn, Q.WATER_TREATMENT_CO2E)</span>
+<span class="fc" id="L455">                    .derived(true)</span>
+<span class="fc" id="L456">                    .response(waterTreatmentCo2e);</span>
+
+<span class="fc" id="L458">            sumAnswers(period, rtn, Q.SCOPE_3_WATER,</span>
+                    Q.WATER_CO2E, Q.WATER_TREATMENT_CO2E);
+<span class="nc" id="L460">        } catch (IllegalStateException | NullPointerException e) {</span>
+<span class="nc" id="L461">            LOGGER.warn(&quot;Insufficient data to calculate CO2e from water&quot;);</span>
+<span class="fc" id="L462">        }</span>
+<span class="fc" id="L463">    }</span>
+
+    protected void crunchScope3Waste(String period, SurveyReturn rtn) {
+        try {
+            // Treasury row 62: Waste Recycling
+<span class="fc" id="L468">            CarbonFactor cFactor = cFactor(CarbonFactors.CLOSED_LOOP_OR_OPEN_LOOP, period);</span>
+<span class="fc" id="L469">            BigDecimal recyclingCo2e = rtn.answerResponseAsBigDecimal(period, Q.RECYCLING_WEIGHT)</span>
+<span class="fc" id="L470">                    .multiply(cFactor.value())</span>
+<span class="fc" id="L471">                    .divide(ONE_THOUSAND, 2, RoundingMode.HALF_UP);</span>
+<span class="fc" id="L472">            getAnswer(period,rtn, Q.RECYCLING_CO2E).response(recyclingCo2e);</span>
+<span class="fc" id="L473">        } catch (IllegalStateException | NullPointerException e) {</span>
+<span class="fc" id="L474">            LOGGER.warn(&quot;Insufficient data to calculate CO2e from recycling waste&quot;);</span>
+<span class="fc" id="L475">        }</span>
+        try {
+            // Treasury row 63: Other Recovery
+<span class="fc" id="L478">            CarbonFactor cFactor = cFactor(CarbonFactors.HIGH_TEMPERATURE_DISPOSAL_WASTE_WITH_ENERGY_RECOVERY, period);</span>
+<span class="fc" id="L479">            BigDecimal recoveryCo2e = rtn.answerResponseAsBigDecimal(period, Q.OTHER_RECOVERY_WEIGHT)</span>
+<span class="fc" id="L480">                    .multiply(cFactor.value())</span>
+<span class="fc" id="L481">                    .divide(ONE_THOUSAND, 2, RoundingMode.HALF_UP);</span>
+<span class="fc" id="L482">            getAnswer(period, rtn, Q.OTHER_RECOVERY_CO2E).derived(true).response(recoveryCo2e);</span>
+<span class="fc" id="L483">        } catch (IllegalStateException | NullPointerException e) {</span>
+<span class="fc" id="L484">            LOGGER.warn(&quot;Insufficient data to calculate CO2e from other waste recovery&quot;);</span>
+<span class="fc" id="L485">        }</span>
+        try {
+            // Treasury row 64: Incineration waste
+<span class="fc" id="L488">            CarbonFactor cFactor = cFactor(CarbonFactors.HIGH_TEMPERATURE_DISPOSAL_WASTE, period);</span>
+<span class="fc" id="L489">            BigDecimal incinerationCo2e = getAnswer(period, rtn, Q.INCINERATION_WEIGHT).responseAsBigDecimal()</span>
+<span class="fc" id="L490">                    .multiply(cFactor.value())</span>
+<span class="fc" id="L491">                    .divide(ONE_THOUSAND, 2, RoundingMode.HALF_UP);</span>
+<span class="fc" id="L492">            getAnswer(period,rtn, Q.INCINERATION_CO2E).response(incinerationCo2e);</span>
+<span class="fc" id="L493">        } catch (IllegalStateException | NullPointerException e) {</span>
+<span class="fc" id="L494">            LOGGER.warn(&quot;Insufficient data to calculate CO2e from incinerating waste&quot;);</span>
+<span class="fc" id="L495">        }</span>
+        try {
+            // Treasury row 65: Landfill disposal waste
+<span class="fc" id="L498">            CarbonFactor cFactor = cFactor(CarbonFactors.LANDFILL_WEIGHTED_AVERAGE, period);</span>
+<span class="fc" id="L499">            BigDecimal landfillCo2e = getAnswer(period, rtn, Q.LANDFILL_WEIGHT).responseAsBigDecimal()</span>
+<span class="fc" id="L500">                    .multiply(cFactor.value())</span>
+<span class="fc" id="L501">                    .divide(ONE_THOUSAND, 2, RoundingMode.HALF_UP);</span>
+<span class="fc" id="L502">            getAnswer(period,rtn, Q.LANDFILL_CO2E).response(landfillCo2e);</span>
+<span class="fc" id="L503">        } catch (IllegalStateException | NullPointerException e) {</span>
+<span class="fc" id="L504">            LOGGER.warn(&quot;Insufficient data to calculate CO2e from sending waste to landfill&quot;);</span>
+<span class="fc" id="L505">        }</span>
+
+<span class="fc" id="L507">        sumAnswers(period, rtn, Q.SCOPE_3_WASTE,</span>
+                Q.RECYCLING_CO2E, Q.OTHER_RECOVERY_CO2E, Q.INCINERATION_CO2E, Q.LANDFILL_CO2E);
+<span class="fc" id="L509">    }</span>
+
+    protected Answer getAnswerForPeriodWithFallback(String period,
+            SurveyReturn rtn, Q q) {
+        try {
+<span class="fc" id="L514">            Answer answer = getAnswer(period, rtn, q);</span>
+<span class="fc bfc" id="L515" title="All 2 branches covered.">            if (answer.response() == null) {</span>
+<span class="fc" id="L516">                throw new IllegalStateException();</span>
+            }
+<span class="fc" id="L518">            return answer;</span>
+<span class="fc" id="L519">        } catch (IllegalStateException e) {</span>
+<span class="fc" id="L520">            LOGGER.warn(&quot;Return does not contain response for {} in {}, use current year as estimate&quot;, q, period);</span>
+<span class="fc" id="L521">            return getAnswer(rtn.applicablePeriod(), rtn, q);</span>
+        }
+    }
+
+    @Transactional
+    private Answer getAnswer(String period, SurveyReturn rtn, Q q) {
+<span class="fc" id="L527">        List&lt;Answer&gt; matches = new ArrayList&lt;Answer&gt;();</span>
+<span class="fc bfc" id="L528" title="All 2 branches covered.">        for (Answer a : rtn.answers()) {</span>
+<span class="fc bfc" id="L529" title="All 4 branches covered.">            if (q.name().equals(a.question().name()) &amp;&amp; period.equals(a.applicablePeriod())) {</span>
+<span class="fc" id="L530">                matches.add(a);</span>
+            }
+<span class="fc" id="L532">        }</span>
+<span class="pc bpc" id="L533" title="1 of 3 branches missed.">        switch (matches.size()) {</span>
+        case 0:
+<span class="fc" id="L535">            throw new IllegalStateException(</span>
+<span class="fc" id="L536">                    String.format(&quot;Return does not contain the expected response for %1$s in %2$s&quot;, q, period));</span>
+        case 1:
+<span class="fc" id="L538">            return matches.get(0);</span>
+        default:
+<span class="nc" id="L540">            Answer a = matches.get(0);</span>
+<span class="nc" id="L541">            StringBuffer sb = new StringBuffer();</span>
+<span class="nc bnc" id="L542" title="All 2 branches missed.">            for (int i = 1; i &lt; matches.size(); i++) {</span>
+<span class="nc" id="L543">                Answer b = matches.get(i);</span>
+<span class="nc bnc" id="L544" title="All 2 branches missed.">                if (a.response() == b.response()</span>
+<span class="nc bnc" id="L545" title="All 4 branches missed.">                        || (b.response() != null &amp;&amp; b.response().equals(a.response()))) {</span>
+<span class="nc" id="L546">                    LOGGER.error(&quot;Remove duplicate answer: {}={} to {} for {} in {}&quot;,</span>
+<span class="nc" id="L547">                            b.id(), b.response(), q.name(), rtn.org(), period, sb.toString());</span>
+//                    rtn.answers().remove(b);
+//                    answerRepo.delete(b.id());
+                } else {
+<span class="nc bnc" id="L551" title="All 2 branches missed.">                    sb.append(b == null ? &quot;&quot; : b.getId()).append(&quot;,&quot;);</span>
+                }
+            }
+<span class="nc bnc" id="L554" title="All 2 branches missed.">            if (sb.length() &gt; 0) {</span>
+<span class="nc" id="L555">                sb = sb.append(a.id());</span>
+<span class="nc" id="L556">                LOGGER.error(&quot;Multiple different answers to {} found for {} in {}. Review ids: {}&quot;,</span>
+<span class="nc" id="L557">                        q.name(), rtn.org(), period, sb.toString());</span>
+            }
+<span class="nc" id="L559">            return a;</span>
+        }
+    }
+
+    private void crunchScope3BiomassWtt(String period, SurveyReturn rtn) {
+        try {
+            // Treasury row 72: Wood logs
+<span class="fc" id="L566">            CarbonFactor cFactor = cFactor(CarbonFactors.WOOD_LOGS_WTT, period);</span>
+<span class="fc" id="L567">            BigDecimal logsCo2e = getAnswer(period, rtn, Q.WOOD_LOGS_USED).responseAsBigDecimal()</span>
+<span class="fc" id="L568">                    .multiply(cFactor.value())</span>
+<span class="fc" id="L569">                    .divide(ONE_THOUSAND, divisionScale, RoundingMode.HALF_UP);</span>
+<span class="fc" id="L570">            getAnswer(period,rtn, Q.WOOD_LOGS_WTT_CO2E).derived(true).response(logsCo2e);</span>
+<span class="fc" id="L571">        } catch (IllegalStateException | NullPointerException e) {</span>
+<span class="fc" id="L572">            LOGGER.warn(&quot;Insufficient data to calculate CO2e from wood logs&quot;);</span>
+<span class="fc" id="L573">            getAnswer(period,rtn, Q.WOOD_LOGS_WTT_CO2E).derived(true).response(BigDecimal.ZERO);</span>
+<span class="fc" id="L574">        }</span>
+
+        try {
+            // Treasury row 73: Wood chips
+<span class="fc" id="L578">            CarbonFactor cFactor = cFactor(CarbonFactors.WOOD_CHIPS_WTT, period);</span>
+<span class="fc" id="L579">            BigDecimal chipsCo2e = getAnswer(period, rtn, Q.WOOD_CHIPS_USED).responseAsBigDecimal()</span>
+<span class="fc" id="L580">                    .multiply(cFactor.value())</span>
+<span class="fc" id="L581">                    .divide(ONE_THOUSAND, divisionScale, RoundingMode.HALF_UP);</span>
+<span class="fc" id="L582">            getAnswer(period,rtn, Q.WOOD_CHIPS_WTT_CO2E).derived(true).response(chipsCo2e);</span>
+<span class="fc" id="L583">        } catch (IllegalStateException | NullPointerException e) {</span>
+<span class="fc" id="L584">            LOGGER.warn(&quot;Insufficient data to calculate CO2e from wood chips&quot;);</span>
+<span class="fc" id="L585">            getAnswer(period,rtn, Q.WOOD_CHIPS_WTT_CO2E).derived(true).response(BigDecimal.ZERO);</span>
+<span class="fc" id="L586">        }</span>
+
+        try {
+            // Treasury row 74: Wood pellets
+<span class="fc" id="L590">            CarbonFactor cFactor = cFactor(CarbonFactors.WOOD_PELLETS_WTT, period);</span>
+<span class="fc" id="L591">            BigDecimal pelletsCo2e = getAnswer(period, rtn, Q.WOOD_PELLETS_USED).responseAsBigDecimal()</span>
+<span class="fc" id="L592">                    .multiply(cFactor.value())</span>
+<span class="fc" id="L593">                    .divide(ONE_THOUSAND, divisionScale, RoundingMode.HALF_UP);</span>
+<span class="fc" id="L594">            getAnswer(period,rtn, Q.WOOD_PELLETS_WTT_CO2E).derived(true).response(pelletsCo2e);</span>
+<span class="fc" id="L595">        } catch (IllegalStateException | NullPointerException e) {</span>
+<span class="fc" id="L596">            LOGGER.warn(&quot;Insufficient data to calculate CO2e from wood pellets&quot;);</span>
+<span class="fc" id="L597">            getAnswer(period,rtn, Q.WOOD_PELLETS_WTT_CO2E).derived(true).response(BigDecimal.ZERO);</span>
+<span class="fc" id="L598">        }</span>
+
+        try {
+<span class="fc" id="L601">            sumAnswers(period, rtn, Q.SCOPE_3_BIOMASS_WTT,</span>
+                    Q.WOOD_LOGS_WTT_CO2E, Q.WOOD_CHIPS_WTT_CO2E, Q.WOOD_PELLETS_WTT_CO2E);
+<span class="nc" id="L603">        } catch (IllegalStateException | NullPointerException e) {</span>
+<span class="nc" id="L604">            LOGGER.warn(&quot;Insufficient data to calculate CO2e from biomass WTT&quot;);</span>
+<span class="fc" id="L605">        }</span>
+<span class="fc" id="L606">    }</span>
+
+    protected void crunchScope3Biomass(String period, SurveyReturn rtn) {
+        try {
+            // Treasury row 72: Wood logs
+<span class="fc" id="L611">            CarbonFactor cFactor = cFactor(CarbonFactors.WOOD_LOGS_TOTAL, period);</span>
+<span class="fc" id="L612">            BigDecimal logsCo2e = getAnswer(period, rtn, Q.WOOD_LOGS_USED).responseAsBigDecimal()</span>
+<span class="fc" id="L613">                    .multiply(cFactor.value())</span>
+<span class="fc" id="L614">                    .divide(ONE_THOUSAND, divisionScale, RoundingMode.HALF_UP);</span>
+<span class="fc" id="L615">            getAnswer(period,rtn, Q.WOOD_LOGS_CO2E).derived(true).response(logsCo2e);</span>
+<span class="fc" id="L616">        } catch (IllegalStateException | NullPointerException e) {</span>
+<span class="fc" id="L617">            LOGGER.warn(&quot;Insufficient data to calculate CO2e from wood logs&quot;);</span>
+<span class="fc" id="L618">            getAnswer(period,rtn, Q.WOOD_LOGS_CO2E).derived(true).response(BigDecimal.ZERO);</span>
+<span class="fc" id="L619">        }</span>
+
+        try {
+            // Treasury row 73: Wood chips
+<span class="fc" id="L623">            CarbonFactor cFactor = cFactor(CarbonFactors.WOOD_CHIPS_TOTAL, period);</span>
+<span class="fc" id="L624">            BigDecimal chipsCo2e = getAnswer(period, rtn, Q.WOOD_CHIPS_USED).responseAsBigDecimal()</span>
+<span class="fc" id="L625">                    .multiply(cFactor.value())</span>
+<span class="fc" id="L626">                    .divide(ONE_THOUSAND, divisionScale, RoundingMode.HALF_UP);</span>
+<span class="fc" id="L627">            getAnswer(period,rtn, Q.WOOD_CHIPS_CO2E).derived(true).response(chipsCo2e);</span>
+<span class="fc" id="L628">        } catch (IllegalStateException | NullPointerException e) {</span>
+<span class="fc" id="L629">            LOGGER.warn(&quot;Insufficient data to calculate CO2e from wood chips&quot;);</span>
+<span class="fc" id="L630">            getAnswer(period,rtn, Q.WOOD_CHIPS_CO2E).derived(true).response(BigDecimal.ZERO);</span>
+<span class="fc" id="L631">        }</span>
+
+        try {
+            // Treasury row 74: Wood pellets
+<span class="fc" id="L635">            CarbonFactor cFactor = cFactor(CarbonFactors.WOOD_PELLETS_TOTAL, period);</span>
+<span class="fc" id="L636">            BigDecimal pelletsCo2e = getAnswer(period, rtn, Q.WOOD_PELLETS_USED).responseAsBigDecimal()</span>
+<span class="fc" id="L637">                    .multiply(cFactor.value())</span>
+<span class="fc" id="L638">                    .divide(ONE_THOUSAND, divisionScale, RoundingMode.HALF_UP);</span>
+<span class="fc" id="L639">            getAnswer(period,rtn, Q.WOOD_PELLETS_CO2E).derived(true).response(pelletsCo2e);</span>
+<span class="fc" id="L640">        } catch (IllegalStateException | NullPointerException e) {</span>
+<span class="fc" id="L641">            LOGGER.warn(&quot;Insufficient data to calculate CO2e from wood pellets&quot;);</span>
+<span class="fc" id="L642">            getAnswer(period,rtn, Q.WOOD_PELLETS_CO2E).derived(true).response(BigDecimal.ZERO);</span>
+<span class="fc" id="L643">        }</span>
+
+<span class="fc" id="L645">        sumAnswers(period, rtn, Q.SCOPE_3_BIOMASS,</span>
+                Q.WOOD_LOGS_CO2E, Q.WOOD_CHIPS_CO2E, Q.WOOD_PELLETS_CO2E);
+<span class="fc" id="L647">    }</span>
+
+    protected void crunchScope3Travel(String period, SurveyReturn rtn) {
+<span class="fc" id="L650">        crunchPatientVisitorMileageCo2e(period, rtn);</span>
+<span class="fc" id="L651">        crunchStaffCommuteCo2e(period, rtn);</span>
+<span class="fc" id="L652">        crunchBizTravel(period, rtn);</span>
+        try {
+<span class="fc" id="L654">            sumAnswers(period, rtn, Q.SCOPE_3_TRAVEL,</span>
+                    SduQuestions.SCOPE_3_TRAVEL_HDRS);
+<span class="nc" id="L656">        } catch (IllegalStateException | NullPointerException e) {</span>
+<span class="nc" id="L657">            LOGGER.warn(&quot;Insufficient data to calculate CO2e from travel&quot;);</span>
+<span class="fc" id="L658">        }</span>
+<span class="fc" id="L659">    }</span>
+
+    protected void crunchBizTravel(String period, SurveyReturn rtn) {
+        // CAR_TOTAL means primary and WTT combined due to CAR
+<span class="fc" id="L663">        CarbonFactor cFactor = cFactor(CarbonFactors.CAR_TOTAL, period);</span>
+        try {
+<span class="fc" id="L665">            BigDecimal fleetMileage = getAnswer(period, rtn, Q.OWNED_LEASED_LOW_CARBON_MILES).responseAsBigDecimal();</span>
+<span class="nc" id="L666">            getAnswer(period, rtn, Q.OWNED_LEASED_LOW_CARBON_CO2E)</span>
+<span class="nc" id="L667">                    .derived(true)</span>
+<span class="nc" id="L668">                    .response(fleetMileage</span>
+<span class="nc" id="L669">                            .multiply(cFactor(CarbonFactors.AVERAGE_BATTERY_AND_PLUGIN_HYBRID_EV_TOTAL, period).value())</span>
+<span class="nc" id="L670">                            .multiply(m2km)</span>
+<span class="nc" id="L671">                            .divide(ONE_THOUSAND, 0, RoundingMode.HALF_UP));</span>
+<span class="fc" id="L672">        } catch (IllegalStateException | NullPointerException e) {</span>
+<span class="fc" id="L673">            LOGGER.warn(&quot;Insufficient data to calculate CO2e from low carbon fleet miles&quot;);</span>
+<span class="nc" id="L674">        }</span>
+        try {
+<span class="fc" id="L676">            BigDecimal fleetMileage = getAnswer(period, rtn, Q.FLEET_ROAD_MILES).responseAsBigDecimal();</span>
+            // Treasury row 51: Owned vehicles both direct and Well to Tank
+<span class="fc" id="L678">            getAnswer(period, rtn, Q.OWNED_FLEET_TRAVEL_CO2E)</span>
+<span class="fc" id="L679">                    .derived(true)</span>
+<span class="fc" id="L680">                    .response(fleetMileage</span>
+<span class="fc" id="L681">                            .multiply(cFactor(CarbonFactors.CAR_TOTAL, period).value())</span>
+<span class="fc" id="L682">                            .multiply(m2km)</span>
+<span class="fc" id="L683">                            .divide(ONE_THOUSAND, 0, RoundingMode.HALF_UP));</span>
+            try {
+<span class="fc" id="L685">                BigDecimal bizTravelRoadCo2e</span>
+<span class="fc" id="L686">                        = getAnswer(period, rtn, Q.BIZ_MILEAGE_ROAD).responseAsBigDecimal()</span>
+<span class="fc" id="L687">                        .add(fleetMileage)</span>
+<span class="fc" id="L688">                        .multiply(cFactor.value())</span>
+<span class="fc" id="L689">                        .multiply(m2km)</span>
+<span class="fc" id="L690">                        .divide(ONE_THOUSAND, divisionScale, RoundingMode.HALF_UP);</span>
+<span class="fc" id="L691">                getAnswer(period,rtn, Q.BIZ_MILEAGE_ROAD_CO2E).response(bizTravelRoadCo2e);</span>
+<span class="nc" id="L692">            } catch (IllegalStateException | NullPointerException e) {</span>
+<span class="nc" id="L693">                LOGGER.warn(&quot;Insufficient data to calculate CO2e from personal road miles&quot;);</span>
+<span class="fc" id="L694">            }</span>
+<span class="fc" id="L695">        } catch (IllegalStateException | NullPointerException e) {</span>
+<span class="fc" id="L696">            LOGGER.warn(&quot;Insufficient data to calculate CO2e from fleet miles&quot;);</span>
+<span class="fc" id="L697">        }</span>
+        try {
+<span class="fc bfc" id="L699" title="All 2 branches covered.">            if (getAnswer(period, rtn, Q.RAIL_MILES).response() == null</span>
+<span class="pc bpc" id="L700" title="1 of 2 branches missed.">                    &amp;&amp; getAnswer(period, rtn, Q.RAIL_COST).response() != null) {</span>
+<span class="fc" id="L701">                BigDecimal railMiles = getAnswer(period, rtn, Q.RAIL_COST).responseAsBigDecimal()</span>
+<span class="fc" id="L702">                        .divide(RAIL_PER_MILE, RoundingMode.HALF_UP);</span>
+<span class="fc" id="L703">                getAnswer(period, rtn, Q.RAIL_MILES).derived(true).response(railMiles);</span>
+            }
+
+<span class="fc" id="L706">            cFactor = cFactor(CarbonFactors.NATIONAL_RAIL_TOTAL, period);</span>
+<span class="fc" id="L707">            BigDecimal bizTravelRailCo2e</span>
+<span class="fc" id="L708">                    = getAnswer(period, rtn, Q.RAIL_MILES).responseAsBigDecimal()</span>
+<span class="fc" id="L709">                    .multiply(cFactor.value())</span>
+<span class="fc" id="L710">                    .multiply(m2km)</span>
+<span class="fc" id="L711">                    .divide(ONE_THOUSAND, divisionScale, RoundingMode.HALF_UP);</span>
+<span class="fc" id="L712">            getAnswer(period,rtn, Q.BIZ_MILEAGE_RAIL_CO2E).response(bizTravelRailCo2e);</span>
+<span class="fc" id="L713">        } catch (IllegalStateException | NullPointerException e) {</span>
+<span class="fc" id="L714">            LOGGER.warn(&quot;Insufficient data to calculate CO2e from rail travel&quot;);</span>
+<span class="fc" id="L715">        }</span>
+        try {
+<span class="fc" id="L717">            BigDecimal bizTravelDomesticAirCo2e</span>
+<span class="fc" id="L718">                    = getAnswer(period, rtn, Q.DOMESTIC_AIR_MILES).responseAsBigDecimal()</span>
+<span class="fc" id="L719">                    .multiply(cFactor(CarbonFactors.DOMESTIC_TOTAL, period).value())</span>
+<span class="fc" id="L720">                    .multiply(m2km)</span>
+<span class="fc" id="L721">                    .divide(ONE_THOUSAND, divisionScale, RoundingMode.HALF_UP);</span>
+<span class="fc" id="L722">            BigDecimal bizTravelShortHaulAirCo2e</span>
+<span class="fc" id="L723">                    = getAnswer(period, rtn, Q.SHORT_HAUL_AIR_MILES).responseAsBigDecimal()</span>
+<span class="fc" id="L724">                    .multiply(cFactor(CarbonFactors.SHORT_HAUL_TOTAL, period).value())</span>
+<span class="fc" id="L725">                    .multiply(m2km)</span>
+<span class="fc" id="L726">                    .divide(ONE_THOUSAND, divisionScale, RoundingMode.HALF_UP);</span>
+<span class="fc" id="L727">            BigDecimal bizTravelLongHaulAirCo2e</span>
+<span class="fc" id="L728">                    = getAnswer(period, rtn, Q.LONG_HAUL_AIR_MILES).responseAsBigDecimal()</span>
+<span class="fc" id="L729">                    .multiply(cFactor(CarbonFactors.LONG_HAUL_TOTAL, period).value())</span>
+<span class="fc" id="L730">                    .multiply(m2km)</span>
+<span class="fc" id="L731">                    .divide(ONE_THOUSAND, divisionScale, RoundingMode.HALF_UP);</span>
+<span class="fc" id="L732">            getAnswer(period,rtn, Q.BIZ_MILEAGE_AIR_CO2E)</span>
+<span class="fc" id="L733">                    .response(bizTravelDomesticAirCo2e.add(bizTravelShortHaulAirCo2e).add(bizTravelLongHaulAirCo2e));</span>
+<span class="fc" id="L734">        } catch (IllegalStateException | NullPointerException e) {</span>
+<span class="fc" id="L735">            LOGGER.warn(&quot;Insufficient data to calculate CO2e from air travel&quot;);</span>
+<span class="fc" id="L736">        }</span>
+        try {
+<span class="fc bfc" id="L738" title="All 2 branches covered.">            if (getAnswer(period, rtn, Q.BUS_MILES).response() == null</span>
+<span class="pc bpc" id="L739" title="1 of 2 branches missed.">                    &amp;&amp; getAnswer(period, rtn, Q.BUS_COST).response() != null) {</span>
+<span class="fc" id="L740">                BigDecimal busMiles = getAnswer(period, rtn, Q.BUS_COST).responseAsBigDecimal()</span>
+<span class="fc" id="L741">                        .divide(BUS_PER_MILE, RoundingMode.HALF_UP);</span>
+<span class="fc" id="L742">                getAnswer(period, rtn, Q.BUS_MILES).derived(true).response(busMiles);</span>
+            }
+
+<span class="fc" id="L745">            cFactor = cFactor(CarbonFactors.BUS_TOTAL, period);</span>
+<span class="fc" id="L746">            BigDecimal bizTravelBusCo2e</span>
+<span class="fc" id="L747">                    = getAnswer(period, rtn, Q.BUS_MILES).responseAsBigDecimal()</span>
+<span class="fc" id="L748">                    .multiply(cFactor.value())</span>
+<span class="fc" id="L749">                    .multiply(m2km)</span>
+<span class="fc" id="L750">                    .divide(ONE_THOUSAND, divisionScale, RoundingMode.HALF_UP);</span>
+<span class="fc" id="L751">            getAnswer(period,rtn, Q.BIZ_MILEAGE_BUS_CO2E).response(bizTravelBusCo2e);</span>
+<span class="fc" id="L752">        } catch (IllegalStateException | NullPointerException e) {</span>
+<span class="fc" id="L753">            LOGGER.warn(&quot;Insufficient data to calculate CO2e from bus travel&quot;);</span>
+<span class="fc" id="L754">        }</span>
+        try {
+<span class="fc bfc" id="L756" title="All 2 branches covered.">            if (getAnswer(period, rtn, Q.TAXI_MILES).response() == null</span>
+<span class="pc bpc" id="L757" title="1 of 2 branches missed.">                    &amp;&amp; getAnswer(period, rtn, Q.TAXI_COST).response() != null) {</span>
+<span class="fc" id="L758">                BigDecimal taxiMiles = getAnswer(period, rtn, Q.TAXI_COST).responseAsBigDecimal()</span>
+<span class="fc" id="L759">                        .divide(TAXI_PER_MILE, RoundingMode.HALF_UP);</span>
+<span class="fc" id="L760">                getAnswer(period, rtn, Q.TAXI_MILES).derived(true).response(taxiMiles);</span>
+            }
+
+<span class="fc" id="L763">            cFactor = cFactor(CarbonFactors.TAXI_TOTAL, period);</span>
+<span class="fc" id="L764">            BigDecimal bizTravelTaxiCo2e</span>
+<span class="fc" id="L765">                    = getAnswer(period, rtn, Q.TAXI_MILES).responseAsBigDecimal()</span>
+<span class="fc" id="L766">                    .multiply(cFactor.value())</span>
+<span class="fc" id="L767">                    .multiply(m2km)</span>
+<span class="fc" id="L768">                    .divide(ONE_THOUSAND, divisionScale, RoundingMode.HALF_UP);</span>
+<span class="fc" id="L769">            getAnswer(period,rtn, Q.BIZ_MILEAGE_TAXI_CO2E).response(bizTravelTaxiCo2e);</span>
+<span class="fc" id="L770">        } catch (IllegalStateException | NullPointerException e) {</span>
+<span class="fc" id="L771">            LOGGER.warn(&quot;Insufficient data to calculate CO2e from taxi travel&quot;);</span>
+<span class="fc" id="L772">        }</span>
+<span class="fc" id="L773">        sumAnswers(period, rtn, Q.BIZ_MILEAGE, SduQuestions.BIZ_MILEAGE_HDRS);</span>
+<span class="fc" id="L774">        sumAnswers(period, rtn, Q.BIZ_MILEAGE_CO2E, SduQuestions.BIZ_MILEAGE_CO2E_HDRS);</span>
+<span class="fc" id="L775">    }</span>
+
+    // Treasury row 53: Staff commute
+    protected void crunchStaffCommuteCo2e(String period, SurveyReturn rtn) {
+        // NOTE: XXX_TOTAL means primary and WTT combined due to XXX
+<span class="fc" id="L780">        CarbonFactor cFactor = cFactor(CarbonFactors.CAR_TOTAL, period);</span>
+        try {
+<span class="fc" id="L782">            BigDecimal totalStaffMiles = getAnswer(period, rtn, Q.STAFF_COMMUTE_MILES_TOTAL).responseAsBigDecimal();</span>
+<span class="fc bfc" id="L783" title="All 2 branches covered.">            if (totalStaffMiles.equals(BigDecimal.ZERO)) {</span>
+<span class="fc" id="L784">                totalStaffMiles = getAnswerForPeriodWithFallback(period, rtn, Q.NO_STAFF).responseAsBigDecimal()</span>
+<span class="fc" id="L785">                        .multiply(getAnswer(period, rtn, Q.STAFF_COMMUTE_MILES_PP).responseAsBigDecimal());</span>
+<span class="fc" id="L786">                getAnswer(period, rtn, Q.STAFF_COMMUTE_MILES_TOTAL).response(totalStaffMiles);</span>
+            }
+
+<span class="fc" id="L789">            getAnswer(period,rtn, Q.STAFF_COMMUTE_MILES_CO2E)</span>
+<span class="fc" id="L790">                    .derived(true)</span>
+<span class="fc" id="L791">                    .response(totalStaffMiles</span>
+<span class="fc" id="L792">                            .multiply(cFactor.value())</span>
+<span class="fc" id="L793">                            .multiply(m2km)</span>
+<span class="fc" id="L794">                            .divide(ONE_THOUSAND, 0, RoundingMode.HALF_UP));</span>
+<span class="fc" id="L795">        } catch (IllegalStateException | NullPointerException e) {</span>
+<span class="fc" id="L796">            LOGGER.warn(&quot;Insufficient data to calculate CO2e from staff commuting&quot;);</span>
+<span class="fc" id="L797">        }</span>
+<span class="fc" id="L798">    }</span>
+
+    protected void crunchPaperCo2e(String period, SurveyReturn rtn) {
+        BigDecimal paperCo2e;
+        try {
+<span class="fc" id="L803">            paperCo2e = getAnswer(period, rtn, Q.PAPER_USED).responseAsBigDecimal()</span>
+<span class="fc" id="L804">                    .multiply(oneThousandth(cFactor(CarbonFactors.PAPER, period)));</span>
+<span class="fc" id="L805">            getAnswer(period,rtn, Q.PAPER_CO2E).derived(true).response(paperCo2e);</span>
+<span class="fc" id="L806">        } catch (IllegalStateException | NullPointerException e) {</span>
+<span class="fc" id="L807">            LOGGER.warn(&quot;Insufficient data to calculate CO2e from paper used&quot;);</span>
+<span class="fc" id="L808">            paperCo2e = BigDecimal.ZERO;</span>
+<span class="fc" id="L809">        }</span>
+<span class="fc" id="L810">    }</span>
+
+    protected void crunchPatientVisitorMileageCo2e(String period,
+            SurveyReturn rtn) {
+<span class="fc" id="L814">        CarbonFactor cFactor = cFactor(CarbonFactors.CAR_TOTAL, period);</span>
+        try {
+            // Treasury row 52: Patient and Visitor
+<span class="fc" id="L817">            BigDecimal visitorMileage = getAnswer(period, rtn, Q.VISITOR_MILEAGE).responseAsBigDecimal();</span>
+<span class="fc bfc" id="L818" title="All 2 branches covered.">            if (visitorMileage.equals(BigDecimal.ZERO)) {</span>
+<span class="fc" id="L819">                visitorMileage =  getAnswer(period, rtn, Q.NO_PATIENT_CONTACTS).responseAsBigDecimal().multiply(new BigDecimal(&quot;3.7&quot;)).multiply(new BigDecimal(&quot;9.4&quot;));</span>
+<span class="fc" id="L820">                getAnswer(period, rtn, Q.VISITOR_MILEAGE).response(visitorMileage);</span>
+            }
+<span class="fc" id="L822">            BigDecimal patientVisitorMileage = getAnswer(period, rtn, Q.PATIENT_MILEAGE).responseAsBigDecimal()</span>
+<span class="fc" id="L823">                    .add(getAnswer(period, rtn, Q.VISITOR_MILEAGE).responseAsBigDecimal());</span>
+<span class="fc" id="L824">            getAnswer(period, rtn, Q.PATIENT_AND_VISITOR_MILEAGE).response(patientVisitorMileage);</span>
+<span class="fc" id="L825">            BigDecimal patientVisitorCo2e = patientVisitorMileage</span>
+<span class="fc" id="L826">                    .multiply(cFactor.value())</span>
+<span class="fc" id="L827">                    .multiply(m2km)</span>
+<span class="fc" id="L828">                    .divide(ONE_THOUSAND, divisionScale , RoundingMode.HALF_UP);</span>
+<span class="fc" id="L829">            getAnswer(period,rtn, Q.PATIENT_AND_VISITOR_MILEAGE_CO2E).derived(true).response(patientVisitorCo2e);</span>
+<span class="fc" id="L830">        } catch (IllegalStateException | NullPointerException e) {</span>
+<span class="fc" id="L831">            LOGGER.warn(&quot;Insufficient data to calculate CO2e from patient and visitor travel&quot;);</span>
+<span class="fc" id="L832">        }</span>
+<span class="fc" id="L833">    }</span>
+
+    protected void calcScope1(String period, SurveyReturn rtn) {
+<span class="fc" id="L836">        crunchOwnedBuildings(period, rtn);</span>
+<span class="fc" id="L837">        CarbonFactor cFactor = cFactor(CarbonFactors.CAR_AVERAGE_SIZE, period);</span>
+<span class="fc" id="L838">        crunchCO2e(period, rtn, Q.FLEET_ROAD_MILES, oneThousandth(cFactor), Q.OWNED_VEHICLES);</span>
+<span class="fc" id="L839">        crunchAnaestheticGases(period, rtn);</span>
+<span class="fc" id="L840">    }</span>
+
+    protected void calcScope2(String period, SurveyReturn rtn) {
+<span class="fc" id="L843">        crunchElectricityUsed(period, rtn);</span>
+<span class="fc" id="L844">        crunchHeatSteam(period, rtn);</span>
+        // TODO EV Owned Vehicles
+<span class="fc" id="L846">    }</span>
+
+    protected void calcCarbonProfileSduMethod(String period, SurveyReturn rtn) {
+<span class="fc" id="L849">        LOGGER.info(&quot;calcCarbonProfileSduMethod for {} in {}&quot;, rtn.getOrg(), rtn.applicablePeriod());</span>
+<span class="fc" id="L850">        sumAnswers(period, rtn, Q.WASTE_AND_WATER_CO2E, Q.SCOPE_3_WASTE, Q.SCOPE_3_WATER);</span>
+
+        // Intentional use of return period for org type
+<span class="fc" id="L853">        String orgType = getAnswer(rtn.applicablePeriod(), rtn, Q.ORG_TYPE).response();</span>
+<span class="pc bpc" id="L854" title="1 of 2 branches missed.">        if (isEmpty(orgType)) {</span>
+<span class="nc" id="L855">            String msg = String.format(</span>
+                    &quot;Cannot model carbon profile of %1$s in %2$s as no org type specified&quot;,
+<span class="nc" id="L857">                    rtn.org(), period);</span>
+<span class="nc" id="L858">            throw new IllegalStateException(msg);</span>
+        }
+<span class="fc" id="L860">        BigDecimal nonPaySpend = getAnswer(period, rtn, Q.NON_PAY_SPEND).responseAsBigDecimal();</span>
+<span class="fc bfc" id="L861" title="All 2 branches covered.">        if (nonPaySpend.equals(BigDecimal.ZERO)</span>
+<span class="pc bpc" id="L862" title="1 of 2 branches missed.">                || getAnswer(period, rtn, Q.NON_PAY_SPEND).derived()) {</span>
+<span class="fc" id="L863">            nonPaySpend = calcNonPaySpendFromOpEx(period, rtn);</span>
+<span class="fc" id="L864">            getAnswer(period, rtn, Q.NON_PAY_SPEND).derived(true).response(nonPaySpend);</span>
+        }
+
+<span class="fc" id="L867">        crunchCapitalSpend(period, rtn, orgType, nonPaySpend);</span>
+
+<span class="fc" id="L869">        WeightingFactor wFactor = wFactor(WeightingFactors.BIZ_SVCS, period, orgType);</span>
+<span class="fc" id="L870">        crunchWeighting(period, rtn, nonPaySpend, Q.BIZ_SVCS_SPEND, wFactor, Q.BIZ_SVCS_CO2E);</span>
+<span class="fc" id="L871">        wFactor = wFactor(WeightingFactors.CONSTRUCTION, period, orgType);</span>
+<span class="fc" id="L872">        crunchWeighting(period, rtn, nonPaySpend, Q.CONSTRUCTION_SPEND, wFactor, Q.CONSTRUCTION_CO2E);</span>
+<span class="fc" id="L873">        wFactor = wFactor(WeightingFactors.CATERING, period, orgType);</span>
+<span class="fc" id="L874">        crunchWeighting(period, rtn, nonPaySpend, Q.CATERING_SPEND, wFactor, Q.CATERING_CO2E);</span>
+<span class="fc" id="L875">        wFactor = wFactor(WeightingFactors.FREIGHT, period, orgType);</span>
+<span class="fc" id="L876">        crunchWeighting(period, rtn, nonPaySpend, Q.FREIGHT_SPEND, wFactor, Q.FREIGHT_CO2E);</span>
+<span class="fc" id="L877">        wFactor = wFactor(WeightingFactors.ICT, period, orgType);</span>
+<span class="fc" id="L878">        crunchWeighting(period, rtn, nonPaySpend, Q.ICT_SPEND, wFactor, Q.ICT_CO2E);</span>
+<span class="fc" id="L879">        wFactor = wFactor(WeightingFactors.FUEL_CHEM_AND_GASES, period, orgType);</span>
+<span class="fc" id="L880">        crunchWeighting(period, rtn, nonPaySpend, Q.CHEM_AND_GAS_SPEND, wFactor, Q.CHEM_AND_GAS_CO2E);</span>
+<span class="fc" id="L881">        wFactor = wFactor(WeightingFactors.MED_INSTRUMENTS, period, orgType);</span>
+<span class="fc" id="L882">        crunchWeighting(period, rtn, nonPaySpend, Q.MED_INSTR_SPEND, wFactor, Q.MED_INSTR_CO2E);</span>
+<span class="fc" id="L883">        wFactor = wFactor(WeightingFactors.OTHER_MANUFACTURING, period, orgType);</span>
+<span class="fc" id="L884">        crunchWeighting(period, rtn, nonPaySpend, Q.OTHER_MANUFACTURED_SPEND, wFactor, Q.OTHER_MANUFACTURED_CO2E);</span>
+<span class="fc" id="L885">        wFactor = wFactor(WeightingFactors.OTHER_PROCURMENT, period, orgType);</span>
+<span class="fc" id="L886">        crunchWeighting(period, rtn, nonPaySpend, Q.OTHER_SPEND, wFactor, Q.OTHER_PROCUREMENT_CO2E);</span>
+<span class="fc" id="L887">        wFactor = wFactor(WeightingFactors.PAPER, period, orgType);</span>
+<span class="fc" id="L888">        crunchWeighting(period, rtn, nonPaySpend, Q.PAPER_AND_CARD_SPEND, wFactor, Q.PAPER_AND_CARD_CO2E);</span>
+<span class="fc" id="L889">        wFactor = wFactor(WeightingFactors.PHARMA, period, orgType);</span>
+<span class="fc" id="L890">        crunchWeighting(period, rtn, nonPaySpend, Q.PHARMA_SPEND, wFactor, Q.PHARMA_CO2E);</span>
+<span class="fc" id="L891">        wFactor = wFactor(WeightingFactors.BIZ_TRAVEL, period, orgType);</span>
+<span class="fc" id="L892">        crunchWeighting(period, rtn, nonPaySpend, Q.TRAVEL_SPEND, wFactor, Q.TRAVEL_CO2E);</span>
+<span class="fc" id="L893">        wFactor = wFactor(WeightingFactors.COMMISSIONING, period, orgType);</span>
+<span class="fc" id="L894">        crunchWeighting(period, rtn, nonPaySpend, Q.COMMISSIONING_SPEND, wFactor, Q.COMMISSIONING_CO2E);</span>
+
+        // intentionally omit waste and water and travel here
+<span class="fc" id="L897">        sumAnswers(period, rtn, Q.PROCUREMENT_CO2E,</span>
+                Q.BIZ_SVCS_CO2E, Q.CAPITAL_CO2E, Q.CONSTRUCTION_CO2E,
+                Q.CATERING_CO2E, Q.FREIGHT_CO2E, Q.ICT_CO2E, Q.CHEM_AND_GAS_CO2E,
+                Q.MED_INSTR_CO2E, Q.OTHER_MANUFACTURED_CO2E,
+                Q.OTHER_PROCUREMENT_CO2E, Q.PAPER_AND_CARD_CO2E, Q.PHARMA_CO2E);
+<span class="fc" id="L902">    }</span>
+
+    // This is probably a poor approximation.
+    // The rational is that capital does not deal with major construction
+    // projects but 'small works'. Therefore it combines a carbon intensity for
+    // construction in 2013-14 with a weighting of different org types
+    protected void crunchCapitalSpend(String period, SurveyReturn rtn,
+            String orgType, BigDecimal nonPaySpend) {
+<span class="fc" id="L910">        WeightingFactor wFactor = wFactor(WeightingFactors.CAPITAL, period, orgType);</span>
+        BigDecimal calcVal;
+        try {
+<span class="fc" id="L913">            Answer capEx = getAnswer(period, rtn, Q.CAPITAL_SPEND);</span>
+<span class="fc bfc" id="L914" title="All 4 branches covered.">            if (capEx.derived() || capEx.response() == null</span>
+<span class="fc bfc" id="L915" title="All 2 branches covered.">                    || capEx.response().trim().length() == 0) {</span>
+<span class="fc" id="L916">                LOGGER.info(&quot;No directly entered capital spend, estimate from non-pay spend&quot;);</span>
+<span class="fc" id="L917">                calcVal = nonPaySpend.multiply(wFactor.proportionOfTotal());</span>
+<span class="fc" id="L918">                LOGGER.info(&quot;Estimated capital spend from non-pay spend as {}&quot;, calcVal);</span>
+<span class="fc" id="L919">                capEx.derived(true).response(calcVal.toPlainString());</span>
+            } else {
+<span class="fc" id="L921">                calcVal = capEx.responseAsBigDecimal();</span>
+            }
+            // This intentionally uses proportion of total not intensity
+            // because as explained above it is a special combined factor
+<span class="fc" id="L925">            calcVal = calcVal.multiply(wFactor.proportionOfTotal());</span>
+<span class="nc" id="L926">        } catch (NumberFormatException e) {</span>
+<span class="nc" id="L927">            LOGGER.error(&quot;Cannot estimate CO2e from capital spend&quot;);</span>
+<span class="nc" id="L928">            calcVal = BigDecimal.ZERO;</span>
+<span class="fc" id="L929">        }</span>
+<span class="fc" id="L930">        LOGGER.info(&quot;Calculated {} emissions as {}&quot;, Q.CAPITAL_CO2E, calcVal);</span>
+<span class="fc" id="L931">        getAnswer(period, rtn, Q.CAPITAL_CO2E).derived(true).response(calcVal.toPlainString());</span>
+<span class="fc" id="L932">    }</span>
+
+    protected BigDecimal calcNonPaySpendFromOpEx(String period,
+            SurveyReturn rtn) {
+<span class="fc" id="L936">        LOGGER.info(String.format(&quot;Need to calc non pay spend from op ex&quot;));</span>
+        // Intentionally use rtn period for org type
+<span class="fc" id="L938">        Answer orgTypeA = rtn.answer(rtn.applicablePeriod(), Q.ORG_TYPE)</span>
+<span class="pc" id="L939">                .orElseThrow(() -&gt; new IllegalArgumentException(String.format(</span>
+                        &quot;Cannot calc non-pay spend from op-ex for %1$s in %2$s as no org type specified.&quot;,
+<span class="nc" id="L941">                        rtn.org(), rtn.applicablePeriod())));</span>
+        BigDecimal opEx;
+        try {
+<span class="fc" id="L944">            Answer opExA = rtn.answer(period, Q.OP_EX)</span>
+<span class="pc" id="L945">                    .orElseThrow(() -&gt; new IllegalArgumentException(String.format(</span>
+                            &quot;Cannot calc non-pay spend from op-ex for %1$s (%2$s) in %3$s as op-ex is missing.&quot;,
+<span class="nc" id="L947">                            rtn.org(), orgTypeA.response(), period)));</span>
+<span class="fc" id="L948">            opEx = opExA.responseAsBigDecimal();</span>
+<span class="nc" id="L949">        } catch (IllegalArgumentException e) {</span>
+            // Warn is enough, opex may not be provided in some years.
+<span class="nc" id="L951">            LOGGER.warn(e.getMessage());</span>
+<span class="nc" id="L952">            opEx = BigDecimal.ZERO;</span>
+<span class="fc" id="L953">        }</span>
+
+<span class="fc" id="L955">        WeightingFactor wFactor = wFactor(</span>
+<span class="fc" id="L956">        WeightingFactors.NON_PAY_OP_EX_PORTION, period, orgTypeA.response());</span>
+
+<span class="fc" id="L958">        BigDecimal nonPaySpend = opEx.multiply(wFactor.proportionOfTotal());</span>
+<span class="fc" id="L959">        LOGGER.info(&quot;Calculated non pay spend {} from op ex {}&quot;, nonPaySpend, opEx.toPlainString());</span>
+<span class="fc" id="L960">        return nonPaySpend;</span>
+    }
+
+    private boolean isEmpty(String value) {
+<span class="pc bpc" id="L964" title="2 of 4 branches missed.">        return value == null || &quot;0&quot;.equals(value);</span>
+    }
+
+    protected void calcCarbonProfileEClassMethod(String period, SurveyReturn rtn) {
+<span class="fc" id="L968">        LOGGER.info(&quot;calcCarbonProfileEClassMethod for {} in {}&quot;, rtn.getOrg(), rtn.applicablePeriod());</span>
+        // Logic here is that *1000 for thousands of pounds to pounds the
+        // /1000 to convert factor from kg to tonnes, i.e. cancel each other out
+<span class="fc" id="L971">        CarbonFactor cFactor = cFactor(CarbonFactors.PROVISIONS, period);</span>
+<span class="fc" id="L972">        crunchCO2e(period, rtn, Q.PROVISIONS, cFactor.value(),</span>
+                Q.PROVISIONS_CO2E);
+<span class="fc" id="L974">        cFactor = cFactor(CarbonFactors.STAFF_CLOTHING, period);</span>
+<span class="fc" id="L975">        crunchCO2e(period, rtn, Q.STAFF_CLOTHING, cFactor.value(),</span>
+                Q.STAFF_CLOTHING_CO2E);
+<span class="fc" id="L977">        cFactor = cFactor(CarbonFactors.PATIENTS_CLOTHING_FOOTWEAR, period);</span>
+<span class="fc" id="L978">        crunchCO2e(period, rtn, Q.PATIENTS_CLOTHING_AND_FOOTWEAR,</span>
+<span class="fc" id="L979">                cFactor.value(), Q.PATIENTS_CLOTHING_AND_FOOTWEAR_CO2E);</span>
+<span class="fc" id="L980">        cFactor = cFactor(</span>
+                CarbonFactors.PHARMACEUTICALS_BLOOD_PRODUCTS_MEDICAL_GASES,
+                period);
+<span class="fc" id="L983">        crunchCO2e(period, rtn, Q.PHARMA_BLOOD_PROD_AND_MED_GASES,</span>
+<span class="fc" id="L984">                cFactor.value(), Q.PHARMA_BLOOD_PROD_AND_MED_GASES_CO2E);</span>
+<span class="fc" id="L985">        cFactor = cFactor(CarbonFactors.DRESSINGS, period);</span>
+<span class="fc" id="L986">        crunchCO2e(period, rtn, Q.DRESSINGS, cFactor.value(), Q.DRESSINGS_CO2E);</span>
+<span class="fc" id="L987">        cFactor = cFactor(CarbonFactors.MEDICAL_SURGICAL_EQUIPMENT, period);</span>
+<span class="fc" id="L988">        crunchCO2e(period, rtn, Q.MEDICAL_AND_SURGICAL_EQUIPT, cFactor.value(),</span>
+                Q.MEDICAL_AND_SURGICAL_EQUIPT_CO2E);
+<span class="fc" id="L990">        cFactor = cFactor(CarbonFactors.PATIENTS_APPLIANCES, period);</span>
+<span class="fc" id="L991">        crunchCO2e(period, rtn, Q.PATIENTS_APPLIANCES, cFactor.value(),</span>
+                Q.PATIENTS_APPLIANCES_CO2E);
+<span class="fc" id="L993">        cFactor = cFactor(CarbonFactors.CHEMICALS_REAGENTS, period);</span>
+<span class="fc" id="L994">        crunchCO2e(period, rtn, Q.CHEMICALS_AND_REAGENTS, cFactor.value(),</span>
+                Q.CHEMICALS_AND_REAGENTS_CO2E);
+<span class="fc" id="L996">        cFactor = cFactor(CarbonFactors.DENTAL_OPTICAL_EQUIPMENT, period);</span>
+<span class="fc" id="L997">        crunchCO2e(period, rtn, Q.DENTAL_AND_OPTICAL_EQUIPT, cFactor.value(),</span>
+                Q.DENTAL_AND_OPTICAL_EQUIPT_CO2E);
+<span class="fc" id="L999">        cFactor = cFactor(</span>
+                CarbonFactors.DIAGNOSTIC_IMAGING_RADIOTHERAPY_EQUIPMENT_SERVICES,
+                period);
+<span class="fc" id="L1002">        crunchCO2e(period, rtn, Q.IMAGING_AND_RADIOTHERAPY_EQUIPT_AND_SVCS,</span>
+<span class="fc" id="L1003">                cFactor.value(),</span>
+                Q.IMAGING_AND_RADIOTHERAPY_EQUIPT_AND_SVCS_CO2E);
+<span class="fc" id="L1005">        cFactor = cFactor(CarbonFactors.LABORATORY_EQUIPMENT_SERVICES, period);</span>
+<span class="fc" id="L1006">        crunchCO2e(period, rtn, Q.LAB_EQUIPT_AND_SVCS, cFactor.value(),</span>
+                Q.LAB_EQUIPT_AND_SVCS_CO2E);
+        // cFactor = cFactor(CarbonFactors.FUEL_LIGHT_POWER_WATER, period);
+        // crunchCO2e(period, rtn, Q.FUEL_LIGHT_POWER_WATER,
+        // cFactor.value(), Q.FUEL_LIGHT_POWER_WATER_CO2E);
+<span class="fc" id="L1011">        cFactor = cFactor(</span>
+                CarbonFactors.HOTEL_SERVICES_EQUIPMENT_MATERIALS_SERVICES,
+                period);
+<span class="fc" id="L1014">        crunchCO2e(period, rtn, Q.HOTEL_EQUIPT_MATERIALS_AND_SVCS,</span>
+<span class="fc" id="L1015">                cFactor.value(), Q.HOTEL_EQUIPT_MATERIALS_AND_SVCS_CO2E);</span>
+<span class="fc" id="L1016">        cFactor = cFactor(CarbonFactors.BUILDING_ENGINEERING_PRODUCTS_SERVICES,</span>
+                period);
+<span class="fc" id="L1018">        crunchCO2e(period, rtn, Q.BLDG_AND_ENG_PROD_AND_SVCS, cFactor.value(),</span>
+                Q.BLDG_AND_ENG_PROD_AND_SVCS_CO2E);
+<span class="fc" id="L1020">        cFactor = cFactor(CarbonFactors.PURCHASED_HEALTHCARE, period);</span>
+<span class="fc" id="L1021">        crunchCO2e(period, rtn, Q.PURCHASED_HEALTHCARE, cFactor.value(),</span>
+                Q.PURCHASED_HEALTHCARE_CO2E);
+<span class="fc" id="L1023">        cFactor = cFactor(CarbonFactors.GARDENING_FARMING, period);</span>
+<span class="fc" id="L1024">        crunchCO2e(period, rtn, Q.GARDENING_AND_FARMING, cFactor.value(),</span>
+                Q.GARDENING_AND_FARMING_CO2E);
+<span class="fc" id="L1026">        cFactor = cFactor(CarbonFactors.FURNITURE_FITTINGS, period);</span>
+<span class="fc" id="L1027">        crunchCO2e(period, rtn, Q.FURNITURE_FITTINGS, cFactor.value(),</span>
+                Q.FURNITURE_FITTINGS_CO2E);
+<span class="fc" id="L1029">        cFactor = cFactor(CarbonFactors.HARDWARE_CROCKERY, period);</span>
+<span class="fc" id="L1030">        crunchCO2e(period, rtn, Q.HARDWARE_CROCKERY, cFactor.value(),</span>
+                Q.HARDWARE_CROCKERY_CO2E);
+<span class="fc" id="L1032">        cFactor = cFactor(CarbonFactors.BEDDING_LINEN_TEXTILES, period);</span>
+<span class="fc" id="L1033">        crunchCO2e(period, rtn, Q.BEDDING_LINEN_AND_TEXTILES, cFactor.value(),</span>
+                Q.BEDDING_LINEN_AND_TEXTILES_CO2E);
+<span class="fc" id="L1035">        cFactor = cFactor(</span>
+                CarbonFactors.OFFICE_EQUIPMENT_TELECOMMS_COMPUTERS_STATIONERY,
+                period);
+<span class="fc" id="L1038">        crunchCO2e(period, rtn, Q.OFFICE_EQUIPT_TELCO_COMPUTERS_AND_STATIONERY,</span>
+<span class="fc" id="L1039">                cFactor.value(),</span>
+                Q.OFFICE_EQUIPT_TELCO_COMPUTERS_AND_STATIONERY_CO2E);
+        // cFactor = cFactor(CarbonFactors.TRANSPORTATION, period);
+        // crunchCO2e(period, rtn, Q.TRANSPORTATION, cFactor.value(),
+        // Q.TRANSPORTATION_CO2E);
+<span class="fc" id="L1044">        cFactor = cFactor(CarbonFactors.RECREATIONAL_EQUIPMENT_SOUVENIRS,</span>
+                period);
+<span class="fc" id="L1046">        crunchCO2e(period, rtn, Q.REC_EQUIPT_AND_SOUVENIRS, cFactor.value(),</span>
+                Q.REC_EQUIPT_AND_SOUVENIRS_CO2E);
+<span class="fc" id="L1048">        cFactor = cFactor(</span>
+                CarbonFactors.STAFF_PATIENT_CONSULTING_SERVICES_EXPENSES,
+                period);
+<span class="fc" id="L1051">        crunchCO2e(period, rtn, Q.CONSULTING_SVCS_AND_EXPENSES, cFactor.value(),</span>
+                Q.CONSULTING_SVCS_AND_EXPENSES_CO2E);
+
+<span class="fc" id="L1054">        sumAnswers(period, rtn, Q.WASTE_AND_WATER_CO2E, Q.SCOPE_3_WASTE, Q.SCOPE_3_WATER);</span>
+<span class="fc" id="L1055">        sumAnswers(period, rtn, Q.PROCUREMENT_CO2E, Q.PROVISIONS_CO2E,</span>
+                Q.STAFF_CLOTHING_CO2E, Q.PATIENTS_CLOTHING_AND_FOOTWEAR_CO2E,
+                Q.PHARMA_BLOOD_PROD_AND_MED_GASES_CO2E,
+                Q.MEDICAL_AND_SURGICAL_EQUIPT_CO2E, Q.PATIENTS_APPLIANCES_CO2E,
+                Q.CHEMICALS_AND_REAGENTS_CO2E, Q.DENTAL_AND_OPTICAL_EQUIPT_CO2E,
+                Q.IMAGING_AND_RADIOTHERAPY_EQUIPT_AND_SVCS_CO2E,
+                Q.LAB_EQUIPT_AND_SVCS_CO2E,
+                Q.HOTEL_EQUIPT_MATERIALS_AND_SVCS_CO2E,
+                Q.BLDG_AND_ENG_PROD_AND_SVCS_CO2E, Q.PURCHASED_HEALTHCARE_CO2E,
+                Q.GARDENING_AND_FARMING_CO2E, Q.FURNITURE_FITTINGS_CO2E,
+                Q.HARDWARE_CROCKERY_CO2E, Q.BEDDING_LINEN_AND_TEXTILES_CO2E,
+                Q.OFFICE_EQUIPT_TELCO_COMPUTERS_AND_STATIONERY_CO2E,
+                Q.REC_EQUIPT_AND_SOUVENIRS_CO2E,
+                Q.CONSULTING_SVCS_AND_EXPENSES_CO2E);
+<span class="fc" id="L1069">    }</span>
+
+    protected void crunchEnergyCostChange(String period, SurveyReturn rtn) {
+        try {
+<span class="fc" id="L1073">            BigDecimal currentEnergyCost = getAnswer(period, rtn, Q.TOTAL_ENERGY_COST).responseAsBigDecimal();</span>
+<span class="fc" id="L1074">            BigDecimal previousEnergyCost = getAnswer(PeriodUtil.previous(period), rtn, Q.TOTAL_ENERGY_COST).responseAsBigDecimal();</span>
+
+<span class="fc" id="L1076">            BigDecimal change = currentEnergyCost.divide(previousEnergyCost, 5, RoundingMode.HALF_UP).multiply(ONE_HUNDRED).subtract(ONE_HUNDRED);</span>
+<span class="fc" id="L1077">            getAnswer(period, rtn, Q.ENERGY_COST_CHANGE_PCT).response(change);</span>
+<span class="fc" id="L1078">        } catch (IllegalStateException | NullPointerException | ArithmeticException e) {</span>
+<span class="fc" id="L1079">            LOGGER.warn(&quot;Insufficient data to calculate change of energy costs in {}&quot;, period);</span>
+<span class="fc" id="L1080">        }</span>
+<span class="fc" id="L1081">    }</span>
+
+    private void crunchHeatSteam(String period, SurveyReturn rtn) {
+<span class="fc" id="L1084">        CarbonFactor cFactor = cFactor(CarbonFactors.ONSITE_HEAT_AND_STEAM, period);</span>
+<span class="fc" id="L1085">        crunchCO2e(period, rtn, Q.STEAM_USED, oneThousandth(cFactor), Q.STEAM_CO2E);</span>
+<span class="fc" id="L1086">        cFactor = cFactor(CarbonFactors.ONSITE_HEAT_AND_STEAM, period);</span>
+<span class="fc" id="L1087">        crunchCO2e(period, rtn, Q.HOT_WATER_USED, oneThousandth(cFactor), Q.HOT_WATER_CO2E);</span>
+        BigDecimal exportedThermalEnergy;
+        try {
+<span class="fc" id="L1090">            cFactor = cFactor(CarbonFactors.ONSITE_HEAT_AND_STEAM, period);</span>
+<span class="fc" id="L1091">            Optional&lt;Answer&gt; crunchCO2e = crunchCO2e(period, rtn, Q.EXPORTED_THERMAL_ENERGY, oneThousandth(cFactor), Q.EXPORTED_THERMAL_ENERGY_CO2E);</span>
+<span class="fc" id="L1092">            exportedThermalEnergy = crunchCO2e.orElseThrow(() -&gt; new IllegalStateException()).responseAsBigDecimal();</span>
+<span class="fc" id="L1093">        } catch (IllegalStateException | NullPointerException e) {</span>
+<span class="fc" id="L1094">            LOGGER.warn(&quot;Insufficient data to calculate CO2e from {}&quot;, Q.EXPORTED_THERMAL_ENERGY);</span>
+<span class="fc" id="L1095">            exportedThermalEnergy = BigDecimal.ZERO;</span>
+<span class="fc" id="L1096">        }</span>
+
+<span class="fc" id="L1098">        BigDecimal netHeatSteamVal = new BigDecimal(&quot;0.000&quot;);</span>
+<span class="fc" id="L1099">        netHeatSteamVal = netHeatSteamVal</span>
+<span class="fc" id="L1100">                .add(getAnswer(period, rtn, Q.STEAM_CO2E).responseAsBigDecimal())</span>
+<span class="fc" id="L1101">                .add(getAnswer(period, rtn, Q.HOT_WATER_CO2E).responseAsBigDecimal())</span>
+<span class="fc" id="L1102">                .subtract(exportedThermalEnergy);</span>
+<span class="fc" id="L1103">        getAnswer(period,rtn, Q.NET_THERMAL_ENERGY_CO2E).response(netHeatSteamVal.toPlainString());</span>
+<span class="fc" id="L1104">    }</span>
+
+    private BigDecimal oneThousandth(CarbonFactor cFactor) {
+<span class="fc" id="L1107">        return cFactor.value().divide(ONE_THOUSAND, cFactor.value().scale()+3, RoundingMode.HALF_UP);</span>
+    }
+
+    protected void crunchElectricityUsed(String period, SurveyReturn rtn) {
+        try {
+<span class="fc" id="L1112">            BigDecimal nonRenewableElecUsed = getAnswer(period, rtn, Q.ELEC_USED).responseAsBigDecimal();</span>
+<span class="fc" id="L1113">            BigDecimal elecFactor = oneThousandth(cFactor(CarbonFactors.ELECTRICITY_UK_TOTAL, period));</span>
+<span class="fc" id="L1114">            getAnswer(period,rtn, Q.ELEC_CO2E).derived(true).response(nonRenewableElecUsed.multiply(elecFactor));</span>
+<span class="nc" id="L1115">        } catch (IllegalStateException | NullPointerException e) {</span>
+<span class="nc" id="L1116">            LOGGER.warn(&quot;Insufficient data to calculate CO2e from grid electricity&quot;);</span>
+<span class="fc" id="L1117">        }</span>
+
+        BigDecimal elecExportedCo2e;
+        try {
+<span class="fc" id="L1121">            elecExportedCo2e = getAnswer(period, rtn, Q.ELEC_EXPORTED).responseAsBigDecimal()</span>
+<span class="fc" id="L1122">                    .multiply(oneThousandth(cFactor(CarbonFactors.ELEC_EXPORTED_GAS_FIRED_CHP_TOTAL, period)));</span>
+<span class="fc" id="L1123">            getAnswer(period,rtn, Q.ELEC_EXPORTED_CO2E).derived(true).response(elecExportedCo2e);</span>
+<span class="fc" id="L1124">        } catch (IllegalStateException | NullPointerException e) {</span>
+<span class="fc" id="L1125">            LOGGER.warn(&quot;Insufficient data to calculate CO2e from elec exported&quot;);</span>
+<span class="fc" id="L1126">            elecExportedCo2e = BigDecimal.ZERO;</span>
+<span class="fc" id="L1127">        }</span>
+<span class="fc" id="L1128">        getAnswer(period,rtn, Q.NET_ELEC_CO2E).derived(true).response(</span>
+<span class="fc" id="L1129">                getAnswer(period,rtn, Q.ELEC_CO2E).responseAsBigDecimal().subtract(elecExportedCo2e));</span>
+
+<span class="fc" id="L1131">        BigDecimal renewableElecUsed = sumAnswers(period, rtn,</span>
+                Q.ELEC_TOTAL_RENEWABLE_USED, Q.ELEC_USED_GREEN_TARIFF,
+                Q.ELEC_3RD_PTY_RENEWABLE_USED, Q.ELEC_OWNED_RENEWABLE_USED_SDU)
+<span class="fc" id="L1134">                .responseAsBigDecimal();</span>
+<span class="fc" id="L1135">        getAnswer(period,rtn, Q.ELEC_TOTAL_RENEWABLE_USED).derived(true).response(renewableElecUsed);</span>
+        try {
+<span class="fc" id="L1137">            BigDecimal elecFactor = oneThousandth(cFactor(CarbonFactors.ELECTRICITY_UK_TOTAL, period));</span>
+            BigDecimal greenTariffGridEquivUsed;
+            try {
+<span class="fc" id="L1140">                greenTariffGridEquivUsed = getAnswer(period, rtn, Q.ELEC_USED_GREEN_TARIFF).responseAsBigDecimal().multiply(</span>
+<span class="fc" id="L1141">                        ONE_HUNDRED.subtract(getAnswer(period, rtn, Q.GREEN_TARIFF_ADDITIONAL_PCT).responseAsBigDecimal()));</span>
+<span class="fc" id="L1142">                getAnswer(period,rtn, Q.ELEC_NON_RENEWABLE_GREEN_TARIFF).derived(true).response(greenTariffGridEquivUsed);</span>
+<span class="fc" id="L1143">                getAnswer(period,rtn, Q.ELEC_NON_RENEWABLE_GREEN_TARIFF_CO2E).derived(true).response(</span>
+<span class="fc" id="L1144">                         greenTariffGridEquivUsed.multiply(elecFactor).divide(ONE_HUNDRED, RoundingMode.HALF_UP));</span>
+<span class="nc" id="L1145">            } catch (IllegalStateException | NullPointerException e) {</span>
+<span class="nc" id="L1146">                LOGGER.warn(&quot;Insufficient data to calculate CO2e saved from green tariff elec used for {} in {}&quot;, rtn.org(), period);</span>
+<span class="nc" id="L1147">                LOGGER.error(e.getMessage(), e);</span>
+<span class="nc" id="L1148">                greenTariffGridEquivUsed = BigDecimal.ZERO;</span>
+<span class="fc" id="L1149">            }</span>
+            BigDecimal thirdPtyRenewableGridEquivUsed;
+            try {
+<span class="fc" id="L1152">                thirdPtyRenewableGridEquivUsed = getAnswer(period, rtn, Q.ELEC_3RD_PTY_RENEWABLE_USED).responseAsBigDecimal().multiply(</span>
+<span class="fc" id="L1153">                        ONE_HUNDRED.subtract(getAnswer(period, rtn, Q.THIRD_PARTY_ADDITIONAL_PCT).responseAsBigDecimal()));</span>
+<span class="fc" id="L1154">                getAnswer(period,rtn, Q.ELEC_NON_RENEWABLE_3RD_PARTY).derived(true).response(thirdPtyRenewableGridEquivUsed);</span>
+<span class="fc" id="L1155">                getAnswer(period,rtn, Q.ELEC_NON_RENEWABLE_3RD_PARTY_CO2E).derived(true).response(</span>
+<span class="fc" id="L1156">                        thirdPtyRenewableGridEquivUsed.multiply(elecFactor).divide(ONE_HUNDRED, RoundingMode.HALF_UP));</span>
+<span class="nc" id="L1157">            } catch (IllegalStateException | NullPointerException e) {</span>
+<span class="nc" id="L1158">                LOGGER.warn(&quot;Insufficient data to calculate CO2e from third party renewable elec used for {} in {}&quot;, rtn.org(), period);</span>
+<span class="nc" id="L1159">                LOGGER.error(e.getMessage(), e);</span>
+<span class="nc" id="L1160">                thirdPtyRenewableGridEquivUsed = BigDecimal.ZERO;</span>
+<span class="fc" id="L1161">            }</span>
+<span class="fc" id="L1162">            BigDecimal renewableElecCo2e = greenTariffGridEquivUsed.add(thirdPtyRenewableGridEquivUsed)</span>
+<span class="fc" id="L1163">                    .multiply(elecFactor).divide(ONE_HUNDRED, RoundingMode.HALF_UP);</span>
+<span class="fc" id="L1164">            getAnswer(period,rtn, Q.ELEC_RENEWABLE_CO2E).derived(true).response(renewableElecCo2e);</span>
+<span class="nc" id="L1165">        } catch (IllegalStateException | NullPointerException e) {</span>
+<span class="nc" id="L1166">            LOGGER.warn(&quot;Insufficient data to calculate CO2e from renewable electricity&quot;);</span>
+<span class="fc" id="L1167">        }</span>
+<span class="fc" id="L1168">    }</span>
+
+    protected void crunchOwnedBuildings(String period, SurveyReturn rtn) {
+<span class="fc" id="L1171">        CarbonFactor cFactor = cFactor(CarbonFactors.GAS_TOTAL, period);</span>
+<span class="fc" id="L1172">        crunchCO2e(period, rtn, Q.GAS_USED, oneThousandth(cFactor), Q.OWNED_BUILDINGS_GAS);</span>
+
+<span class="fc" id="L1174">        cFactor = cFactor(CarbonFactors.FUEL_OIL_TOTAL, period);</span>
+<span class="fc" id="L1175">        crunchCO2e(period, rtn, Q.OIL_USED, oneThousandth(cFactor), Q.OWNED_BUILDINGS_OIL);</span>
+
+<span class="fc" id="L1177">        cFactor = cFactor(CarbonFactors.COAL_INDUSTRIAL_TOTAL, period);</span>
+<span class="fc" id="L1178">        crunchCO2e(period, rtn, Q.COAL_USED, oneThousandth(cFactor), Q.OWNED_BUILDINGS_COAL);</span>
+<span class="fc" id="L1179">        sumAnswers(period, rtn,Q.OWNED_BUILDINGS, Q.OWNED_BUILDINGS_GAS, Q.OWNED_BUILDINGS_OIL, Q.OWNED_BUILDINGS_COAL);</span>
+<span class="fc" id="L1180">    }</span>
+
+    protected void crunchAnaestheticGases(String period, SurveyReturn rtn) {
+<span class="fc" id="L1183">        CarbonFactor cFactor = cFactor(CarbonFactors.DESFLURANE, period);</span>
+<span class="fc" id="L1184">        crunchCO2e(period, rtn, Q.DESFLURANE, cFactor.value(), Q.DESFLURANE_CO2E);</span>
+<span class="fc" id="L1185">        cFactor = cFactor(CarbonFactors.ISOFLURANE, period);</span>
+<span class="fc" id="L1186">        crunchCO2e(period, rtn, Q.ISOFLURANE, cFactor.value(), Q.ISOFLURANE_CO2E);</span>
+<span class="fc" id="L1187">        cFactor = cFactor(CarbonFactors.SEVOFLURANE, period);</span>
+<span class="fc" id="L1188">        crunchCO2e(period, rtn, Q.SEVOFLURANE, cFactor.value(), Q.SEVOFLURANE_CO2E);</span>
+<span class="fc" id="L1189">        cFactor = cFactor(CarbonFactors.NITROUS_OXIDE, period);</span>
+<span class="fc" id="L1190">        crunchCO2e(period, rtn, Q.NITROUS_OXIDE, cFactor.value(), Q.NITROUS_OXIDE_CO2E);</span>
+<span class="fc" id="L1191">        cFactor = cFactor(CarbonFactors.NITROUS_OXIDE_WITH_OXYGEN_50_50_SPLIT, period);</span>
+<span class="fc" id="L1192">        crunchCO2e(period, rtn, Q.PORTABLE_NITROUS_OXIDE_MIX, cFactor.value(), Q.PORTABLE_NITROUS_OXIDE_MIX_CO2E);</span>
+<span class="fc" id="L1193">        cFactor = cFactor(CarbonFactors.NITROUS_OXIDE_WITH_OXYGEN_50_50_SPLIT, period);</span>
+<span class="fc" id="L1194">        crunchCO2e(period, rtn, Q.PORTABLE_NITROUS_OXIDE_MIX_MATERNITY, cFactor.value(), Q.PORTABLE_NITROUS_OXIDE_MIX_MATERNITY_CO2E);</span>
+<span class="fc" id="L1195">        sumAnswers(period, rtn, Q.ANAESTHETIC_GASES_CO2E, Q.DESFLURANE_CO2E, Q.ISOFLURANE_CO2E, Q.SEVOFLURANE_CO2E, Q.NITROUS_OXIDE_CO2E, Q.PORTABLE_NITROUS_OXIDE_MIX_CO2E, Q.PORTABLE_NITROUS_OXIDE_MIX_MATERNITY_CO2E);</span>
+<span class="fc" id="L1196">    }</span>
+
+    public void crunchSocialValue(String period, SurveyReturn rtn) {
+        try {
+<span class="fc" id="L1200">            sumAnswers(period, rtn, Q.SV_TOTAL, Q.SV_ENVIRONMENT, Q.SV_GROWTH,</span>
+                    Q.SV_INNOVATION, Q.SV_JOBS, Q.SV_SOCIAL);
+<span class="fc" id="L1202">        } catch (IllegalStateException e) {</span>
+<span class="pc bpc" id="L1203" title="1 of 2 branches missed.">            if (PeriodUtil.before(period, &quot;2018-19&quot;)) {</span>
+<span class="fc" id="L1204">                LOGGER.debug(&quot;Ignoring question not expected in {}: {}&quot;, period, e.getMessage());</span>
+            } else {
+<span class="nc" id="L1206">                throw e;</span>
+            }
+<span class="fc" id="L1208">        }</span>
+<span class="fc" id="L1209">    }</span>
+
+    public void crunchSocialInvestmentRecorded(String period, SurveyReturn rtn) {
+        try {
+<span class="fc" id="L1213">            sumAnswers(period, rtn, Q.SI_TOTAL, Q.SI_ENVIRONMENT, Q.SI_GROWTH,</span>
+                    Q.SI_INNOVATION, Q.SI_JOBS, Q.SI_SOCIAL);
+<span class="fc" id="L1215">        } catch (IllegalStateException e) {</span>
+<span class="pc bpc" id="L1216" title="1 of 2 branches missed.">            if (PeriodUtil.before(period, &quot;2018-19&quot;)) {</span>
+<span class="fc" id="L1217">                LOGGER.debug(&quot;Ignoring question not expected in {}: {}&quot;, period, e.getMessage());</span>
+            } else {
+<span class="nc" id="L1219">                throw e;</span>
+            }
+<span class="fc" id="L1221">        }</span>
+<span class="fc" id="L1222">    }</span>
+
+    private Answer sumAnswers(String period, SurveyReturn rtn, Q trgtQName,
+            Q... srcQs) {
+<span class="fc" id="L1226">        BigDecimal calcVal = new BigDecimal(&quot;0.000&quot;);</span>
+<span class="fc bfc" id="L1227" title="All 2 branches covered.">        for (Q src : srcQs) {</span>
+            try {
+<span class="fc" id="L1229">                calcVal = calcVal.add(getAnswer(period, rtn, src).responseAsBigDecimal());</span>
+<span class="fc" id="L1230">            } catch (IllegalStateException e) {</span>
+<span class="fc" id="L1231">                LOGGER.warn(&quot;No CO2e attributable to {}&quot;, src);</span>
+<span class="nc" id="L1232">            } catch (NullPointerException e) {</span>
+<span class="nc" id="L1233">                LOGGER.warn(&quot;Insufficient data to calculate CO2e from {}&quot;, src);</span>
+<span class="fc" id="L1234">            }</span>
+        }
+<span class="fc" id="L1236">        return getAnswer(period, rtn, trgtQName).derived(true).response(calcVal.toPlainString());</span>
+    }
+
+    private Optional&lt;Answer&gt; crunchCO2e(String period, SurveyReturn rtn, Q srcQ,
+            BigDecimal cFactor, Q trgtQ) {
+<span class="fc" id="L1241">        BigDecimal calcVal = new BigDecimal(&quot;0.00&quot;);</span>
+        try {
+<span class="fc" id="L1243">            calcVal = getAnswer(period, rtn, srcQ).responseAsBigDecimal()</span>
+<span class="fc" id="L1244">                    .multiply(cFactor);</span>
+<span class="fc" id="L1245">            return Optional.of(getAnswer(period, rtn, trgtQ).derived(true).response(calcVal.toPlainString()));</span>
+<span class="fc" id="L1246">        } catch (IllegalStateException | NullPointerException e) {</span>
+<span class="fc" id="L1247">            LOGGER.warn(&quot;Insufficient data to calculate CO2e from {}&quot;, srcQ);</span>
+<span class="nc" id="L1248">        } catch (NumberFormatException e) {</span>
+<span class="nc" id="L1249">            LOGGER.error(&quot;Cannot calculate CO2e from {}&quot;, srcQ);</span>
+<span class="fc" id="L1250">        }</span>
+<span class="fc" id="L1251">        return Optional.empty();</span>
+    }
+
+    CarbonFactor cFactor(CarbonFactors cfName, String period) {
+<span class="pc bpc" id="L1255" title="1 of 2 branches missed.">        for (CarbonFactor cfactor : cfactors) {</span>
+<span class="fc bfc" id="L1256" title="All 4 branches covered.">            if (cfName.name().equals(cfactor.name()) &amp;&amp; period.equals(cfactor.applicablePeriod())) {</span>
+<span class="fc" id="L1257">                return cfactor;</span>
+            }
+<span class="fc" id="L1259">        }</span>
+<span class="nc" id="L1260">        LOGGER.error(&quot;Unable to find Carbon Factor {} for period {}&quot;, cfName, period);</span>
+<span class="nc" id="L1261">        throw new ObjectNotFoundException(CarbonFactor.class, cfName.name());</span>
+    }
+
+    private Answer crunchWeighting(String period, SurveyReturn rtn, BigDecimal nonPaySpend,
+            Q srcQ, WeightingFactor wFactor, Q trgtQ) {
+<span class="fc" id="L1266">        BigDecimal calcVal = new BigDecimal(&quot;0.00&quot;);</span>
+        try {
+<span class="pc bpc" id="L1268" title="1 of 2 branches missed.">            if (BigDecimal.ZERO.equals(getAnswer(period, rtn, srcQ).responseAsBigDecimal())) {</span>
+<span class="fc" id="L1269">                LOGGER.info(&quot;No directly entered spend {}, estimate from non-pay spend&quot;, srcQ);</span>
+<span class="fc" id="L1270">                calcVal = nonPaySpend.multiply(wFactor.proportionOfTotal());</span>
+<span class="fc" id="L1271">                LOGGER.info(&quot;Estimated {} from non-pay spend as {}&quot;, srcQ, calcVal);</span>
+<span class="fc" id="L1272">                getAnswer(period, rtn, srcQ).derived(true).response(calcVal.toPlainString());</span>
+            } else {
+<span class="nc" id="L1274">                LOGGER.info(&quot;Have directly entered spend {}, no need to estimate&quot;, srcQ);</span>
+<span class="nc" id="L1275">                calcVal = getAnswer(period, rtn, srcQ).responseAsBigDecimal();</span>
+            }
+<span class="fc" id="L1277">            calcVal = calcVal.multiply(wFactor.intensityValue());</span>
+<span class="nc" id="L1278">        } catch (NumberFormatException e) {</span>
+<span class="nc" id="L1279">            LOGGER.error(&quot;Cannot estimate CO2e from spend&quot;);</span>
+<span class="fc" id="L1280">        }</span>
+<span class="fc" id="L1281">        LOGGER.info(&quot;Calculated {} emissions as {}&quot;, trgtQ, calcVal);</span>
+<span class="fc" id="L1282">        return getAnswer(period, rtn, trgtQ).derived(true).response(calcVal.toPlainString());</span>
+    }
+
+    private WeightingFactor wFactor(WeightingFactors wName, String period, String orgType) {
+<span class="pc bpc" id="L1286" title="6 of 9 branches missed.">        switch (orgType.toLowerCase()) {</span>
+        case &quot;acute&quot;:
+        case &quot;acute - small&quot;:
+        case &quot;acute - medium&quot;:
+        case &quot;acute - large&quot;:
+        case &quot;acute - teaching&quot;:
+        case &quot;acute - specialist&quot;:
+        case &quot;acute - multi-service&quot;:
+        case &quot;acute trust&quot;:
+<span class="fc" id="L1295">            orgType = &quot;Acute&quot;;</span>
+<span class="fc" id="L1296">            break;</span>
+        case &quot;ambulance&quot;:
+        case &quot;ambulance trust&quot;:
+<span class="nc" id="L1299">            orgType = &quot;Ambulance&quot;;</span>
+<span class="nc" id="L1300">            break;</span>
+        case &quot;care&quot;:
+        case &quot;adult social care&quot;:
+        case &quot;social care&quot;:
+<span class="nc" id="L1304">            orgType = &quot;Care&quot;;</span>
+<span class="nc" id="L1305">            break;</span>
+        case &quot;clinical commissioning group&quot;:
+<span class="fc" id="L1307">            orgType = &quot;Clinical commissioning group&quot;;</span>
+<span class="fc" id="L1308">            break;</span>
+        case &quot;community&quot;:
+<span class="fc" id="L1310">            orgType = &quot;Community&quot;;</span>
+<span class="fc" id="L1311">            break;</span>
+        case &quot;mental health&quot;:
+        case &quot;mental health / learning disability&quot;:
+        case &quot;mental health learning disability&quot;:
+        case &quot;mental health and learning disability&quot;:
+<span class="nc" id="L1316">            orgType = &quot;Mental health learning disability&quot;;</span>
+<span class="nc" id="L1317">            break;</span>
+        case &quot;independent sector&quot;:
+<span class="nc" id="L1319">            break;</span>
+        case &quot;social enterprise&quot;:
+<span class="nc" id="L1321">            break;</span>
+        default:
+<span class="nc" id="L1323">            LOGGER.warn(&quot;Unhandled org type when looking up weighting factor {}: {}&quot;, wName, orgType);</span>
+        }
+
+<span class="fc bfc" id="L1326" title="All 2 branches covered.">        for (WeightingFactor wfactor : wfactors) {</span>
+<span class="fc bfc" id="L1327" title="All 2 branches covered.">            if (wName.name().equals(wfactor.category())</span>
+<span class="fc bfc" id="L1328" title="All 2 branches covered.">                    &amp;&amp; period.equals(wfactor.applicablePeriod())</span>
+<span class="fc bfc" id="L1329" title="All 2 branches covered.">                    &amp;&amp; orgType.equalsIgnoreCase(wfactor.orgType())) {</span>
+<span class="fc" id="L1330">                return wfactor;</span>
+            }
+<span class="fc" id="L1332">        }</span>
+<span class="fc" id="L1333">        LOGGER.info(</span>
+                &quot;Unable to find exact Weighting Factor, now looking for {} and org type {} alone&quot;,
+                wName, orgType);
+<span class="pc bpc" id="L1336" title="1 of 2 branches missed.">        for (WeightingFactor wfactor : wfactors) {</span>
+<span class="fc bfc" id="L1337" title="All 2 branches covered.">            if (wName.name().equals(wfactor.category())</span>
+<span class="fc bfc" id="L1338" title="All 2 branches covered.">                    &amp;&amp; orgType.equalsIgnoreCase(wfactor.orgType())) {</span>
+<span class="fc" id="L1339">                return wfactor;</span>
+            }
+<span class="fc" id="L1341">        }</span>
+<span class="nc" id="L1342">        LOGGER.error(&quot;Unable to find any Weighting Factor {} for period {} and org type {}&quot;,</span>
+                wName, period, orgType);
+<span class="nc" id="L1344">        throw new ObjectNotFoundException(WeightingFactor.class, wName.name());</span>
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.2.201808211720</span></div></body></html>

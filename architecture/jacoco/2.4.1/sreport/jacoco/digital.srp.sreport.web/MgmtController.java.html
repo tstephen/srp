@@ -1,0 +1,297 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>MgmtController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Sustainability Reporting</a> &gt; <a href="index.source.html" class="el_package">digital.srp.sreport.web</a> &gt; <span class="el_source">MgmtController.java</span></div><h1>MgmtController.java</h1><pre class="source lang-java linenums">package digital.srp.sreport.web;
+
+import java.io.IOException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import digital.srp.sreport.api.exceptions.SReportException;
+import digital.srp.sreport.importers.EricCsvImporter;
+import digital.srp.sreport.importers.QuestionCsvImporter;
+import digital.srp.sreport.model.Answer;
+import digital.srp.sreport.model.Question;
+import digital.srp.sreport.model.Survey;
+import digital.srp.sreport.model.SurveyCategory;
+import digital.srp.sreport.model.SurveyReturn;
+import digital.srp.sreport.model.returns.EricDataSet;
+import digital.srp.sreport.model.returns.EricDataSetFactory;
+import digital.srp.sreport.model.surveys.Eric1516;
+import digital.srp.sreport.model.surveys.Sdu1617;
+import digital.srp.sreport.model.surveys.Sdu1718;
+import digital.srp.sreport.model.surveys.Sdu1819;
+import digital.srp.sreport.model.surveys.Sdu1920;
+import digital.srp.sreport.model.surveys.SurveyFactory;
+import digital.srp.sreport.repositories.AnswerRepository;
+import digital.srp.sreport.repositories.QuestionRepository;
+import digital.srp.sreport.repositories.SurveyCategoryRepository;
+import digital.srp.sreport.repositories.SurveyRepository;
+import digital.srp.sreport.repositories.SurveyReturnRepository;
+import digital.srp.sreport.services.HistoricDataMerger;
+
+/**
+ * REST web service for managing application data.
+ *
+ * @author Tim Stephenson
+ */
+@Controller
+@RequestMapping(value = &quot;/admin/data-mgmt&quot;)
+<span class="fc" id="L50">public class MgmtController {</span>
+
+<span class="fc" id="L52">    private static final Logger LOGGER = LoggerFactory</span>
+<span class="fc" id="L53">            .getLogger(MgmtController.class);</span>
+
+<span class="fc" id="L55">    protected DateFormat isoFormatter = new SimpleDateFormat(&quot;yyyy-MM-dd'T'HH:mm:ss.Z&quot;);</span>
+
+    @Autowired
+    protected HistoricDataMerger historicDataMerger;
+
+    @Autowired
+    protected QuestionRepository qRepo;
+
+    @Autowired
+    protected SurveyCategoryRepository surveyCategoryRepo;
+
+    @Autowired
+    protected SurveyRepository surveyRepo;
+
+    @Autowired
+    protected SurveyCategoryRepository catRepo;
+
+    @Autowired
+    protected AnswerRepository answerRepo;
+
+    @Autowired
+    protected SurveyReturnRepository returnRepo;
+
+    @RequestMapping(value = &quot;/&quot;, method = RequestMethod.GET, headers = &quot;Accept=application/json&quot;)
+    public String showStatus(Model model) throws IOException {
+<span class="nc" id="L80">        LOGGER.info(&quot;showStatus&quot;);</span>
+
+<span class="nc" id="L82">        model.addAttribute(&quot;answers&quot;, answerRepo.count());</span>
+<span class="nc" id="L83">        model.addAttribute(&quot;questions&quot;, qRepo.count());</span>
+<span class="nc" id="L84">        model.addAttribute(&quot;surveys&quot;, surveyRepo.count());</span>
+
+<span class="nc" id="L86">        model.addAttribute(&quot;returns&quot;, returnRepo.count());</span>
+        // TODO can get this streaming returns but fetching all returns is prohibitive
+//        List&lt;SurveyReturn&gt; returns = returnRepo.findAll();
+//        String[] orgs = returns.stream().map(p -&gt; p.org()).collect(Collectors.joining()).split(&quot;,&quot;);
+//        model.addAttribute(&quot;orgs&quot;, orgs.length);
+
+<span class="nc" id="L92">        addMetaData(model);</span>
+<span class="nc" id="L93">        return &quot;jsonStatus&quot;;</span>
+    }
+
+    private void addMetaData(Model model) {
+<span class="nc" id="L97">        model.addAttribute(&quot;now&quot;, isoFormatter.format(new Date()));</span>
+<span class="nc" id="L98">    }</span>
+
+    @RequestMapping(value = &quot;/&quot;, method = RequestMethod.POST, headers = &quot;Accept=application/json&quot;)
+    public String initAndShowStatus(Model model) throws IOException {
+<span class="nc" id="L102">        LOGGER.info(String.format(&quot;initAndShowStatus&quot;));</span>
+
+<span class="nc" id="L104">        initQuestions(model);</span>
+<span class="nc" id="L105">        initSurveys(model);</span>
+
+<span class="nc" id="L107">        String[] ericDataSets = { &quot;ERIC-2016-17&quot;, &quot;ERIC-2015-16&quot;, &quot;ERIC-2014-15&quot;, &quot;ERIC-2013-14&quot; };</span>
+<span class="nc bnc" id="L108" title="All 2 branches missed.">        for (String ericDataSet : ericDataSets) {</span>
+<span class="nc" id="L109">            initEricReturns(ericDataSet);</span>
+        }
+
+<span class="nc" id="L112">        return showStatus(model);</span>
+    }
+
+    @RequestMapping(value = &quot;/questions&quot;, method = RequestMethod.GET, headers = &quot;Accept=application/json&quot;)
+    public String showQuestionStatus(Model model) throws IOException {
+<span class="nc" id="L117">        long questions = qRepo.count();</span>
+<span class="nc" id="L118">        LOGGER.info(&quot;showQuestionStatus: found: {}&quot;, questions);</span>
+<span class="nc" id="L119">        model.addAttribute(&quot;questions&quot;, questions);</span>
+<span class="nc" id="L120">        addMetaData(model);</span>
+<span class="nc" id="L121">        return &quot;jsonStatus&quot;;</span>
+    }
+
+    @RequestMapping(value = &quot;/questions&quot;, method = RequestMethod.POST, headers = &quot;Accept=application/json&quot;)
+    public String initQuestions(Model model) throws IOException {
+<span class="nc" id="L126">        LOGGER.info(&quot;initQuestions&quot;);</span>
+<span class="nc" id="L127">        List&lt;Question&gt; questions = new QuestionCsvImporter().readQuestions();</span>
+<span class="nc" id="L128">        LOGGER.info(&quot;questions to import found: {}&quot;, questions.size());</span>
+<span class="nc" id="L129">        List&lt;Question&gt; existingQuestions = qRepo.findAll();</span>
+<span class="nc" id="L130">        LOGGER.info(&quot;existing questions found: {}&quot;, existingQuestions.size());</span>
+<span class="nc bnc" id="L131" title="All 2 branches missed.">        for (Question question : questions) {</span>
+<span class="nc bnc" id="L132" title="All 2 branches missed.">            if (findMatchingQ(question, existingQuestions) == null) {</span>
+<span class="nc" id="L133">                LOGGER.info(&quot;found new question: {}, attempting to save...&quot;, question.name());</span>
+                try {
+<span class="nc" id="L135">                    qRepo.save(question);</span>
+<span class="nc" id="L136">                } catch (Exception e) {</span>
+<span class="nc" id="L137">                    LOGGER.error(&quot;unable to save new question: {}\n  ({})&quot;, question.name(), e.getMessage());</span>
+<span class="nc" id="L138">                }</span>
+            }
+<span class="nc" id="L140">        }</span>
+<span class="nc" id="L141">        return showQuestionStatus(model);</span>
+    }
+
+    private Question findMatchingQ(Question question, List&lt;Question&gt; existingQuestions) {
+<span class="nc bnc" id="L145" title="All 2 branches missed.">        for (Question q : existingQuestions) {</span>
+<span class="nc bnc" id="L146" title="All 2 branches missed.">            if (q.name().equals(question.name())) {</span>
+<span class="nc" id="L147">                return q;</span>
+            }
+<span class="nc" id="L149">        }</span>
+<span class="nc" id="L150">        return null;</span>
+    }
+
+    @RequestMapping(value = &quot;/surveys&quot;, method = RequestMethod.GET, headers = &quot;Accept=application/json&quot;)
+    public String showSurveysStatus(Model model) throws IOException {
+<span class="nc" id="L155">        model.addAttribute(&quot;surveys&quot;, surveyRepo.count());</span>
+<span class="nc" id="L156">        addMetaData(model);</span>
+<span class="nc" id="L157">        return &quot;jsonStatus&quot;;</span>
+    }
+
+    @RequestMapping(value = &quot;/surveys&quot;, method = RequestMethod.POST, headers = &quot;Accept=application/json&quot;)
+    public String initSurveys(Model model) throws IOException {
+<span class="nc" id="L162">        Survey[] expectedSurveys = {</span>
+<span class="nc" id="L163">                Eric1516.getInstance().getSurvey(),</span>
+<span class="nc" id="L164">                Sdu1617.getInstance().getSurvey(),</span>
+<span class="nc" id="L165">                Sdu1718.getInstance().getSurvey(),</span>
+<span class="nc" id="L166">                Sdu1819.getInstance().getSurvey(),</span>
+<span class="nc" id="L167">                Sdu1920.getInstance().getSurvey()</span>
+        };
+<span class="nc bnc" id="L169" title="All 2 branches missed.">        for (Survey expected : expectedSurveys) {</span>
+<span class="nc" id="L170">            initSurvey(expected);</span>
+        }
+
+<span class="nc" id="L173">        return showSurveysStatus(model);</span>
+    }
+
+    private void initSurvey(Survey expected) {
+<span class="nc" id="L177">        Survey survey = surveyRepo.findByName(expected.name());</span>
+<span class="nc bnc" id="L178" title="All 2 branches missed.">        if (survey == null) {</span>
+<span class="nc" id="L179">            LOGGER.warn(String.format(</span>
+                    &quot;Could not find expected survey %1$s, attempt to create&quot;,
+                    expected));
+<span class="nc" id="L182">            surveyRepo.save(expected);</span>
+        } else {
+<span class="nc" id="L184">            LOGGER.debug(String.format(&quot;Expected survey %1$s found, checking categories&quot;, expected));</span>
+<span class="nc bnc" id="L185" title="All 2 branches missed.">            for (SurveyCategory cat : expected.categories()) {</span>
+<span class="nc" id="L186">                SurveyCategory existingCat = catRepo.findBySurveyAndCategory(expected.name(), cat.name());</span>
+<span class="nc bnc" id="L187" title="All 2 branches missed.">                if (existingCat == null) {</span>
+<span class="nc" id="L188">                    catRepo.save(cat.survey(survey));</span>
+                } else {
+<span class="nc" id="L190">                    catRepo.save(existingCat.questionEnums(cat.questionEnums()));</span>
+                }
+<span class="nc" id="L192">            }</span>
+        }
+<span class="nc" id="L194">    }</span>
+
+    @RequestMapping(value = &quot;/surveys/{surveyName}&quot;, method = RequestMethod.GET, headers = &quot;Accept=application/json&quot;)
+    public String showSurveyStatus(@PathVariable(&quot;surveyName&quot;) String surveyName, Model model) throws IOException, Exception {
+<span class="nc" id="L198">        Survey survey = surveyRepo.findByName(surveyName);</span>
+<span class="nc bnc" id="L199" title="All 2 branches missed.">        model.addAttribute(&quot;surveys&quot;, survey == null ? 0 : 1);</span>
+
+        // If not found will throw exception &amp; be translated into 404 above
+        // so never get here
+<span class="nc" id="L203">        model.addAttribute(&quot;questions&quot;, qRepo.countBySurveyName(surveyName));</span>
+<span class="nc" id="L204">        List&lt;SurveyCategory&gt; cats = surveyCategoryRepo.findBySurveyName(surveyName);</span>
+
+<span class="nc" id="L206">        String[] qNames = cats.stream().map(p -&gt; p.questionNames()).collect(Collectors.joining(&quot;,&quot;)).split(&quot;,&quot;);</span>
+<span class="nc" id="L207">        model.addAttribute(&quot;answers&quot;, answerRepo.countBySurveyName(surveyName, qNames));</span>
+<span class="nc" id="L208">        model.addAttribute(&quot;returns&quot;, returnRepo.countBySurveyName(surveyName));</span>
+<span class="nc" id="L209">        addMetaData(model);</span>
+
+<span class="nc" id="L211">        return &quot;jsonStatus&quot;;</span>
+    }
+
+    @RequestMapping(value = &quot;/surveys/{surveyName}&quot;, method = RequestMethod.POST, headers = &quot;Accept=application/json&quot;)
+    public String initSurveyAndShowStatus(@PathVariable(&quot;surveyName&quot;) String surveyName, Model model) throws IOException, Exception {
+<span class="nc" id="L216">        initSurvey(SurveyFactory.getInstance(surveyName).getSurvey());</span>
+<span class="nc" id="L217">        return showSurveyStatus(surveyName, model);</span>
+    }
+
+    @RequestMapping(value = &quot;/answers/{ericDataSet}&quot;, method = RequestMethod.GET, headers = &quot;Accept=application/json&quot;)
+    public @ResponseBody String initEricReturns(@PathVariable(&quot;ericDataSet&quot;) String ericDataSet) {
+<span class="nc" id="L222">        List&lt;SurveyReturn&gt; existingReturns = returnRepo.findBySurveyName(ericDataSet);</span>
+<span class="nc" id="L223">        LOGGER.debug(&quot; ... {} existing returns&quot;, existingReturns.size());</span>
+
+<span class="nc" id="L225">        EricDataSet ericDS = EricDataSetFactory.getInstance(ericDataSet);</span>
+        try {
+<span class="nc" id="L227">            List&lt;SurveyReturn&gt; returns = new EricCsvImporter().readEricReturns(ericDS);</span>
+<span class="nc" id="L228">            LOGGER.info(&quot;Found {} {} returns to import...&quot;, returns.size(), ericDataSet);</span>
+<span class="nc" id="L229">            Survey survey = surveyRepo.findByName(ericDataSet);</span>
+<span class="nc bnc" id="L230" title="All 2 branches missed.">            if (survey == null) {</span>
+<span class="nc" id="L231">                survey = new Survey().name(ericDataSet).applicablePeriod(returns.get(0).applicablePeriod());</span>
+<span class="nc" id="L232">                survey = surveyRepo.save(survey);</span>
+            }
+<span class="nc" id="L234">            importReturns(survey, existingReturns, returns);</span>
+<span class="nc" id="L235">        } catch (Throwable e) {</span>
+<span class="nc" id="L236">            String msg = String.format(&quot;Unable to load ERIC data from %1$s&quot;, ericDS.getDataFile());</span>
+<span class="nc" id="L237">            LOGGER.error(msg, e);</span>
+<span class="nc" id="L238">            throw new SReportException(msg, e);</span>
+<span class="nc" id="L239">        }</span>
+<span class="nc" id="L240">        return &quot;jsonStatus&quot;;</span>
+    }
+
+    private void importReturns(Survey survey,
+            List&lt;SurveyReturn&gt; existingReturns, List&lt;SurveyReturn&gt; returns) {
+<span class="nc bnc" id="L245" title="All 2 branches missed.">        for (SurveyReturn surveyReturn : returns) {</span>
+<span class="nc" id="L246">            surveyReturn.survey(survey);</span>
+<span class="nc" id="L247">            SurveyReturn existingReturn = findBySurveyAndOrg(existingReturns, surveyReturn);</span>
+<span class="nc bnc" id="L248" title="All 2 branches missed.">            if (existingReturn == null) {</span>
+<span class="nc" id="L249">                saveReturnAndAnswers(surveyReturn);</span>
+            } else {
+<span class="nc" id="L251">                LOGGER.debug(&quot;Starting to add answers for org: {}&quot;, surveyReturn.org());</span>
+<span class="nc" id="L252">                long count = historicDataMerger.merge(surveyReturn.answers(), existingReturn);</span>
+<span class="nc" id="L253">                LOGGER.debug(&quot;... added {} answers for org: {}&quot;, count, surveyReturn.org());</span>
+            }
+<span class="nc" id="L255">        }</span>
+<span class="nc" id="L256">    }</span>
+
+    private Question findQ(Answer answer) {
+<span class="nc" id="L259">        LOGGER.info(&quot;findQ {}&quot;, answer.question().q().name());</span>
+        try {
+<span class="nc" id="L261">            Question q = qRepo.findByName(answer.question().name());</span>
+<span class="nc bnc" id="L262" title="All 2 branches missed.">            if (q == null) {</span>
+<span class="nc" id="L263">                String msg = String.format(&quot;Missing question %1$s. You must create all questions before attempting to import returns that use them&quot;,</span>
+<span class="nc" id="L264">                        answer.question().q().name());</span>
+<span class="nc" id="L265">                throw new IllegalStateException(msg);</span>
+            }
+<span class="nc" id="L267">            return q;</span>
+<span class="nc" id="L268">        } catch (Exception e) {</span>
+<span class="nc" id="L269">            String msg = String.format(&quot;Cannot read question %1$s because: %2$s&quot;,</span>
+<span class="nc" id="L270">                    answer.question().q().name(), e.getMessage());</span>
+<span class="nc" id="L271">            throw new IllegalStateException(msg);</span>
+        }
+    }
+
+    private void saveReturnAndAnswers(SurveyReturn surveyReturn) {
+<span class="nc" id="L276">        LOGGER.info(&quot;Save new return {} for {} with {} answers&quot;, surveyReturn.name(), surveyReturn.org(), surveyReturn.answers().size());</span>
+<span class="nc bnc" id="L277" title="All 2 branches missed.">        for (Answer answer : surveyReturn.answers()) {</span>
+<span class="nc" id="L278">            answer.question(findQ(answer));</span>
+<span class="nc" id="L279">            answer.addSurveyReturn(surveyReturn);</span>
+<span class="nc" id="L280">        }</span>
+<span class="nc" id="L281">        returnRepo.save(surveyReturn);</span>
+<span class="nc" id="L282">    }</span>
+
+    private SurveyReturn findBySurveyAndOrg(List&lt;SurveyReturn&gt; existingReturns,
+            SurveyReturn surveyReturn) {
+<span class="nc bnc" id="L286" title="All 2 branches missed.">        for (SurveyReturn ret : existingReturns) {</span>
+<span class="nc bnc" id="L287" title="All 2 branches missed.">            if (ret.name().equals(surveyReturn.name())</span>
+<span class="nc bnc" id="L288" title="All 2 branches missed.">                    &amp;&amp; ret.org().equals(surveyReturn.org())) {</span>
+<span class="nc" id="L289">                LOGGER.info(String.format(&quot;Skipping insert of return for %1$s because %2$d matches name and org&quot;, surveyReturn.name(), ret.id()));</span>
+<span class="nc" id="L290">                return ret;</span>
+            }
+<span class="nc" id="L292">        }</span>
+<span class="nc" id="L293">        return null;</span>
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.2.201808211720</span></div></body></html>

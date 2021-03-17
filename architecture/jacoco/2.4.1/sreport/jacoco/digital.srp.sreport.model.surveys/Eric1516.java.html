@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Eric1516.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Sustainability Reporting</a> &gt; <a href="index.source.html" class="el_package">digital.srp.sreport.model.surveys</a> &gt; <span class="el_source">Eric1516.java</span></div><h1>Eric1516.java</h1><pre class="source lang-java linenums">package digital.srp.sreport.model.surveys;
+
+import java.util.ArrayList;
+
+import digital.srp.sreport.model.Q;
+import digital.srp.sreport.model.StatusType;
+import digital.srp.sreport.model.Survey;
+import digital.srp.sreport.model.SurveyCategory;
+import digital.srp.sreport.model.returns.EricQuestions;
+
+/**
+ * 
+ * @author Tim Stephenson
+ */
+public class Eric1516 implements EricQuestions, SurveyFactory {
+    public static final String PERIOD = &quot;2015-16&quot;;
+    public static final String ID = &quot;ERIC-&quot;+PERIOD;
+<span class="fc" id="L18">    private static final Eric1516 eric1516 = new Eric1516();</span>
+
+    /**
+     * Private constructor to prevent instantiation.
+     */
+    private Eric1516() {
+    }
+
+    public static SurveyFactory getInstance() {
+<span class="fc" id="L27">        return eric1516;</span>
+    }
+
+    public Survey getSurvey() {
+<span class="fc" id="L31">        SurveyCategory catOrg = new SurveyCategory()</span>
+<span class="fc" id="L32">                .name(&quot;Organisation&quot;)</span>
+<span class="fc" id="L33">                .questionEnums(</span>
+                        Q.ORG_CODE,
+                        Q.ORG_NAME,
+                        Q.COMMISSIONING_REGION,
+                        Q.ORG_TYPE
+                );
+
+<span class="fc" id="L40">        SurveyCategory catProfile = new SurveyCategory()</span>
+<span class="fc" id="L41">                .name(&quot;Trust Profile&quot;)</span>
+<span class="fc" id="L42">                .questionEnums(</span>
+                        Q.NO_ACUTE_SITES,
+                        Q.NO_SPECIALIST_SITES,
+                        Q.NO_MIXED_SITES,
+                        Q.NO_MENTAL_HEALTH_SITES,
+                        Q.NO_LD_SITES,
+                        Q.NO_MENTAL_HEALTH_LD_SITES,
+                        Q.NO_COMMUNITY_HOSPITAL_SITES,
+                        Q.NO_OTHER_INPATIENT_SITES,
+                        Q.NO_OUTPATIENT_SITES,
+                        Q.NO_SUPPORT_SITES,
+                        Q.NO_OTHER_SITES
+                );
+        
+<span class="fc" id="L56">        SurveyCategory catStrategy = new SurveyCategory()</span>
+<span class="fc" id="L57">                .name(&quot;Strategies and Policies&quot;)</span>
+<span class="fc" id="L58">                .questionEnums(</span>
+                        Q.ESTATES_DEV_STRATEGY,
+                        Q.HEALTHY_TRANSPORT_PLAN,
+                        Q.BOARD_ADAPTATION_PLAN,
+                        Q.SDMP_CRMP,
+                        Q.CARBON_REDUCTION_TARGET,
+                        Q.PFA_ASSESSMENT,
+                        Q.PFA_ACTION_PLAN
+                );
+
+<span class="fc" id="L68">        SurveyCategory catContractingOut = new SurveyCategory()</span>
+<span class="fc" id="L69">                .name(&quot;Contracted Out Services&quot;)</span>
+<span class="fc" id="L70">                .questionEnums(</span>
+                        Q.CONTRACTING_OUT_VAL,
+                        Q.CONTRACTING_OUT_PCT
+                );
+
+<span class="fc" id="L75">        SurveyCategory catFinance = new SurveyCategory()</span>
+<span class="fc" id="L76">                .name(&quot;Finance&quot;)</span>
+<span class="fc" id="L77">                .questionEnums(</span>
+                        Q.CAPITAL_NEW_BUILD,
+                        Q.CAPITAL_IMPROVING_EXISTING,
+                        Q.CAPITAL_EQUIPMENT,
+                        Q.PRIVATE_SECTOR,
+                        Q.BACKLOG_MAINTENANCE_VAL,
+                        Q.PFA_ACTION_PLAN_VAL,
+                        Q.NON_EMERGENCY_TRANSPORT_VAL,
+                        Q.INCOME_CATERING,
+                        Q.INCOME_LAUNDRY,
+                        Q.INCOME_OTHER
+                );
+        
+<span class="fc" id="L90">        SurveyCategory catSafety = new SurveyCategory()</span>
+<span class="fc" id="L91">                .name(&quot;Safety&quot;)</span>
+<span class="fc" id="L92">                .questionEnums(</span>
+                        Q.NO_RIDDOR_INCIDENTS,
+                        Q.NO_FM_INCIDENTS,
+                        Q.NO_FM_CLINICAL_INCIDENTS
+                );
+
+<span class="fc" id="L98">        SurveyCategory catFireSafety = new SurveyCategory()</span>
+<span class="fc" id="L99">                .name(&quot;Fire Safety&quot;)</span>
+<span class="fc" id="L100">                .questionEnums(</span>
+                        Q.NO_FIRES,
+                        Q.NO_FALSE_ALARMS,
+                        Q.NO_FIRE_DEATHS,
+                        Q.NO_FIRE_INJURIES,
+                        Q.NO_EVAC_INJURIES
+                );
+        
+<span class="fc" id="L108">        Survey survey = new Survey().name(ID).status(StatusType.Published.name())</span>
+<span class="fc" id="L109">                .applicablePeriod(&quot;2015-16&quot;)</span>
+<span class="fc" id="L110">                .categories(catOrg, catProfile, catStrategy, catContractingOut, catFinance, catSafety, catFireSafety);</span>
+<span class="fc" id="L111">        return survey;</span>
+    }
+
+    public Q[] getQs() {
+<span class="nc" id="L115">        ArrayList&lt;Q&gt; list = new ArrayList&lt;Q&gt;();</span>
+<span class="nc bnc" id="L116" title="All 2 branches missed.">        for (SurveyCategory category : getSurvey().categories()) {</span>
+<span class="nc" id="L117">            list.addAll(category.questionEnums());</span>
+<span class="nc" id="L118">        }</span>
+<span class="nc" id="L119">        return list.toArray(new Q[list.size()]);</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.2.201808211720</span></div></body></html>

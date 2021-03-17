@@ -1,0 +1,309 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>OrganisationIntervention.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Marginal Abatement Cost Curves</a> &gt; <a href="index.source.html" class="el_package">digital.srp.macc.model</a> &gt; <span class="el_source">OrganisationIntervention.java</span></div><h1>OrganisationIntervention.java</h1><pre class="source lang-java linenums">/*******************************************************************************
+ * Copyright 2015, 2017 Tim Stephenson and contributors
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *******************************************************************************/
+package digital.srp.macc.model;
+
+import java.math.BigDecimal;
+import java.util.List;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+import javax.persistence.Transient;
+import javax.xml.bind.annotation.XmlElement;
+
+import org.springframework.hateoas.Link;
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonView;
+
+import digital.srp.macc.maths.Finance;
+import digital.srp.macc.maths.SignificantFiguresFormat;
+import digital.srp.macc.views.OrganisationInterventionViews;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+/**
+ * A segmentation of all the organisations in the NHS, public health and social
+ * care.
+ *
+ * @author Tim Stephenson
+ */
+<span class="pc bnc" id="L51" title="All 78 branches missed.">@Data</span>
+@Entity
+@Table(name = &quot;TR_ORG_INTVN&quot;)
+<span class="fc" id="L54">@NoArgsConstructor</span>
+<span class="nc" id="L55">@AllArgsConstructor</span>
+@JsonIgnoreProperties( allowGetters = true, value = { &quot;unit&quot;} )
+public class OrganisationIntervention {
+
+    @Id
+    @Column(name = &quot;id&quot;)
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    @JsonProperty
+    @JsonView({ OrganisationInterventionViews.Summary.class })
+<span class="nc" id="L64">    private Long id;</span>
+
+    @JsonProperty
+    @JsonView({ OrganisationInterventionViews.Detailed.class })
+    @Column(name = &quot;annual_turnover&quot;)
+<span class="nc" id="L69">    private int annualTurnover;</span>
+
+    @JsonProperty
+    @JsonView({ OrganisationInterventionViews.Detailed.class })
+    @Column(name = &quot;annual_energy_use&quot;)
+<span class="nc" id="L74">    private int annualEnergyUse;</span>
+
+    @JsonProperty
+    @JsonView({ OrganisationInterventionViews.Detailed.class })
+    @Column(name = &quot;no_of_staff&quot;)
+<span class="nc" id="L79">    private int noOfStaff;</span>
+
+    @JsonProperty
+    @JsonView({ OrganisationInterventionViews.Detailed.class })
+    @Column(name = &quot;no_of_patient_interactions&quot;)
+<span class="nc" id="L84">    private int noOfPatientInteractions;</span>
+
+    @JsonProperty
+    @JsonView({ OrganisationInterventionViews.Detailed.class })
+    @Column(name = &quot;no_of_in_patients&quot;)
+<span class="nc" id="L89">    private int noOfInPatients;</span>
+
+    @JsonProperty
+    @JsonView({ OrganisationInterventionViews.Detailed.class })
+    @Column(name = &quot;floor_area&quot;)
+<span class="nc" id="L94">    private int floorArea;</span>
+
+    @JsonProperty
+    @JsonView({ OrganisationInterventionViews.Detailed.class })
+    @Column(name = &quot;annual_mileage&quot;)
+<span class="nc" id="L99">    private long annualMileage;</span>
+
+    @JsonProperty
+    @JsonView({ OrganisationInterventionViews.Detailed.class })
+    @Column(name = &quot;typical_journey_distance&quot;)
+<span class="nc" id="L104">    private int typicalJourneyDistance;</span>
+
+    @JsonProperty
+    @JsonView({ OrganisationInterventionViews.Detailed.class })
+    @Column(name = &quot;unit_count&quot;)
+    private double unitCount;
+
+    @JsonProperty
+    @JsonView({ OrganisationInterventionViews.Summary.class })
+    @Column(name = &quot;logo&quot;)
+<span class="nc" id="L114">    private String logo;</span>
+
+    @JsonProperty
+    @JsonView({ OrganisationInterventionViews.Summary.class })
+    @Column(name = &quot;tenant_id&quot;)
+<span class="nc" id="L119">    private String tenantId;</span>
+
+    @JsonProperty
+    @JsonView({ OrganisationInterventionViews.Summary.class })
+    @ManyToOne
+    @JoinColumn(name = &quot;organisation_type_id&quot;)
+<span class="fc" id="L125">    private OrganisationType organisationType;</span>
+
+    @JsonProperty
+    @JsonView({ OrganisationInterventionViews.Detailed.class })
+    @ManyToOne
+<span class="fc" id="L130">    private Intervention intervention;</span>
+
+    @Transient
+    @XmlElement(name = &quot;link&quot;, namespace = Link.ATOM_NAMESPACE)
+    @JsonProperty(&quot;links&quot;)
+    @JsonView({ OrganisationInterventionViews.Summary.class })
+<span class="nc" id="L136">    private List&lt;Link&gt; links;</span>
+
+    public OrganisationIntervention(OrganisationType orgType,
+<span class="nc" id="L139">            Intervention newIntervention) {</span>
+<span class="nc" id="L140">        setOrganisationType(orgType);</span>
+<span class="nc" id="L141">        setIntervention(newIntervention);</span>
+<span class="nc" id="L142">    }</span>
+
+    @JsonProperty
+    @JsonView({ OrganisationInterventionViews.Detailed.class })
+    public BigDecimal getTargetYearSavings() {
+<span class="fc" id="L147">        BigDecimal unitCount = getUnitCount();</span>
+<span class="pc bpc" id="L148" title="2 of 4 branches missed.">        if (unitCount == null || unitCount.intValue() == 0) {</span>
+<span class="nc" id="L149">            return null;</span>
+        } else {
+<span class="fc" id="L151">            return getIntervention().getInterventionType()</span>
+<span class="fc" id="L152">                    .getTargetYearSavings()</span>
+<span class="fc" id="L153">                    .divide(unitCount, Finance.ROUND_MODE);</span>
+        }
+    }
+
+    @JsonProperty
+    @JsonView({ OrganisationInterventionViews.Detailed.class })
+    public BigDecimal getTonnesCo2eSavedTargetYear() {
+<span class="fc" id="L160">        BigDecimal unitCount = getUnitCount();</span>
+<span class="pc bpc" id="L161" title="2 of 4 branches missed.">        if (unitCount == null || unitCount.intValue() == 0) {</span>
+<span class="nc" id="L162">            return null;</span>
+        } else {
+<span class="fc" id="L164">            return getIntervention().getInterventionType()</span>
+<span class="fc" id="L165">                    .getTonnesCo2eSavedTargetYear()</span>
+<span class="fc" id="L166">                    .multiply(getProportionOfUnits());</span>
+        }
+    }
+
+    public BigDecimal getUnitCount() {
+<span class="pc bpc" id="L171" title="1 of 4 branches missed.">        if (unitCount == 0 &amp;&amp; getOrganisationType().getCount() == 0) {</span>
+<span class="nc" id="L172">            return null;</span>
+<span class="fc bfc" id="L173" title="All 2 branches covered.">        } else if (unitCount == 0) {</span>
+<span class="fc" id="L174">            return SignificantFiguresFormat.getInstance().round(</span>
+<span class="fc" id="L175">                    getIntervention().getUnitCount().divide(</span>
+<span class="fc" id="L176">                    new BigDecimal(getOrganisationType().getCount()),</span>
+                    Finance.ROUND_MODE));
+        } else {
+<span class="fc" id="L179">            return new BigDecimal(unitCount);</span>
+        }
+    }
+
+    @JsonProperty
+    @JsonView({ OrganisationInterventionViews.Detailed.class })
+    public BigDecimal getProportionOfUnits() {
+<span class="fc" id="L186">        return getUnitCount().divide(</span>
+<span class="fc" id="L187">                new BigDecimal(getIntervention().getInterventionType()</span>
+<span class="fc" id="L188">                        .getUnitCount()), 8,</span>
+                Finance.ROUND_MODE);
+    }
+
+    @JsonProperty
+    @JsonView({ OrganisationInterventionViews.Detailed.class })
+    public BigDecimal getCashOutflowsUpFront() {
+<span class="fc" id="L195">        return getIntervention().getInterventionType()</span>
+<span class="fc" id="L196">                .getCashOutflowsUpFrontNational()</span>
+<span class="fc" id="L197">                .multiply(getProportionOfUnits());</span>
+    }
+
+    @JsonProperty
+    @JsonView({ OrganisationInterventionViews.Detailed.class })
+    public BigDecimal getAnnualCashInflowsTargetYear() {
+<span class="fc" id="L203">        return getIntervention()</span>
+<span class="fc" id="L204">                .getInterventionType()</span>
+<span class="fc" id="L205">                .getAnnualCashInflowsNationalTargetYear()</span>
+<span class="fc" id="L206">                .multiply(getProportionOfUnits());</span>
+    }
+
+    @JsonProperty
+    @JsonView({ OrganisationInterventionViews.Detailed.class })
+    public BigDecimal getAnnualCashOutflowsTargetYear() {
+<span class="fc" id="L212">        return getIntervention()</span>
+<span class="fc" id="L213">                .getInterventionType()</span>
+<span class="fc" id="L214">                .getAnnualCashOutflowsNationalTargetYear()</span>
+<span class="fc" id="L215">                .multiply(getProportionOfUnits());</span>
+    }
+
+    /** Convenience method to access intervention type's name. */
+    @JsonProperty
+    @JsonView({ OrganisationInterventionViews.Detailed.class })
+    public String getName() {
+<span class="nc" id="L222">        return intervention.getInterventionType().getName();</span>
+    }
+
+    /** Convenience method to access intervention type's description. */
+    @JsonProperty
+    @JsonView({ OrganisationInterventionViews.Detailed.class })
+    public String getDescription() {
+<span class="nc" id="L229">        return intervention.getInterventionType().getDescription();</span>
+    }
+
+    /** Convenience method to access intervention type's further info URL. */
+    @JsonProperty
+    @JsonView({ OrganisationInterventionViews.Detailed.class })
+    public String getFurtherInfo() {
+<span class="nc" id="L236">        return intervention.getInterventionType().getFurtherInfo();</span>
+    }
+
+    /** Convenience method to access intervention type's unit. */
+    @JsonProperty
+    @JsonView({ OrganisationInterventionViews.Detailed.class })
+    public String getUnit() {
+<span class="nc" id="L243">        return intervention.getInterventionType().getUnit();</span>
+    }
+
+    /** Convenience method to access intervention type's (aka national) unit count. */
+    @JsonProperty
+    @JsonView({ OrganisationInterventionViews.Detailed.class })
+    public Integer getUnitCountNational() {
+<span class="nc" id="L250">        return intervention.getInterventionType().getUnitCount();</span>
+    }
+
+    /** Convenience method to access description of intervention type's unit. */
+    @JsonProperty
+    @JsonView({ OrganisationInterventionViews.Detailed.class })
+    public String getUnitDescription() {
+<span class="nc" id="L257">        return intervention.getInterventionType().getUnitDescription();</span>
+    }
+
+    /** Convenience method to access description of intervention type's uptake. */
+    @JsonProperty
+    @JsonView({ OrganisationInterventionViews.Detailed.class })
+    public Short getUptake() {
+<span class="nc" id="L264">        return intervention.getInterventionType().getUptake();</span>
+    }
+
+    /** Convenience method to access intervention type's data. */
+    @JsonProperty
+    @JsonView({ OrganisationInterventionViews.Detailed.class })
+    public BigDecimal getCashOutflowsUpFrontNational() {
+<span class="nc" id="L271">        return intervention.getInterventionType().getCashOutflowsUpFrontNational();</span>
+    }
+
+    /** Convenience method to access intervention type's data. */
+    @JsonProperty
+    @JsonView({ OrganisationInterventionViews.Detailed.class })
+    public BigDecimal getAnnualCashOutflowsNationalTargetYear() {
+<span class="nc" id="L278">        return intervention.getInterventionType().getAnnualCashOutflowsNationalTargetYear();</span>
+    }
+
+    /** Convenience method to access intervention type's data. */
+    @JsonProperty
+    @JsonView({ OrganisationInterventionViews.Detailed.class })
+    public BigDecimal getAnnualCashInflowsNationalTargetYear() {
+<span class="nc" id="L285">        return intervention.getInterventionType().getAnnualCashInflowsNationalTargetYear();</span>
+    }
+
+    /** Convenience method to access intervention type's data. */
+    @JsonProperty
+    @JsonView({ OrganisationInterventionViews.Detailed.class })
+    public BigDecimal getCostPerTonneCo2e() {
+<span class="nc" id="L292">        return intervention.getInterventionType().getCostPerTonneCo2e();</span>
+    }
+
+    /** Convenience method to access intervention type's data. */
+    @JsonProperty
+    @JsonView({ OrganisationInterventionViews.Detailed.class })
+    public Short getConfidence() {
+<span class="nc" id="L299">        return intervention.getInterventionType().getConfidence();</span>
+    }
+
+    /** Convenience method to access intervention type's data. */
+    @JsonProperty
+    @JsonView({ OrganisationInterventionViews.Detailed.class })
+    public String getSlug() {
+<span class="nc" id="L306">        return intervention.getInterventionType().getSlug();</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.2.201808211720</span></div></body></html>

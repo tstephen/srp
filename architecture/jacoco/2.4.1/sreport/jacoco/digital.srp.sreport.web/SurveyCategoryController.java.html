@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>SurveyCategoryController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Sustainability Reporting</a> &gt; <a href="index.source.html" class="el_package">digital.srp.sreport.web</a> &gt; <span class="el_source">SurveyCategoryController.java</span></div><h1>SurveyCategoryController.java</h1><pre class="source lang-java linenums">package digital.srp.sreport.web;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.transaction.Transactional;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.hateoas.Link;
+import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
+
+import com.fasterxml.jackson.annotation.JsonView;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import digital.srp.sreport.model.SurveyCategory;
+import digital.srp.sreport.model.views.SurveyCategoryViews;
+import digital.srp.sreport.repositories.SurveyCategoryRepository;
+
+/**
+ * REST web service for accessing category categories.
+ */
+@Controller
+@RequestMapping(value = &quot;/survey-categories&quot;)
+<span class="fc" id="L35">public class SurveyCategoryController {</span>
+
+<span class="fc" id="L37">    private static final Logger LOGGER = LoggerFactory</span>
+<span class="fc" id="L38">            .getLogger(SurveyCategoryController.class);</span>
+
+    @Autowired 
+    protected ObjectMapper objectMapper;
+    
+    @Autowired
+    protected  SurveyCategoryRepository catRepo;
+
+    /**
+     * Return just the specified category.
+     * 
+     * @return The specified category.
+     */
+    @RequestMapping(value = &quot;/{id}&quot;, method = RequestMethod.GET)
+    @JsonView(SurveyCategoryViews.Detailed.class)
+    @Transactional
+    public @ResponseBody SurveyCategory findById(
+            @PathVariable(&quot;id&quot;) Long catId) {
+<span class="nc" id="L56">        LOGGER.info(String.format(&quot;findById %1$s&quot;, catId));</span>
+
+<span class="nc" id="L58">        SurveyCategory cat = catRepo.findOne(catId);</span>
+
+<span class="nc" id="L60">        return addLinks(cat);</span>
+    }
+
+    /**
+     * Return a list of categories, optionally paged.
+     * 
+     * @return categories.
+     */
+    @RequestMapping(value = &quot;/&quot;, method = RequestMethod.GET)
+    @JsonView(SurveyCategoryViews.Summary.class)
+    public @ResponseBody List&lt;SurveyCategory&gt; list(
+            @RequestParam(value = &quot;page&quot;, required = false) Integer page,
+            @RequestParam(value = &quot;limit&quot;, required = false) Integer limit) {
+<span class="nc" id="L73">        LOGGER.info(String.format(&quot;List categories&quot;));</span>
+
+        List&lt;SurveyCategory&gt; list;
+<span class="nc bnc" id="L76" title="All 2 branches missed.">        if (limit == null) {</span>
+<span class="nc" id="L77">            list = catRepo.findAll();</span>
+        } else {
+<span class="nc bnc" id="L79" title="All 2 branches missed.">            Pageable pageable = new PageRequest(page == null ? 0 : page, limit);</span>
+<span class="nc" id="L80">            list = catRepo.findPage(pageable);</span>
+        }
+<span class="nc" id="L82">        LOGGER.info(String.format(&quot;Found %1$s categories&quot;, list.size()));</span>
+
+<span class="nc" id="L84">        return list;</span>
+    }
+    
+    /**
+     * Delete an existing survey category.
+     */
+    @ResponseStatus(value = HttpStatus.NO_CONTENT)
+    @RequestMapping(value = &quot;/{id}&quot;, method = RequestMethod.DELETE)
+    @Transactional
+    public @ResponseBody void delete(@PathVariable(&quot;id&quot;) Long catId) {
+<span class="nc" id="L94">        catRepo.delete(catId);</span>
+<span class="nc" id="L95">    }</span>
+
+    private SurveyCategory addLinks(SurveyCategory cat) {
+<span class="nc" id="L98">        List&lt;Link&gt; links = new ArrayList&lt;Link&gt;();</span>
+<span class="nc" id="L99">        links.add(new Link(getClass().getAnnotation(RequestMapping.class).value()[0] + &quot;/&quot; + cat.id()));</span>
+        
+<span class="nc" id="L101">        return cat.links(links);</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.2.201808211720</span></div></body></html>

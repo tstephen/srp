@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>DefaultCompletenessValidator.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Sustainability Reporting</a> &gt; <a href="index.source.html" class="el_package">digital.srp.sreport.services</a> &gt; <span class="el_source">DefaultCompletenessValidator.java</span></div><h1>DefaultCompletenessValidator.java</h1><pre class="source lang-java linenums">package digital.srp.sreport.services;
+
+import java.util.HashSet;
+import java.util.Set;
+
+import javax.validation.ConstraintViolation;
+import javax.validation.Validation;
+import javax.validation.Validator;
+import javax.validation.ValidatorFactory;
+
+import org.springframework.stereotype.Component;
+
+import digital.srp.sreport.api.CompletenessValidator;
+import digital.srp.sreport.model.SurveyReturn;
+
+@Component
+public class DefaultCompletenessValidator implements CompletenessValidator {
+
+    private Validator validator;
+
+<span class="fc" id="L21">    public DefaultCompletenessValidator() {</span>
+<span class="fc" id="L22">        ValidatorFactory factory = Validation.buildDefaultValidatorFactory();</span>
+<span class="fc" id="L23">        validator = factory.getValidator();</span>
+<span class="fc" id="L24">    }</span>
+    
+    @Override
+    public SurveyReturn validate(SurveyReturn rtn) {
+
+<span class="fc" id="L29">        Set&lt;ConstraintViolation&lt;SurveyReturn&gt;&gt; problems = validator</span>
+<span class="fc" id="L30">                .validate(rtn);</span>
+<span class="fc" id="L31">        Set&lt;String&gt; issues= new HashSet&lt;String&gt;();</span>
+<span class="pc bpc" id="L32" title="1 of 2 branches missed.">        for (ConstraintViolation&lt;SurveyReturn&gt; constraintViolation : problems) {</span>
+<span class="nc" id="L33">            issues.add(constraintViolation.getMessage());</span>
+<span class="nc" id="L34">        }</span>
+<span class="fc" id="L35">        return rtn.completeness(issues);</span>
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.2.201808211720</span></div></body></html>

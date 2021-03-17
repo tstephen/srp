@@ -1,0 +1,400 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>SurveyReturn.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Sustainability Reporting</a> &gt; <a href="index.source.html" class="el_package">digital.srp.sreport.model</a> &gt; <span class="el_source">SurveyReturn.java</span></div><h1>SurveyReturn.java</h1><pre class="source lang-java linenums">package digital.srp.sreport.model;
+
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.EntityListeners;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
+import javax.persistence.Transient;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
+import javax.xml.bind.annotation.XmlElement;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.data.annotation.CreatedBy;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedBy;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+import org.springframework.hateoas.Link;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonView;
+
+import digital.srp.sreport.api.MandatoryCurrentPeriodAnswersProvided;
+import digital.srp.sreport.internal.EntityAuditorListener;
+import digital.srp.sreport.model.views.AnswerViews;
+import digital.srp.sreport.model.views.HealthCheckViews;
+import digital.srp.sreport.model.views.SurveyReturnViews;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
+import lombok.experimental.Accessors;
+
+
+/**
+ * Root object making up a single organisation's submission for a single period.
+ *
+ * @author Tim Stephenson
+ */
+@Accessors(fluent=true, chain = true)
+<span class="pc" id="L59">@Data</span>
+<span class="nc" id="L60">@ToString(exclude = { &quot;survey&quot; })</span>
+<span class="pc bpc" id="L61" title="44 of 78 branches missed.">@EqualsAndHashCode(exclude = { &quot;id&quot;, &quot;survey&quot;, &quot;revision&quot;, &quot;created&quot;, &quot;createdBy&quot;, &quot;lastUpdated&quot;, &quot;updatedBy&quot; })</span>
+<span class="fc" id="L62">@NoArgsConstructor</span>
+@Entity
+/* For whatever reason AuditingEntityListener is not adding auditor, hence own listener as well */
+@EntityListeners( { AuditingEntityListener.class, EntityAuditorListener.class})
+@Table(name= &quot;SR_RETURN&quot;)
+// Take care that what is validated here must be provided by createBlankReturn
+//@MinimumPeriodsProvided(noPeriods = 4)
+@MandatoryCurrentPeriodAnswersProvided(requiredAnswers = {Q.ORG_CODE})
+public class SurveyReturn {
+<span class="fc" id="L71">    private static final Logger LOGGER = LoggerFactory</span>
+<span class="fc" id="L72">            .getLogger(SurveyReturn.class);</span>
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    @JsonProperty
+    @JsonView(SurveyReturnViews.Summary.class)
+    @Column(name = &quot;id&quot;)
+<span class="fc" id="L79">    private Long id;</span>
+
+    @NotNull
+    @Size(max = 50)
+    @JsonProperty
+    @JsonView({ AnswerViews.Detailed.class, HealthCheckViews.Summary.class, SurveyReturnViews.Summary.class })
+    @Column(name = &quot;name&quot;)
+<span class="fc" id="L86">    private String name;</span>
+
+    /**
+     * Commonly this will be a unique organisation identifier maintained in
+     * another system, though it could simply be a friendly name too.
+     */
+    @NotNull
+    @Size(max = 50)
+    @JsonProperty
+    @JsonView({ AnswerViews.Detailed.class, HealthCheckViews.Summary.class, SurveyReturnViews.Summary.class })
+    @Column(name = &quot;org&quot;)
+<span class="fc" id="L97">    private String org;</span>
+
+<span class="fc" id="L99">    @NotNull</span>
+    @Size(max = 50)
+    @JsonProperty
+    @JsonView({ HealthCheckViews.Summary.class, SurveyReturnViews.Summary.class })
+    @Column(name = &quot;status&quot;)
+<span class="fc" id="L104">    private String status = StatusType.Draft.name();</span>
+
+    /**
+     * Period this set of responses apply to.
+     *
+     * &lt;p&gt;For example: calendar or financial year, quarter etc.
+     */
+    @NotNull
+    @JsonProperty
+    @Size(max = 20)
+    @JsonView({ HealthCheckViews.Summary.class, SurveyReturnViews.Summary.class })
+    @Column(name = &quot;applicable_period&quot;)
+<span class="fc" id="L116">    private String applicablePeriod;</span>
+
+    /**
+     * Typically there will be one revision of a survey submitted but this
+     * allows for a re-statement if needed.
+     */
+<span class="fc" id="L122">    @JsonProperty</span>
+    @JsonView({ HealthCheckViews.Summary.class, SurveyReturnViews.Summary.class })
+    @Column(name = &quot;revision&quot;)
+<span class="fc" id="L125">    private Short revision = 1;</span>
+
+
+    @Temporal(TemporalType.TIMESTAMP)
+    @JsonProperty
+    @JsonView(SurveyReturnViews.Summary.class)
+    @Column(name = &quot;submitted_date&quot;)
+<span class="fc" id="L132">    private Date submittedDate;</span>
+
+    /**
+     * Username of submitter.
+     */
+    @JsonProperty
+    @JsonView(SurveyReturnViews.Summary.class)
+    @Column(name = &quot;submitted_by&quot;)
+<span class="fc" id="L140">    private String submittedBy;</span>
+
+    @Transient
+    @XmlElement(name = &quot;link&quot;, namespace = Link.ATOM_NAMESPACE)
+    @JsonProperty(&quot;links&quot;)
+    @JsonView(SurveyReturnViews.Summary.class)
+<span class="fc" id="L146">    private List&lt;Link&gt; links;</span>
+
+    @JsonProperty
+    @JsonView(SurveyReturnViews.Summary.class)
+    @Column(name = &quot;created&quot;, nullable = false, updatable = false)
+    @CreatedDate
+<span class="nc" id="L152">    private Date created;</span>
+
+    @JsonProperty
+    @JsonView(SurveyReturnViews.Summary.class)
+    @Column(name = &quot;created_by&quot;)
+    @CreatedBy
+<span class="nc" id="L158">    private String createdBy;</span>
+
+    @JsonProperty
+    @JsonView(SurveyReturnViews.Summary.class)
+    @Column(name = &quot;last_updated&quot;)
+    @LastModifiedDate
+<span class="nc" id="L164">    private Date lastUpdated;</span>
+
+    @JsonProperty
+    @JsonView(SurveyReturnViews.Summary.class)
+    @Column(name = &quot;updated_by&quot;)
+    @LastModifiedBy
+<span class="nc" id="L170">    private String updatedBy;</span>
+
+    @JsonProperty
+    @JsonView({ AnswerViews.Detailed.class, SurveyReturnViews.Summary.class })
+    @ManyToOne(fetch = FetchType.EAGER)
+<span class="fc" id="L175">    private Survey survey;</span>
+
+    @JsonProperty
+    @JsonView(SurveyReturnViews.Detailed.class)
+//    @Transient
+    @ManyToMany(cascade=CascadeType.ALL, fetch = FetchType.EAGER, mappedBy = &quot;surveyReturns&quot;)
+    private Set&lt;Answer&gt; answers;
+
+    @JsonProperty
+    @JsonView(SurveyReturnViews.Summary.class)
+    @Transient
+<span class="fc" id="L186">    private Set&lt;String&gt; completeness;</span>
+
+    public SurveyReturn(String name, String org, String status,
+            String applicablePeriod, Short revision) {
+<span class="fc" id="L190">        this();</span>
+<span class="fc" id="L191">        this.name = name;</span>
+<span class="fc" id="L192">        this.org = org;</span>
+<span class="fc" id="L193">        this.status = status;</span>
+<span class="fc" id="L194">        this.applicablePeriod = applicablePeriod;</span>
+<span class="fc" id="L195">        this.revision = revision;</span>
+<span class="fc" id="L196">    }</span>
+
+    public Set&lt;Answer&gt; answers() {
+<span class="fc bfc" id="L199" title="All 2 branches covered.">        if (answers == null) {</span>
+<span class="fc" id="L200">            answers = new HashSet&lt;Answer&gt;();</span>
+        }
+<span class="fc" id="L202">        return answers;</span>
+    }
+
+    public Set&lt;Answer&gt; derivedAnswers() {
+<span class="nc" id="L206">        HashSet&lt;Answer&gt; derivedAnswers = new HashSet&lt;Answer&gt;();</span>
+<span class="nc bnc" id="L207" title="All 2 branches missed.">        for (Answer answer : answers()) {</span>
+<span class="nc bnc" id="L208" title="All 4 branches missed.">            if (answer.derived() &amp;&amp; answer.response() != null ) {</span>
+<span class="nc" id="L209">                derivedAnswers.add(answer);</span>
+            }
+<span class="nc" id="L211">        }</span>
+<span class="nc" id="L212">        return derivedAnswers;</span>
+    }
+
+    public Set&lt;Answer&gt; underivedAnswers() {
+<span class="nc" id="L216">        HashSet&lt;Answer&gt; underivedAnswers = new HashSet&lt;Answer&gt;();</span>
+<span class="nc bnc" id="L217" title="All 2 branches missed.">        for (Answer answer : answers()) {</span>
+<span class="nc bnc" id="L218" title="All 4 branches missed.">            if (!answer.derived() &amp;&amp; answer.response() != null ) {</span>
+<span class="nc" id="L219">                underivedAnswers.add(answer);</span>
+            }
+<span class="nc" id="L221">        }</span>
+<span class="nc" id="L222">        return underivedAnswers;</span>
+    }
+
+    public Optional&lt;Answer&gt; answer(String period, Q q) {
+<span class="fc" id="L226">        Answer a = null;</span>
+<span class="fc" id="L227">        List&lt;Answer&gt; matches = new ArrayList&lt;Answer&gt;();</span>
+<span class="fc bfc" id="L228" title="All 2 branches covered.">        for (Answer answer1 : answers()) {</span>
+<span class="fc bfc" id="L229" title="All 4 branches covered.">            if (answer1.question().q().equals(q) &amp;&amp; answer1.applicablePeriod().equals(period)) {</span>
+<span class="fc" id="L230">                matches.add(answer1);</span>
+<span class="fc" id="L231">                a = answer1;</span>
+            }
+<span class="fc" id="L233">        }</span>
+<span class="fc bfc" id="L234" title="All 2 branches covered.">        if (matches.size() &gt; 1) {</span>
+<span class="fc" id="L235">            StringBuffer sb = new StringBuffer();</span>
+<span class="fc bfc" id="L236" title="All 2 branches covered.">            for (Answer answer2 : matches) {</span>
+<span class="pc bpc" id="L237" title="1 of 2 branches missed.">                if (answer2!=null) {</span>
+<span class="pc bpc" id="L238" title="1 of 2 branches missed.">                sb.append(answer2.id() == null ? &quot;&quot; : answer2.id()).append(&quot;=&quot;).append(answer2.response());</span>
+                }
+<span class="fc" id="L240">            }</span>
+<span class="fc" id="L241">            LOGGER.error(&quot;Multiple answers to {} found for {} in {}. Review records: {}&quot;,</span>
+<span class="fc" id="L242">                    q.name(), org, period, sb.toString());</span>
+        }
+<span class="fc" id="L244">        return Optional.ofNullable(a);</span>
+    }
+
+    public Answer createEmptyAnswer(String period, Question existingQ) {
+<span class="nc" id="L248">        return new Answer()</span>
+<span class="nc" id="L249">                .addSurveyReturn(this)</span>
+<span class="nc" id="L250">                .derived(true)</span>
+<span class="nc" id="L251">                .applicablePeriod(period)</span>
+<span class="nc" id="L252">                .question(existingQ)</span>
+<span class="nc" id="L253">                .status(StatusType.Draft.name());</span>
+    }
+
+    public synchronized Answer initAnswer(SurveyReturn rtn, String period, Question existingQ) {
+<span class="nc" id="L257">        Answer answer = rtn.createEmptyAnswer(period, existingQ);</span>
+<span class="nc" id="L258">        rtn.answers().add(answer);</span>
+<span class="nc" id="L259">        return answer;</span>
+    }
+
+    public BigDecimal answerResponseAsBigDecimal(String period, Q q) {
+<span class="fc" id="L263">        Optional&lt;Answer&gt; answer = answer(period, q);</span>
+<span class="fc bfc" id="L264" title="All 2 branches covered.">        if (answer.isPresent()) {</span>
+            try {
+<span class="fc" id="L266">                return new BigDecimal(answer.get().response());</span>
+<span class="nc" id="L267">            } catch (NumberFormatException e) {</span>
+<span class="nc" id="L268">                LOGGER.warn(&quot;Requesting {}={} as number&quot;, q.name(), answer.get().response());</span>
+<span class="nc" id="L269">                return BigDecimal.ZERO;</span>
+            }
+        } else {
+<span class="fc" id="L272">            return BigDecimal.ZERO;</span>
+        }
+    }
+
+    public Long getId() {
+<span class="fc" id="L277">        return id;</span>
+    }
+
+    public void setId(Long id) {
+<span class="fc" id="L281">        this.id = id;</span>
+<span class="fc" id="L282">    }</span>
+
+    public String getName() {
+<span class="fc" id="L285">        return name;</span>
+    }
+
+    public void setName(String name) {
+<span class="fc" id="L289">        this.name = name;</span>
+<span class="fc" id="L290">    }</span>
+
+    public String getOrg() {
+<span class="fc" id="L293">        return org;</span>
+    }
+
+    public void setOrg(String org) {
+<span class="fc" id="L297">        this.org = org;</span>
+<span class="fc" id="L298">    }</span>
+
+    public String getStatus() {
+<span class="fc" id="L301">        return status;</span>
+    }
+
+    public void setStatus(String status) {
+<span class="fc" id="L305">        this.status = status;</span>
+<span class="fc" id="L306">    }</span>
+
+    public String getApplicablePeriod() {
+<span class="fc" id="L309">        return applicablePeriod;</span>
+    }
+
+    public Set&lt;String&gt; getIncludedPeriods() {
+<span class="fc" id="L313">        Set&lt;String&gt; periods = new HashSet&lt;String&gt;();</span>
+<span class="fc bfc" id="L314" title="All 2 branches covered.">        for (Answer answer : answers()) {</span>
+<span class="fc" id="L315">            periods.add(answer.applicablePeriod());</span>
+<span class="fc" id="L316">        }</span>
+<span class="fc" id="L317">        return periods;</span>
+    }
+
+    public void setApplicablePeriod(String applicablePeriod) {
+<span class="fc" id="L321">        this.applicablePeriod = applicablePeriod;</span>
+<span class="fc" id="L322">    }</span>
+
+    public Short getRevision() {
+<span class="fc" id="L325">        return revision;</span>
+    }
+
+    public void setRevision(Short revision) {
+<span class="fc" id="L329">        this.revision = revision;</span>
+<span class="fc" id="L330">    }</span>
+
+    public Date getSubmittedDate() {
+<span class="fc" id="L333">        return submittedDate;</span>
+    }
+
+    public void setSubmittedDate(Date submittedDate) {
+<span class="fc" id="L337">        this.submittedDate = submittedDate;</span>
+<span class="fc" id="L338">    }</span>
+
+    public String getSubmittedBy() {
+<span class="fc" id="L341">        return submittedBy;</span>
+    }
+
+    public void setSubmittedBy(String submittedBy) {
+<span class="fc" id="L345">        this.submittedBy = submittedBy;</span>
+<span class="fc" id="L346">    }</span>
+
+    public List&lt;Link&gt; getLinks() {
+<span class="fc" id="L349">        return links;</span>
+    }
+
+    public void setLinks(List&lt;Link&gt; links) {
+<span class="fc" id="L353">        this.links = links;</span>
+<span class="fc" id="L354">    }</span>
+
+    public Date getCreated() {
+<span class="fc" id="L357">        return created;</span>
+    }
+
+    public void setCreated(Date created) {
+<span class="fc" id="L361">        this.created = created;</span>
+<span class="fc" id="L362">    }</span>
+
+    public String getCreatedBy() {
+<span class="fc" id="L365">        return createdBy;</span>
+    }
+
+    public void setCreatedBy(String createdBy) {
+<span class="fc" id="L369">        this.createdBy = createdBy;</span>
+<span class="fc" id="L370">    }</span>
+
+    public Date getLastUpdated() {
+<span class="fc" id="L373">        return lastUpdated;</span>
+    }
+
+    public void setLastUpdated(Date lastUpdated) {
+<span class="fc" id="L377">        this.lastUpdated = lastUpdated;</span>
+<span class="fc" id="L378">    }</span>
+
+    public String getUpdatedBy() {
+<span class="fc" id="L381">        return updatedBy;</span>
+    }
+
+    public void setUpdatedBy(String updatedBy) {
+<span class="fc" id="L385">        this.updatedBy = updatedBy;</span>
+<span class="fc" id="L386">    }</span>
+
+    public Set&lt;Answer&gt; getAnswers() {
+<span class="fc bfc" id="L389" title="All 2 branches covered.">        if (answers == null) {</span>
+<span class="fc" id="L390">            answers = new HashSet&lt;Answer&gt;();</span>
+        }
+<span class="fc" id="L392">        return answers;</span>
+    }
+
+    public void setAnswers(Set&lt;Answer&gt; answers) {
+<span class="fc" id="L396">        this.answers = answers;</span>
+<span class="fc" id="L397">    }</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.2.201808211720</span></div></body></html>

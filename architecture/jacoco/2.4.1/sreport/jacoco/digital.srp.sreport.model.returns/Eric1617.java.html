@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Eric1617.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Sustainability Reporting</a> &gt; <a href="index.source.html" class="el_package">digital.srp.sreport.model.returns</a> &gt; <span class="el_source">Eric1617.java</span></div><h1>Eric1617.java</h1><pre class="source lang-java linenums">package digital.srp.sreport.model.returns;
+
+<span class="nc" id="L3">public class Eric1617 implements EricDataSet, EricQuestions {</span>
+
+    public static final String PERIOD = &quot;2016-17&quot;;
+
+    public static final String NAME = &quot;ERIC-&quot; + PERIOD;
+
+    public static final String DATA_FILE = &quot;/data/ERIC-&quot; + PERIOD + &quot;.csv&quot;;
+
+<span class="fc" id="L11">    public static final String[] HEADERS = {</span>
+            &quot;Organisation Code&quot;,
+            &quot;Organisation Name&quot;, &quot;Commissioning Region&quot;, &quot;Organisation Type&quot;,
+            &quot;Number of sites - General acute hospital (No.)&quot;,
+            &quot;Number of sites - Specialist hospital (acute only) (No.)&quot;,
+            &quot;Number of sites - Mixed service hospital (No.)&quot;,
+            &quot;Number of sites - Mental Health (including Specialist services) (No.)&quot;,
+            &quot;Number of sites - Learning Disabilities (No.)&quot;,
+            &quot;Number of sites - Mental Health and Learning Disabilities (No.)&quot;,
+            &quot;Number of sites - Community hospital (with inpatient beds) (No.)&quot;,
+            &quot;Number of sites - Other inpatient (No.)&quot;,
+            &quot;Number of sites - Non inpatient (No.)&quot;,
+            &quot;Number of sites - Support facilities (No.)&quot;,
+            &quot;Number of sites - Unreported sites (No.)&quot;,
+            &quot;Number of sites leased from NHS Property Services (No.)&quot;,
+            &quot;Estates Development Strategy (Yes/No)&quot;,
+            &quot;Healthy transport plan (Yes/No)&quot;,
+            &quot;Board approved Adaptation Plan (Yes/No)&quot;,
+            &quot;Sustainable Development Management Plan/Carbon Reduction Management Plan (Yes/No)&quot;,
+            &quot;Carbon reduction target (Select)&quot;,
+            &quot;NHS Premises and Facilities Assurance - Assessment/Approval (Select)&quot;,
+            &quot;NHS Premises and Facilities Assurance - action plan (Select)&quot;,
+            &quot;Capital investment for new build (£)&quot;,
+            &quot;Capital investment for improving existing buildings (£)&quot;,
+            &quot;Capital investment for equipment (£)&quot;,
+            &quot;Private Sector investment (£)&quot;,
+            &quot;Investment to reduce backlog maintenance (£)&quot;,
+            &quot;Cost to meet NHS Premises and Facilities Assurance action plan (£)&quot;,
+            &quot;Estates and Facilities savings from Cost Improvement Plans (£)&quot;,
+            &quot;Estates and Facilities planned savings from Cost Improvement Plans (£)&quot;,
+            &quot;Income from services provided to other organisations - catering (£)&quot;,
+            &quot;Income from services provided to other organisations - laundry and linen (£)&quot;,
+            &quot;Income from services provided to other organisations - other (£)&quot;,
+            &quot;RIDDOR incidents (No.)&quot;,
+            &quot;Estates and facilities related incidents (No.)&quot;,
+            &quot;Clinical service incidents caused by estates and infrastructure failure (No.)&quot;,
+            &quot;Overheating occurrences triggering a risk assessment (No.)&quot;,
+            &quot;Percentage of clinical space monitored for temperatures (%)&quot;,
+            &quot;Fires recorded (No.)&quot;, &quot;False alarms - No call out (No.)&quot;,
+            &quot;False alarms - Call out (No.)&quot;,
+            &quot;Number of deaths resulting from fire(s) (No.)&quot;,
+            &quot;Number of people injured resulting from fire(s) (No.)&quot;,
+            &quot;Number of patients sustaining injuries during evacuation (No.)&quot;,
+            &quot;Estates and facilities finance costs (£)&quot;,
+            &quot;Estates and property maintenance (£)&quot;,
+            &quot;Grounds and gardens maintenance (£)&quot;,
+            &quot;Electro Bio Medical Equipment maintenance cost (£)&quot;,
+            &quot;Other Hard FM (Estates) costs (£)&quot;,
+            &quot;Other Soft FM (Hotel Services) costs (£)&quot;,
+            &quot;Income received for area leased out for retail sales (£)&quot;,
+            &quot;Area leased out for retail sales (m²)&quot;,
+            &quot;Gross internal floor area (m²)&quot;, &quot;Occupied floor area (m²)&quot;,
+            &quot;NHS estate occupied floor area (%)&quot;, &quot;Site heated volume (m³)&quot;,
+            &quot;Land area owned (Hectares)&quot;,
+            &quot;Land area not delivering services (Hectares)&quot;,
+            &quot;Clinical space (m²)&quot;, &quot;Non-clinical space (m²)&quot;,
+            &quot;Not functionally suitable - occupied floor area (%)&quot;,
+            &quot;Not functionally suitable - patient occupied floor area (%)&quot;,
+            &quot;Floor area - empty (%)&quot;, &quot;Floor area - under used (%)&quot;,
+            &quot;Single bedrooms for patients with en-suite facilities (No.)&quot;,
+            &quot;Single bedrooms for patients without en-suite facilities (No.)&quot;,
+            &quot;Isolation rooms (No.)&quot;, &quot;Cost to eradicate high risk backlog (£)&quot;,
+            &quot;Cost to eradicate significant risk backlog (£)&quot;,
+            &quot;Cost to eradicate moderate risk backlog (£)&quot;,
+            &quot;Cost to eradicate low risk backlog (£)&quot;,
+            &quot;Cost to eradicate Safety related Critical Infrastructure Risk (£)&quot;,
+            &quot;Cost to eradicate non-compliance related Critical Infrastructure Risk (£)&quot;,
+            &quot;Cost to eradicate continuity related Critical Infrastructure Risk (£)&quot;,
+            &quot;CHP units operated on the site (No.)&quot;, &quot;CHP unit/s size (Watts)&quot;,
+            &quot;CHP unit/s efficiency (%)&quot;,
+            &quot;Fossil energy input to CHP system/s (kWh)&quot;,
+            &quot;Thermal energy output of CHP system/s (kWh)&quot;,
+            &quot;Electrical energy output of CHP system/s (kWh)&quot;,
+            &quot;Exported electricity (kWh)&quot;, &quot;Exported thermal energy (kWh)&quot;,
+            &quot;Energy costs (all energy supplies) (£)&quot;,
+            &quot;Electricity consumed (kWh)&quot;, &quot;Gas consumed (kWh)&quot;,
+            &quot;Oil consumed (kWh)&quot;, &quot;Coal consumed (kWh)&quot;, &quot;Steam consumed (kWh)&quot;,
+            &quot;Hot water consumed (kWh)&quot;,
+            &quot;Electricity consumed - green energy tariff (kWh)&quot;,
+            &quot;Electricity consumed - third party owned renewable (kWh)&quot;,
+            &quot;Non-fossil fuel consumed - renewable (kWh)&quot;,
+            &quot;Electrical energy output of owned onsite renewables (kWh)&quot;,
+            &quot;Peak electrical load (MW)&quot;, &quot;Maximum electrical load (MW)&quot;,
+            &quot;Water cost (£)&quot;, &quot;Sewage cost (£)&quot;,
+            &quot;Water volume (including borehole) (m³)&quot;,
+            &quot;Landfill disposal cost (£)&quot;, &quot;Landfill disposal volume (Tonnes)&quot;,
+            &quot;Incineration disposal cost (£)&quot;,
+            &quot;Incineration disposal volume (Tonnes)&quot;, &quot;Waste reycling cost (£)&quot;,
+            &quot;Waste reycling volume (Tonnes)&quot;, &quot;Other recovery cost (£)&quot;,
+            &quot;Other recovery volume (Tonnes)&quot;, &quot;Parking spaces available (No.)&quot;,
+            &quot;Designated disabled parking spaces (No.)&quot;,
+            &quot;Average fee charged per hour for patient/visitor parking (£)&quot;,
+            &quot;Average fee charged per hour for staff parking (£)&quot;,
+            &quot;Cleaning service cost (£)&quot;, &quot;Cleaning staff (WTE)&quot;,
+            &quot;Cost of cleaning occupied floor area assessed as Red/Very High Risk (£)&quot;,
+            &quot;Occupied floor area assessed as Red/Very High Risk (%)&quot;,
+            &quot;Required standard for occupied floor area assessed as Red/Very High Risk (%)&quot;,
+            &quot;Achieved standard for occupied floor area identified as Red/Very High Risk (%)&quot;,
+            &quot;Cost of cleaning occupied floor area assessed as Amber/High and Significant Risk (£)&quot;,
+            &quot;Occupied floor area assessed as Amber/High and Significant Risk (%)&quot;,
+            &quot;Required standard for occupied floor area assessed as Amber/High and Significant Risk (%)&quot;,
+            &quot;Achieved standard for occupied floor area identified as Amber/High and Significant Risk (%)&quot;,
+            &quot;Cost of cleaning occupied floor area assessed as Green/Low Risk (£)&quot;,
+            &quot;Occupied floor area assessed as Green/Low Risk (%)&quot;,
+            &quot;Required standard for occupied floor area assessed as Green/Low Risk (%)&quot;,
+            &quot;Achieved standard for occupied floor area identified as Green/Low Risk (%)&quot;,
+            &quot;Cost of cleaning the occupied floor area not requiring regular cleaning (£)&quot;,
+            &quot;Occupied floor area not requiring regular cleaning (%)&quot;,
+            &quot;Inpatient food service cost (£)&quot;,
+            &quot;Inpatient main meals requested (No.)&quot;,
+            &quot;Cost of feeding one inpatient per day (inpatient meal day) (£)&quot;,
+            &quot;Laundry and linen service cost (£)&quot;, &quot;Pieces per annum (No.)&quot;,
+            &quot;Portering service cost (£)&quot;, &quot;Portering staff (WTE)&quot;
+    };
+
+    @Override
+    public String getDataFile() {
+<span class="nc" id="L128">        return DATA_FILE;</span>
+    }
+
+    @Override
+    public String[] getHeaders() {
+<span class="nc" id="L133">        return HEADERS;</span>
+    }
+
+    @Override
+    public String getPeriod() {
+<span class="nc" id="L138">        return PERIOD;</span>
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.2.201808211720</span></div></body></html>

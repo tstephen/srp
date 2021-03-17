@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>HealthCheckController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Sustainability Reporting</a> &gt; <a href="index.source.html" class="el_package">digital.srp.sreport.web</a> &gt; <span class="el_source">HealthCheckController.java</span></div><h1>HealthCheckController.java</h1><pre class="source lang-java linenums">package digital.srp.sreport.web;
+
+import java.util.ArrayList;
+import java.util.Set;
+
+import javax.validation.ConstraintViolation;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.fasterxml.jackson.annotation.JsonView;
+
+import digital.srp.sreport.api.exceptions.FailedHealthCheckException;
+import digital.srp.sreport.internal.PeriodUtil;
+import digital.srp.sreport.model.Answer;
+import digital.srp.sreport.model.HealthCheck;
+import digital.srp.sreport.model.SurveyReturn;
+import digital.srp.sreport.model.views.HealthCheckViews;
+import digital.srp.sreport.repositories.AnswerRepository;
+import digital.srp.sreport.repositories.SurveyReturnRepository;
+import digital.srp.sreport.services.HealthChecker;
+
+/**
+ * REST web service for performing calculations on a report.
+ *
+ * @author Tim Stephenson
+ */
+@Controller
+@RequestMapping(value = &quot;/admin/health&quot;)
+<span class="fc" id="L36">public class HealthCheckController {</span>
+
+<span class="fc" id="L38">    private static final Logger LOGGER = LoggerFactory</span>
+<span class="fc" id="L39">            .getLogger(HealthCheckController.class);</span>
+
+    @Autowired
+    protected HealthChecker healthChecker;
+
+    @Autowired
+    protected SurveyReturnRepository returnRepo;
+
+    @Autowired
+    protected AnswerRepository answerRepo;
+
+    @Autowired
+    protected SurveyReturnController surveyReturnController;
+
+    /**
+     * Run all calculations based on the return inputs.
+     *
+     * @return return including latest calculations.
+     */
+    @RequestMapping(value = &quot;/{returnId}&quot;, method = RequestMethod.GET, produces = {
+            &quot;application/json&quot; })
+    @JsonView(HealthCheckViews.Summary.class)
+    public @ResponseBody HealthCheck checkHealth(
+            @PathVariable(&quot;returnId&quot;) Long returnId) {
+<span class="nc" id="L63">        LOGGER.info(String.format(&quot;Checking health for %1$s&quot;, returnId));</span>
+
+<span class="nc" id="L65">        SurveyReturn rtn = returnRepo.findOne(returnId);</span>
+<span class="nc" id="L66">        checkHealth(rtn,</span>
+<span class="nc" id="L67">                PeriodUtil.periodsSinceInc(rtn.applicablePeriod(), &quot;2007-08&quot;),</span>
+                false);
+
+<span class="nc" id="L70">        return new HealthCheck(rtn);</span>
+    }
+
+    /**
+     * Run all calculations based on the return inputs.
+     *
+     * @return return including latest calculations.
+     */
+    @RequestMapping(value = &quot;/{surveyName}/{org}&quot;, method = RequestMethod.GET, produces = {
+            &quot;application/json&quot; })
+    @JsonView(HealthCheckViews.Summary.class)
+    public @ResponseBody HealthCheck checkHealth(
+            @PathVariable(&quot;surveyName&quot;) String surveyName,
+            @PathVariable(&quot;org&quot;) String org) {
+<span class="nc" id="L84">        LOGGER.info(String.format(&quot;Checking health for %1$s %2$s&quot;, surveyName,</span>
+                org));
+
+<span class="nc" id="L87">        SurveyReturn rtn = surveyReturnController</span>
+<span class="nc" id="L88">                .findCurrentBySurveyNameAndOrg(surveyName, org);</span>
+<span class="nc" id="L89">        checkHealth(rtn,</span>
+<span class="nc" id="L90">                PeriodUtil.periodsSinceInc(rtn.applicablePeriod(), &quot;2007-08&quot;),</span>
+                false);
+
+<span class="nc" id="L93">        return new HealthCheck(rtn);</span>
+    }
+
+    /**
+     * Run all validators on the specified return.
+     *
+     * @return summary return.
+     */
+    @RequestMapping(value = &quot;/{returnId}&quot;, method = RequestMethod.POST, produces = {
+            &quot;application/json&quot; })
+    @JsonView(HealthCheckViews.Summary.class)
+    public @ResponseBody HealthCheck checkHealthAndAttemptFixes(
+            @PathVariable(&quot;returnId&quot;) Long returnId) {
+<span class="nc" id="L106">        LOGGER.info(String.format(&quot;Checking health for %1$s&quot;, returnId));</span>
+
+<span class="nc" id="L108">        SurveyReturn rtn = returnRepo.findOne(returnId);</span>
+<span class="nc" id="L109">        checkHealth(rtn,</span>
+<span class="nc" id="L110">                PeriodUtil.periodsSinceInc(rtn.applicablePeriod(), &quot;2007-08&quot;),</span>
+                true);
+
+<span class="nc" id="L113">        return new HealthCheck(rtn);</span>
+    }
+
+    /**
+     * Run all validators on the specified return.
+     *
+     * @return return including latest calculations.
+     */
+    @RequestMapping(value = &quot;/{surveyName}/{org}&quot;, method = RequestMethod.POST, produces = {
+            &quot;application/json&quot; })
+    @JsonView(HealthCheckViews.Summary.class)
+    public @ResponseBody HealthCheck checkHealthAndAttemptFixes(
+            @PathVariable(&quot;surveyName&quot;) String surveyName,
+            @PathVariable(&quot;org&quot;) String org) {
+<span class="nc" id="L127">        LOGGER.info(String.format(&quot;Checking health for %1$s %2$s&quot;, surveyName,</span>
+                org));
+
+<span class="nc" id="L130">        SurveyReturn rtn = surveyReturnController</span>
+<span class="nc" id="L131">                .findCurrentBySurveyNameAndOrg(surveyName, org);</span>
+<span class="nc" id="L132">        checkHealth(rtn,</span>
+<span class="nc" id="L133">                PeriodUtil.periodsSinceInc(rtn.applicablePeriod(), &quot;2007-08&quot;),</span>
+                true);
+
+<span class="nc" id="L136">        return new HealthCheck(rtn);</span>
+    }
+
+    private void checkHealth(SurveyReturn rtn, int yearsToCalc,
+            boolean attemptFixes) {
+<span class="nc" id="L141">        Set&lt;ConstraintViolation&lt;SurveyReturn&gt;&gt; issues = healthChecker</span>
+<span class="nc" id="L142">                .validate(rtn);</span>
+<span class="nc bnc" id="L143" title="All 2 branches missed.">        if (issues.size() == 0) {</span>
+            ; // Sunny in Sunnyvale
+        } else {
+<span class="nc" id="L146">            String msg = String.format(</span>
+                    &quot;Found %1$d issues, cannot run calculations until they are corrected&quot;,
+<span class="nc" id="L148">                    issues.size());</span>
+<span class="nc bnc" id="L149" title="All 2 branches missed.">            if (attemptFixes) {</span>
+<span class="nc" id="L150">                long duplicateViolationCount = 0;</span>
+<span class="nc" id="L151">                long duplicateAnswerCount = 0;</span>
+<span class="nc" id="L152">                ArrayList&lt;Long&gt; toDelete = new ArrayList&lt;Long&gt;();</span>
+<span class="nc bnc" id="L153" title="All 2 branches missed.">                for (ConstraintViolation&lt;SurveyReturn&gt; issue : issues) {</span>
+<span class="nc bnc" id="L154" title="All 3 branches missed.">                    switch (issue.getClass().getSimpleName()) {</span>
+                    case &quot;DuplicateAnswerConstraintViolation&quot;:
+<span class="nc" id="L156">                        duplicateViolationCount++;</span>
+                        @SuppressWarnings(&quot;unchecked&quot;)
+<span class="nc" id="L158">                        Set&lt;Answer&gt; answers = (Set&lt;Answer&gt;) issue.getLeafBean();</span>
+<span class="nc" id="L159">                        Answer[] array = new Answer[answers.size()];</span>
+<span class="nc" id="L160">                        answers.toArray(array);</span>
+<span class="nc bnc" id="L161" title="All 2 branches missed.">                        for (int i = 1; i &lt; array.length; i++) {</span>
+<span class="nc" id="L162">                            long start = System.currentTimeMillis();</span>
+<span class="nc" id="L163">                            LOGGER.info(&quot;deleting answer with id: {}&quot;,</span>
+<span class="nc" id="L164">                                    array[i].id());</span>
+<span class="nc" id="L165">                            toDelete.add(array[i].id());</span>
+<span class="nc" id="L166">                            LOGGER.info(&quot;  took {}ms&quot;,</span>
+<span class="nc" id="L167">                                    (System.currentTimeMillis() - start));</span>
+<span class="nc" id="L168">                            duplicateAnswerCount++;</span>
+                        }
+<span class="nc" id="L170">                        break;</span>
+                    case &quot;SurveyDefinedAnswersProvided&quot;:
+<span class="nc" id="L172">                        long start = System.currentTimeMillis();</span>
+<span class="nc" id="L173">                        LOGGER.error(&quot;Missing answers detected by validator - Hurrah!&quot;);</span>
+<span class="nc" id="L174">                        LOGGER.info(&quot;  took {}ms&quot;,</span>
+<span class="nc" id="L175">                                (System.currentTimeMillis() - start));</span>
+                        break;
+                    }
+<span class="nc" id="L178">                }</span>
+<span class="nc" id="L179">                LOGGER.info(</span>
+                        &quot;found {} answers with duplicates and {} records to delete&quot;,
+<span class="nc" id="L181">                        duplicateViolationCount, duplicateAnswerCount);</span>
+<span class="nc" id="L182">                Long[] ids = new Long[toDelete.size()];</span>
+<span class="nc" id="L183">                toDelete.toArray(ids);</span>
+<span class="nc" id="L184">                answerRepo.deleteAnswers(ids);</span>
+<span class="nc" id="L185">                LOGGER.info(&quot;  the deed is done&quot;);</span>
+<span class="nc" id="L186">            } else {</span>
+<span class="nc" id="L187">                throw new FailedHealthCheckException(msg, rtn, issues);</span>
+            }
+        }
+<span class="nc" id="L190">    }</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.2.201808211720</span></div></body></html>

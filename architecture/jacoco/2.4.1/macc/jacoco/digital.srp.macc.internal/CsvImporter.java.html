@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>CsvImporter.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Marginal Abatement Cost Curves</a> &gt; <a href="index.source.html" class="el_package">digital.srp.macc.internal</a> &gt; <span class="el_source">CsvImporter.java</span></div><h1>CsvImporter.java</h1><pre class="source lang-java linenums">/*******************************************************************************
+ * Copyright 2015, 2017 Tim Stephenson and contributors
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *******************************************************************************/
+package digital.srp.macc.internal;
+
+import java.beans.PropertyDescriptor;
+import java.io.IOException;
+import java.io.Reader;
+import java.io.StringReader;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVParser;
+import org.apache.commons.csv.CSVRecord;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
+
+import digital.srp.macc.model.Intervention;
+import digital.srp.macc.model.InterventionType;
+import digital.srp.macc.model.OrganisationType;
+
+<span class="fc" id="L39">public class CsvImporter {</span>
+
+<span class="fc" id="L41">    private static final Logger LOGGER = LoggerFactory</span>
+<span class="fc" id="L42">            .getLogger(CsvImporter.class);</span>
+
+    public List&lt;InterventionType&gt; readInterventions(Reader in, String[] headers)
+            throws IOException {
+<span class="fc" id="L46">        List&lt;InterventionType&gt; interventionTypes = new ArrayList&lt;InterventionType&gt;();</span>
+<span class="fc" id="L47">        PropertyDescriptor[] interventionTypeDescriptors = BeanUtils</span>
+<span class="fc" id="L48">                .getPropertyDescriptors(InterventionType.class);</span>
+        // This JavaDoc is not (currently) true:
+        // If your source contains a header record, you can simplify your
+        // code and safely reference columns, by using withHeader(String...)
+        // with no arguments:
+        // CSVFormat.EXCEL.withHeader();
+
+<span class="fc" id="L55">        final CSVParser parser = new CSVParser(in,</span>
+<span class="fc" id="L56">                CSVFormat.EXCEL.withHeader(headers));</span>
+<span class="fc" id="L57">        Iterable&lt;CSVRecord&gt; records = parser.getRecords();</span>
+        // Iterable&lt;CSVRecord&gt; records = CSVFormat.EXCEL.withHeader(headers)
+        // .parse(in);
+
+<span class="fc bfc" id="L61" title="All 2 branches covered.">        for (CSVRecord record : records) {</span>
+            // skip header
+<span class="fc bfc" id="L63" title="All 2 branches covered.">            if (record.getRecordNumber() &gt; 1) {</span>
+<span class="fc" id="L64">                InterventionType interventionType = new InterventionType();</span>
+<span class="fc bfc" id="L65" title="All 2 branches covered.">                for (PropertyDescriptor pd : interventionTypeDescriptors) {</span>
+<span class="fc bfc" id="L66" title="All 2 branches covered.">                    if (record.isMapped(pd.getName())) {</span>
+<span class="fc" id="L67">                        setField(interventionType, pd, record.get(pd.getName())</span>
+<span class="fc" id="L68">                                .trim());</span>
+<span class="fc bfc" id="L69" title="All 2 branches covered.">                    } else if (&quot;annualCashOutflowsTS&quot;.equals(pd.getName())</span>
+<span class="fc bfc" id="L70" title="All 2 branches covered.">                            &amp;&amp; (record.get(&quot;annualCashOutflows&quot;).contains(&quot;,&quot;) || record</span>
+<span class="fc bfc" id="L71" title="All 2 branches covered.">                                    .get(&quot;annualCashOutflows&quot;).contains(&quot; &quot;))) {</span>
+<span class="fc" id="L72">                        setTimeSeriesField(interventionType, pd, record,</span>
+                                &quot;annualCashOutflows&quot;);
+<span class="fc bfc" id="L74" title="All 2 branches covered.">                    } else if (&quot;annualCashInflowsTS&quot;.equals(pd.getName())</span>
+<span class="fc bfc" id="L75" title="All 2 branches covered.">                            &amp;&amp; (record.get(&quot;annualCashInflows&quot;).contains(&quot;,&quot;) || record</span>
+<span class="fc bfc" id="L76" title="All 2 branches covered.">                                    .get(&quot;annualCashInflows&quot;).contains(&quot; &quot;))) {</span>
+<span class="fc" id="L77">                        setTimeSeriesField(interventionType, pd, record,</span>
+                                &quot;annualCashInflows&quot;);
+<span class="fc bfc" id="L79" title="All 2 branches covered.">                    } else if (&quot;annualTonnesCo2eSavedTS&quot;.equals(pd.getName())</span>
+<span class="fc bfc" id="L80" title="All 2 branches covered.">                            &amp;&amp; (record.get(&quot;annualTonnesCo2eSaved&quot;).contains(</span>
+<span class="fc" id="L81">                                    &quot;,&quot;) || record.get(&quot;annualTonnesCo2eSaved&quot;)</span>
+<span class="pc bpc" id="L82" title="1 of 2 branches missed.">                                    .contains(&quot; &quot;))) {</span>
+<span class="fc" id="L83">                        setTimeSeriesField(interventionType, pd, record,</span>
+                                &quot;annualTonnesCo2eSaved&quot;);
+                    } else {
+<span class="fc" id="L86">                        LOGGER.warn(String.format(</span>
+                                &quot;No value for %1$s of record %2$d&quot;,
+<span class="fc" id="L88">                                pd.getName(), record.getRecordNumber()));</span>
+                    }
+                }
+<span class="fc" id="L91">                interventionTypes.add(interventionType);</span>
+            }
+<span class="fc" id="L93">        }</span>
+<span class="fc" id="L94">        parser.close();</span>
+<span class="fc" id="L95">        return interventionTypes;</span>
+    }
+
+    // Time series are a special case
+    private void setTimeSeriesField(InterventionType intervention,
+            PropertyDescriptor pd, CSVRecord record, String key) {
+<span class="fc" id="L101">        String val = record.get(key).trim();</span>
+<span class="fc bfc" id="L102" title="All 2 branches covered.">        if (val.endsWith(&quot;,&quot;)) {</span>
+<span class="fc" id="L103">            val = val.substring(0, val.length() - 1);</span>
+        }
+<span class="fc" id="L105">        setField(intervention, pd, val);</span>
+<span class="fc" id="L106">    }</span>
+
+    private void setField(Object bean, PropertyDescriptor propertyDescriptor,
+            Object value) {
+<span class="pc bpc" id="L110" title="1 of 4 branches missed.">        if (value == null || value.toString().length() == 0) {</span>
+<span class="fc" id="L111">            return;</span>
+        }
+        try {
+            // Convert %, cannot do it in LibreOffice as converts to fraction
+<span class="fc bfc" id="L115" title="All 2 branches covered.">            if (value.toString().endsWith(&quot;%&quot;)) {</span>
+<span class="fc" id="L116">                value = value.toString().substring(0,</span>
+<span class="fc" id="L117">                        value.toString().length() - 1);</span>
+            }
+            // Some funny formatting of money as strings
+<span class="fc bfc" id="L120" title="All 2 branches covered.">            if (value.toString().startsWith(&quot;£&quot;)) {</span>
+<span class="fc" id="L121">                value = value.toString().substring(1).replace(&quot;,&quot;, &quot;&quot;);</span>
+            }
+            // Change 8 spaces (originally a tab?) to comma
+<span class="fc bfc" id="L124" title="All 2 branches covered.">            if (value.toString().contains(&quot;        &quot;)) {</span>
+<span class="fc" id="L125">                value = value.toString().replaceAll(&quot;        &quot;, &quot;,&quot;);</span>
+            }
+<span class="fc" id="L127">            Method method = propertyDescriptor.getWriteMethod();</span>
+<span class="pc bpc" id="L128" title="4 of 9 branches missed.">            switch (method.getParameterTypes()[0].getName()) {</span>
+            case &quot;boolean&quot;:
+<span class="fc" id="L130">                method.invoke(bean, Boolean.parseBoolean(value.toString()));</span>
+<span class="fc" id="L131">                break;</span>
+            case &quot;double&quot;:
+<span class="nc" id="L133">                method.invoke(bean, Double.valueOf(value.toString()));</span>
+<span class="nc" id="L134">                break;</span>
+            case &quot;java.lang.Float&quot;:
+<span class="fc" id="L136">                method.invoke(bean, new Float(value.toString()));</span>
+<span class="fc" id="L137">                break;</span>
+            case &quot;java.lang.Integer&quot;:
+<span class="nc" id="L139">                method.invoke(bean, new Integer(value.toString()));</span>
+<span class="nc" id="L140">                break;</span>
+            case &quot;java.lang.Short&quot;:
+<span class="fc" id="L142">                method.invoke(bean, new Short(value.toString()));</span>
+<span class="fc" id="L143">                break;</span>
+            case &quot;java.lang.String&quot;:
+<span class="pc bpc" id="L145" title="2 of 4 branches missed.">                if (value != null &amp;&amp; value.toString().trim().length() &gt; 0) {</span>
+<span class="fc" id="L146">                    method.invoke(bean, value.toString());</span>
+                }
+                break;
+            case &quot;java.math.BigDecimal&quot;:
+<span class="fc" id="L150">                method.invoke(bean, new BigDecimal(value.toString()));</span>
+<span class="fc" id="L151">                break;</span>
+            case &quot;digital.srp.macc.model.OrganisationType&quot;:
+<span class="nc" id="L153">                OrganisationType organisationType = new OrganisationType();</span>
+<span class="nc" id="L154">                ((Intervention) bean).setOrganisationType(organisationType);</span>
+<span class="nc" id="L155">                organisationType.setName(value.toString());</span>
+<span class="nc" id="L156">                break;</span>
+            default:
+<span class="nc" id="L158">                LOGGER.warn(String.format(&quot;  Treating %1$s as String&quot;,</span>
+<span class="nc" id="L159">                        method.getParameterTypes()[0].getName()));</span>
+<span class="nc" id="L160">                method.invoke(bean, value.toString());</span>
+            }
+
+<span class="fc" id="L163">        } catch (IllegalAccessException | IllegalArgumentException</span>
+                | InvocationTargetException e) {
+<span class="fc" id="L165">            LOGGER.error(String.format(&quot;Error parsing %1$s.%2$s from %3$s&quot;,</span>
+<span class="fc" id="L166">                    bean.getClass().getName(), propertyDescriptor.getName(),</span>
+<span class="fc" id="L167">                    value.toString()));</span>
+<span class="fc" id="L168">        }</span>
+<span class="fc" id="L169">    }</span>
+
+    public List&lt;InterventionType&gt; readInterventionTypes(StringReader in,
+            String[] headers) throws IOException {
+<span class="nc" id="L173">        List&lt;InterventionType&gt; types = new ArrayList&lt;InterventionType&gt;();</span>
+<span class="nc" id="L174">        PropertyDescriptor[] propertyDescriptors = BeanUtils</span>
+<span class="nc" id="L175">                .getPropertyDescriptors(InterventionType.class);</span>
+
+<span class="nc" id="L177">        final CSVParser parser = new CSVParser(in,</span>
+<span class="nc" id="L178">                CSVFormat.EXCEL.withHeader(headers));</span>
+<span class="nc" id="L179">        Iterable&lt;CSVRecord&gt; records = parser.getRecords();</span>
+
+<span class="nc bnc" id="L181" title="All 2 branches missed.">        for (CSVRecord record : records) {</span>
+            // skip header
+<span class="nc bnc" id="L183" title="All 2 branches missed.">            if (record.getRecordNumber() &gt; 1) {</span>
+<span class="nc" id="L184">                InterventionType type = new InterventionType();</span>
+<span class="nc bnc" id="L185" title="All 2 branches missed.">                for (PropertyDescriptor pd : propertyDescriptors) {</span>
+<span class="nc bnc" id="L186" title="All 2 branches missed.">                    if (record.isMapped(pd.getName())) {</span>
+<span class="nc" id="L187">                        setField(type, pd, record.get(pd.getName()).trim());</span>
+                    }
+                }
+
+<span class="nc" id="L191">                types.add(type);</span>
+            }
+<span class="nc" id="L193">        }</span>
+<span class="nc" id="L194">        parser.close();</span>
+<span class="nc" id="L195">        return types;</span>
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.2.201808211720</span></div></body></html>

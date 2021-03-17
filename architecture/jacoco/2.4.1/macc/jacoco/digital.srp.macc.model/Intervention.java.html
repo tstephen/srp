@@ -1,0 +1,340 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Intervention.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Marginal Abatement Cost Curves</a> &gt; <a href="index.source.html" class="el_package">digital.srp.macc.model</a> &gt; <span class="el_source">Intervention.java</span></div><h1>Intervention.java</h1><pre class="source lang-java linenums">/*******************************************************************************
+ * Copyright 2015, 2017 Tim Stephenson and contributors
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *******************************************************************************/
+package digital.srp.macc.model;
+
+import java.math.BigDecimal;
+import java.util.List;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+import javax.persistence.Transient;
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
+import javax.xml.bind.annotation.XmlElement;
+
+import org.springframework.hateoas.Link;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonView;
+
+import digital.srp.macc.maths.Finance;
+import digital.srp.macc.views.InterventionViews;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+/**
+ * An action or related set of actions aimed at providing Carbon Abatement or
+ * other sustainability benefit.
+ *
+ * @author Tim Stephenson
+ */
+<span class="pc bnc" id="L53" title="All 54 branches missed.">@Data</span>
+@Entity
+@Table(name = &quot;TR_INTVN&quot;)
+<span class="fc" id="L56">@NoArgsConstructor</span>
+<span class="nc" id="L57">@AllArgsConstructor</span>
+public class Intervention implements CsvSerializable {
+
+    private static final long serialVersionUID = -4380531011333907658L;
+
+    public String toCsvHeader() {
+<span class="nc" id="L63">        return &quot;Intervention Id, Intervention Type, Organisation Type, Share of Total, Cash Outflow Up Front, Annual Cash Inflows, Annual Cash Outflows, Total Net Present Value, Annual Tonnes CO2e Saved, Annual Elec Saved, Annual Gas Saved, Tonnes CO2e Saved Target Year, Cost Per Tonne CO2e, Target Year Savings&quot;;</span>
+    }
+
+    @Id
+    @Column(name = &quot;id&quot;)
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    @JsonProperty
+    @JsonView({ InterventionViews.Summary.class })
+<span class="nc" id="L71">    private Long id;</span>
+
+    // @JsonManagedReference
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = &quot;INTERVENTION_TYPE_ID&quot;)
+    @JsonView({ InterventionViews.Summary.class })
+<span class="fc" id="L77">    private InterventionType interventionType;</span>
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = &quot;ORG_TYPE_ID&quot;)
+    @JsonView({ InterventionViews.Summary.class })
+<span class="nc" id="L82">    private OrganisationType organisationType;</span>
+
+    @JsonProperty
+    @JsonView({ InterventionViews.Summary.class })
+    @Min(value = 0)
+    @Max(100)
+    @Column(name = &quot;SHARE&quot;, nullable = true)
+    @NotNull
+<span class="nc" id="L90">    private Float shareOfTotal;</span>
+
+    @JsonProperty
+    @JsonView({ InterventionViews.Summary.class })
+    @Column(name = &quot;tenant_id&quot;)
+<span class="nc" id="L95">    private String tenantId;</span>
+
+    @Transient
+    @XmlElement(name = &quot;link&quot;, namespace = Link.ATOM_NAMESPACE)
+    @JsonProperty(&quot;links&quot;)
+    @JsonView({ InterventionViews.Summary.class })
+<span class="nc" id="L101">    private List&lt;Link&gt; links;</span>
+
+<span class="nc" id="L103">    public Intervention(InterventionType it, OrganisationType orgType) {</span>
+<span class="nc" id="L104">        setInterventionType(it);</span>
+<span class="nc" id="L105">        setOrganisationType(orgType);</span>
+<span class="nc" id="L106">    }</span>
+
+    public BigDecimal getShareAsBigDecimal() {
+<span class="pc bpc" id="L109" title="1 of 2 branches missed.">        return shareOfTotal == null ? null : new BigDecimal(shareOfTotal)</span>
+<span class="fc" id="L110">                .divide(new BigDecimal(100.00f));</span>
+    }
+
+    @JsonProperty
+    @JsonView({ InterventionViews.Detailed.class })
+    public BigDecimal getAnnualGasSaved() {
+<span class="nc bnc" id="L116" title="All 2 branches missed.">        if (getInterventionType().getAnnualGasSaved() == null) {</span>
+<span class="nc" id="L117">            return Finance.ZERO_BIG_DECIMAL;</span>
+        } else {
+<span class="nc" id="L119">            return getShareAsBigDecimal().multiply(</span>
+<span class="nc" id="L120">                    getInterventionType().getAnnualGasSaved());</span>
+        }
+    }
+
+    @JsonProperty
+    @JsonView({ InterventionViews.Detailed.class })
+    public BigDecimal getAnnualElecSaved() {
+<span class="nc bnc" id="L127" title="All 2 branches missed.">        if (getInterventionType().getAnnualElecSaved() == null) {</span>
+<span class="nc" id="L128">            return Finance.ZERO_BIG_DECIMAL;</span>
+        } else {
+<span class="nc" id="L130">            return getShareAsBigDecimal().multiply(</span>
+<span class="nc" id="L131">                    getInterventionType().getAnnualElecSaved());</span>
+        }
+    }
+
+    @JsonProperty
+    @JsonView({ InterventionViews.Detailed.class })
+    public BigDecimal getAnnualTonnesCo2eSaved() {
+<span class="nc" id="L138">        return getShareAsBigDecimal()</span>
+<span class="nc" id="L139">                .multiply(getInterventionType().getAnnualTonnesCo2eSaved());</span>
+    }
+
+    @JsonProperty
+    @JsonView({ InterventionViews.Detailed.class })
+    public BigDecimal getAnnualCashOutflows() {
+<span class="nc bnc" id="L145" title="All 2 branches missed.">        if (getInterventionType().getAnnualCashOutflows() == null) {</span>
+<span class="nc" id="L146">            return Finance.ZERO_BIG_DECIMAL;</span>
+        } else {
+<span class="nc" id="L148">            return getShareAsBigDecimal()</span>
+<span class="nc" id="L149">                    .multiply(getInterventionType().getUptakeFactor())</span>
+<span class="nc" id="L150">                    .multiply(getInterventionType().getAnnualCashOutflows());</span>
+        }
+    }
+
+    @JsonProperty
+    @JsonView({ InterventionViews.Detailed.class })
+    public BigDecimal getAnnualCashOutflows(int target) {
+<span class="nc bnc" id="L157" title="All 2 branches missed.">        if (getInterventionType().getAnnualCashOutflows() == null) {</span>
+<span class="nc" id="L158">            return Finance.ZERO_BIG_DECIMAL;</span>
+        } else {
+<span class="nc" id="L160">            return getShareAsBigDecimal()</span>
+<span class="nc" id="L161">                    .multiply(getInterventionType().getUptakeFactor())</span>
+<span class="nc" id="L162">                    .multiply(getInterventionType()</span>
+<span class="nc" id="L163">                            .getAnnualCashOutflowsNationalTargetYear());</span>
+        }
+    }
+
+    @JsonProperty
+    @JsonView({ InterventionViews.Detailed.class })
+    public BigDecimal getAnnualCashInflows() {
+<span class="nc" id="L170">        return getShareAsBigDecimal()</span>
+<span class="nc" id="L171">                .multiply(getInterventionType().getUptakeFactor())</span>
+<span class="nc" id="L172">                .multiply(getInterventionType().getAnnualCashInflows());</span>
+    }
+
+    @JsonProperty
+    @JsonView({ InterventionViews.Detailed.class })
+    public BigDecimal getAnnualCashInflows(int target) {
+<span class="nc bnc" id="L178" title="All 2 branches missed.">        if (getInterventionType().getAnnualCashInflows() == null) {</span>
+<span class="nc" id="L179">            return Finance.ZERO_BIG_DECIMAL;</span>
+        } else {
+<span class="nc" id="L181">            return getShareAsBigDecimal()</span>
+<span class="nc" id="L182">                    .multiply(getInterventionType().getUptakeFactor())</span>
+<span class="nc" id="L183">                    .multiply(getInterventionType().getAnnualCashInflowsNationalTargetYear());</span>
+        }
+    }
+
+    @JsonProperty
+    @JsonView({ InterventionViews.Detailed.class })
+    public BigDecimal getCashOutflowUpFront() {
+<span class="nc" id="L190">        return getShareAsBigDecimal()</span>
+<span class="nc" id="L191">                .multiply(getInterventionType().getUptakeFactor())</span>
+<span class="nc" id="L192">                .multiply(getInterventionType().getCashOutflowsUpFrontNational());</span>
+    }
+
+    @JsonProperty
+    @JsonView({ InterventionViews.Detailed.class })
+    public BigDecimal getTotalNpv() {
+<span class="nc" id="L198">        return getShareAsBigDecimal().multiply(</span>
+<span class="nc" id="L199">                getInterventionType().getTotalNpv());</span>
+    }
+
+    @JsonProperty
+    @JsonView({ InterventionViews.Detailed.class })
+    public Long getTonnesCo2eSavedTargetYear() {
+<span class="nc" id="L205">        return getShareAsBigDecimal()</span>
+<span class="nc" id="L206">                .multiply(getInterventionType().getUptakeFactor())</span>
+<span class="nc" id="L207">                .multiply(new BigDecimal(getInterventionType()</span>
+<span class="nc" id="L208">                        .getTonnesCo2eSavedTargetYear().toString()))</span>
+<span class="nc" id="L209">                .longValue();</span>
+    }
+
+    @JsonProperty
+    @JsonView({ InterventionViews.Detailed.class })
+    public Long getTargetYearSavings() {
+<span class="nc" id="L215">        return getShareAsBigDecimal().multiply(</span>
+<span class="nc" id="L216">                new BigDecimal(getInterventionType().getTargetYearSavings()</span>
+<span class="nc" id="L217">                        .toString())).longValue();</span>
+    }
+
+    @JsonProperty
+    @JsonView({ InterventionViews.Detailed.class })
+    @Transient
+    public BigDecimal getUnitCount() {
+<span class="fc" id="L224">        Integer unitCount = getInterventionType().getUnitCount();</span>
+<span class="pc bpc" id="L225" title="1 of 2 branches missed.">        return getShareAsBigDecimal().multiply(</span>
+<span class="fc" id="L226">                new BigDecimal(unitCount == null ? &quot;0&quot; : unitCount.toString()));</span>
+    }
+
+    /** Convenience method to access intervention type's name. */
+    @JsonProperty
+    @JsonView({ InterventionViews.Detailed.class })
+    public String getName() {
+<span class="nc" id="L233">        return getInterventionType().getName();</span>
+    }
+
+    /** Convenience method to access intervention type's description. */
+    @JsonProperty
+    @JsonView({ InterventionViews.Detailed.class })
+    public String getDescription() {
+<span class="nc" id="L240">        return getInterventionType().getDescription();</span>
+    }
+
+    /** Convenience method to access intervention type's further info URL. */
+    @JsonProperty
+    @JsonView({ InterventionViews.Detailed.class })
+    public String getFurtherInfo() {
+<span class="nc" id="L247">        return getInterventionType().getFurtherInfo();</span>
+    }
+
+    /** Convenience method to access intervention type's unit. */
+    @JsonProperty
+    @JsonView({ InterventionViews.Detailed.class })
+    public String getUnit() {
+<span class="nc" id="L254">        return getInterventionType().getUnit();</span>
+    }
+
+    /** Convenience method to access intervention type's (aka national) unit count. */
+    @JsonProperty
+    @JsonView({ InterventionViews.Detailed.class })
+    public Integer getUnitCountNational() {
+<span class="nc" id="L261">        return getInterventionType().getUnitCount();</span>
+    }
+
+    /** Convenience method to access description of intervention type's unit. */
+    @JsonProperty
+    @JsonView({ InterventionViews.Detailed.class })
+    public String getUnitDescription() {
+<span class="nc" id="L268">        return getInterventionType().getUnitDescription();</span>
+    }
+
+    /** Convenience method to access description of intervention type's uptake. */
+    @JsonProperty
+    @JsonView({ InterventionViews.Detailed.class })
+    public Short getUptake() {
+<span class="nc" id="L275">        return getInterventionType().getUptake();</span>
+    }
+
+    /** Convenience method to access intervention type's data. */
+    @JsonProperty
+    @JsonView({ InterventionViews.Detailed.class })
+    public BigDecimal getCashOutflowsUpFrontNational() {
+<span class="nc" id="L282">        return getInterventionType().getCashOutflowsUpFrontNational();</span>
+    }
+
+    /** Convenience method to access intervention type's data. */
+    @JsonProperty
+    @JsonView({ InterventionViews.Detailed.class })
+    public BigDecimal getAnnualCashOutflowsNationalTargetYear() {
+<span class="nc" id="L289">        return getInterventionType().getAnnualCashOutflowsNationalTargetYear();</span>
+    }
+
+    /** Convenience method to access intervention type's data. */
+    @JsonProperty
+    @JsonView({ InterventionViews.Detailed.class })
+    public BigDecimal getAnnualCashInflowsNationalTargetYear() {
+<span class="nc" id="L296">        return getInterventionType().getAnnualCashInflowsNationalTargetYear();</span>
+    }
+
+    /** Convenience method to access intervention type's data. */
+    @JsonProperty
+    @JsonView({ InterventionViews.Detailed.class })
+    public BigDecimal getCostPerTonneCo2e() {
+<span class="nc" id="L303">        return getInterventionType().getCostPerTonneCo2e();</span>
+    }
+
+    /** Convenience method to access intervention type's data. */
+    @JsonProperty
+    @JsonView({ InterventionViews.Detailed.class })
+    public Short getConfidence() {
+<span class="nc" id="L310">        return getInterventionType().getConfidence();</span>
+    }
+
+    /** Convenience method to access intervention type's data. */
+    @JsonProperty
+    @JsonView({ InterventionViews.Detailed.class })
+    public String getSlug() {
+<span class="nc" id="L317">        return getInterventionType().getSlug();</span>
+    }
+
+    @Override
+    public String toString() {
+<span class="nc" id="L322">        return String</span>
+<span class="nc" id="L323">                .format(&quot;Intervention [id=%s, interventionType=%s, organisationType=%s, shareOfTotal=%s, tenantId=%s]&quot;,</span>
+<span class="nc" id="L324">                        id, interventionType.getName(),</span>
+<span class="nc" id="L325">                        organisationType.getName(), shareOfTotal, tenantId);</span>
+    }
+
+    public String toCsv() {
+<span class="nc" id="L329">        return String.format(</span>
+                &quot;%s,\&quot;%s\&quot;,\&quot;%s\&quot;,%s,%s,%s,%s,%s,%s,%s,%s,%d,%f,%d&quot;, id,
+<span class="nc" id="L331">                interventionType.getName(), organisationType.getName(),</span>
+<span class="nc" id="L332">                shareOfTotal, getCashOutflowUpFront(), getAnnualCashInflows(),</span>
+<span class="nc" id="L333">                getAnnualCashOutflows(), getTotalNpv(),</span>
+<span class="nc" id="L334">                getAnnualTonnesCo2eSaved(), getAnnualElecSaved(),</span>
+<span class="nc" id="L335">                getAnnualGasSaved(), getTonnesCo2eSavedTargetYear(),</span>
+<span class="nc" id="L336">                getCostPerTonneCo2e(), getTargetYearSavings());</span>
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.2.201808211720</span></div></body></html>
