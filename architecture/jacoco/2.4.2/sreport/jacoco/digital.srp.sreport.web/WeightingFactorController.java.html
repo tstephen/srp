@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>WeightingFactorController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Sustainability Reporting</a> &gt; <a href="index.source.html" class="el_package">digital.srp.sreport.web</a> &gt; <span class="el_source">WeightingFactorController.java</span></div><h1>WeightingFactorController.java</h1><pre class="source lang-java linenums">package digital.srp.sreport.web;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+
+import javax.annotation.PostConstruct;
+import javax.transaction.Transactional;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.hateoas.Link;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder;
+import org.springframework.web.util.UriComponentsBuilder;
+
+import com.fasterxml.jackson.annotation.JsonView;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import digital.srp.sreport.importers.WeightingFactorCsvImporter;
+import digital.srp.sreport.model.WeightingFactor;
+import digital.srp.sreport.model.views.WeightingFactorViews;
+import digital.srp.sreport.repositories.WeightingFactorRepository;
+
+/**
+ * REST web service for accessing carbon factors.
+ *
+ * @author Tim Stephenson
+ */
+@Controller
+@RequestMapping(value = &quot;/wfactors&quot;)
+<span class="fc" id="L47">public class WeightingFactorController {</span>
+
+<span class="fc" id="L49">    private static final Logger LOGGER = LoggerFactory</span>
+<span class="fc" id="L50">            .getLogger(WeightingFactorController.class);</span>
+
+    @Autowired
+    protected ObjectMapper objectMapper;
+
+    @Autowired
+    protected  WeightingFactorRepository wfactorRepo;
+
+    @PostConstruct
+    protected void init() throws IOException {
+<span class="fc" id="L60">        List&lt;WeightingFactor&gt; existingFactors = wfactorRepo.findAll();</span>
+<span class="fc" id="L61">        List&lt;WeightingFactor&gt; factors = new WeightingFactorCsvImporter().readWeightingFactors();</span>
+
+<span class="fc bfc" id="L63" title="All 2 branches covered.">        for (WeightingFactor factor : factors) {</span>
+<span class="pc bpc" id="L64" title="1 of 2 branches missed.">            if (existingFactors.contains(factor)) {</span>
+<span class="nc" id="L65">                LOGGER.info(String.format(</span>
+                        &quot;Skip import of existing factor: %1$s for: %2$s&quot;,
+<span class="nc" id="L67">                        factor.orgType(), factor.applicablePeriod()));</span>
+            } else {
+<span class="fc" id="L69">                factor.createdBy(&quot;Inst&quot;);</span>
+<span class="fc" id="L70">                createInternal(factor);</span>
+            }
+<span class="fc" id="L72">        }</span>
+<span class="fc" id="L73">    }</span>
+
+    /**
+     * Return just the specified weighting factor.
+     *
+     * @return The specified weighting factor.
+     */
+    @RequestMapping(value = &quot;/{id}&quot;, method = RequestMethod.GET)
+    @JsonView(WeightingFactorViews.Detailed.class)
+    @Transactional
+    public @ResponseBody WeightingFactor findById(
+            @PathVariable(&quot;id&quot;) Long factorId) {
+<span class="nc" id="L85">        LOGGER.info(String.format(&quot;findById %1$s&quot;, factorId));</span>
+
+<span class="nc" id="L87">        WeightingFactor factor = wfactorRepo.findOne(factorId);</span>
+
+<span class="nc" id="L89">        return addLinks(factor);</span>
+    }
+
+    /**
+     * Return just the specified weighting factor.
+     *
+     * @return The specified weighting factor.
+     */
+    @RequestMapping(value = &quot;/findByName/{name}&quot;, method = RequestMethod.GET)
+    @JsonView(WeightingFactorViews.Detailed.class)
+    @Transactional
+    public @ResponseBody WeightingFactor findByName(
+            @PathVariable(&quot;name&quot;) String name) {
+<span class="nc" id="L102">        LOGGER.info(String.format(&quot;findByName %1$s&quot;, name));</span>
+
+<span class="nc" id="L104">        WeightingFactor factor = wfactorRepo.findByOrgType(name);</span>
+
+<span class="nc" id="L106">        return factor;</span>
+    }
+
+    /**
+     * Return a list of carbon factors, optionally paged.
+     *
+     * @return carbon factors.
+     */
+    @RequestMapping(value = &quot;/&quot;, method = RequestMethod.GET)
+    @JsonView(WeightingFactorViews.Summary.class)
+    public @ResponseBody List&lt;WeightingFactor&gt; list(
+            @RequestParam(value = &quot;page&quot;, required = false) Integer page,
+            @RequestParam(value = &quot;limit&quot;, required = false) Integer limit) {
+<span class="nc" id="L119">        LOGGER.info(String.format(&quot;List weighting factors&quot;));</span>
+
+        List&lt;WeightingFactor&gt; list;
+<span class="nc bnc" id="L122" title="All 2 branches missed.">        if (limit == null) {</span>
+<span class="nc" id="L123">            list = wfactorRepo.findAll();</span>
+        } else {
+<span class="nc bnc" id="L125" title="All 2 branches missed.">            Pageable pageable = new PageRequest(page == null ? 0 : page, limit);</span>
+<span class="nc" id="L126">            list = wfactorRepo.findPage(pageable);</span>
+        }
+<span class="nc" id="L128">        LOGGER.info(String.format(&quot;Found %1$s carbon factors&quot;, list.size()));</span>
+
+<span class="nc" id="L130">        return list;</span>
+    }
+
+    /**
+     * Create a new weighting factor.
+     *
+     * @return
+     */
+    @SuppressWarnings({ &quot;rawtypes&quot;, &quot;unchecked&quot; })
+    @ResponseStatus(value = HttpStatus.CREATED)
+    @RequestMapping(value = &quot;/&quot;, method = RequestMethod.POST)
+    public @ResponseBody ResponseEntity&lt;?&gt; create(
+            @RequestBody WeightingFactor factor) {
+
+<span class="nc" id="L144">        createInternal(factor);</span>
+
+<span class="nc" id="L146">        UriComponentsBuilder builder = MvcUriComponentsBuilder</span>
+<span class="nc" id="L147">                .fromController(getClass());</span>
+<span class="nc" id="L148">        HashMap&lt;String, String&gt; vars = new HashMap&lt;String, String&gt;();</span>
+<span class="nc" id="L149">        vars.put(&quot;id&quot;, factor.id().toString());</span>
+
+<span class="nc" id="L151">        HttpHeaders headers = new HttpHeaders();</span>
+<span class="nc" id="L152">        headers.setLocation(builder.path(&quot;/{id}&quot;).buildAndExpand(vars).toUri());</span>
+<span class="nc" id="L153">        return new ResponseEntity(headers, HttpStatus.CREATED);</span>
+    }
+
+    protected void createInternal(WeightingFactor factor) {
+<span class="fc" id="L157">        factor.created(new Date());</span>
+<span class="fc" id="L158">        factor = wfactorRepo.save(factor);</span>
+<span class="fc" id="L159">    }</span>
+
+    /**
+     * Update an existing cfactor.
+     */
+    @ResponseStatus(value = HttpStatus.NO_CONTENT)
+    @RequestMapping(value = &quot;/{id}&quot;, method = RequestMethod.PUT, consumes = { &quot;application/json&quot; })
+    @Transactional
+    public @ResponseBody void update(
+            @PathVariable(&quot;id&quot;) Long cfactorId,
+            @RequestBody WeightingFactor updatedWeightingFactor) {
+//        WeightingFactor cfactor = cfactorRepo.findOne(cfactorId);
+//
+//        NullAwareBeanUtils.copyNonNullProperties(updatedOrder, cfactor, &quot;id&quot;);
+
+<span class="nc" id="L174">        wfactorRepo.save(updatedWeightingFactor);</span>
+<span class="nc" id="L175">    }</span>
+
+
+    /**
+     * Delete an existing cfactor.
+     */
+    @ResponseStatus(value = HttpStatus.NO_CONTENT)
+    @RequestMapping(value = &quot;/{id}&quot;, method = RequestMethod.DELETE)
+    @Transactional
+    public @ResponseBody void delete(@PathVariable(&quot;id&quot;) Long cfactorId) {
+<span class="nc" id="L185">        wfactorRepo.delete(cfactorId);</span>
+<span class="nc" id="L186">    }</span>
+
+    private WeightingFactor addLinks(WeightingFactor cfactor) {
+<span class="nc" id="L189">        List&lt;Link&gt; links = new ArrayList&lt;Link&gt;();</span>
+<span class="nc" id="L190">        links.add(new Link(getClass().getAnnotation(RequestMapping.class).value()[0] + &quot;/&quot; + cfactor.id()));</span>
+
+<span class="nc" id="L192">        return cfactor.links(links);</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.2.201808211720</span></div></body></html>

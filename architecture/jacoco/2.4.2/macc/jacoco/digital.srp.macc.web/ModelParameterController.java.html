@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ModelParameterController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Marginal Abatement Cost Curves</a> &gt; <a href="index.source.html" class="el_package">digital.srp.macc.web</a> &gt; <span class="el_source">ModelParameterController.java</span></div><h1>ModelParameterController.java</h1><pre class="source lang-java linenums">/*******************************************************************************
+ * Copyright 2015, 2017 Tim Stephenson and contributors
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *******************************************************************************/
+package digital.srp.macc.web;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.hateoas.Link;
+import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
+
+import com.fasterxml.jackson.annotation.JsonView;
+
+import digital.srp.macc.model.ModelParameter;
+import digital.srp.macc.repositories.ModelParameterRepository;
+import digital.srp.macc.views.ModelParameterViews;
+
+/**
+ * REST endpoint for accessing {@link ModelParameter}
+ *
+ * @author Tim Stephenson
+ */
+@Controller
+@RequestMapping(value = &quot;/{tenantId}/parameters&quot;)
+<span class="nc" id="L51">public class ModelParameterController {</span>
+
+<span class="nc" id="L53">    private static final Logger LOGGER = LoggerFactory</span>
+<span class="nc" id="L54">            .getLogger(ModelParameterController.class);</span>
+
+    @Autowired
+    private ModelParameterRepository modelParamRepo;
+
+    /**
+     * Return just the messages for a specific tenant.
+     *
+     * @return messages for that tenant.
+     */
+    @RequestMapping(value = &quot;/&quot;, method = RequestMethod.GET)
+    @JsonView(ModelParameterViews.Summary.class)
+    public @ResponseBody List&lt;ModelParameter&gt; listForTenant(
+            @PathVariable(&quot;tenantId&quot;) String tenantId,
+            @RequestParam(value = &quot;page&quot;, required = false) Integer page,
+            @RequestParam(value = &quot;limit&quot;, required = false) Integer limit) {
+<span class="nc" id="L70">        LOGGER.info(String.format(&quot;List messages for tenant %1$s&quot;, tenantId));</span>
+
+        List&lt;ModelParameter&gt; list;
+<span class="nc bnc" id="L73" title="All 2 branches missed.">        if (limit == null) {</span>
+<span class="nc" id="L74">            list = modelParamRepo.findAllForTenant(tenantId);</span>
+        } else {
+<span class="nc bnc" id="L76" title="All 2 branches missed.">            Pageable pageable = new PageRequest(page == null ? 0 : page, limit);</span>
+<span class="nc" id="L77">            list = modelParamRepo.findPageForTenant(tenantId, pageable);</span>
+        }
+<span class="nc" id="L79">        LOGGER.info(String.format(&quot;Found %1$s messages&quot;, list.size()));</span>
+
+<span class="nc" id="L81">        return addLinks(list);</span>
+    }
+
+    /**
+     * @return The specified parameter.
+     */
+    @RequestMapping(value = &quot;/{idOrName}&quot;, method = RequestMethod.GET)
+    @JsonView(ModelParameterViews.Detailed.class)
+    public @ResponseBody ModelParameter findById(
+            @PathVariable(&quot;idOrName&quot;) String param) {
+<span class="nc" id="L91">        LOGGER.info(String.format(&quot;findById %1$s&quot;, param));</span>
+
+
+        ModelParameter parameter;
+        try {
+<span class="nc" id="L96">            parameter = modelParamRepo.findOne(Long.parseLong(param));</span>
+<span class="nc" id="L97">        } catch (NumberFormatException e) {</span>
+<span class="nc" id="L98">            parameter = modelParamRepo.findByName(param);</span>
+<span class="nc" id="L99">        }</span>
+
+<span class="nc" id="L101">        return addLinks(parameter);</span>
+    }
+
+    /**
+     * Export all contacts for the tenant.
+     *
+     * @return contacts for that tenant.
+     */
+    @RequestMapping(value = &quot;/&quot;, method = RequestMethod.GET, produces = &quot;text/csv&quot;)
+    public @ResponseBody List&lt;ModelParameter&gt; exportAsCsv(
+            @PathVariable(&quot;tenantId&quot;) String tenantId,
+            @RequestParam(value = &quot;page&quot;, required = false) Integer page,
+            @RequestParam(value = &quot;limit&quot;, required = false) Integer limit) {
+<span class="nc" id="L114">        LOGGER.info(String.format(&quot;Export messages for tenant %1$s&quot;, tenantId));</span>
+
+        List&lt;ModelParameter&gt; list;
+<span class="nc bnc" id="L117" title="All 2 branches missed.">        if (limit == null) {</span>
+<span class="nc" id="L118">            list = modelParamRepo.findAllForTenant(tenantId);</span>
+        } else {
+<span class="nc bnc" id="L120" title="All 2 branches missed.">            Pageable pageable = new PageRequest(page == null ? 0 : page, limit);</span>
+<span class="nc" id="L121">            list = modelParamRepo.findPageForTenant(tenantId, pageable);</span>
+        }
+<span class="nc" id="L123">        LOGGER.info(String.format(&quot;Found %1$s messages&quot;, list.size()));</span>
+
+<span class="nc" id="L125">        return list;</span>
+    }
+
+    /**
+     * Update an existing parameter.
+     */
+    @ResponseStatus(value = HttpStatus.NO_CONTENT)
+    @RequestMapping(value = &quot;/{id}&quot;, method = RequestMethod.PUT, consumes = { &quot;application/json&quot; })
+    public @ResponseBody void update(@PathVariable(&quot;tenantId&quot;) String tenantId,
+            @PathVariable(&quot;id&quot;) Long paramId,
+            @RequestBody ModelParameter updatedParam) {
+<span class="nc" id="L136">        ModelParameter param = modelParamRepo.findOne(paramId);</span>
+
+<span class="nc" id="L138">        BeanUtils.copyProperties(updatedParam, param, &quot;id&quot;, &quot;valueAsBigDecimal&quot;);</span>
+<span class="nc" id="L139">        param.setTenantId(tenantId);</span>
+<span class="nc" id="L140">        modelParamRepo.save(param);</span>
+<span class="nc" id="L141">    }</span>
+
+    private List&lt;ModelParameter&gt; addLinks(List&lt;ModelParameter&gt; params) {
+<span class="nc bnc" id="L144" title="All 2 branches missed.">        for (ModelParameter param : params) {</span>
+<span class="nc" id="L145">            addLinks(param);</span>
+<span class="nc" id="L146">        }</span>
+<span class="nc" id="L147">        return params;</span>
+    }
+
+    private ModelParameter addLinks(ModelParameter modelParameter) {
+<span class="nc" id="L151">        List&lt;Link&gt; links = new ArrayList&lt;Link&gt;();</span>
+<span class="nc" id="L152">        links.add(new Link(String.format(&quot;/%1$s/parameters/%2$d&quot;, modelParameter.getTenantId(), modelParameter.getId())));</span>
+
+<span class="nc" id="L154">        modelParameter.setLinks(links);</span>
+<span class="nc" id="L155">        return modelParameter;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.2.201808211720</span></div></body></html>

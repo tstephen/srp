@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ModelParameter.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Marginal Abatement Cost Curves</a> &gt; <a href="index.source.html" class="el_package">digital.srp.macc.model</a> &gt; <span class="el_source">ModelParameter.java</span></div><h1>ModelParameter.java</h1><pre class="source lang-java linenums">/*******************************************************************************
+ * Copyright 2015, 2017 Tim Stephenson and contributors
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *******************************************************************************/
+package digital.srp.macc.model;
+
+import java.math.BigDecimal;
+import java.util.List;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Lob;
+import javax.persistence.Table;
+import javax.persistence.Transient;
+import javax.validation.constraints.Size;
+import javax.xml.bind.annotation.XmlElement;
+
+import org.springframework.hateoas.Link;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonView;
+
+import digital.srp.macc.views.ModelParameterViews;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+/**
+ * An action or related set of actions aimed at providing Carbon Abatement or
+ * other sustainability benefit.
+ *
+ * @author Tim Stephenson
+ */
+<span class="pc bnc" id="L48" title="All 62 branches missed.">@Data</span>
+@Entity
+@Table(name = &quot;TR_MODEL_PARAM&quot;)
+<span class="nc" id="L51">@NoArgsConstructor</span>
+<span class="nc" id="L52">@AllArgsConstructor</span>
+public class ModelParameter {
+
+    @Id
+    @Column(name = &quot;id&quot;)
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    @JsonProperty
+    @JsonView({ ModelParameterViews.Summary.class })
+<span class="fc" id="L60">    private Long id;</span>
+
+    @JsonProperty
+    @JsonView({ ModelParameterViews.Summary.class })
+    @Column(name = &quot;name&quot;)
+<span class="fc" id="L65">    private String name;</span>
+
+    @JsonProperty
+    @JsonView({ ModelParameterViews.Detailed.class })
+    @Column(name = &quot;description&quot;)
+<span class="fc" id="L70">    private String description;</span>
+
+    @JsonProperty
+    @JsonView({ ModelParameterViews.Summary.class })
+    @Size(max = 50)
+    @Column(name = &quot;value&quot;)
+<span class="fc" id="L76">    private String value;</span>
+
+    @JsonProperty
+    @JsonView({ ModelParameterViews.Detailed.class })
+    @Column(name = &quot;valuets&quot;)
+    @Lob
+<span class="fc" id="L82">    private String valueTS;</span>
+
+    @JsonProperty
+    @JsonView({ ModelParameterViews.Summary.class })
+    @Column(name = &quot;tenant_id&quot;)
+<span class="fc" id="L87">    private String tenantId;</span>
+
+    @Transient
+    @XmlElement(name = &quot;link&quot;, namespace = Link.ATOM_NAMESPACE)
+    @JsonProperty(&quot;links&quot;)
+    @JsonView({ ModelParameterViews.Summary.class })
+<span class="fc" id="L93">    private List&lt;Link&gt; links;</span>
+
+    public ModelParameter(String name, String valueTS) {
+<span class="fc" id="L96">        super();</span>
+<span class="fc" id="L97">        this.name = name;</span>
+<span class="fc" id="L98">        this.valueTS = valueTS;</span>
+<span class="fc" id="L99">    }</span>
+
+    public ModelParameter(String name, BigDecimal value) {
+<span class="fc" id="L102">        super();</span>
+<span class="fc" id="L103">        this.name = name;</span>
+<span class="fc" id="L104">        this.value = value.toPlainString();</span>
+<span class="fc" id="L105">    }</span>
+
+    @JsonProperty
+    @Transient
+    public BigDecimal getValueAsBigDecimal() {
+<span class="pc bpc" id="L110" title="1 of 2 branches missed.">        return value == null ? null : new BigDecimal(value);</span>
+    }
+
+    @JsonProperty
+    @Transient
+    public void setValueAsBigDecimal(BigDecimal value) {
+<span class="nc bnc" id="L116" title="All 2 branches missed.">        this.value = value == null ? null : value.toPlainString();</span>
+<span class="nc" id="L117">    }</span>
+
+    @JsonProperty
+    @Transient
+    public List&lt;BigDecimal&gt; getValueTimeSeries() {
+<span class="fc" id="L122">        return new TimeSeries(valueTS).asList();</span>
+    }
+
+    @JsonProperty
+    @Transient
+    public void setValueTimeSeries(List&lt;BigDecimal&gt; values) {
+<span class="nc" id="L128">        valueTS = TimeSeries.asString(values);</span>
+<span class="nc" id="L129">    }</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.2.201808211720</span></div></body></html>

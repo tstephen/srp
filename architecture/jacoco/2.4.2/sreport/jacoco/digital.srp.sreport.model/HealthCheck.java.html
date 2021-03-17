@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>HealthCheck.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Sustainability Reporting</a> &gt; <a href="index.source.html" class="el_package">digital.srp.sreport.model</a> &gt; <span class="el_source">HealthCheck.java</span></div><h1>HealthCheck.java</h1><pre class="source lang-java linenums">package digital.srp.sreport.model;
+
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+import javax.persistence.Column;
+import javax.persistence.Transient;
+import javax.validation.ConstraintViolation;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
+import javax.xml.bind.annotation.XmlElement;
+
+import org.springframework.data.annotation.CreatedBy;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.hateoas.Link;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonView;
+
+import digital.srp.sreport.model.views.HealthCheckViews;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
+
+/**
+ * Health status of a single organisation's return for a single period.
+ *
+ * @author Tim Stephenson
+ */
+@Accessors(fluent=true, chain = true)
+<span class="nc bnc" id="L35" title="All 112 branches missed.">@Data</span>
+//@ToString(exclude = { &quot;survey&quot; })
+//@EqualsAndHashCode(exclude = { &quot;id&quot;, &quot;survey&quot;, &quot;revision&quot;, &quot;created&quot;, &quot;createdBy&quot;, &quot;lastUpdated&quot;, &quot;updatedBy&quot; })
+<span class="nc" id="L38">@NoArgsConstructor</span>
+public class HealthCheck {
+
+    @NotNull
+    @Size(max = 50)
+    @JsonProperty
+    @JsonView(HealthCheckViews.Summary.class)
+<span class="nc" id="L45">    private String name;</span>
+
+    /**
+     * Commonly this will be a unique organisation identifier maintained in
+     * another system, though it could simply be a friendly name too.
+     */
+    @NotNull
+    @Size(max = 50)
+    @JsonProperty
+    @JsonView(HealthCheckViews.Summary.class)
+<span class="nc" id="L55">    private String org;</span>
+
+<span class="nc" id="L57">    @NotNull</span>
+    @Size(max = 50)
+    @JsonProperty
+    @JsonView(HealthCheckViews.Summary.class)
+<span class="nc" id="L61">    private String status = StatusType.Draft.name();</span>
+
+    /**
+     * Period this set of responses apply to.
+     *
+     * &lt;p&gt;For example: calendar or financial year, quarter etc.
+     */
+    @NotNull
+    @JsonProperty
+    @Size(max = 20)
+    @JsonView(HealthCheckViews.Summary.class)
+<span class="nc" id="L72">    private String applicablePeriod;</span>
+
+    /**
+     * Typically there will be one revision of a survey submitted but this
+     * allows for a re-statement if needed.
+     */
+<span class="nc" id="L78">    @JsonProperty</span>
+    @JsonView(HealthCheckViews.Summary.class)
+<span class="nc" id="L80">    private Short revision = 1;</span>
+
+    @JsonProperty
+<span class="nc" id="L83">    private Date submittedDate;</span>
+
+    /**
+     * Username of submitter.
+     */
+    @JsonProperty
+<span class="nc" id="L89">    private String submittedBy;</span>
+
+    @Transient
+    @XmlElement(name = &quot;link&quot;, namespace = Link.ATOM_NAMESPACE)
+    @JsonProperty(&quot;links&quot;)
+<span class="nc" id="L94">    private List&lt;Link&gt; links;</span>
+
+    @JsonProperty
+    @CreatedDate
+<span class="nc" id="L98">    private Date created;</span>
+
+    @JsonProperty
+    @Column(name = &quot;created_by&quot;)
+    @CreatedBy
+<span class="nc" id="L103">    private String createdBy;</span>
+
+    @JsonProperty
+    @LastModifiedDate
+<span class="nc" id="L107">    private Date lastUpdated;</span>
+
+    @JsonProperty
+<span class="nc" id="L110">    private String updatedBy;</span>
+
+    @JsonProperty
+    @JsonView(HealthCheckViews.Summary.class)
+<span class="nc" id="L114">    private int answerCount;</span>
+
+    @JsonProperty
+    @JsonView(HealthCheckViews.Detailed.class)
+<span class="nc" id="L118">    private Set&lt;String&gt; issues;</span>
+
+    public HealthCheck(SurveyReturn rtn) {
+<span class="nc" id="L121">        this();</span>
+<span class="nc" id="L122">        this.name = rtn.name();</span>
+<span class="nc" id="L123">        this.org = rtn.org();</span>
+<span class="nc" id="L124">        this.status = rtn.status();</span>
+<span class="nc" id="L125">        this.applicablePeriod = rtn.applicablePeriod();</span>
+<span class="nc" id="L126">        this.revision = rtn.revision();</span>
+<span class="nc" id="L127">        this.answerCount = rtn.answers().size();</span>
+<span class="nc" id="L128">        this.issues = Collections.emptySet();</span>
+<span class="nc" id="L129">    }</span>
+
+    public HealthCheck(SurveyReturn rtn, Set&lt;ConstraintViolation&lt;SurveyReturn&gt;&gt; violations) {
+<span class="nc" id="L132">        this(rtn);</span>
+<span class="nc" id="L133">        HashSet&lt;String&gt; issues = new HashSet&lt;String&gt;();</span>
+<span class="nc bnc" id="L134" title="All 2 branches missed.">        for (ConstraintViolation&lt;SurveyReturn&gt; cv : violations) {</span>
+<span class="nc" id="L135">            issues.add(cv.getMessage());</span>
+<span class="nc" id="L136">        }</span>
+<span class="nc" id="L137">        this.issues = issues;</span>
+<span class="nc" id="L138">    }</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.2.201808211720</span></div></body></html>

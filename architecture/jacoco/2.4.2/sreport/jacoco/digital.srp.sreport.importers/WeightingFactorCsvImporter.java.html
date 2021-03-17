@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>WeightingFactorCsvImporter.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Sustainability Reporting</a> &gt; <a href="index.source.html" class="el_package">digital.srp.sreport.importers</a> &gt; <span class="el_source">WeightingFactorCsvImporter.java</span></div><h1>WeightingFactorCsvImporter.java</h1><pre class="source lang-java linenums">package digital.srp.sreport.importers;
+
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVParser;
+import org.apache.commons.csv.CSVRecord;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import digital.srp.sreport.model.WeightingFactor;
+import digital.srp.sreport.model.WeightingFactors;
+
+<span class="fc" id="L20">public class WeightingFactorCsvImporter {</span>
+
+<span class="fc" id="L22">    private static final Logger LOGGER = LoggerFactory</span>
+<span class="fc" id="L23">            .getLogger(WeightingFactorCsvImporter.class);</span>
+
+    public static final String DATA = &quot;/data/WeightingFactors.csv&quot;;
+<span class="fc" id="L26">    public static final String[] HEADERS = { &quot;category&quot;,</span>
+            &quot;acute_c&quot;, &quot;ambulance_c&quot;, &quot;care_c&quot;, &quot;clinical_commissioning_group_c&quot;,
+            &quot;community_c&quot;, &quot;mental_health_learning_disability_c&quot;, &quot;social_enterprise_c&quot;,
+            &quot;acute_m&quot;, &quot;ambulance_m&quot;, &quot;care_m&quot;, &quot;clinical_commissioning_group_m&quot;,
+            &quot;community_m&quot;, &quot;mental_health_learning_disability_m&quot;, &quot;social_enterprise_m&quot;,
+            &quot;acute_p&quot;, &quot;ambulance_p&quot;, &quot;care_p&quot;, &quot;clinical_commissioning_group_p&quot;,
+            &quot;community_p&quot;, &quot;mental_health_learning_disability_p&quot;, &quot;social_enterprise_p&quot;};
+
+    public static final int NO_ORG_TYPES = 7;
+
+    public List&lt;WeightingFactor&gt; readWeightingFactors()
+            throws IOException {
+<span class="fc" id="L38">        try (InputStreamReader isr = new InputStreamReader(</span>
+<span class="fc" id="L39">                getClass().getResourceAsStream(DATA))) {</span>
+<span class="fc" id="L40">            return readWeightingFactors(isr, HEADERS);</span>
+        }
+    }
+
+    public List&lt;WeightingFactor&gt; readWeightingFactors(Reader in, String[] headers)
+            throws IOException {
+<span class="fc" id="L46">        final CSVParser parser = new CSVParser(in,</span>
+<span class="fc" id="L47">                CSVFormat.EXCEL.withHeader(headers));</span>
+<span class="fc" id="L48">        LOGGER.info(String.format(&quot;readWeightingFactors&quot;));</span>
+
+<span class="fc" id="L50">        List&lt;WeightingFactor&gt; wfactors = new ArrayList&lt;WeightingFactor&gt;();</span>
+
+<span class="fc" id="L52">        Iterable&lt;CSVRecord&gt; records = parser.getRecords();</span>
+
+<span class="fc bfc" id="L54" title="All 2 branches covered.">        for (CSVRecord record : records) {</span>
+<span class="fc" id="L55">            LOGGER.info(String.format(&quot;importing record %1$d&quot;, record.getRecordNumber()));</span>
+<span class="fc bfc" id="L56" title="All 2 branches covered.">            if (record.getRecordNumber() &gt; 2) { // skip headers</span>
+                try {
+<span class="fc" id="L58">                    wfactors.add(newWeightingFactor(record, 1));</span>
+<span class="fc" id="L59">                    wfactors.add(newWeightingFactor(record, 2));</span>
+<span class="fc" id="L60">                    wfactors.add(newWeightingFactor(record, 3));</span>
+<span class="fc" id="L61">                    wfactors.add(newWeightingFactor(record, 4));</span>
+<span class="fc" id="L62">                    wfactors.add(newWeightingFactor(record, 5));</span>
+<span class="fc" id="L63">                    wfactors.add(newWeightingFactor(record, 6));</span>
+<span class="fc" id="L64">                    wfactors.add(newWeightingFactor(record, 7));</span>
+<span class="nc" id="L65">                } catch (Exception e) {</span>
+<span class="nc" id="L66">                    LOGGER.error(String.format(&quot;Problem with record: %1$d: %2$s&quot;, record.getRecordNumber(), e.getMessage()));</span>
+<span class="fc" id="L67">                }</span>
+            }
+<span class="fc" id="L69">        }</span>
+<span class="fc" id="L70">        parser.close();</span>
+
+<span class="fc" id="L72">        return wfactors;</span>
+    }
+
+    private WeightingFactor newWeightingFactor(CSVRecord record, int idx) {
+<span class="fc" id="L76">        String value = record.get(idx);</span>
+<span class="pc bpc" id="L77" title="1 of 2 branches missed.">        if (value.startsWith(&quot;.&quot;)) {</span>
+<span class="nc" id="L78">            value = &quot;0&quot; + value;</span>
+        }
+<span class="fc" id="L80">        LOGGER.debug(&quot;value: {}&quot;, value);</span>
+
+<span class="fc" id="L82">        String category = record.get(0);</span>
+<span class="pc bpc" id="L83" title="1 of 27 branches missed.">        switch(category) {</span>
+        case &quot;Energy&quot;:
+<span class="fc" id="L85">            category = WeightingFactors.ENERGY.name();</span>
+<span class="fc" id="L86">            break;</span>
+        case &quot;Gas&quot;:
+<span class="fc" id="L88">            category = WeightingFactors.GAS.name();</span>
+<span class="fc" id="L89">            break;</span>
+        case &quot;Electricity&quot;:
+<span class="fc" id="L91">            category = WeightingFactors.ELEC.name();</span>
+<span class="fc" id="L92">            break;</span>
+        case &quot;Oil&quot;:
+<span class="fc" id="L94">            category = WeightingFactors.OIL.name();</span>
+<span class="fc" id="L95">            break;</span>
+        case &quot;Coal&quot;:
+<span class="fc" id="L97">            category = WeightingFactors.COAL.name();</span>
+<span class="fc" id="L98">            break;</span>
+        case &quot;Business services&quot;:
+<span class="fc" id="L100">            category = WeightingFactors.BIZ_SVCS.name();</span>
+<span class="fc" id="L101">            break;</span>
+        case &quot;Capital spend&quot;:
+<span class="fc" id="L103">            category = WeightingFactors.CAPITAL.name();</span>
+<span class="fc" id="L104">            break;</span>
+        case &quot;Construction&quot;:
+<span class="fc" id="L106">            category = WeightingFactors.CONSTRUCTION.name();</span>
+<span class="fc" id="L107">            break;</span>
+        case &quot;Food and catering&quot;:
+<span class="fc" id="L109">            category = WeightingFactors.CATERING.name();</span>
+<span class="fc" id="L110">            break;</span>
+        case &quot;Freight transport&quot;:
+<span class="fc" id="L112">            category = WeightingFactors.FREIGHT.name();</span>
+<span class="fc" id="L113">            break;</span>
+        case &quot;Information and communication technologies&quot;:
+<span class="fc" id="L115">            category = WeightingFactors.ICT.name();</span>
+<span class="fc" id="L116">            break;</span>
+        case &quot;Manufactured fuels chemicals and gases&quot;:
+<span class="fc" id="L118">            category = WeightingFactors.FUEL_CHEM_AND_GASES.name();</span>
+<span class="fc" id="L119">            break;</span>
+        case &quot;Medical Instruments /equipment&quot;:
+<span class="fc" id="L121">            category = WeightingFactors.MED_INSTRUMENTS.name();</span>
+<span class="fc" id="L122">            break;</span>
+        case &quot;Other manufactured products&quot;:
+<span class="fc" id="L124">            category = WeightingFactors.OTHER_MANUFACTURING.name();</span>
+<span class="fc" id="L125">            break;</span>
+        case &quot;Other procurement&quot;:
+<span class="fc" id="L127">            category = WeightingFactors.OTHER_PROCURMENT.name();</span>
+<span class="fc" id="L128">            break;</span>
+        case &quot;Non-pay op ex portion&quot;:
+<span class="fc" id="L130">            category = WeightingFactors.NON_PAY_OP_EX_PORTION.name();</span>
+<span class="fc" id="L131">            break;</span>
+        case &quot;Paper products&quot;:
+<span class="fc" id="L133">            category = WeightingFactors.PAPER.name();</span>
+<span class="fc" id="L134">            break;</span>
+        case &quot;Pharmaceuticals&quot;:
+<span class="fc" id="L136">            category = WeightingFactors.PHARMA.name();</span>
+<span class="fc" id="L137">            break;</span>
+        case &quot;Waste products and recycling&quot;:
+<span class="fc" id="L139">            category = WeightingFactors.WASTE.name();</span>
+<span class="fc" id="L140">            break;</span>
+        case &quot;Water and sanitation&quot;:
+<span class="fc" id="L142">            category = WeightingFactors.WATER.name();</span>
+<span class="fc" id="L143">            break;</span>
+        case &quot;Anaesthetic gases&quot;:
+<span class="fc" id="L145">            category = WeightingFactors.ANAESTHETIC_GASES.name();</span>
+<span class="fc" id="L146">            break;</span>
+        case &quot;Patient Travel&quot;:
+<span class="fc" id="L148">            category = WeightingFactors.PATIENT_TRAVEL.name();</span>
+<span class="fc" id="L149">            break;</span>
+        case &quot;Visitor Travel&quot;:
+<span class="fc" id="L151">            category = WeightingFactors.VISITOR_TRAVEL.name();</span>
+<span class="fc" id="L152">            break;</span>
+        case &quot;Staff Travel&quot;:
+<span class="fc" id="L154">            category = WeightingFactors.STAFF_TRAVEL.name();</span>
+<span class="fc" id="L155">            break;</span>
+        case &quot;Business Travel and fleet&quot;:
+<span class="fc" id="L157">            category = WeightingFactors.BIZ_TRAVEL.name();</span>
+<span class="fc" id="L158">            break;</span>
+        case &quot;Commissioned health and social care services&quot;:
+<span class="fc" id="L160">            category = WeightingFactors.COMMISSIONING.name();</span>
+<span class="fc" id="L161">            break;</span>
+        default:
+<span class="nc" id="L163">            LOGGER.error(&quot;No conversion for category {}&quot;, category);</span>
+        }
+
+<span class="fc" id="L166">        WeightingFactor factor = new WeightingFactor()</span>
+<span class="fc" id="L167">                .category(category)</span>
+<span class="fc" id="L168">                .applicablePeriod(&quot;2014-15&quot;)</span>
+<span class="fc" id="L169">                .orgType(HEADERS[idx].substring(0, 1).toUpperCase()+HEADERS[idx].substring(1, HEADERS[idx].length()-2).replace('_', ' '))</span>
+<span class="fc" id="L170">                .carbonValue(new BigDecimal(record.get(idx).trim()).setScale(0, RoundingMode.HALF_UP))</span>
+<span class="fc" id="L171">                .moneyValue(new BigDecimal(record.get(idx+NO_ORG_TYPES).trim()).multiply(new BigDecimal(&quot;1000&quot;)).setScale(0, RoundingMode.HALF_UP))</span>
+<span class="fc" id="L172">                .proportionOfTotal(new BigDecimal(record.get(idx+(NO_ORG_TYPES*2)).trim()).setScale(3, RoundingMode.HALF_UP));</span>
+
+<span class="fc" id="L174">        return factor;</span>
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.2.201808211720</span></div></body></html>

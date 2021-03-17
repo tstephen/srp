@@ -1,0 +1,314 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>AnswerController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Sustainability Reporting</a> &gt; <a href="index.source.html" class="el_package">digital.srp.sreport.web</a> &gt; <span class="el_source">AnswerController.java</span></div><h1>AnswerController.java</h1><pre class="source lang-java linenums">package digital.srp.sreport.web;
+
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+
+import javax.persistence.EntityManager;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Join;
+import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Root;
+import javax.transaction.Transactional;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.hateoas.Link;
+import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
+
+import com.fasterxml.jackson.annotation.JsonView;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import digital.srp.sreport.api.exceptions.ResultSetTooLargeException;
+import digital.srp.sreport.model.Answer;
+import digital.srp.sreport.model.Criterion;
+import digital.srp.sreport.model.Q;
+import digital.srp.sreport.model.Question;
+import digital.srp.sreport.model.SurveyCategory;
+import digital.srp.sreport.model.SurveyReturn;
+import digital.srp.sreport.model.views.AnswerViews;
+import digital.srp.sreport.repositories.AnswerRepository;
+import digital.srp.sreport.repositories.QuestionRepository;
+import digital.srp.sreport.repositories.SurveyCategoryRepository;
+import digital.srp.sreport.repositories.SurveyReturnRepository;
+
+/**
+ * REST web service for accessing answers.
+ *
+ * @author Tim Stephenson
+ */
+@Controller
+@RequestMapping(value = &quot;/answers&quot;)
+<span class="fc" id="L55">public class AnswerController {</span>
+
+<span class="fc" id="L57">    private static final Logger LOGGER = LoggerFactory</span>
+<span class="fc" id="L58">            .getLogger(AnswerController.class);</span>
+
+    @Autowired
+    protected EntityManager entityManager;
+
+    @Autowired
+    protected ObjectMapper objectMapper;
+
+    @Autowired
+    protected AnswerRepository answerRepo;
+
+    @Autowired
+    protected QuestionRepository qRepo;
+
+    @Autowired
+    protected SurveyReturnRepository rtnRepo;
+
+    @Autowired
+    protected SurveyCategoryRepository catRepo;
+
+    @Value(&quot;${srp.reporting.maxRows:5000}&quot;)
+    private int maxAnswers;
+
+    /**
+     * Return just the specified answer.
+     *
+     * @return The specified answer.
+     */
+    @RequestMapping(value = &quot;/{id}&quot;, method = RequestMethod.GET)
+    @JsonView(AnswerViews.Detailed.class)
+    @Transactional
+    public @ResponseBody Answer findById(
+            @PathVariable(&quot;id&quot;) Long answerId) {
+<span class="nc" id="L91">        LOGGER.info(String.format(&quot;findById %1$s&quot;, answerId));</span>
+
+<span class="nc" id="L93">        Answer answer = answerRepo.findOne(answerId);</span>
+
+<span class="nc" id="L95">        return addLinks(answer);</span>
+    }
+
+    // TODO remove or require paging
+    /**
+     * Return a list of answers, optionally paged.
+     *
+     * @return answers.
+     */
+    @RequestMapping(value = &quot;/&quot;, method = RequestMethod.GET)
+    @JsonView(AnswerViews.Summary.class)
+    public @ResponseBody List&lt;Answer&gt; list(
+            @RequestParam(value = &quot;page&quot;, required = false) Integer page,
+            @RequestParam(value = &quot;limit&quot;, required = false) Integer limit) {
+<span class="nc" id="L109">        LOGGER.info(String.format(&quot;List answers&quot;));</span>
+
+        List&lt;Answer&gt; list;
+<span class="nc bnc" id="L112" title="All 2 branches missed.">        if (limit == null) {</span>
+<span class="nc" id="L113">            list = answerRepo.findAll();</span>
+        } else {
+<span class="nc bnc" id="L115" title="All 2 branches missed.">            Pageable pageable = new PageRequest(page == null ? 0 : page, limit);</span>
+<span class="nc" id="L116">            list = answerRepo.findPage(pageable);</span>
+        }
+<span class="nc" id="L118">        LOGGER.info(String.format(&quot;Found %1$s answers&quot;, list.size()));</span>
+
+<span class="nc" id="L120">        addQuestionCategory(list);</span>
+<span class="nc" id="L121">        return list;</span>
+    }
+
+    private void addQuestionCategory(List&lt;Answer&gt; list) {
+<span class="nc" id="L125">        List&lt;SurveyCategory&gt; categories = catRepo.findAll();</span>
+<span class="nc bnc" id="L126" title="All 2 branches missed.">        for (Answer answer : list) {</span>
+<span class="nc" id="L127">            answer.question().categories(new ArrayList&lt;String&gt;());</span>
+<span class="nc bnc" id="L128" title="All 2 branches missed.">            for (SurveyCategory cat : categories) {</span>
+<span class="nc" id="L129">                LOGGER.debug(&quot;Does {} contain {}?&quot;, cat.name(), answer.question().name());</span>
+<span class="nc bnc" id="L130" title="All 2 branches missed.">                if (cat.questionEnums().contains(answer.question().q())) {</span>
+<span class="nc" id="L131">                    answer.question().categories().add(cat.name());</span>
+                }
+<span class="nc" id="L133">            }</span>
+<span class="nc bnc" id="L134" title="All 2 branches missed.">            if (answer.question().categories().size() == 0) {</span>
+<span class="nc" id="L135">                answer.question().categories().add(&quot;Unspecified&quot;);</span>
+            }
+<span class="nc" id="L137">        }</span>
+<span class="nc" id="L138">    }</span>
+
+    @RequestMapping(value = &quot;/findByCriteria&quot;, method = RequestMethod.POST)
+    @JsonView(AnswerViews.Detailed.class)
+    public @ResponseBody List&lt;Answer&gt; findByCriteria(
+            @RequestBody List&lt;Criterion&gt; criteria,
+            @RequestParam(value = &quot;page&quot;, required = false) Integer page,
+            @RequestParam(value = &quot;limit&quot;, required = false) Integer limit)
+    throws Exception {
+<span class="nc" id="L147">        LOGGER.info(&quot;List answers by criteria {}&quot;, criteria);</span>
+
+<span class="nc" id="L149">        CriteriaBuilder builder = entityManager.getCriteriaBuilder();</span>
+<span class="nc" id="L150">        CriteriaQuery&lt;Answer&gt; cq = builder.createQuery(Answer.class);</span>
+<span class="nc" id="L151">        Root&lt;Answer&gt; answer = cq.from(Answer.class);</span>
+<span class="nc" id="L152">        Join&lt;Answer, Question&gt; questions = answer.join(&quot;question&quot;);</span>
+<span class="nc" id="L153">        Join&lt;Answer, SurveyReturn&gt; surveyReturns = answer.join(&quot;surveyReturns&quot;);</span>
+
+<span class="nc" id="L155">        Predicate predicate = builder.conjunction();</span>
+
+<span class="nc bnc" id="L157" title="All 2 branches missed.">        for (Criterion criterion : criteria) {</span>
+<span class="nc bnc" id="L158" title="All 7 branches missed.">            switch (criterion.getField()) {</span>
+            case &quot;category&quot;:
+<span class="nc" id="L160">                SurveyCategory category = catRepo.findByName(</span>
+<span class="nc" id="L161">                        criterion.getValue());</span>
+
+<span class="nc" id="L163">                predicate = builder.and(</span>
+                        predicate,
+<span class="nc" id="L165">                        questions.get(&quot;name&quot;).in(</span>
+<span class="nc" id="L166">                                    ((Object[]) category.questionNames().split(&quot;,&quot;))));</span>
+<span class="nc" id="L167">                break;</span>
+            case &quot;org&quot;:
+            case &quot;organisation&quot;:
+<span class="nc" id="L170">                predicate = builder.and(</span>
+                        predicate,
+<span class="nc" id="L172">                        builder.equal(</span>
+<span class="nc" id="L173">                                surveyReturns.get(&quot;org&quot;),</span>
+<span class="nc" id="L174">                                criterion.getValue().toString()));</span>
+<span class="nc" id="L175">                break;</span>
+            case &quot;orgType&quot;:
+            case &quot;organisation type&quot;:
+<span class="nc" id="L178">                predicate = builder.and(</span>
+                        predicate,
+<span class="nc" id="L180">                        surveyReturns.get(&quot;org&quot;)</span>
+<span class="nc" id="L181">                                .in(getOrgsMatching(Q.ORG_TYPE).toArray()));</span>
+<span class="nc" id="L182">                break;</span>
+            case &quot;period&quot;:
+<span class="nc" id="L184">                predicate = builder.and(</span>
+                        predicate,
+<span class="nc" id="L186">                        builder.equal(</span>
+<span class="nc" id="L187">                                answer.get(&quot;applicablePeriod&quot;),</span>
+<span class="nc" id="L188">                                criterion.getValue().toString()));</span>
+<span class="nc" id="L189">                break;</span>
+            case &quot;question&quot;:
+<span class="nc" id="L191">                predicate = builder.and(</span>
+                        predicate,
+<span class="nc" id="L193">                        builder.equal(</span>
+<span class="nc" id="L194">                                questions.get(&quot;name&quot;),</span>
+<span class="nc" id="L195">                                criterion.getValue().toString()));</span>
+<span class="nc" id="L196">                break;</span>
+            case &quot;region&quot;:
+<span class="nc" id="L198">                predicate = builder.and(</span>
+                        predicate,
+<span class="nc" id="L200">                        surveyReturns.get(&quot;org&quot;)</span>
+<span class="nc" id="L201">                                .in(getOrgsMatching(Q.COMMISSIONING_REGION).toArray()));</span>
+<span class="nc" id="L202">                break;</span>
+            default:
+                // e.g. status
+<span class="nc" id="L205">                predicate = builder.and(</span>
+                        predicate,
+<span class="nc" id="L207">                        builder.equal(</span>
+<span class="nc" id="L208">                                answer.get(criterion.getField()),</span>
+<span class="nc" id="L209">                                criterion.getValue()));</span>
+            }
+<span class="nc" id="L211">        }</span>
+<span class="nc" id="L212">        cq.where(predicate);</span>
+<span class="nc" id="L213">        LOGGER.debug(&quot;... built query: {}&quot;, predicate);</span>
+
+<span class="nc" id="L215">        List&lt;Answer&gt; list = entityManager.createQuery(cq).setMaxResults(maxAnswers).getResultList();</span>
+<span class="nc" id="L216">        LOGGER.info(&quot;... found {} answers&quot;, list.size());</span>
+
+<span class="nc bnc" id="L218" title="All 2 branches missed.">        if (list.size() &gt; maxAnswers) {</span>
+<span class="nc" id="L219">            throw new ResultSetTooLargeException(criteria, list.size());</span>
+        } else {
+<span class="nc" id="L221">            addQuestionCategory(list);</span>
+<span class="nc" id="L222">            return list;</span>
+        }
+    }
+
+    private HashSet&lt;String&gt; getOrgsMatching(Q q) {
+<span class="nc" id="L227">        HashSet&lt;String&gt; orgs = new HashSet&lt;String&gt;();</span>
+<span class="nc" id="L228">        List&lt;Answer&gt; answers = answerRepo.findByQuestion(q.code());</span>
+<span class="nc bnc" id="L229" title="All 2 branches missed.">        for (Answer a : answers) {</span>
+<span class="nc bnc" id="L230" title="All 2 branches missed.">            for (SurveyReturn rtn : a.surveyReturns()) {</span>
+<span class="nc" id="L231">                orgs.add(rtn.org());</span>
+<span class="nc" id="L232">            }</span>
+<span class="nc" id="L233">        }</span>
+<span class="nc" id="L234">        return orgs;</span>
+    }
+
+    /**
+     * @return list of answers for a given period, optionally paged.
+     */
+    @RequestMapping(value = &quot;/findByPeriod/{period}&quot;, method = RequestMethod.GET)
+    @JsonView(AnswerViews.Detailed.class)
+    public @ResponseBody List&lt;Answer&gt; findByPeriod(
+            @PathVariable(&quot;period&quot;) String period,
+            @RequestParam(value = &quot;page&quot;, required = false) Integer page,
+            @RequestParam(value = &quot;limit&quot;, required = false) Integer limit) {
+<span class="nc" id="L246">        LOGGER.info(String.format(&quot;List answers by period %1$s&quot;, period));</span>
+
+        List&lt;Answer&gt; list;
+<span class="nc bnc" id="L249" title="All 2 branches missed.">        if (limit == null) {</span>
+<span class="nc" id="L250">            list = answerRepo.findByPeriod(period);</span>
+        } else {
+<span class="nc bnc" id="L252" title="All 2 branches missed.">            Pageable pageable = new PageRequest(page == null ? 0 : page, limit);</span>
+<span class="nc" id="L253">            list = answerRepo.findPageByPeriod(pageable, period);</span>
+        }
+<span class="nc" id="L255">        LOGGER.info(String.format(&quot;Found %1$s answers&quot;, list.size()));</span>
+
+<span class="nc" id="L257">        addQuestionCategory(list);</span>
+<span class="nc" id="L258">        return list;</span>
+    }
+
+    /**
+     * @return answer to the given question for the specified return and period.
+     */
+    @RequestMapping(value = &quot;/findByReturnPeriodAndQ/{rtn}/{period}/{q}&quot;, method = RequestMethod.GET)
+    @JsonView(AnswerViews.Detailed.class)
+    public @ResponseBody Answer findByReturnPeriodAndQ(
+            @PathVariable(&quot;rtn&quot;) Long rtnId,
+            @PathVariable(&quot;period&quot;) String period,
+            @PathVariable(&quot;q&quot;) String q) {
+<span class="nc" id="L270">        LOGGER.info(&quot;find answer by rtn {}, period {} and q {}&quot;, rtnId, period, q);</span>
+
+<span class="nc" id="L272">        List&lt;Answer&gt; list = answerRepo.findByReturnPeriodAndQ(rtnId, period, q);</span>
+        Answer a;
+<span class="nc bnc" id="L274" title="All 3 branches missed.">        switch (list.size()) {</span>
+        case 0:
+<span class="nc" id="L276">            Question question = qRepo.findByName(q);</span>
+<span class="nc" id="L277">            SurveyReturn rtn = rtnRepo.findOne(rtnId);</span>
+<span class="nc" id="L278">            a = new Answer().question(question).addSurveyReturn(rtn)</span>
+<span class="nc" id="L279">                    .applicablePeriod(period);</span>
+<span class="nc bnc" id="L280" title="All 2 branches missed.">            if (q.equals(Q.ORG_CODE.code())) {</span>
+<span class="nc" id="L281">                a.response(rtn.org());</span>
+            }
+<span class="nc" id="L283">            answerRepo.save(a);</span>
+<span class="nc" id="L284">            break;</span>
+        case 1:
+<span class="nc" id="L286">            a = list.get(0);</span>
+<span class="nc" id="L287">            break;</span>
+        default:
+<span class="nc" id="L289">            list.sort((r1,r2) -&gt; r1.revision().compareTo(r2.revision()));</span>
+<span class="nc" id="L290">            a = list.get(0);</span>
+            break;
+        }
+
+<span class="nc" id="L294">        return a;</span>
+    }
+
+    /**
+     * Delete an existing answer.
+     */
+    @ResponseStatus(value = HttpStatus.NO_CONTENT)
+    @RequestMapping(value = &quot;/{id}&quot;, method = RequestMethod.DELETE)
+    @Transactional
+    public @ResponseBody void delete(@PathVariable(&quot;id&quot;) Long answerId) {
+<span class="nc" id="L304">        answerRepo.delete(answerId);</span>
+<span class="nc" id="L305">    }</span>
+
+    private Answer addLinks(Answer answer) {
+<span class="nc" id="L308">        List&lt;Link&gt; links = new ArrayList&lt;Link&gt;();</span>
+<span class="nc" id="L309">        links.add(new Link(getClass().getAnnotation(RequestMapping.class).value()[0] + &quot;/&quot; + answer.id()));</span>
+
+<span class="nc" id="L311">        return answer.links(links);</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.2.201808211720</span></div></body></html>

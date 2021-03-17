@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>HistoricDataMerger.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Sustainability Reporting</a> &gt; <a href="index.source.html" class="el_package">digital.srp.sreport.services</a> &gt; <span class="el_source">HistoricDataMerger.java</span></div><h1>HistoricDataMerger.java</h1><pre class="source lang-java linenums">package digital.srp.sreport.services;
+
+import java.util.Optional;
+import java.util.Set;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
+
+import digital.srp.sreport.model.Answer;
+import digital.srp.sreport.model.StatusType;
+import digital.srp.sreport.model.SurveyReturn;
+
+/**
+ * Import any answers available in the ERIC returns that has not been added to
+ * the SDU return yet.
+ *
+ * @author Tim Stephenson
+ */
+@Component
+<span class="fc" id="L21">public class HistoricDataMerger {</span>
+<span class="fc" id="L22">    private static final Logger LOGGER = LoggerFactory</span>
+<span class="fc" id="L23">            .getLogger(HistoricDataMerger.class);</span>
+
+    public long merge(Set&lt;Answer&gt; answersToImport, SurveyReturn trgt) {
+<span class="fc" id="L26">        long count = 0;</span>
+<span class="fc bfc" id="L27" title="All 2 branches covered.">        for (Answer a : answersToImport) {</span>
+<span class="fc" id="L28">            Optional&lt;Answer&gt; trgtA = trgt.answer(a.applicablePeriod(),</span>
+<span class="fc" id="L29">                    a.question().q());</span>
+<span class="fc bfc" id="L30" title="All 2 branches covered.">            if (!trgtA.isPresent()) {</span>
+<span class="fc" id="L31">                Answer a2 = new Answer()</span>
+<span class="fc" id="L32">                        .applicablePeriod(a.applicablePeriod())</span>
+<span class="fc" id="L33">                        .revision(trgt.revision())</span>
+<span class="fc" id="L34">                        .status(StatusType.Draft.name())</span>
+<span class="fc" id="L35">                        .response(a.response())</span>
+<span class="fc" id="L36">                        .question(a.question())</span>
+<span class="fc" id="L37">                        .addSurveyReturn(trgt);</span>
+<span class="fc" id="L38">                LOGGER.info(&quot;Copying {}, {} = {} to {} ({})&quot;,</span>
+<span class="fc" id="L39">                        a2.question().name(), a2.applicablePeriod(),</span>
+<span class="fc" id="L40">                        a2.response(), trgt.name(), trgt.id());</span>
+<span class="fc" id="L41">                trgt.answers().add(a2);</span>
+<span class="fc" id="L42">                count++;</span>
+<span class="pc bpc" id="L43" title="1 of 2 branches missed.">            } else if (trgtA.get().response() == null) {</span>
+<span class="nc" id="L44">                trgtA.get().response(a.response());</span>
+<span class="nc" id="L45">                LOGGER.info(&quot;Copying {}, {} = {} to {} ({})&quot;,</span>
+<span class="nc" id="L46">                        a.question().name(), a.applicablePeriod(), a.response(),</span>
+<span class="nc" id="L47">                        trgt.name(), trgt.id());</span>
+<span class="nc" id="L48">                count++;</span>
+            } else {
+<span class="fc" id="L50">                LOGGER.debug(</span>
+                        &quot;{}({}) already has answer of {} to {} for {}, ignoring&quot;,
+<span class="fc" id="L52">                        trgt.name(), trgt.id(), a.response(),</span>
+<span class="fc" id="L53">                        a.question().name(), a.applicablePeriod());</span>
+            }
+<span class="fc" id="L55">        }</span>
+<span class="fc" id="L56">        return count;</span>
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.2.201808211720</span></div></body></html>

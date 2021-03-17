@@ -65,6 +65,15 @@ docker run -p 8080:8080 \
 Release History
 ---------------
 
+2.4.2 - 17 Mar 21 - 8a4215a34876a2946a61dedc5be6aa9432ca8ba0
+
+  - couple of dependabot upgrades
+  - integrate jacoco code quality analysis
+
+2.4.1 - 19 Nov 20 - e9e4cbb4a94fc92566ebffeca8bfc6a91c7799df
+
+  - fix eclass and labels
+
 2.4.0 - 02 Nov 20 (belatedly build release for 2019-20)
 
   - #10 Paper spend is referred to on the report as Spend Q5 but not captured
@@ -77,7 +86,7 @@ Release History
 2.3.0 - 23 Oct 18
 
   - #288 Implement 'health-check' for returns
-  - #286 Render tables and graphs client side 
+  - #286 Render tables and graphs client side
   - #284 Remove 'Import ERIC data' (now implicit)
 
 2.2.0 - 02 Aug 18 - 3515b3c38eed136e3a5663340489bdc31041f786
@@ -88,7 +97,7 @@ Release History
 
   - Revised benchmarking in reports
 
-2.0.0 - 28 Feb 18 
+2.0.0 - 28 Feb 18
 
   - SDU reporting project
 
@@ -96,6 +105,6 @@ Release History
 
   - SDU Healthy Returns 2020 (macc project)
 
-1.0.0 - 30 Sept 15 
-  
+1.0.0 - 30 Sept 15
+
   - support the 50K app, included modules: disclosure, financial, contacts, workflow, decisions

@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Invoice.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Marginal Abatement Cost Curves</a> &gt; <a href="index.source.html" class="el_package">digital.srp.macc.model</a> &gt; <span class="el_source">Invoice.java</span></div><h1>Invoice.java</h1><pre class="source lang-java linenums">/*******************************************************************************
+ * Copyright 2015, 2017 Tim Stephenson and contributors
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *******************************************************************************/
+package digital.srp.macc.model;
+
+import java.io.Serializable;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.List;
+
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import lombok.Data;
+
+<span class="nc bnc" id="L32" title="All 46 branches missed.">@Data</span>
+public class Invoice implements Serializable {
+
+    private static final long serialVersionUID = 3710321395342737285L;
+
+<span class="fc" id="L37">    public static final List&lt;String&gt; fieldNames4WhereClause = java.util.Arrays.asList(&quot;id&quot;, &quot;invoiceRef&quot;, &quot;invoiceDate&quot;, &quot;invoicePeriodStart&quot;, &quot;invoicePeriodEnd&quot;, &quot;amount&quot;, &quot;supplier&quot;);</span>
+
+<span class="fc" id="L39">    public static final List&lt;String&gt; fieldNames4OrderByClause = java.util.Arrays.asList(&quot;id&quot;, &quot;invoiceRef&quot;, &quot;invoiceDate&quot;, &quot;invoicePeriodStart&quot;, &quot;invoicePeriodEnd&quot;, &quot;amount&quot;, &quot;supplier&quot;);</span>
+
+<span class="fc" id="L41">    private static final Logger LOGGER = LoggerFactory.getLogger(Invoice.class);</span>
+
+    private static final int MILLIS_IN_DAY = 1000 * 60 * 60 * 24;
+
+    /**
+     */
+<span class="nc" id="L47">    private String invoiceRef;</span>
+
+    /**
+     */
+    @Temporal(TemporalType.TIMESTAMP)
+<span class="nc" id="L52">    private Date invoiceDate;</span>
+
+    /**
+     */
+    @Temporal(TemporalType.TIMESTAMP)
+<span class="fc" id="L57">    private Date invoicePeriodStart;</span>
+
+    /**
+     */
+    @Temporal(TemporalType.TIMESTAMP)
+<span class="fc" id="L62">    private Date invoicePeriodEnd;</span>
+
+    /**
+     */
+<span class="fc" id="L66">    private Float amount;</span>
+
+    public Invoice(String invoiceRef, Date invoiceDate, Date invoicePeriodStart, Date invoicePeriodEnd, Float amount) {
+<span class="fc" id="L69">        super();</span>
+<span class="fc" id="L70">        this.invoiceRef = invoiceRef;</span>
+<span class="fc" id="L71">        this.invoiceDate = invoiceDate;</span>
+<span class="fc" id="L72">        setInvoicePeriodStart(invoicePeriodStart);</span>
+<span class="fc" id="L73">        setInvoicePeriodEnd(invoicePeriodEnd);</span>
+<span class="fc" id="L74">        this.amount = amount;</span>
+<span class="fc" id="L75">    }</span>
+
+    public void setInvoicePeriodStart(Date invoicePeriodStart) {
+<span class="fc" id="L78">        Calendar cal = new GregorianCalendar();</span>
+<span class="fc" id="L79">        cal.setTime(invoicePeriodStart);</span>
+<span class="fc" id="L80">        cal.set(Calendar.MILLISECOND, 0);</span>
+<span class="fc" id="L81">        cal.set(Calendar.SECOND, 0);</span>
+<span class="fc" id="L82">        cal.set(Calendar.MINUTE, 0);</span>
+<span class="fc" id="L83">        cal.set(Calendar.HOUR, 0);</span>
+<span class="fc" id="L84">        this.invoicePeriodStart = cal.getTime();</span>
+<span class="fc" id="L85">        LOGGER.debug(String.format(&quot;set invoice period to start %1$s&quot;, getInvoicePeriodStart()));</span>
+<span class="fc" id="L86">    }</span>
+
+    public void setInvoicePeriodEnd(Date invoicePeriodEnd) {
+<span class="fc" id="L89">        Calendar cal = new GregorianCalendar();</span>
+<span class="fc" id="L90">        cal.setTime(invoicePeriodEnd);</span>
+<span class="fc" id="L91">        cal.set(Calendar.MILLISECOND, 999);</span>
+<span class="fc" id="L92">        cal.set(Calendar.SECOND, 59);</span>
+<span class="fc" id="L93">        cal.set(Calendar.MINUTE, 59);</span>
+<span class="fc" id="L94">        cal.set(Calendar.HOUR, 23);</span>
+<span class="fc" id="L95">        this.invoicePeriodEnd = cal.getTime();</span>
+<span class="fc" id="L96">        LOGGER.debug(String.format(&quot;set invoice period to end %1$s&quot;, getInvoicePeriodEnd()));</span>
+<span class="fc" id="L97">    }</span>
+
+    public long getDaysInvoiced() {
+        // Chose to not use Joda Time as nearly half a meg of disk space
+        // Days.daysBetween(start.toLocalDate(), end.toLocalDate()).getDays()
+<span class="fc" id="L102">        Calendar startCal = new GregorianCalendar();</span>
+<span class="fc" id="L103">        startCal.setTime(getInvoicePeriodStart());</span>
+<span class="fc" id="L104">        Calendar endCal = new GregorianCalendar();</span>
+<span class="fc" id="L105">        endCal.setTime(getInvoicePeriodEnd());</span>
+<span class="fc" id="L106">        long dstAdjustment = 1;</span>
+<span class="fc bfc" id="L107" title="All 4 branches covered.">        if (!startCal.getTimeZone().inDaylightTime(startCal.getTime()) &amp;&amp; endCal.getTimeZone().inDaylightTime(getInvoicePeriodEnd())) {</span>
+<span class="fc" id="L108">            dstAdjustment += endCal.getTimeZone().getDSTSavings();</span>
+<span class="fc bfc" id="L109" title="All 4 branches covered.">        } else if (startCal.getTimeZone().inDaylightTime(getInvoicePeriodStart()) &amp;&amp; !endCal.getTimeZone().inDaylightTime(endCal.getTime())) {</span>
+<span class="fc" id="L110">            dstAdjustment -= endCal.getTimeZone().getDSTSavings();</span>
+        }
+<span class="fc" id="L112">        double daysInvoiced = (getInvoicePeriodEnd().getTime() - getInvoicePeriodStart().getTime() + dstAdjustment) / MILLIS_IN_DAY;</span>
+<span class="fc" id="L113">        LOGGER.debug(&quot;days invoiced: &quot; + daysInvoiced);</span>
+<span class="fc" id="L114">        return (long) daysInvoiced;</span>
+    }
+
+    public float getDailyAverage() {
+<span class="fc" id="L118">        float dailyRate = getAmount() / getDaysInvoiced();</span>
+<span class="fc" id="L119">        LOGGER.debug(String.format(&quot;Daily average of %1$s for %2$s days is %3$s&quot;, getAmount(), getDaysInvoiced(), dailyRate));</span>
+<span class="fc" id="L120">        return dailyRate;</span>
+    }
+
+    public long invoiceDaysInYear(ReportingYear year) {
+<span class="fc" id="L124">        long daysInYear = getDaysInvoiced();</span>
+<span class="fc bfc" id="L125" title="All 2 branches covered.">        if (getInvoicePeriodStart().before(year.getStartDate())) {</span>
+<span class="fc" id="L126">            daysInYear -= ((year.getStartDate().getTime() - getInvoicePeriodStart().getTime()) / MILLIS_IN_DAY);</span>
+        }
+<span class="fc bfc" id="L128" title="All 2 branches covered.">        if (getInvoicePeriodEnd().after(year.getEndDate())) {</span>
+<span class="fc" id="L129">            daysInYear -= ((getInvoicePeriodEnd().getTime() - year.getEndDate().getTime()) / MILLIS_IN_DAY);</span>
+        }
+<span class="fc" id="L131">        return daysInYear;</span>
+    }
+
+    public static List&lt;Invoice&gt; findInvoicesByExample(Invoice example) {
+<span class="nc" id="L135">        throw new RuntimeException(&quot;Not yet implemented&quot;);</span>
+        //return (List&lt;Invoice&gt;) FindByExampleHelper.findByExample(example, &quot;invoiceDate&quot;, &quot;DESC&quot;, fieldNames4OrderByClause);
+    }
+
+    public static List&lt;Invoice&gt; findInvoicesByPurposeAndYear(String purpose2, String year) {
+<span class="nc" id="L140">        throw new RuntimeException(&quot;Not yet implemented&quot;);</span>
+        // String jpaQuery = &quot;SELECT o FROM Invoice o &quot; +
+        // &quot;WHERE o.purpose.name = :name &quot; +
+        // &quot;AND o.invoicePeriodStart BETWEEN :yearStart AND :yearEnd&quot;;
+        // Query q = entityManager().createQuery(jpaQuery, Invoice.class);
+        // q.setParameter(&quot;name&quot;, purpose2);
+        // GregorianCalendar yearStart = new
+        // GregorianCalendar(Integer.parseInt(year), Calendar.JANUARY, 0);
+        // q.setParameter(&quot;yearStart&quot;, yearStart.getTime());
+        // GregorianCalendar yearEnd = new
+        // GregorianCalendar(Integer.parseInt(year), Calendar.DECEMBER, 31);
+        // q.setParameter(&quot;yearEnd&quot;, yearEnd.getTime());
+        // return q.getResultList();
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.2.201808211720</span></div></body></html>

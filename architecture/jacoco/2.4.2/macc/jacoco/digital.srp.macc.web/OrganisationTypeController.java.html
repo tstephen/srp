@@ -1,0 +1,246 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>OrganisationTypeController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Marginal Abatement Cost Curves</a> &gt; <a href="index.source.html" class="el_package">digital.srp.macc.web</a> &gt; <span class="el_source">OrganisationTypeController.java</span></div><h1>OrganisationTypeController.java</h1><pre class="source lang-java linenums">/*******************************************************************************
+ * Copyright 2015, 2017 Tim Stephenson and contributors
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *******************************************************************************/
+package digital.srp.macc.web;
+
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.hateoas.Link;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.multipart.MultipartFile;
+
+import com.fasterxml.jackson.annotation.JsonView;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import digital.srp.macc.model.OrganisationType;
+import digital.srp.macc.repositories.OrganisationTypeRepository;
+import digital.srp.macc.views.OrganisationTypeViews;
+
+/**
+ * REST endpoint for accessing {@link OrganisationType}
+ *
+ * @author Tim Stephenson
+ */
+@Controller
+@RequestMapping(value = &quot;/{tenantId}/organisation-types&quot;)
+<span class="fc" id="L59">public class OrganisationTypeController {</span>
+
+<span class="fc" id="L61">    private static final Logger LOGGER = LoggerFactory</span>
+<span class="fc" id="L62">            .getLogger(OrganisationTypeController.class);</span>
+
+    @Autowired
+    private OrganisationTypeRepository organisationTypeRepo;
+
+    @Autowired
+    private ObjectMapper objectMapper;
+
+    /**
+     * Imports JSON representation of organistion types.
+     *
+     * &lt;p&gt;
+     * This is a handy link: http://shancarter.github.io/mr-data-converter/
+     *
+     * @param file
+     *            A file posted in a multi-part request
+     * @return The meta data of the added model
+     * @throws IOException
+     *             If cannot parse the JSON.
+     */
+    @RequestMapping(value = &quot;/upload&quot;, method = RequestMethod.POST)
+    public @ResponseBody Iterable&lt;OrganisationType&gt; handleFileUpload(
+            @PathVariable(&quot;tenantId&quot;) String tenantId,
+            @RequestParam(value = &quot;file&quot;, required = true) MultipartFile file)
+            throws IOException {
+<span class="nc" id="L87">        LOGGER.info(String.format(&quot;Uploading org types for: %1$s&quot;, tenantId));</span>
+<span class="nc" id="L88">        String content = new String(file.getBytes());</span>
+
+<span class="nc" id="L90">        List&lt;OrganisationType&gt; list = objectMapper.readValue(content,</span>
+<span class="nc" id="L91">                new TypeReference&lt;List&lt;OrganisationType&gt;&gt;() {</span>
+                });
+<span class="nc" id="L93">        LOGGER.info(String.format(&quot;  found %1$d org types&quot;, list.size()));</span>
+<span class="nc bnc" id="L94" title="All 2 branches missed.">        for (OrganisationType orgType : list) {</span>
+<span class="nc" id="L95">            orgType.setTenantId(tenantId);</span>
+<span class="nc" id="L96">        }</span>
+
+<span class="nc" id="L98">        Iterable&lt;OrganisationType&gt; result = organisationTypeRepo.save(list);</span>
+<span class="nc" id="L99">        LOGGER.info(&quot;  saved.&quot;);</span>
+<span class="nc" id="L100">        return result;</span>
+    }
+
+    /**
+     * Create a new organisation type.
+     *
+     * @return
+     * @throws URISyntaxException
+     */
+    @SuppressWarnings({ &quot;rawtypes&quot;, &quot;unchecked&quot; })
+    @ResponseStatus(value = HttpStatus.CREATED)
+    @RequestMapping(value = &quot;/&quot;, method = RequestMethod.POST)
+    public @ResponseBody ResponseEntity&lt;? extends OrganisationType&gt; create(
+            @PathVariable(&quot;tenantId&quot;) String tenantId,
+            @RequestBody OrganisationType orgType) throws Exception {
+<span class="nc" id="L115">        orgType.setTenantId(tenantId);</span>
+
+<span class="nc" id="L117">        orgType = organisationTypeRepo.save(orgType);</span>
+
+<span class="nc" id="L119">        HttpHeaders headers = new HttpHeaders();</span>
+<span class="nc" id="L120">        headers.setLocation(new URI(getTenantUri(orgType)));</span>
+
+<span class="nc" id="L122">        return new ResponseEntity(orgType, headers, HttpStatus.CREATED);</span>
+    }
+
+    /**
+     * Return just the organisation types for a specific tenant.
+     *
+     * @return organisation types for that tenant.
+     */
+    @RequestMapping(value = &quot;/&quot;, method = RequestMethod.GET)
+    @JsonView({ OrganisationTypeViews.Summary.class })
+    public @ResponseBody List&lt;OrganisationType&gt; listForTenant(
+            @PathVariable(&quot;tenantId&quot;) String tenantId,
+            @RequestParam(value = &quot;filter&quot;, required = false) String filter,
+            @RequestParam(value = &quot;page&quot;, required = false) Integer page,
+            @RequestParam(value = &quot;limit&quot;, required = false) Integer limit) {
+<span class="nc" id="L137">        LOGGER.info(String.format(&quot;List organisation types for tenant %1$s&quot;, tenantId));</span>
+
+        List&lt;OrganisationType&gt; list;
+<span class="nc bnc" id="L140" title="All 2 branches missed.">        if (&quot;reportingType&quot;.equals(filter)) {</span>
+<span class="nc" id="L141">            list = organisationTypeRepo.findAllReportingTypeForTenant(tenantId);</span>
+<span class="nc bnc" id="L142" title="All 2 branches missed.">        } else if (limit == null) {</span>
+<span class="nc" id="L143">            list = organisationTypeRepo.findAllForTenant(tenantId);</span>
+        } else {
+<span class="nc bnc" id="L145" title="All 2 branches missed.">            Pageable pageable = new PageRequest(page == null ? 0 : page, limit);</span>
+<span class="nc" id="L146">            list = organisationTypeRepo.findPageForTenant(tenantId, pageable);</span>
+        }
+<span class="nc" id="L148">        LOGGER.info(String.format(&quot;Found %1$s organisation types&quot;, list.size()));</span>
+
+<span class="nc" id="L150">        return addLinks(list);</span>
+    }
+
+    /**
+     * @return one organisation type with the provided id.
+     */
+    @RequestMapping(value = &quot;/{id}&quot;, method = RequestMethod.GET)
+    @JsonView({ OrganisationTypeViews.Summary.class })
+    public @ResponseBody OrganisationType findById(
+            @PathVariable(&quot;tenantId&quot;) String tenantId,
+            @PathVariable(&quot;id&quot;) Long id) {
+<span class="nc" id="L161">        LOGGER.info(String.format(&quot;Find organisation types for tenant %1$s with id %2$d&quot;, tenantId, id));</span>
+
+<span class="nc" id="L163">        return addLinks(organisationTypeRepo.findOne(id));</span>
+    }
+
+    /**
+     * Return just the matching organisation types for a specific tenant.
+     *
+     * @param tenantId
+     * @status Comma separated list of status to include.
+     * @return interventions for that tenant.
+     */
+    @JsonView({ OrganisationTypeViews.Summary.class })
+    @RequestMapping(value = &quot;/status/{status}&quot;, method = RequestMethod.GET)
+    public @ResponseBody List&lt;OrganisationType&gt; findByStatusForTenant(
+            @PathVariable(&quot;tenantId&quot;) String tenantId,
+            @PathVariable(&quot;status&quot;) String status) {
+<span class="nc" id="L178">        LOGGER.info(String.format(</span>
+                &quot;List organisation types for tenant %1$s with status %2$s&quot;,
+                tenantId, status));
+
+<span class="nc" id="L182">        List&lt;OrganisationType&gt; list = organisationTypeRepo</span>
+<span class="nc" id="L183">                .findByStatusForTenant(tenantId, status);</span>
+<span class="nc" id="L184">        LOGGER.info(String.format(&quot;Found %1$s organisation types&quot;, list.size()));</span>
+
+<span class="nc" id="L186">        return addLinks(list);</span>
+    }
+
+    /**
+     * @return All organisation types for that tenant.
+     */
+    @RequestMapping(value = &quot;/&quot;, method = RequestMethod.GET, produces = &quot;text/csv&quot;)
+    public @ResponseBody List&lt;OrganisationType&gt; exportAsCsv(
+            @PathVariable(&quot;tenantId&quot;) String tenantId,
+            @RequestParam(value = &quot;page&quot;, required = false) Integer page,
+            @RequestParam(value = &quot;limit&quot;, required = false) Integer limit) {
+<span class="nc" id="L197">        LOGGER.info(String.format(&quot;Export organisation types for tenant %1$s&quot;, tenantId));</span>
+
+        List&lt;OrganisationType&gt; list;
+<span class="nc bnc" id="L200" title="All 2 branches missed.">        if (limit == null) {</span>
+<span class="nc" id="L201">            list = organisationTypeRepo.findAllForTenant(tenantId);</span>
+        } else {
+<span class="nc bnc" id="L203" title="All 2 branches missed.">            Pageable pageable = new PageRequest(page == null ? 0 : page, limit);</span>
+<span class="nc" id="L204">            list = organisationTypeRepo.findPageForTenant(tenantId, pageable);</span>
+        }
+<span class="nc" id="L206">        LOGGER.info(String.format(&quot;Found %1$s organisation types&quot;, list.size()));</span>
+
+<span class="nc" id="L208">        return list;</span>
+    }
+
+    /**
+     * Update an existing organisation type.
+     */
+    @ResponseStatus(value = HttpStatus.NO_CONTENT)
+    @RequestMapping(value = &quot;/{id}&quot;, method = RequestMethod.PUT, consumes = { &quot;application/json&quot; })
+    public @ResponseBody void update(@PathVariable(&quot;tenantId&quot;) String tenantId,
+            @PathVariable(&quot;id&quot;) Long orgTypeId,
+            @RequestBody OrganisationType updatedOrgType) {
+<span class="nc" id="L219">        OrganisationType orgType = organisationTypeRepo.findOne(orgTypeId);</span>
+
+<span class="nc" id="L221">        BeanUtils.copyProperties(updatedOrgType, orgType, &quot;id&quot;);</span>
+<span class="nc" id="L222">        orgType.setTenantId(tenantId);</span>
+<span class="nc" id="L223">        organisationTypeRepo.save(orgType);</span>
+<span class="nc" id="L224">    }</span>
+
+    private List&lt;OrganisationType&gt; addLinks(List&lt;OrganisationType&gt; orgTypes) {
+<span class="nc bnc" id="L227" title="All 2 branches missed.">        for (OrganisationType orgType : orgTypes) {</span>
+<span class="nc" id="L228">            addLinks(orgType);</span>
+<span class="nc" id="L229">        }</span>
+<span class="nc" id="L230">        return orgTypes;</span>
+    }
+
+    private OrganisationType addLinks(final OrganisationType orgType) {
+<span class="nc" id="L234">        List&lt;Link&gt; links = new ArrayList&lt;Link&gt;();</span>
+<span class="nc" id="L235">        links.add(new Link(getTenantUri(orgType)));</span>
+
+<span class="nc" id="L237">        orgType.setLinks(links);</span>
+<span class="nc" id="L238">        return orgType;</span>
+    }
+
+    private String getTenantUri(final OrganisationType orgType) {
+<span class="nc" id="L242">        return String.format(&quot;/%1$s/organisation-types/%2$s&quot;,</span>
+<span class="nc" id="L243">                orgType.getTenantId(), orgType.getId());</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.2.201808211720</span></div></body></html>

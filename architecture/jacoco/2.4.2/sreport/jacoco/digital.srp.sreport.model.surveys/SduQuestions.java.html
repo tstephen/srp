@@ -1,0 +1,288 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>SduQuestions.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Sustainability Reporting</a> &gt; <a href="index.source.html" class="el_package">digital.srp.sreport.model.surveys</a> &gt; <span class="el_source">SduQuestions.java</span></div><h1>SduQuestions.java</h1><pre class="source lang-java linenums">package digital.srp.sreport.model.surveys;
+
+import digital.srp.sreport.model.Q;
+
+public interface SduQuestions {
+
+<span class="fc" id="L7">    Q[] SPEND_HDRS = new Q[] {</span>
+            Q.ENERGY_CO2E_PER_POUND,
+            Q.COMMISSIONING_CO2E_PER_POUND,
+            Q.PROCUREMENT_CO2E_PER_POUND,
+            Q.TRAVEL_CO2E_PER_POUND
+    };
+
+<span class="fc" id="L14">    Q[] FOOTPRINT_PCT_HDRS = new Q[] { Q.ENERGY_CO2E_PCT,</span>
+            Q.COMMISSIONING_CO2E_PCT,
+            Q.PROCUREMENT_CO2E_PCT,
+            Q.TRAVEL_CO2E_PCT
+    };
+
+<span class="fc" id="L20">    Q[] FOOTPRINT_2017_PCT_HDRS = new Q[] {</span>
+            Q.CORE_CO2E_PCT,
+            Q.COMMISSIONING_CO2E_PCT,
+            Q.PROCUREMENT_2017_CO2E_PCT,
+            Q.COMMUNITY_CO2E_PCT
+    };
+
+<span class="fc" id="L27">    Q[] WATER_HDRS = new Q[] { Q.WATER_VOL, Q.WASTE_WATER, Q.WATER_AND_SEWAGE_COST };</span>
+
+<span class="fc" id="L29">    Q[] WATER_CO2E_HDRS = new Q[] { Q.WATER_CO2E, Q.WATER_TREATMENT_CO2E };</span>
+
+<span class="fc" id="L31">    Q[] WASTE_HDRS = new Q[] {Q. RECYCLING_WEIGHT,</span>
+            Q.OTHER_RECOVERY_WEIGHT, Q.INCINERATION_WEIGHT,Q. LANDFILL_WEIGHT
+    };
+
+<span class="fc" id="L35">    Q[] WASTE_CO2E_HDRS = new Q[] {Q. RECYCLING_CO2E,</span>
+            Q.OTHER_RECOVERY_CO2E, Q.INCINERATION_CO2E,Q. LANDFILL_CO2E
+    };
+
+<span class="fc" id="L39">    Q[] BIZ_MILEAGE_ACTIVE_PUBLIC_HDRS = new Q[] {</span>
+            Q.RAIL_MILES, Q.BUS_MILES, Q.TAXI_MILES
+    };
+
+<span class="fc" id="L43">    Q[] BIZ_MILEAGE_HDRS = new Q[] {</span>
+            Q.BIZ_MILEAGE_ROAD,
+            Q.FLEET_ROAD_MILES,
+            Q.OWNED_LEASED_LOW_CARBON_MILES,
+            Q.DOMESTIC_AIR_MILES, Q.SHORT_HAUL_AIR_MILES, Q.LONG_HAUL_AIR_MILES,
+            Q.RAIL_MILES, Q.BUS_MILES, Q.TAXI_MILES,
+
+    };
+
+<span class="fc" id="L52">    Q[] BIZ_MILEAGE_CO2E_HDRS = new Q[] {</span>
+            Q.BIZ_MILEAGE_ROAD_CO2E,
+            Q.OWNED_FLEET_TRAVEL_CO2E,
+            Q.OWNED_LEASED_LOW_CARBON_CO2E,
+            Q.BIZ_MILEAGE_AIR_CO2E,
+            Q.BIZ_MILEAGE_RAIL_CO2E,
+            Q.BIZ_MILEAGE_BUS_CO2E,
+            Q.BIZ_MILEAGE_TAXI_CO2E
+    };
+
+<span class="fc" id="L62">    Q[] PAPER_HDRS = new Q[] {</span>
+            Q.PAPER_SPEND, Q.PAPER_USED
+    };
+
+<span class="fc" id="L66">    Q[] PAPER_CO2E_HDRS = new Q[] {</span>
+            Q.PAPER_CO2E
+    };
+
+<span class="fc" id="L70">    Q[] TRAVEL_HDRS = new Q[] { Q.PATIENT_AND_VISITOR_MILEAGE,</span>
+            Q.BIZ_MILEAGE, Q.STAFF_COMMUTE_MILES_TOTAL
+    };
+
+<span class="fc" id="L74">    Q[] TRAVEL_CO2E_HDRS = new Q[] { Q.PATIENT_AND_VISITOR_MILEAGE_CO2E,</span>
+            Q.BIZ_MILEAGE_CO2E, Q.STAFF_COMMUTE_MILES_CO2E
+    };
+
+<span class="fc" id="L78">    Q[] ENERGY_CO2E_HDRS = new Q[] {</span>
+            Q.ELEC_CO2E, Q.OWNED_BUILDINGS_GAS,
+            Q.OWNED_BUILDINGS_OIL, Q.OWNED_BUILDINGS_COAL,
+            Q.STEAM_CO2E, Q.HOT_WATER_CO2E, Q.ELEC_RENEWABLE_CO2E,
+            Q.EXPORTED_THERMAL_ENERGY_CO2E
+    };
+
+<span class="fc" id="L85">    Q[] ENERGY_HDRS = new Q[] {</span>
+            Q.GAS_USED, Q.OIL_USED, Q.COAL_USED,
+            Q.STEAM_USED, Q.HOT_WATER_USED,
+            Q.ELEC_USED, Q.ELEC_TOTAL_RENEWABLE_USED
+    };
+
+<span class="fc" id="L91">    Q[] ORG_HDRS = new Q[] { Q.FLOOR_AREA, Q.NO_STAFF };</span>
+
+<span class="fc" id="L93">    Q[] SUMMARY_SCOPE_HDRS = new Q[] {</span>
+            Q.SCOPE_1, Q.SCOPE_2, Q.SCOPE_3
+    };
+
+<span class="fc" id="L97">    Q[] ANAESTHETIC_GASES_CO2E_HDRS = new Q[] {</span>
+            Q.DESFLURANE_CO2E, Q.ISOFLURANE_CO2E, Q.SEVOFLURANE_CO2E,
+            Q.NITROUS_OXIDE_CO2E, Q.PORTABLE_NITROUS_OXIDE_MIX_CO2E,
+            Q.PORTABLE_NITROUS_OXIDE_MIX_MATERNITY_CO2E
+    };
+
+<span class="fc" id="L103">    Q[] SCOPE_1_HDRS = new Q[] {</span>
+            Q.OWNED_BUILDINGS_GAS, Q.OWNED_BUILDINGS_OIL, Q.OWNED_BUILDINGS_COAL,
+            Q.OWNED_VEHICLES, Q.ANAESTHETIC_GASES_CO2E };
+
+<span class="fc" id="L107">    Q[] SCOPE_2_HDRS = new Q[] { Q.NET_THERMAL_ENERGY_CO2E, Q.NET_ELEC_CO2E };</span>
+
+<span class="fc" id="L109">    Q[] SCOPE_3_HDRS = new Q[] {</span>
+            Q.PROCUREMENT_CO2E, Q.COMMISSIONING_CO2E, Q.SCOPE_3_TRAVEL,
+            Q.SCOPE_3_WASTE, Q.SCOPE_3_WATER, Q.LEASED_ASSETS_ENERGY_USE,
+            Q.SCOPE_3_ENERGY_WTT
+    };
+
+<span class="fc" id="L115">    Q[] SCOPE_3_TRAVEL_HDRS = new Q[] {</span>
+        Q.BIZ_MILEAGE_ROAD_CO2E,
+        Q.BIZ_MILEAGE_RAIL_CO2E,
+        Q.BIZ_MILEAGE_AIR_CO2E,
+        /* Q.FUEL_WTT, BIZ_MILEAGE calculated including WTT */
+        Q.PATIENT_AND_VISITOR_MILEAGE_CO2E,
+        Q.STAFF_COMMUTE_MILES_CO2E
+    };
+
+<span class="fc" id="L124">    Q[] SDU_PROFILE_CO2E_HDRS = new Q[] {</span>
+            /* community */
+            Q.PATIENT_AND_VISITOR_MILEAGE_CO2E,
+            Q.STAFF_COMMUTE_MILES_CO2E,
+            /* procurement */
+            Q.BIZ_SVCS_CO2E, Q.CAPITAL_CO2E,
+            Q.CONSTRUCTION_CO2E, Q.CATERING_CO2E, Q.FREIGHT_CO2E,
+            Q.ICT_CO2E, Q.CHEM_AND_GAS_CO2E, Q. MED_INSTR_CO2E,
+            Q.OTHER_MANUFACTURED_CO2E,
+            /* #203 drop as no Carbon factor Q.OTHER_PROCUREMENT_CO2E */
+            Q.PAPER_AND_CARD_CO2E, Q.PHARMA_CO2E,
+            /* core */
+            Q.OWNED_BUILDINGS_COAL,
+            Q.NET_ELEC_CO2E,
+            Q.OWNED_BUILDINGS_GAS, Q.OWNED_BUILDINGS_OIL,
+            Q.NET_THERMAL_ENERGY_CO2E,
+            Q.LEASED_ASSETS_ENERGY_USE,
+            Q.BIZ_MILEAGE_CO2E,
+            Q.ANAESTHETIC_GASES_CO2E,
+            Q.WASTE_AND_WATER_CO2E,
+            /* commissioning */
+            Q.TOTAL_COMMISSIONING_CO2E
+    };
+
+<span class="fc" id="L148">    Q[] BIOMASS_CO2E_WTT_HDRS = new Q[] {</span>
+            Q.WOOD_LOGS_WTT_CO2E, Q.WOOD_CHIPS_WTT_CO2E, Q.WOOD_PELLETS_WTT_CO2E
+    };
+
+<span class="fc" id="L152">    Q[] BIOMASS_CO2E_NOSCOPE_HDRS = new Q[] {</span>
+            Q.WOOD_LOGS_CO2E, Q.WOOD_CHIPS_CO2E, Q.WOOD_PELLETS_CO2E
+    };
+
+<span class="fc" id="L156">    Q[] SDU_PROFILE_HDRS = new Q[] {</span>
+            Q.BIZ_SVCS_SPEND, Q.CAPITAL_SPEND, Q.CONSTRUCTION_SPEND,
+            Q.CATERING_SPEND, Q.FREIGHT_SPEND, Q.ICT_SPEND, Q.CHEM_AND_GAS_SPEND,
+            Q.OTHER_MANUFACTURED_SPEND, Q.MED_INSTR_SPEND, Q.OTHER_SPEND,
+            Q.PAPER_AND_CARD_SPEND, Q.PHARMA_SPEND, Q.TRAVEL_SPEND,
+            Q.COMMISSIONING_SPEND
+    };
+
+<span class="fc" id="L164">    Q[] ECLASS_PROFILE_HDRS = new Q[] {</span>
+            /* community */
+            Q.PATIENT_AND_VISITOR_MILEAGE_CO2E,
+            Q.STAFF_COMMUTE_MILES_CO2E,
+            /* procurement */
+            Q.PROVISIONS_CO2E, Q.STAFF_CLOTHING_CO2E,
+            Q.PATIENTS_CLOTHING_AND_FOOTWEAR_CO2E,
+            Q.PHARMA_BLOOD_PROD_AND_MED_GASES_CO2E, Q.DRESSINGS_CO2E,
+            Q.MEDICAL_AND_SURGICAL_EQUIPT_CO2E, Q.PATIENTS_APPLIANCES_CO2E,
+            Q.CHEMICALS_AND_REAGENTS_CO2E, Q.DENTAL_AND_OPTICAL_EQUIPT_CO2E,
+            Q.IMAGING_AND_RADIOTHERAPY_EQUIPT_AND_SVCS_CO2E,
+            Q.LAB_EQUIPT_AND_SVCS_CO2E,
+            Q.HOTEL_EQUIPT_MATERIALS_AND_SVCS_CO2E,
+            Q.BLDG_AND_ENG_PROD_AND_SVCS_CO2E, Q.PURCHASED_HEALTHCARE_CO2E,
+            Q.GARDENING_AND_FARMING_CO2E, Q.FURNITURE_FITTINGS_CO2E,
+            Q.HARDWARE_CROCKERY_CO2E, Q.BEDDING_LINEN_AND_TEXTILES_CO2E,
+            Q.OFFICE_EQUIPT_TELCO_COMPUTERS_AND_STATIONERY_CO2E,
+            Q.REC_EQUIPT_AND_SOUVENIRS_CO2E,
+            Q.CONSULTING_SVCS_AND_EXPENSES_CO2E,
+            /* core */
+            Q.OWNED_BUILDINGS_COAL,
+            Q.NET_ELEC_CO2E,
+            Q.OWNED_BUILDINGS_GAS, Q.OWNED_BUILDINGS_OIL,
+            Q.NET_THERMAL_ENERGY_CO2E,
+            Q.LEASED_ASSETS_ENERGY_USE,
+            Q.BIZ_MILEAGE_CO2E,
+            Q.ANAESTHETIC_GASES_CO2E,
+            Q.WASTE_AND_WATER_CO2E,
+            /* commissioning */
+            Q.TOTAL_COMMISSIONING_CO2E
+    };
+
+<span class="fc" id="L196">    Q[] CORE_CO2E_HDRS = new Q[] {</span>
+            /* All energy */
+            Q.OWNED_BUILDINGS_GAS, Q.OWNED_BUILDINGS_OIL,
+            Q.OWNED_BUILDINGS_COAL, Q.NET_ELEC_CO2E, Q.NET_THERMAL_ENERGY_CO2E,
+            Q.SCOPE_3_BIOMASS, Q.WOOD_LOGS_WTT_CO2E, Q.WOOD_CHIPS_WTT_CO2E,
+            Q.WOOD_PELLETS_WTT_CO2E,
+            /* water and waste */
+            Q.WASTE_AND_WATER_CO2E, Q.ANAESTHETIC_GASES_CO2E,
+            /*
+             * all travel excepting individual citizens (patients, visitors and
+             * staff)
+             */
+            Q.BIZ_MILEAGE_CO2E, Q.BIZ_MILEAGE_ROAD_CO2E,
+            Q.BIZ_MILEAGE_RAIL_CO2E, Q.BIZ_MILEAGE_AIR_CO2E,
+            Q.OWNED_FLEET_TRAVEL_CO2E };
+
+<span class="fc" id="L212">    Q[] CITIZEN_CO2E_HDRS = new Q[]{</span>
+            Q.STAFF_COMMUTE_MILES_CO2E,
+            Q.PATIENT_AND_VISITOR_MILEAGE_CO2E
+    };
+
+    /** @deprecated {@link BENCHMARK_2017_HDRS} provides the preferred categories */
+<span class="fc" id="L218">    Q[] BENCHMARK_HDRS = new Q[] {</span>
+            Q.TOTAL_ENERGY_CO2E,
+            Q.SCOPE_3_TRAVEL,
+            Q.TOTAL_PROCUREMENT_CO2E,
+            Q.COMMISSIONING_CO2E
+    };
+
+<span class="fc" id="L225">    Q[] BENCHMARK_2017_HDRS = new Q[] {</span>
+            Q.TOTAL_CORE_CO2E,
+            Q.TOTAL_COMMISSIONING_CO2E,
+            Q.TOTAL_PROCUREMENT_2017_CO2E,
+            Q.TOTAL_COMMUNITY_CO2E
+    };
+
+<span class="fc" id="L232">    Q[] BENCHMARK_BY_POPULATION_HDRS = new Q[] {</span>
+            Q.TOTAL_CORE_CO2E_BY_POP,
+            Q.TOTAL_COMMISSIONING_CO2E_BY_POP,
+            Q.TOTAL_PROCUREMENT_2017_CO2E_BY_POP,
+            Q.TOTAL_COMMUNITY_CO2E_BY_POP
+    };
+
+<span class="fc" id="L239">    Q[] BENCHMARK_BY_FLOOR_AREA_HDRS = new Q[] {</span>
+            Q.TOTAL_CORE_CO2E_BY_FLOOR,
+            Q.TOTAL_COMMISSIONING_CO2E_BY_FLOOR,
+            Q.TOTAL_PROCUREMENT_2017_CO2E_BY_FLOOR,
+            Q.TOTAL_COMMUNITY_CO2E_BY_FLOOR
+    };
+
+<span class="fc" id="L246">    Q[] BENCHMARK_BY_WTE_HDRS = new Q[] {</span>
+            Q.TOTAL_CORE_CO2E_BY_WTE,
+            Q.TOTAL_COMMISSIONING_CO2E_BY_WTE,
+            Q.TOTAL_PROCUREMENT_2017_CO2E_BY_WTE,
+            Q.TOTAL_COMMUNITY_CO2E_BY_WTE
+    };
+
+<span class="fc" id="L253">    Q[] BENCHMARK_BY_BEDS_HDRS = new Q[] {</span>
+            Q.TOTAL_CORE_CO2E_BY_BEDS,
+            Q.TOTAL_COMMISSIONING_CO2E_BY_BEDS,
+            Q.TOTAL_PROCUREMENT_2017_CO2E_BY_BEDS,
+            Q.TOTAL_COMMUNITY_CO2E_BY_BEDS
+    };
+
+<span class="fc" id="L260">    Q[] BENCHMARK_BY_PATIENT_CONTACTS_HDRS = new Q[] {</span>
+            Q.TOTAL_CORE_CO2E_BY_PATIENT_CONTACT,
+            Q.TOTAL_COMMISSIONING_CO2E_BY_PATIENT_CONTACT,
+            Q.TOTAL_PROCUREMENT_2017_CO2E_BY_PATIENT_CONTACT,
+            Q.TOTAL_COMMUNITY_CO2E_BY_PATIENT_CONTACT
+    };
+
+<span class="fc" id="L267">    Q[] BENCHMARK_BY_OPEX_HDRS = new Q[] {</span>
+            Q.TOTAL_CORE_CO2E_BY_OPEX,
+            Q.TOTAL_COMMISSIONING_CO2E_BY_OPEX,
+            Q.TOTAL_PROCUREMENT_2017_CO2E_BY_OPEX,
+            Q.TOTAL_COMMUNITY_CO2E_BY_OPEX
+    };
+
+<span class="fc" id="L274">    Q[] QUALITATIVE_QS = new Q[] {</span>
+            Q.ADAPTATION_PERF,
+            Q.ENERGY_PERF,
+            Q.PAPER_PERF,
+            Q.TRAJECTORY_PERF,
+            Q.TRAVEL_PERF,
+            Q.WASTE_PERF,
+            Q.WASTE_CTXT,
+            Q.WATER_PERF,
+            Q.WATER_CTXT
+    };
+
+    public String ANALYSE_BY_E_CLASS = &quot;0-E-Class&quot;;
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.2.201808211720</span></div></body></html>

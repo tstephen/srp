@@ -1,0 +1,252 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>WeightingFactor.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Sustainability Reporting</a> &gt; <a href="index.source.html" class="el_package">digital.srp.sreport.model</a> &gt; <span class="el_source">WeightingFactor.java</span></div><h1>WeightingFactor.java</h1><pre class="source lang-java linenums">package digital.srp.sreport.model;
+
+import java.math.BigDecimal;
+import java.util.Date;
+import java.util.List;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
+import javax.persistence.Transient;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
+import javax.xml.bind.annotation.XmlElement;
+
+import org.springframework.data.annotation.CreatedBy;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedBy;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.hateoas.Link;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonView;
+
+import digital.srp.sreport.model.views.SurveyViews;
+import digital.srp.sreport.model.views.WeightingFactorViews;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
+import lombok.experimental.Accessors;
+
+/**
+ *
+ * @author Tim Stephenson
+ */
+@Accessors(fluent=true)
+<span class="pc" id="L40">@Data</span>
+<span class="nc" id="L41">@ToString(exclude = { &quot;id&quot; })</span>
+<span class="pc bpc" id="L42" title="61 of 70 branches missed.">@EqualsAndHashCode(exclude = { &quot;id&quot;, &quot;created&quot;, &quot;createdBy&quot;, &quot;lastUpdated&quot;, &quot;updatedBy&quot; })</span>
+<span class="fc" id="L43">@NoArgsConstructor</span>
+@Entity
+@Table(name= &quot;SR_WFACTOR&quot;)
+public class WeightingFactor {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    @JsonProperty
+    @JsonView(WeightingFactorViews.Summary.class)
+    @Column(name = &quot;id&quot;)
+<span class="nc" id="L53">    private Long id;</span>
+
+    @NotNull
+    @Size(max = 50)
+    @JsonProperty
+    @JsonView(WeightingFactorViews.Summary.class)
+    @Column(name = &quot;org_type&quot;)
+<span class="fc" id="L60">    private String orgType;</span>
+
+    @NotNull
+    @Size(max = 60)
+    @JsonProperty
+    @JsonView(WeightingFactorViews.Summary.class)
+    @Column(name = &quot;category&quot;)
+<span class="fc" id="L67">    private String category;</span>
+
+    /**
+     * Currently only done once in 2014-15
+     */
+    @NotNull
+    @Size(max = 7)
+    @JsonProperty
+    @JsonView(WeightingFactorViews.Summary.class)
+    @Column(name = &quot;period&quot;)
+<span class="fc" id="L77">    private String applicablePeriod;</span>
+
+    /**
+     * Volume of carbon emissions in kgCO&lt;sub&gt;2&lt;/sub&gt;e.
+     */
+    @NotNull
+    @JsonProperty
+    @JsonView(WeightingFactorViews.Summary.class)
+    @Column(name = &quot;c_val&quot;, precision = 12, scale = 0)
+<span class="fc" id="L86">    private BigDecimal carbonValue;</span>
+
+    /**
+     * Value of spend in £s.
+     */
+    @NotNull
+    @JsonProperty
+    @JsonView(WeightingFactorViews.Summary.class)
+    @Column(name = &quot;m_val&quot;, precision = 12, scale = 0)
+<span class="fc" id="L95">    private BigDecimal moneyValue;</span>
+
+
+    /**
+     * Proportion of total spending spent on this category (derived empirically).
+     */
+    @JsonProperty
+    @JsonView(WeightingFactorViews.Summary.class)
+    @Column(name = &quot;p_val&quot;, precision = 6, scale = 3)
+<span class="fc" id="L104">    private BigDecimal proportionOfTotal;</span>
+
+    /**
+     * Intensity of carbon emissions in kgCO&lt;sub&gt;2&lt;/sub&gt;e / £.
+     */
+    @JsonProperty
+    @JsonView(WeightingFactorViews.Summary.class)
+    @Column(name = &quot;i_val&quot;, precision = 6, scale = 3)
+    private BigDecimal intensityValue;
+
+    @Transient
+    @XmlElement(name = &quot;link&quot;, namespace = Link.ATOM_NAMESPACE)
+    @JsonProperty(&quot;links&quot;)
+    @JsonView(SurveyViews.Summary.class)
+<span class="fc" id="L118">    private List&lt;Link&gt; links;</span>
+
+    @Column(name = &quot;created&quot;, nullable = false, updatable = false)
+    @CreatedDate
+<span class="nc" id="L122">    private Date created;</span>
+
+    @Column(name = &quot;created_by&quot;)
+    @CreatedBy
+<span class="nc" id="L126">    private String createdBy;</span>
+
+    @Column(name = &quot;last_updated&quot;)
+    @LastModifiedDate
+<span class="nc" id="L130">    private Date lastUpdated;</span>
+
+    @Column(name = &quot;updated_by&quot;)
+    @LastModifiedBy
+<span class="nc" id="L134">    private String updatedBy;</span>
+
+    public BigDecimal intensityValue() {
+<span class="pc bpc" id="L137" title="2 of 6 branches missed.">        if (carbonValue == null || moneyValue == null || moneyValue.intValue() == 0) {</span>
+<span class="fc" id="L138">            return BigDecimal.ZERO;</span>
+        }
+<span class="fc" id="L140">        return carbonValue.divide(moneyValue,3, java.math.RoundingMode.HALF_UP);</span>
+    }
+
+    public void intensityValue(BigDecimal intensityValue) {
+        //this.intensityValue = intensityValue;
+<span class="nc" id="L145">    }</span>
+
+    public Long getId() {
+<span class="fc" id="L148">        return id;</span>
+    }
+
+    public void setId(Long id) {
+<span class="nc" id="L152">        this.id = id;</span>
+<span class="nc" id="L153">    }</span>
+
+    public String getOrgType() {
+<span class="nc" id="L156">        return orgType;</span>
+    }
+
+    public void setOrgType(String orgType) {
+<span class="nc" id="L160">        this.orgType = orgType;</span>
+<span class="nc" id="L161">    }</span>
+
+    public String getCategory() {
+<span class="nc" id="L164">        return category;</span>
+    }
+
+    public void setCategory(String category) {
+<span class="nc" id="L168">        this.category = category;</span>
+<span class="nc" id="L169">    }</span>
+
+    public String getApplicablePeriod() {
+<span class="nc" id="L172">        return applicablePeriod;</span>
+    }
+
+    public void setApplicablePeriod(String applicablePeriod) {
+<span class="nc" id="L176">        this.applicablePeriod = applicablePeriod;</span>
+<span class="nc" id="L177">    }</span>
+
+    public BigDecimal getCarbonValue() {
+<span class="nc" id="L180">        return carbonValue;</span>
+    }
+
+    public void setCarbonValue(BigDecimal carbonValue) {
+<span class="nc" id="L184">        this.carbonValue = carbonValue;</span>
+<span class="nc" id="L185">    }</span>
+
+    public BigDecimal getMoneyValue() {
+<span class="nc" id="L188">        return moneyValue;</span>
+    }
+
+    public void setMoneyValue(BigDecimal moneyValue) {
+<span class="nc" id="L192">        this.moneyValue = moneyValue;</span>
+<span class="nc" id="L193">    }</span>
+
+    public BigDecimal getProportionOfTotal() {
+<span class="nc" id="L196">        return proportionOfTotal;</span>
+    }
+
+    public void setProportionOfTotal(BigDecimal proportionOfTotal) {
+<span class="nc" id="L200">        this.proportionOfTotal = proportionOfTotal;</span>
+<span class="nc" id="L201">    }</span>
+
+    public BigDecimal getIntensityValue() {
+<span class="nc" id="L204">        return intensityValue;</span>
+    }
+
+    public void setIntensityValue(BigDecimal intensityValue) {
+<span class="nc" id="L208">        this.intensityValue = intensityValue;</span>
+<span class="nc" id="L209">    }</span>
+
+    public List&lt;Link&gt; getLinks() {
+<span class="nc" id="L212">        return links;</span>
+    }
+
+    public void setLinks(List&lt;Link&gt; links) {
+<span class="nc" id="L216">        this.links = links;</span>
+<span class="nc" id="L217">    }</span>
+
+    public Date getCreated() {
+<span class="nc" id="L220">        return created;</span>
+    }
+
+    public void setCreated(Date created) {
+<span class="nc" id="L224">        this.created = created;</span>
+<span class="nc" id="L225">    }</span>
+
+    public String getCreatedBy() {
+<span class="nc" id="L228">        return createdBy;</span>
+    }
+
+    public void setCreatedBy(String createdBy) {
+<span class="nc" id="L232">        this.createdBy = createdBy;</span>
+<span class="nc" id="L233">    }</span>
+
+    public Date getLastUpdated() {
+<span class="nc" id="L236">        return lastUpdated;</span>
+    }
+
+    public void setLastUpdated(Date lastUpdated) {
+<span class="nc" id="L240">        this.lastUpdated = lastUpdated;</span>
+<span class="nc" id="L241">    }</span>
+
+    public String getUpdatedBy() {
+<span class="nc" id="L244">        return updatedBy;</span>
+    }
+
+    public void setUpdatedBy(String updatedBy) {
+<span class="nc" id="L248">        this.updatedBy = updatedBy;</span>
+<span class="nc" id="L249">    }</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.2.201808211720</span></div></body></html>

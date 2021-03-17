@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>InterventionTypeValidator.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Marginal Abatement Cost Curves</a> &gt; <a href="index.source.html" class="el_package">digital.srp.macc.maths</a> &gt; <span class="el_source">InterventionTypeValidator.java</span></div><h1>InterventionTypeValidator.java</h1><pre class="source lang-java linenums">/*******************************************************************************
+ * Copyright 2015, 2017 Tim Stephenson and contributors
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *******************************************************************************/
+package digital.srp.macc.maths;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import digital.srp.macc.model.InterventionType;
+
+<span class="nc" id="L23">public class InterventionTypeValidator {</span>
+
+<span class="fc" id="L25">    private static final Logger LOGGER = LoggerFactory</span>
+<span class="fc" id="L26">            .getLogger(InterventionTypeValidator.class);</span>
+
+    public static boolean isValid(InterventionType intervention) {
+<span class="fc" id="L29">        LOGGER.info(String.format(&quot;Checking validity of %1$s intervention&quot;,</span>
+<span class="fc" id="L30">                intervention.getName()));</span>
+<span class="fc" id="L31">        boolean valid = true;</span>
+<span class="pc bpc" id="L32" title="1 of 2 branches missed.">        if (intervention.getName() == null) {</span>
+<span class="nc" id="L33">            LOGGER.error(&quot;  Name is null&quot;);</span>
+<span class="nc" id="L34">            valid = false;</span>
+        }
+<span class="fc bfc" id="L36" title="All 2 branches covered.">        if (intervention.getScaling() == null) {</span>
+<span class="fc" id="L37">            LOGGER.error(&quot;  Scaling is null&quot;);</span>
+<span class="fc" id="L38">            valid = false;</span>
+        }
+<span class="fc bfc" id="L40" title="All 2 branches covered.">        if (intervention.getUptake() == null) {</span>
+<span class="fc" id="L41">            LOGGER.error(&quot;  Uptake is null&quot;);</span>
+<span class="fc" id="L42">            valid = false;</span>
+        }
+<span class="fc bfc" id="L44" title="All 2 branches covered.">        if (intervention.getAnnualCashInflowsTS() != null</span>
+<span class="pc bpc" id="L45" title="1 of 2 branches missed.">                &amp;&amp; intervention.getAnnualCashInflowsTimeSeries().size() == 0) {</span>
+<span class="nc" id="L46">            LOGGER.error(&quot;  Did not parse annual cash inflows time series&quot;);</span>
+<span class="nc" id="L47">            valid = false;</span>
+        }
+<span class="fc bfc" id="L49" title="All 2 branches covered.">        if (intervention.getAnnualTonnesCo2eSavedTS() == null</span>
+<span class="fc bfc" id="L50" title="All 2 branches covered.">                &amp;&amp; intervention.getAnnualTonnesCo2eSaved() == null) {</span>
+<span class="fc" id="L51">            LOGGER.error(&quot;  No CO2e savings, either as time series or single number&quot;);</span>
+<span class="fc" id="L52">            valid = false;</span>
+        }
+<span class="fc bfc" id="L54" title="All 2 branches covered.">        if (intervention.getAnnualTonnesCo2eSavedTS() != null</span>
+<span class="pc bpc" id="L55" title="1 of 2 branches missed.">                &amp;&amp; intervention.getAnnualTonnesCo2eSavedTimeSeries().size() &lt; 5) {</span>
+<span class="nc" id="L56">            LOGGER.error(&quot;  CO2e savings are specified by a time series but does not go as far as 2020&quot;);</span>
+<span class="nc" id="L57">            valid = false;</span>
+        }
+        // This is likely a calculation bug
+<span class="fc bfc" id="L60" title="All 2 branches covered.">        if (valid</span>
+<span class="pc bpc" id="L61" title="1 of 2 branches missed.">                &amp;&amp; (intervention.getCostPerTonneCo2e() == null || intervention</span>
+<span class="fc bfc" id="L62" title="All 2 branches covered.">                        .getCostPerTonneCo2e().floatValue() == 0.0f)) {</span>
+<span class="fc" id="L63">            LOGGER.error(&quot;  Could not calculate cost per tonne&quot;);</span>
+<span class="fc" id="L64">            valid = false;</span>
+        }
+<span class="fc bfc" id="L66" title="All 2 branches covered.">        if (valid</span>
+<span class="pc bpc" id="L67" title="1 of 2 branches missed.">                &amp;&amp; (intervention.getTonnesCo2eSavedTargetYear() == null || intervention</span>
+<span class="fc bfc" id="L68" title="All 2 branches covered.">                        .getTonnesCo2eSavedTargetYear().longValue() == 0l)) {</span>
+<span class="fc" id="L69">            LOGGER.error(&quot;  Could not calculate CO2e saved in target year&quot;);</span>
+<span class="fc" id="L70">            valid = false;</span>
+        }
+<span class="fc bfc" id="L72" title="All 2 branches covered.">        if (valid) {</span>
+<span class="fc" id="L73">            LOGGER.info(&quot;  Valid and complete&quot;);</span>
+        }
+<span class="fc" id="L75">        return valid;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.2.201808211720</span></div></body></html>

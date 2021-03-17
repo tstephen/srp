@@ -1,0 +1,857 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>SduReportController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Sustainability Reporting</a> &gt; <a href="index.source.html" class="el_package">digital.srp.sreport.web</a> &gt; <span class="el_source">SduReportController.java</span></div><h1>SduReportController.java</h1><pre class="source lang-java linenums">package digital.srp.sreport.web;
+
+import java.text.DecimalFormat;
+import java.text.Format;
+import java.util.Optional;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+
+import digital.srp.sreport.internal.PeriodUtil;
+import digital.srp.sreport.model.surveys.SduQuestions;
+import digital.srp.sreport.repositories.AnswerRepository;
+import digital.srp.sreport.repositories.SurveyRepository;
+import digital.srp.sreport.repositories.SurveyReturnRepository;
+import digital.srp.sreport.services.ReportModelHelper;
+import digital.srp.sreport.services.tds.Aggregator;
+import digital.srp.sreport.services.tds.Totaller;
+
+/**
+ * REST web service for accessing various reports.
+ *
+ * @author Tim Stephenson
+ */
+@Controller
+@RequestMapping(value = &quot;/reports&quot;)
+<span class="fc" id="L33">public class SduReportController implements SduQuestions {</span>
+
+<span class="fc" id="L35">    private static final Logger LOGGER = LoggerFactory</span>
+<span class="fc" id="L36">            .getLogger(SduReportController.class);</span>
+
+    private static final String DEFAULT_MAX_PERIODS = &quot;4&quot;;
+
+    @Autowired
+    protected SurveyRepository surveyRepo;
+
+    @Autowired
+    protected SurveyReturnRepository returnRepo;
+
+    @Autowired
+    protected AnswerRepository answerRepo;
+
+<span class="fc" id="L49">    private DecimalFormat rawDecimalFormat = new DecimalFormat(&quot;#&quot;);</span>
+    // #183 remove round to 3 sig fig
+<span class="fc" id="L51">    private Format prettyPrintDecimalFormat = new DecimalFormat(&quot;#,###&quot;);</span>
+
+<span class="fc" id="L53">    private Aggregator totaller = new Totaller();</span>
+
+    /**
+     * A table of organisation data for the specified organisation and
+     * period.
+     *
+     * @return HTML table.
+     */
+    @RequestMapping(value = &quot;/{org}/{period}/org.html&quot;, method = RequestMethod.GET, produces = &quot;text/html&quot;)
+    public String orgTable(@PathVariable(&quot;org&quot;) String org,
+            @PathVariable(&quot;period&quot;) String period,
+            @RequestParam(value = &quot;maxPeriods&quot;, required = false, defaultValue = DEFAULT_MAX_PERIODS) Integer maxPeriods,
+            Model model) {
+<span class="nc" id="L66">        LOGGER.info(String.format(&quot;orgTable for %1$s %2$s&quot;, org, period));</span>
+
+<span class="nc" id="L68">        new ReportModelHelper(answerRepo).fillModel(org, period, ORG_HDRS, model, true, prettyPrintDecimalFormat, maxPeriods, true, Optional.empty());</span>
+<span class="nc" id="L69">        return &quot;table-period-as-col&quot;;</span>
+    }
+
+    /**
+     * A table of energy use (kWh) for the specified organisation and
+     * period.
+     *
+     * @return HTML table.
+     */
+    @RequestMapping(value = &quot;/{org}/{period}/energy.html&quot;, method = RequestMethod.GET, produces = &quot;text/html&quot;)
+    public String energyTable(@PathVariable(&quot;org&quot;) String org,
+            @PathVariable(&quot;period&quot;) String period,
+            @RequestParam(value = &quot;maxPeriods&quot;, required = false, defaultValue = DEFAULT_MAX_PERIODS) Integer maxPeriods,
+            Model model) {
+<span class="nc" id="L83">        LOGGER.info(String.format(&quot;energyTable for %1$s %2$s&quot;, org, period));</span>
+
+<span class="nc" id="L85">        new ReportModelHelper(answerRepo).fillModel(org, period, ENERGY_HDRS, model, true, prettyPrintDecimalFormat, maxPeriods, true, Optional.of(totaller));</span>
+<span class="nc" id="L86">        return &quot;table-period-as-col&quot;;</span>
+    }
+
+    /**
+     * A table of energy use (kWh) for the specified organisation and
+     * period.
+     *
+     * @return CSV with header row.
+     */
+    @RequestMapping(value = &quot;/{org}/{period}/energy.csv&quot;, method = RequestMethod.GET, produces = &quot;text/csv&quot;)
+    public String energyCsv(@PathVariable(&quot;org&quot;) String org,
+            @PathVariable(&quot;period&quot;) String period, @RequestParam(value = &quot;maxPeriods&quot;, required = false, defaultValue = DEFAULT_MAX_PERIODS) Integer maxPeriods,
+            Model model) {
+<span class="nc" id="L99">        LOGGER.info(String.format(&quot;energyCsv for %1$s %2$s&quot;, org, period));</span>
+
+<span class="nc" id="L101">        new ReportModelHelper(answerRepo).fillModel(org, period, ENERGY_HDRS, model, false, rawDecimalFormat, maxPeriods, true, Optional.empty());</span>
+<span class="nc" id="L102">        return &quot;csv&quot;;</span>
+    }
+
+    /**
+     * A table of energy use (CO2e) for the specified organisation and
+     * period.
+     *
+     * @return HTML table.
+     */
+    @RequestMapping(value = &quot;/{org}/{period}/energy-co2e.html&quot;, method = RequestMethod.GET, produces = &quot;text/html&quot;)
+    public String energyCO2eTable(@PathVariable(&quot;org&quot;) String org,
+            @PathVariable(&quot;period&quot;) String period, @RequestParam(value = &quot;maxPeriods&quot;, required = false, defaultValue = DEFAULT_MAX_PERIODS) Integer maxPeriods,
+            Model model) {
+<span class="nc" id="L115">        LOGGER.info(</span>
+<span class="nc" id="L116">                String.format(&quot;energyCO2eTable for %1$s %2$s&quot;, org, period));</span>
+
+<span class="nc" id="L118">        new ReportModelHelper(answerRepo).fillModel(org, period, ENERGY_CO2E_HDRS, model, true, prettyPrintDecimalFormat, maxPeriods, true, Optional.of(totaller));</span>
+<span class="nc" id="L119">        return &quot;table-period-as-col&quot;;</span>
+    }
+
+    /**
+     * A table of energy use (CO2e) for the specified organisation and
+     * period.
+     *
+     * @return CSV with header row.
+     */
+    @RequestMapping(value = &quot;/{org}/{period}/energy-co2e.csv&quot;, method = RequestMethod.GET, produces = &quot;text/csv&quot;)
+    public String energyCO2eCsv(@PathVariable(&quot;org&quot;) String org,
+            @PathVariable(&quot;period&quot;) String period, @RequestParam(value = &quot;maxPeriods&quot;, required = false, defaultValue = DEFAULT_MAX_PERIODS) Integer maxPeriods,
+            Model model) {
+<span class="nc" id="L132">        LOGGER.info(String.format(&quot;energyCO2eCsv for %1$s %2$s&quot;, org, period));</span>
+
+<span class="nc" id="L134">        new ReportModelHelper(answerRepo).fillModel(org, period, ENERGY_CO2E_HDRS, model, false, rawDecimalFormat, maxPeriods, true, Optional.empty());</span>
+<span class="nc" id="L135">        return &quot;csv&quot;;</span>
+    }
+
+    /**
+     * A table of paper data for the specified organisation and period.
+     *
+     * @return HTML table.
+     */
+    @RequestMapping(value = &quot;/{org}/{period}/paper.html&quot;, method = RequestMethod.GET, produces = &quot;text/html&quot;)
+    public String paperTable(@PathVariable(&quot;org&quot;) String org,
+            @PathVariable(&quot;period&quot;) String period, @RequestParam(value = &quot;maxPeriods&quot;, required = false, defaultValue = DEFAULT_MAX_PERIODS) Integer maxPeriods,
+            Model model) {
+<span class="nc" id="L147">        LOGGER.info(String.format(&quot;paperTable for %1$s %2$s&quot;, org, period));</span>
+
+<span class="nc" id="L149">        new ReportModelHelper(answerRepo).fillModel(org, period, PAPER_HDRS, model, true, prettyPrintDecimalFormat, maxPeriods, true, Optional.empty());</span>
+<span class="nc" id="L150">        return &quot;table-period-as-col&quot;;</span>
+    }
+
+    /**
+     * A table of paper data emissions (CO2e) for the specified
+     * organisation and period.
+     *
+     * @return HTML table.
+     */
+    @RequestMapping(value = &quot;/{org}/{period}/paper-co2e.html&quot;, method = RequestMethod.GET, produces = &quot;text/html&quot;)
+    public String paperCO2eTable(@PathVariable(&quot;org&quot;) String org,
+            @PathVariable(&quot;period&quot;) String period, @RequestParam(value = &quot;maxPeriods&quot;, required = false, defaultValue = DEFAULT_MAX_PERIODS) Integer maxPeriods,
+            Model model) {
+<span class="nc" id="L163">        LOGGER.info(String.format(&quot;paperCO2eTable for %1$s %2$s&quot;, org, period));</span>
+
+<span class="nc" id="L165">        new ReportModelHelper(answerRepo).fillModel(org, period, PAPER_CO2E_HDRS, model, true, prettyPrintDecimalFormat, maxPeriods, true, Optional.empty());</span>
+<span class="nc" id="L166">        return &quot;table-period-as-col&quot;;</span>
+    }
+
+    /**
+     * A table of paper use (CO2e) for the specified organisation and
+     * period.
+     *
+     * @return CSV with header row.
+     */
+    @RequestMapping(value = &quot;/{org}/{period}/paper-co2e.csv&quot;, method = RequestMethod.GET, produces = &quot;text/csv&quot;)
+    public String paperCO2eCsv(@PathVariable(&quot;org&quot;) String org,
+            @PathVariable(&quot;period&quot;) String period, @RequestParam(value = &quot;maxPeriods&quot;, required = false, defaultValue = DEFAULT_MAX_PERIODS) Integer maxPeriods,
+            Model model) {
+<span class="nc" id="L179">        LOGGER.info(String.format(&quot;paperCO2eCsv for %1$s %2$s&quot;, org, period));</span>
+
+<span class="nc" id="L181">        new ReportModelHelper(answerRepo).fillModel(org, period, PAPER_CO2E_HDRS, model, false, rawDecimalFormat, maxPeriods, true, Optional.empty());</span>
+<span class="nc" id="L182">        return &quot;csv&quot;;</span>
+    }
+
+    /**
+     * A table of travel data for the specified organisation and period.
+     *
+     * @return HTML table.
+     */
+    @RequestMapping(value = &quot;/{org}/{period}/travel.html&quot;, method = RequestMethod.GET, produces = &quot;text/html&quot;)
+    public String travelTable(@PathVariable(&quot;org&quot;) String org,
+            @PathVariable(&quot;period&quot;) String period, @RequestParam(value = &quot;maxPeriods&quot;, required = false, defaultValue = DEFAULT_MAX_PERIODS) Integer maxPeriods,
+            Model model) {
+<span class="nc" id="L194">        LOGGER.info(String.format(&quot;travelTable for %1$s %2$s&quot;, org, period));</span>
+
+<span class="nc" id="L196">        new ReportModelHelper(answerRepo).fillModel(org, period, TRAVEL_HDRS, model, true, prettyPrintDecimalFormat, maxPeriods, true, Optional.of(totaller));</span>
+<span class="nc" id="L197">        return &quot;table-period-as-col&quot;;</span>
+    }
+
+    /**
+     * A table of travel data emissions (CO2e) for the specified
+     * organisation and period.
+     *
+     * @return HTML table.
+     */
+    @RequestMapping(value = &quot;/{org}/{period}/travel-co2e.html&quot;, method = RequestMethod.GET, produces = &quot;text/html&quot;)
+    public String travelCO2eTable(@PathVariable(&quot;org&quot;) String org,
+            @PathVariable(&quot;period&quot;) String period, @RequestParam(value = &quot;maxPeriods&quot;, required = false, defaultValue = DEFAULT_MAX_PERIODS) Integer maxPeriods,
+            Model model) {
+<span class="nc" id="L210">        LOGGER.info(String.format(&quot;travelCO2eTable for %1$s %2$s&quot;, org, period));</span>
+
+<span class="nc" id="L212">        new ReportModelHelper(answerRepo).fillModel(org, period, SCOPE_3_TRAVEL_HDRS, model, true, prettyPrintDecimalFormat, maxPeriods, true, Optional.of(totaller));</span>
+<span class="nc" id="L213">        return &quot;table-period-as-col&quot;;</span>
+    }
+
+    /**
+     * A table of travel use (CO2e) for the specified organisation and
+     * period.
+     *
+     * @return CSV with header row.
+     */
+    @RequestMapping(value = &quot;/{org}/{period}/travel-co2e.csv&quot;, method = RequestMethod.GET, produces = &quot;text/csv&quot;)
+    public String travelCO2eCsv(@PathVariable(&quot;org&quot;) String org,
+            @PathVariable(&quot;period&quot;) String period, @RequestParam(value = &quot;maxPeriods&quot;, required = false, defaultValue = DEFAULT_MAX_PERIODS) Integer maxPeriods,
+            Model model) {
+<span class="nc" id="L226">        LOGGER.info(String.format(&quot;travelCO2eCsv for %1$s %2$s&quot;, org, period));</span>
+
+<span class="nc" id="L228">        new ReportModelHelper(answerRepo).fillModel(org, period, SCOPE_3_TRAVEL_HDRS, model, false, rawDecimalFormat, maxPeriods, true, Optional.empty());</span>
+<span class="nc" id="L229">        return &quot;csv&quot;;</span>
+    }
+
+    /**
+     * A table of waste (tonnes) for the specified organisation and
+     * period.
+     *
+     * @return HTML table.
+     */
+    @RequestMapping(value = &quot;/{org}/{period}/waste.html&quot;, method = RequestMethod.GET, produces = &quot;text/html&quot;)
+    public String wasteTable(@PathVariable(&quot;org&quot;) String org,
+            @PathVariable(&quot;period&quot;) String period, @RequestParam(value = &quot;maxPeriods&quot;, required = false, defaultValue = DEFAULT_MAX_PERIODS) Integer maxPeriods,
+            Model model) {
+<span class="nc" id="L242">        LOGGER.info(String.format(&quot;wasteTable for %1$s %2$s&quot;, org, period));</span>
+
+<span class="nc" id="L244">        new ReportModelHelper(answerRepo).fillModel(org, period, WASTE_HDRS, model, true, prettyPrintDecimalFormat, maxPeriods, true, Optional.of(totaller));</span>
+<span class="nc" id="L245">        return &quot;table-period-as-col&quot;;</span>
+    }
+
+    /**
+     * A table of waste (CO2e) for the specified organisation and
+     * period.
+     *
+     * @return HTML table.
+     */
+    @RequestMapping(value = &quot;/{org}/{period}/waste-co2e.html&quot;, method = RequestMethod.GET, produces = &quot;text/html&quot;)
+    public String wasteCO2eTable(@PathVariable(&quot;org&quot;) String org,
+            @PathVariable(&quot;period&quot;) String period, @RequestParam(value = &quot;maxPeriods&quot;, required = false, defaultValue = DEFAULT_MAX_PERIODS) Integer maxPeriods,
+            Model model) {
+<span class="nc" id="L258">        LOGGER.info(String.format(&quot;wasteCO2eTable for %1$s %2$s&quot;, org, period));</span>
+
+<span class="nc" id="L260">        new ReportModelHelper(answerRepo).fillModel(org, period, WASTE_CO2E_HDRS, model, true, prettyPrintDecimalFormat, maxPeriods, true, Optional.of(totaller));</span>
+<span class="nc" id="L261">        return &quot;table-period-as-col&quot;;</span>
+    }
+
+    /**
+     * A table of waste (CO2e) for the specified organisation and
+     * period.
+     *
+     * @return CSV with header row.
+     */
+    @RequestMapping(value = &quot;/{org}/{period}/waste-co2e.csv&quot;, method = RequestMethod.GET, produces = &quot;text/csv&quot;)
+    public String wasteCO2eCsv(@PathVariable(&quot;org&quot;) String org,
+            @PathVariable(&quot;period&quot;) String period, @RequestParam(value = &quot;maxPeriods&quot;, required = false, defaultValue = DEFAULT_MAX_PERIODS) Integer maxPeriods,
+            Model model) {
+<span class="nc" id="L274">        LOGGER.info(String.format(&quot;wasteCO2eCsv for %1$s %2$s&quot;, org, period));</span>
+
+<span class="nc" id="L276">        new ReportModelHelper(answerRepo).fillModel(org, period, WASTE_CO2E_HDRS, model, false, rawDecimalFormat, maxPeriods, true, Optional.empty());</span>
+<span class="nc" id="L277">        return &quot;csv&quot;;</span>
+    }
+
+    /**
+     * A table of water use for the specified organisation and period.
+     *
+     * @return HTML table.
+     */
+    @RequestMapping(value = &quot;/{org}/{period}/water.html&quot;, method = RequestMethod.GET, produces = &quot;text/html&quot;)
+    public String waterTable(@PathVariable(&quot;org&quot;) String org,
+            @PathVariable(&quot;period&quot;) String period, @RequestParam(value = &quot;maxPeriods&quot;, required = false, defaultValue = DEFAULT_MAX_PERIODS) Integer maxPeriods,
+            Model model) {
+<span class="nc" id="L289">        LOGGER.info(String.format(&quot;waterTable for %1$s %2$s&quot;, org, period));</span>
+
+<span class="nc" id="L291">        new ReportModelHelper(answerRepo).fillModel(org, period, WATER_HDRS, model, true, prettyPrintDecimalFormat, maxPeriods, true, Optional.empty());</span>
+<span class="nc" id="L292">        return &quot;table-period-as-col&quot;;</span>
+    }
+
+    /**
+     * A table of water emissions (CO2e) for the specified organisation and
+     * period.
+     *
+     * @return HTML table.
+     */
+    @RequestMapping(value = &quot;/{org}/{period}/water-co2e.html&quot;, method = RequestMethod.GET, produces = &quot;text/html&quot;)
+    public String waterCO2eTable(@PathVariable(&quot;org&quot;) String org,
+            @PathVariable(&quot;period&quot;) String period, @RequestParam(value = &quot;maxPeriods&quot;, required = false, defaultValue = DEFAULT_MAX_PERIODS) Integer maxPeriods,
+            Model model) {
+<span class="nc" id="L305">        LOGGER.info(String.format(&quot;waterCO2eTable for %1$s %2$s&quot;, org, period));</span>
+
+<span class="nc" id="L307">        new ReportModelHelper(answerRepo).fillModel(org, period, WATER_CO2E_HDRS, model, true, prettyPrintDecimalFormat, maxPeriods, true, Optional.of(totaller));</span>
+<span class="nc" id="L308">        return &quot;table-period-as-col&quot;;</span>
+    }
+
+    /**
+     * A table of water emissions (CO2e) for the specified organisation and
+     * period.
+     *
+     * @return CSV with header row.
+     */
+    @RequestMapping(value = &quot;/{org}/{period}/water-co2e.csv&quot;, method = RequestMethod.GET, produces = &quot;text/csv&quot;)
+    public String waterCO2eCsv(@PathVariable(&quot;org&quot;) String org,
+            @PathVariable(&quot;period&quot;) String period, @RequestParam(value = &quot;maxPeriods&quot;, required = false, defaultValue = DEFAULT_MAX_PERIODS) Integer maxPeriods,
+            Model model) {
+<span class="nc" id="L321">        LOGGER.info(String.format(&quot;waterCO2eCsv for %1$s %2$s&quot;, org, period));</span>
+
+<span class="nc" id="L323">        new ReportModelHelper(answerRepo).fillModel(org, period, WATER_CO2E_HDRS, model, false, rawDecimalFormat, maxPeriods, true, Optional.empty());</span>
+<span class="nc" id="L324">        return &quot;csv&quot;;</span>
+    }
+
+    /**
+     * A table of biomass well to tank emissions (CO2e) for the specified organisation and
+     * period.
+     *
+     * @return HTML table.
+     */
+    @RequestMapping(value = &quot;/{org}/{period}/biomass-co2e-wtt.html&quot;, method = RequestMethod.GET, produces = &quot;text/html&quot;)
+    public String biomassCO2eWttTable(@PathVariable(&quot;org&quot;) String org,
+            @PathVariable(&quot;period&quot;) String period, @RequestParam(value = &quot;maxPeriods&quot;, required = false, defaultValue = DEFAULT_MAX_PERIODS) Integer maxPeriods,
+            Model model) {
+<span class="nc" id="L337">        LOGGER.info(String.format(&quot;biomassCO2eWttTable for %1$s %2$s&quot;, org, period));</span>
+
+<span class="nc" id="L339">        new ReportModelHelper(answerRepo).fillModel(org, period, BIOMASS_CO2E_WTT_HDRS, model, true, prettyPrintDecimalFormat, maxPeriods, true, Optional.of(totaller));</span>
+<span class="nc" id="L340">        return &quot;table-period-as-col&quot;;</span>
+    }
+
+    /**
+     * A table of biomass well to tank emissions (CO2e) for the specified organisation and
+     * period.
+     *
+     * @return CSV with header row.
+     */
+    @RequestMapping(value = &quot;/{org}/{period}/biomass-co2e-wtt.csv&quot;, method = RequestMethod.GET, produces = &quot;text/csv&quot;)
+    public String biomassCO2eWttCsv(@PathVariable(&quot;org&quot;) String org,
+            @PathVariable(&quot;period&quot;) String period, @RequestParam(value = &quot;maxPeriods&quot;, required = false, defaultValue = DEFAULT_MAX_PERIODS) Integer maxPeriods,
+            Model model) {
+<span class="nc" id="L353">        LOGGER.info(String.format(&quot;biomassCO2eWttCsv for %1$s %2$s&quot;, org, period));</span>
+
+<span class="nc" id="L355">        new ReportModelHelper(answerRepo).fillModel(org, period, BIOMASS_CO2E_WTT_HDRS, model, false, rawDecimalFormat, maxPeriods, true, Optional.empty());</span>
+<span class="nc" id="L356">        return &quot;csv&quot;;</span>
+    }
+
+    /**
+     * A table of biomass out of scope emissions (CO2e) use for the specified organisation and
+     * period.
+     *
+     * @return HTML table.
+     */
+    @RequestMapping(value = &quot;/{org}/{period}/biomass-co2e-noscope.html&quot;, method = RequestMethod.GET, produces = &quot;text/html&quot;)
+    public String biomassCO2eNoScopeTable(@PathVariable(&quot;org&quot;) String org,
+            @PathVariable(&quot;period&quot;) String period, @RequestParam(value = &quot;maxPeriods&quot;, required = false, defaultValue = DEFAULT_MAX_PERIODS) Integer maxPeriods,
+            Model model) {
+<span class="nc" id="L369">        LOGGER.info(String.format(&quot;biomassCO2eNoScopeTable for %1$s %2$s&quot;, org, period));</span>
+
+<span class="nc" id="L371">        new ReportModelHelper(answerRepo).fillModel(org, period, BIOMASS_CO2E_NOSCOPE_HDRS, model, true, prettyPrintDecimalFormat, maxPeriods, true, Optional.of(totaller));</span>
+<span class="nc" id="L372">        return &quot;table-period-as-col&quot;;</span>
+    }
+
+    /**
+     * A table of biomass out of scope emissions (CO2e) for the specified organisation and
+     * period.
+     *
+     * @return CSV with header row.
+     */
+    @RequestMapping(value = &quot;/{org}/{period}/biomass-co2e-noscope.csv&quot;, method = RequestMethod.GET, produces = &quot;text/csv&quot;)
+    public String biomassCO2eNoScopeCsv(@PathVariable(&quot;org&quot;) String org,
+            @PathVariable(&quot;period&quot;) String period, @RequestParam(value = &quot;maxPeriods&quot;, required = false, defaultValue = DEFAULT_MAX_PERIODS) Integer maxPeriods,
+            Model model) {
+<span class="nc" id="L385">        LOGGER.info(String.format(&quot;biomassCO2eNoScopeCsv for %1$s %2$s&quot;, org, period));</span>
+
+<span class="nc" id="L387">        new ReportModelHelper(answerRepo).fillModel(org, period, BIOMASS_CO2E_NOSCOPE_HDRS, model, false, rawDecimalFormat, maxPeriods, true, Optional.empty());</span>
+<span class="nc" id="L388">        return &quot;csv&quot;;</span>
+    }
+
+    /**
+     * A table of categorised carbon emissions for the specified
+     * organisation and period.
+     *
+     * @return HTML table.
+     */
+    @RequestMapping(value = &quot;/{org}/{period}/carbon-footprint.html&quot;, method = RequestMethod.GET, produces = &quot;text/html&quot;)
+    public String footprintTable(@PathVariable(&quot;org&quot;) String org,
+            @PathVariable(&quot;period&quot;) String period, @RequestParam(value = &quot;maxPeriods&quot;, required = false, defaultValue = DEFAULT_MAX_PERIODS) Integer maxPeriods,
+            Model model) {
+<span class="nc" id="L401">        LOGGER.info(String.format(&quot;footprintTable for %1$s %2$s&quot;, org, period));</span>
+
+        // If only fetching one period make sure it is not lost off right edge
+<span class="nc bnc" id="L404" title="All 2 branches missed.">        boolean ascending = maxPeriods.equals(1) ? false : true;</span>
+<span class="nc" id="L405">        new ReportModelHelper(answerRepo).fillModel(org, period, FOOTPRINT_2017_PCT_HDRS, model, true, prettyPrintDecimalFormat, maxPeriods, ascending, Optional.of(totaller));</span>
+<span class="nc" id="L406">        return &quot;table-period-as-col&quot;;</span>
+    }
+
+    /**
+     * A table of categorised carbon emissions for the specified
+     * organisation and period.
+     *
+     * @return CSV with header row.
+     */
+    @RequestMapping(value = &quot;/{org}/{period}/carbon-footprint.csv&quot;, method = RequestMethod.GET, produces = &quot;text/csv&quot;)
+    public String footprintCsv(@PathVariable(&quot;org&quot;) String org,
+            @PathVariable(&quot;period&quot;) String period,
+            @RequestParam(value = &quot;maxPeriods&quot;, required = false, defaultValue = DEFAULT_MAX_PERIODS) Integer maxPeriods,
+            Model model) {
+<span class="nc" id="L420">        LOGGER.info(String.format(&quot;footprintCsv for %1$s %2$s&quot;, org, period));</span>
+
+<span class="nc" id="L422">        new ReportModelHelper(answerRepo).fillModel(org, period, FOOTPRINT_2017_PCT_HDRS, model, true, rawDecimalFormat, maxPeriods, true, Optional.empty());</span>
+<span class="nc" id="L423">        return &quot;csv-period-as-col&quot;;</span>
+    }
+
+    /**
+     * A table of categorised carbon emissions for the specified
+     * organisation and period.
+     *
+     * @return CSV with header row.
+     */
+    @RequestMapping(value = &quot;/{org}/{period}/carbon-emissions-profile.csv&quot;, method = RequestMethod.GET, produces = &quot;text/csv&quot;)
+    public String emissionsProfileCsv(@PathVariable(&quot;org&quot;) String org,
+            @PathVariable(&quot;period&quot;) String period, @RequestParam(value = &quot;maxPeriods&quot;, required = false, defaultValue = DEFAULT_MAX_PERIODS) Integer maxPeriods,
+            Model model) {
+<span class="nc" id="L436">        LOGGER.info(String.format(&quot;emissionsProfileCsv for %1$s %2$s&quot;, org, period));</span>
+
+<span class="nc" id="L438">        new ReportModelHelper(answerRepo).fillModel(org, period, SDU_PROFILE_CO2E_HDRS, model, false, rawDecimalFormat, maxPeriods, true, Optional.empty());</span>
+<span class="nc" id="L439">        return &quot;csv&quot;;</span>
+    }
+
+    /**
+     * A table of categorised carbon emissions in ratio to expenditure
+     * for the specified organisation and period.
+     *
+     * @return HTML table.
+     */
+    @RequestMapping(value = &quot;/{org}/{period}/carbon-by-expenditure.html&quot;, method = RequestMethod.GET, produces = &quot;text/html&quot;)
+    public String carbonByExpenditureTable(@PathVariable(&quot;org&quot;) String org,
+            @PathVariable(&quot;period&quot;) String period, @RequestParam(value = &quot;maxPeriods&quot;, required = false, defaultValue = DEFAULT_MAX_PERIODS) Integer maxPeriods,
+            Model model) {
+<span class="nc" id="L452">        LOGGER.info(String.format(&quot;carbonByExpenditureTable for %1$s %2$s&quot;, org, period));</span>
+
+<span class="nc" id="L454">        new ReportModelHelper(answerRepo).fillModel(org, period, SPEND_HDRS, model, true, prettyPrintDecimalFormat, maxPeriods, true, Optional.of(totaller));</span>
+<span class="nc" id="L455">        return &quot;table-period-as-col&quot;;</span>
+    }
+
+    /**
+     * A table of categorised carbon emissions in ratio to expenditure
+     * for the specified organisation and period.
+     *
+     * @return CSV with header row.
+     */
+    @RequestMapping(value = &quot;/{org}/{period}/carbon-by-expenditure.csv&quot;, method = RequestMethod.GET, produces = &quot;text/csv&quot;)
+    public String carbonByExpenditureCsv(@PathVariable(&quot;org&quot;) String org,
+            @PathVariable(&quot;period&quot;) String period, @RequestParam(value = &quot;maxPeriods&quot;, required = false, defaultValue = DEFAULT_MAX_PERIODS) Integer maxPeriods,
+            Model model) {
+<span class="nc" id="L468">        LOGGER.info(String.format(&quot;carbonByExpenditureCsv for %1$s %2$s&quot;, org, period));</span>
+
+<span class="nc" id="L470">        new ReportModelHelper(answerRepo).fillModel(org, period, SPEND_HDRS, model, false, rawDecimalFormat, maxPeriods, true, Optional.empty());</span>
+<span class="nc" id="L471">        return &quot;csv&quot;;</span>
+    }
+
+    /***** TREASURY OUPUTS ****/
+
+    /**
+     * A summary table of emissions by scope.
+     *
+     * @return HTML table.
+     */
+    @RequestMapping(value = &quot;/{org}/{period}/scope-summary.html&quot;, method = RequestMethod.GET, produces = &quot;text/html&quot;)
+    public String scopeSummaryTable(@PathVariable(&quot;org&quot;) String org,
+            @PathVariable(&quot;period&quot;) String period, @RequestParam(value = &quot;maxPeriods&quot;, required = false, defaultValue = DEFAULT_MAX_PERIODS) Integer maxPeriods,
+            Model model) {
+<span class="nc" id="L485">        LOGGER.info(String.format(&quot;scopeSummaryTable for %1$s %2$s&quot;, org, period));</span>
+
+<span class="nc" id="L487">        new ReportModelHelper(answerRepo).fillModel(org, period, SUMMARY_SCOPE_HDRS, model, true, prettyPrintDecimalFormat, maxPeriods, true, Optional.of(totaller));</span>
+<span class="nc" id="L488">        return &quot;table-period-as-col&quot;;</span>
+    }
+
+    /**
+     * A summary table of emissions by scope.
+     *
+     * @return HTML table.
+     */
+    @RequestMapping(value = &quot;/{org}/{period}/scope-1.html&quot;, method = RequestMethod.GET, produces = &quot;text/html&quot;)
+    public String scope1Table(@PathVariable(&quot;org&quot;) String org,
+            @PathVariable(&quot;period&quot;) String period, @RequestParam(value = &quot;maxPeriods&quot;, required = false, defaultValue = DEFAULT_MAX_PERIODS) Integer maxPeriods,
+            Model model) {
+<span class="nc" id="L500">        LOGGER.info(String.format(&quot;scope1Table for %1$s %2$s&quot;, org, period));</span>
+
+<span class="nc" id="L502">         new ReportModelHelper(answerRepo).fillModel(org, period, SCOPE_1_HDRS, model, true, prettyPrintDecimalFormat, maxPeriods, true, Optional.of(totaller));</span>
+//        new ReportModelHelper(answerRepo).fillModel(org, period, SCOPE_1_HDRS, model, true, prettyPrintDecimalFormat, maxPeriods, true, Optional.empty());
+<span class="nc" id="L504">        return &quot;table-period-as-col&quot;;</span>
+    }
+
+    /**
+     * A summary table of emissions by scope.
+     *
+     * @return HTML table.
+     */
+    @RequestMapping(value = &quot;/{org}/{period}/scope-2.html&quot;, method = RequestMethod.GET, produces = &quot;text/html&quot;)
+    public String scope2Table(@PathVariable(&quot;org&quot;) String org,
+            @PathVariable(&quot;period&quot;) String period, @RequestParam(value = &quot;maxPeriods&quot;, required = false, defaultValue = DEFAULT_MAX_PERIODS) Integer maxPeriods,
+            Model model) {
+<span class="nc" id="L516">        LOGGER.info(String.format(&quot;scope2Table for %1$s %2$s&quot;, org, period));</span>
+
+<span class="nc" id="L518">        new ReportModelHelper(answerRepo).fillModel(org, period, SCOPE_2_HDRS, model, true, prettyPrintDecimalFormat, maxPeriods, true, Optional.of(totaller));</span>
+<span class="nc" id="L519">        return &quot;table-period-as-col&quot;;</span>
+    }
+
+    /**
+     * A summary table of emissions by scope.
+     *
+     * @return HTML table.
+     */
+    @RequestMapping(value = &quot;/{org}/{period}/scope-3.html&quot;, method = RequestMethod.GET, produces = &quot;text/html&quot;)
+    public String scope3Table(@PathVariable(&quot;org&quot;) String org,
+            @PathVariable(&quot;period&quot;) String period, @RequestParam(value = &quot;maxPeriods&quot;, required = false, defaultValue = DEFAULT_MAX_PERIODS) Integer maxPeriods,
+            Model model) {
+<span class="nc" id="L531">        LOGGER.info(String.format(&quot;scope3Table for %1$s %2$s&quot;, org, period));</span>
+
+<span class="nc" id="L533">        new ReportModelHelper(answerRepo).fillModel(org, period, SCOPE_3_HDRS, model, true, prettyPrintDecimalFormat, maxPeriods, true, Optional.of(totaller));</span>
+<span class="nc" id="L534">        return &quot;table-period-as-col&quot;;</span>
+    }
+
+    /**
+     * A summary table of emissions by scope.
+     *
+     * @return HTML table.
+     */
+    @RequestMapping(value = &quot;/{org}/{period}/sdu-spend-profile.html&quot;, method = RequestMethod.GET, produces = &quot;text/html&quot;)
+    public String sduSpendProfileTable(@PathVariable(&quot;org&quot;) String org,
+            @PathVariable(&quot;period&quot;) String period, @RequestParam(value = &quot;maxPeriods&quot;, required = false, defaultValue = DEFAULT_MAX_PERIODS) Integer maxPeriods,
+            Model model) {
+<span class="nc" id="L546">        LOGGER.info(String.format(&quot;sduSpendProfileTable for %1$s %2$s&quot;, org, period));</span>
+
+<span class="nc" id="L548">        new ReportModelHelper(answerRepo).fillModel(org, period, SDU_PROFILE_HDRS, model, true, prettyPrintDecimalFormat, maxPeriods, true, Optional.of(totaller));</span>
+<span class="nc" id="L549">        return &quot;table-period-as-col&quot;;</span>
+    }
+
+    /**
+     * A summary table of emissions by scope.
+     *
+     * @return HTML table.
+     */
+    @RequestMapping(value = &quot;/{org}/{period}/sdu-carbon-profile.html&quot;, method = RequestMethod.GET, produces = &quot;text/html&quot;)
+    public String sduCarbonProfileTable(@PathVariable(&quot;org&quot;) String org,
+            @PathVariable(&quot;period&quot;) String period, @RequestParam(value = &quot;maxPeriods&quot;, required = false, defaultValue = DEFAULT_MAX_PERIODS) Integer maxPeriods,
+            Model model) {
+<span class="nc" id="L561">        LOGGER.info(String.format(&quot;sduCarbonProfileTable for %1$s %2$s&quot;, org, period));</span>
+
+<span class="nc" id="L563">        new ReportModelHelper(answerRepo).fillModel(org, period, SDU_PROFILE_CO2E_HDRS, model, true, prettyPrintDecimalFormat, maxPeriods, true, Optional.of(totaller));</span>
+<span class="nc" id="L564">        return &quot;table-period-as-col&quot;;</span>
+    }
+
+    /**
+     * A summary table of emissions by E-Class.
+     *
+     * @return HTML table.
+     */
+    @RequestMapping(value = &quot;/{org}/{period}/eclass-carbon-profile.html&quot;, method = RequestMethod.GET, produces = &quot;text/html&quot;)
+    public String eclassCarbonProfileTable(@PathVariable(&quot;org&quot;) String org,
+            @PathVariable(&quot;period&quot;) String period, @RequestParam(value = &quot;maxPeriods&quot;, required = false, defaultValue = DEFAULT_MAX_PERIODS) Integer maxPeriods,
+            Model model) {
+<span class="nc" id="L576">        LOGGER.info(String.format(&quot;eclassCarbonProfileTable for %1$s %2$s&quot;, org, period));</span>
+
+<span class="nc" id="L578">        new ReportModelHelper(answerRepo).fillModel(org, period, ECLASS_PROFILE_HDRS, model, true, prettyPrintDecimalFormat, maxPeriods, true, Optional.of(totaller));</span>
+<span class="nc" id="L579">        return &quot;table-period-as-col&quot;;</span>
+    }
+
+    /**
+     * A trajectory table of emissions by SDU groupings.
+     *
+     * @return HTML table.
+     */
+    @RequestMapping(value = &quot;/{org}/{period}/carbon-trajectory.html&quot;, method = RequestMethod.GET, produces = &quot;text/html&quot;)
+    public String carbonTrajectoryTable(@PathVariable(&quot;org&quot;) String org,
+            @PathVariable(&quot;period&quot;) String period, Model model) {
+<span class="nc" id="L590">        LOGGER.info(String.format(&quot;carbonTrajectoryTable for %1$s %2$s&quot;, org, period));</span>
+
+<span class="nc" id="L592">        new ReportModelHelper(answerRepo).fillModel(org, period, BENCHMARK_2017_HDRS,</span>
+                model, true, prettyPrintDecimalFormat,
+<span class="nc" id="L594">                PeriodUtil.periodsSinceInc(period, &quot;2007-08&quot;), true,</span>
+<span class="nc" id="L595">                Optional.of(totaller));</span>
+<span class="nc" id="L596">        return &quot;table-period-as-col&quot;;</span>
+    }
+
+    /**
+     * A table of categorised carbon emissions compared to target for the
+     * specified organisation and period.
+     *
+     * @return CSV with header row.
+     */
+    @RequestMapping(value = &quot;/{org}/{period}/carbon-trajectory.csv&quot;, method = RequestMethod.GET, produces = &quot;text/csv&quot;)
+    public String carbonTrajectoryCsv(@PathVariable(&quot;org&quot;) String org,
+            @PathVariable(&quot;period&quot;) String period, Model model) {
+<span class="nc" id="L608">        LOGGER.info(String.format(&quot;carbonTrajectoryCsv for %1$s %2$s&quot;, org, period));</span>
+
+<span class="nc" id="L610">        new ReportModelHelper(answerRepo).fillModel(org, period, BENCHMARK_2017_HDRS,</span>
+                model, false, rawDecimalFormat,
+<span class="nc" id="L612">                PeriodUtil.periodsSinceInc(period, &quot;2007-08&quot;), true,</span>
+<span class="nc" id="L613">                Optional.empty());</span>
+<span class="nc" id="L614">        return &quot;csv&quot;;</span>
+    }
+
+    /**
+     * @return HTML table.
+     * @deprecated Use co2e2017Table
+     */
+    @RequestMapping(value = &quot;/{org}/{period}/co2e-2016.html&quot;, method = RequestMethod.GET, produces = &quot;text/html&quot;)
+    public String co2eTable(@PathVariable(&quot;org&quot;) String org,
+            @PathVariable(&quot;period&quot;) String period, @RequestParam(value = &quot;maxPeriods&quot;, required = false, defaultValue = DEFAULT_MAX_PERIODS) Integer maxPeriods,
+            Model model) {
+<span class="nc" id="L625">        LOGGER.info(String.format(&quot;co2eTable for %1$s %2$s&quot;, org, period));</span>
+
+<span class="nc" id="L627">        new ReportModelHelper(answerRepo).fillModel(org, period, BENCHMARK_HDRS, model, true, prettyPrintDecimalFormat, maxPeriods, true, Optional.of(totaller));</span>
+<span class="nc" id="L628">        return &quot;table-period-as-col&quot;;</span>
+    }
+
+    /**
+     * @return CSV with header row.
+     * @deprecated Use co2e2017Csv
+     */
+    @RequestMapping(value = &quot;/{org}/{period}/co2e-2016.csv&quot;, method = RequestMethod.GET, produces = &quot;text/csv&quot;)
+    public String co2eCsv(@PathVariable(&quot;org&quot;) String org,
+            @PathVariable(&quot;period&quot;) String period, @RequestParam(value = &quot;maxPeriods&quot;, required = false, defaultValue = DEFAULT_MAX_PERIODS) Integer maxPeriods,
+            Model model) {
+<span class="nc" id="L639">        LOGGER.info(String.format(&quot;co2eTable for %1$s %2$s&quot;, org, period));</span>
+
+<span class="nc" id="L641">        new ReportModelHelper(answerRepo).fillModel(org, period, BENCHMARK_HDRS, model, false, rawDecimalFormat, maxPeriods, true, Optional.empty());</span>
+<span class="nc" id="L642">        return &quot;csv&quot;;</span>
+    }
+
+    /**
+     * Total Carbon footprint in categories revised for 2017-18.
+     *
+     * @return HTML table.
+     */
+    @RequestMapping(value = &quot;/{org}/{period}/co2e.html&quot;, method = RequestMethod.GET, produces = &quot;text/html&quot;)
+    public String co2e2017Table(@PathVariable(&quot;org&quot;) String org,
+            @PathVariable(&quot;period&quot;) String period, @RequestParam(value = &quot;maxPeriods&quot;, required = false, defaultValue = DEFAULT_MAX_PERIODS) Integer maxPeriods,
+            Model model) {
+<span class="nc" id="L654">        LOGGER.info(String.format(&quot;co2eTable for %1$s %2$s&quot;, org, period));</span>
+
+<span class="nc" id="L656">        new ReportModelHelper(answerRepo).fillModel(org, period, BENCHMARK_2017_HDRS, model, true, prettyPrintDecimalFormat, maxPeriods, true, Optional.of(totaller));</span>
+<span class="nc" id="L657">        return &quot;table-period-as-col&quot;;</span>
+    }
+
+    /**
+     * Total Carbon footprint in categories revised for 2017-18.
+     *
+     * @return CSV with header row.
+     */
+    @RequestMapping(value = &quot;/{org}/{period}/co2e.csv&quot;, method = RequestMethod.GET, produces = &quot;text/csv&quot;)
+    public String co2e2017Csv(@PathVariable(&quot;org&quot;) String org,
+            @PathVariable(&quot;period&quot;) String period, @RequestParam(value = &quot;maxPeriods&quot;, required = false, defaultValue = DEFAULT_MAX_PERIODS) Integer maxPeriods,
+            Model model) {
+<span class="nc" id="L669">        LOGGER.info(String.format(&quot;co2eTable for %1$s %2$s&quot;, org, period));</span>
+
+<span class="nc" id="L671">        new ReportModelHelper(answerRepo).fillModel(org, period, BENCHMARK_2017_HDRS, model, false, rawDecimalFormat, maxPeriods, true, Optional.empty());</span>
+<span class="nc" id="L672">        return &quot;csv&quot;;</span>
+    }
+
+    /**
+     * Total Carbon footprint by population.
+     *
+     * @return HTML table.
+     */
+    @RequestMapping(value = &quot;/{org}/{period}/co2e-by-population.html&quot;, method = RequestMethod.GET, produces = &quot;text/html&quot;)
+    public String co2eByPopulationTable(@PathVariable(&quot;org&quot;) String org,
+            @PathVariable(&quot;period&quot;) String period, @RequestParam(value = &quot;maxPeriods&quot;, required = false, defaultValue = DEFAULT_MAX_PERIODS) Integer maxPeriods,
+            Model model) {
+<span class="nc" id="L684">        LOGGER.info(String.format(&quot;co2eByPopulationTable for %1$s %2$s&quot;, org, period));</span>
+
+<span class="nc" id="L686">        new ReportModelHelper(answerRepo).fillModel(org, period, BENCHMARK_BY_POPULATION_HDRS, model, true, prettyPrintDecimalFormat, maxPeriods, true, Optional.of(totaller));</span>
+<span class="nc" id="L687">        return &quot;table-period-as-col&quot;;</span>
+    }
+
+    /**
+     * Total Carbon footprint by population.
+     *
+     * @return CSV with header row.
+     */
+    @RequestMapping(value = &quot;/{org}/{period}/co2e-by-population.csv&quot;, method = RequestMethod.GET, produces = &quot;text/csv&quot;)
+    public String co2eByPopulationCsv(@PathVariable(&quot;org&quot;) String org,
+            @PathVariable(&quot;period&quot;) String period, @RequestParam(value = &quot;maxPeriods&quot;, required = false, defaultValue = DEFAULT_MAX_PERIODS) Integer maxPeriods,
+            Model model) {
+<span class="nc" id="L699">        LOGGER.info(String.format(&quot;co2eByPopulationTable for %1$s %2$s&quot;, org, period));</span>
+
+<span class="nc" id="L701">        new ReportModelHelper(answerRepo).fillModel(org, period, BENCHMARK_BY_POPULATION_HDRS, model, false, rawDecimalFormat, maxPeriods, true, Optional.empty());</span>
+<span class="nc" id="L702">        return &quot;csv&quot;;</span>
+    }
+
+    /**
+     * Total Carbon footprint by gross internal area.
+     *
+     * @return HTML table.
+     */
+    @RequestMapping(value = &quot;/{org}/{period}/co2e-by-floor-area.html&quot;, method = RequestMethod.GET, produces = &quot;text/html&quot;)
+    public String co2eByFloorAreaTable(@PathVariable(&quot;org&quot;) String org,
+            @PathVariable(&quot;period&quot;) String period, @RequestParam(value = &quot;maxPeriods&quot;, required = false, defaultValue = DEFAULT_MAX_PERIODS) Integer maxPeriods,
+            Model model) {
+<span class="nc" id="L714">        LOGGER.info(String.format(&quot;co2eByFloorAreaTable for %1$s %2$s&quot;, org, period));</span>
+
+<span class="nc" id="L716">        new ReportModelHelper(answerRepo).fillModel(org, period, BENCHMARK_BY_FLOOR_AREA_HDRS, model, true, prettyPrintDecimalFormat, maxPeriods, true, Optional.of(totaller));</span>
+<span class="nc" id="L717">        return &quot;table-period-as-col&quot;;</span>
+    }
+
+    /**
+     * Total Carbon footprint by gross internal area.
+     *
+     * @return CSV with header row.
+     */
+    @RequestMapping(value = &quot;/{org}/{period}/co2e-by-floor-area.csv&quot;, method = RequestMethod.GET, produces = &quot;text/csv&quot;)
+    public String co2eByFloorAreaCsv(@PathVariable(&quot;org&quot;) String org,
+            @PathVariable(&quot;period&quot;) String period, @RequestParam(value = &quot;maxPeriods&quot;, required = false, defaultValue = DEFAULT_MAX_PERIODS) Integer maxPeriods,
+            Model model) {
+<span class="nc" id="L729">        LOGGER.info(String.format(&quot;co2eByFloorAreaTable for %1$s %2$s&quot;, org, period));</span>
+
+<span class="nc" id="L731">        new ReportModelHelper(answerRepo).fillModel(org, period, BENCHMARK_BY_FLOOR_AREA_HDRS, model, false, rawDecimalFormat, maxPeriods, true, Optional.empty());</span>
+<span class="nc" id="L732">        return &quot;csv&quot;;</span>
+    }
+
+    /**
+     * Total Carbon footprint by number of staff.
+     *
+     * @return HTML table.
+     */
+    @RequestMapping(value = &quot;/{org}/{period}/co2e-by-wte.html&quot;, method = RequestMethod.GET, produces = &quot;text/html&quot;)
+    public String co2eByWteTable(@PathVariable(&quot;org&quot;) String org,
+            @PathVariable(&quot;period&quot;) String period, @RequestParam(value = &quot;maxPeriods&quot;, required = false, defaultValue = DEFAULT_MAX_PERIODS) Integer maxPeriods,
+            Model model) {
+<span class="nc" id="L744">        LOGGER.info(String.format(&quot;co2eByWteTable for %1$s %2$s&quot;, org, period));</span>
+
+<span class="nc" id="L746">        new ReportModelHelper(answerRepo).fillModel(org, period, BENCHMARK_BY_WTE_HDRS, model, true,</span>
+<span class="nc" id="L747">                prettyPrintDecimalFormat, maxPeriods, true, Optional.of(totaller));</span>
+<span class="nc" id="L748">        return &quot;table-period-as-col&quot;;</span>
+    }
+
+    /**
+     * Total Carbon footprint by number of staff.
+     *
+     * @return CSV with header row.
+     */
+    @RequestMapping(value = &quot;/{org}/{period}/co2e-by-wte.csv&quot;, method = RequestMethod.GET, produces = &quot;text/csv&quot;)
+    public String co2eByWteCsv(@PathVariable(&quot;org&quot;) String org,
+            @PathVariable(&quot;period&quot;) String period, @RequestParam(value = &quot;maxPeriods&quot;, required = false, defaultValue = DEFAULT_MAX_PERIODS) Integer maxPeriods,
+            Model model) {
+<span class="nc" id="L760">        LOGGER.info(String.format(&quot;co2eByWteTable for %1$s %2$s&quot;, org, period));</span>
+
+<span class="nc" id="L762">        new ReportModelHelper(answerRepo).fillModel(org, period, BENCHMARK_BY_WTE_HDRS, model, false, rawDecimalFormat, maxPeriods, true, Optional.empty());</span>
+<span class="nc" id="L763">        return &quot;csv&quot;;</span>
+    }
+
+    /**
+     * Total Carbon footprint by number of occupied beds.
+     *
+     * @return HTML table.
+     */
+    @RequestMapping(value = &quot;/{org}/{period}/co2e-by-beds.html&quot;, method = RequestMethod.GET, produces = &quot;text/html&quot;)
+    public String co2eByBedsTable(@PathVariable(&quot;org&quot;) String org,
+            @PathVariable(&quot;period&quot;) String period, @RequestParam(value = &quot;maxPeriods&quot;, required = false, defaultValue = DEFAULT_MAX_PERIODS) Integer maxPeriods,
+            Model model) {
+<span class="nc" id="L775">        LOGGER.info(String.format(&quot;co2eByBedsTable for %1$s %2$s&quot;, org, period));</span>
+
+<span class="nc" id="L777">        new ReportModelHelper(answerRepo).fillModel(org, period, BENCHMARK_BY_BEDS_HDRS, model, true, prettyPrintDecimalFormat, maxPeriods, true, Optional.of(totaller));</span>
+<span class="nc" id="L778">        return &quot;table-period-as-col&quot;;</span>
+    }
+
+    /**
+     * Total Carbon footprint by number of occupied beds.
+     *
+     * @return CSV with header row.
+     */
+    @RequestMapping(value = &quot;/{org}/{period}/co2e-by-beds.csv&quot;, method = RequestMethod.GET, produces = &quot;text/csv&quot;)
+    public String co2eByBedsCsv(@PathVariable(&quot;org&quot;) String org,
+            @PathVariable(&quot;period&quot;) String period, @RequestParam(value = &quot;maxPeriods&quot;, required = false, defaultValue = DEFAULT_MAX_PERIODS) Integer maxPeriods,
+            Model model) {
+<span class="nc" id="L790">        LOGGER.info(String.format(&quot;co2eByBedsTable for %1$s %2$s&quot;, org, period));</span>
+
+<span class="nc" id="L792">        new ReportModelHelper(answerRepo).fillModel(org, period, BENCHMARK_BY_BEDS_HDRS, model, false, rawDecimalFormat, maxPeriods, true, Optional.empty());</span>
+<span class="nc" id="L793">        return &quot;csv&quot;;</span>
+    }
+
+    /**
+     * Total Carbon footprint by patient contacts.
+     *
+     * @return HTML table.
+     */
+    @RequestMapping(value = &quot;/{org}/{period}/co2e-by-patient-contacts.html&quot;, method = RequestMethod.GET, produces = &quot;text/html&quot;)
+    public String co2eByPatientContactsTable(@PathVariable(&quot;org&quot;) String org,
+            @PathVariable(&quot;period&quot;) String period, @RequestParam(value = &quot;maxPeriods&quot;, required = false, defaultValue = DEFAULT_MAX_PERIODS) Integer maxPeriods,
+            Model model) {
+<span class="nc" id="L805">        LOGGER.info(String.format(&quot;co2eByPatientContactsTable for %1$s %2$s&quot;, org, period));</span>
+
+<span class="nc" id="L807">        new ReportModelHelper(answerRepo).fillModel(org, period, BENCHMARK_BY_PATIENT_CONTACTS_HDRS, model, true, prettyPrintDecimalFormat, maxPeriods, true, Optional.of(totaller));</span>
+<span class="nc" id="L808">        return &quot;table-period-as-col&quot;;</span>
+    }
+
+    /**
+     * Total Carbon footprint by patient contacts.
+     *
+     * @return CSV with header row.
+     */
+    @RequestMapping(value = &quot;/{org}/{period}/co2e-by-patient-contacts.csv&quot;, method = RequestMethod.GET, produces = &quot;text/csv&quot;)
+    public String co2eByPatientContactsCsv(@PathVariable(&quot;org&quot;) String org,
+            @PathVariable(&quot;period&quot;) String period, @RequestParam(value = &quot;maxPeriods&quot;, required = false, defaultValue = DEFAULT_MAX_PERIODS) Integer maxPeriods,
+            Model model) {
+<span class="nc" id="L820">        LOGGER.info(String.format(&quot;co2eByPatientContactsTable for %1$s %2$s&quot;, org, period));</span>
+
+<span class="nc" id="L822">        new ReportModelHelper(answerRepo).fillModel(org, period, BENCHMARK_BY_PATIENT_CONTACTS_HDRS, model, false, rawDecimalFormat, maxPeriods, true, Optional.empty());</span>
+<span class="nc" id="L823">        return &quot;csv&quot;;</span>
+    }
+
+    /**
+     * Total Carbon footprint by operating expenditure.
+     *
+     * @return HTML table.
+     */
+    @RequestMapping(value = &quot;/{org}/{period}/co2e-by-opex.html&quot;, method = RequestMethod.GET, produces = &quot;text/html&quot;)
+    public String co2eByOpExTable(@PathVariable(&quot;org&quot;) String org,
+            @PathVariable(&quot;period&quot;) String period, @RequestParam(value = &quot;maxPeriods&quot;, required = false, defaultValue = DEFAULT_MAX_PERIODS) Integer maxPeriods,
+            Model model) {
+<span class="nc" id="L835">        LOGGER.info(String.format(&quot;co2eByOpExTable for %1$s %2$s&quot;, org, period));</span>
+
+<span class="nc" id="L837">        new ReportModelHelper(answerRepo).fillModel(org, period, BENCHMARK_BY_OPEX_HDRS, model, true, prettyPrintDecimalFormat, maxPeriods, true, Optional.of(totaller));</span>
+<span class="nc" id="L838">        return &quot;table-period-as-col&quot;;</span>
+    }
+
+    /**
+     * Total Carbon footprint by operating expenditure.
+     *
+     * @return CSV with header row.
+     */
+    @RequestMapping(value = &quot;/{org}/{period}/co2e-by-opex.csv&quot;, method = RequestMethod.GET, produces = &quot;text/csv&quot;)
+    public String co2eByOpExCsv(@PathVariable(&quot;org&quot;) String org,
+            @PathVariable(&quot;period&quot;) String period, @RequestParam(value = &quot;maxPeriods&quot;, required = false, defaultValue = DEFAULT_MAX_PERIODS) Integer maxPeriods,
+            Model model) {
+<span class="nc" id="L850">        LOGGER.info(String.format(&quot;co2eByOpExTable for %1$s %2$s&quot;, org, period));</span>
+
+<span class="nc" id="L852">        new ReportModelHelper(answerRepo).fillModel(org, period, BENCHMARK_BY_OPEX_HDRS, model, false, rawDecimalFormat, maxPeriods, true, Optional.empty());</span>
+<span class="nc" id="L853">        return &quot;csv&quot;;</span>
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.2.201808211720</span></div></body></html>

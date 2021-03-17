@@ -1,0 +1,291 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Question.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Sustainability Reporting</a> &gt; <a href="index.source.html" class="el_package">digital.srp.sreport.model</a> &gt; <span class="el_source">Question.java</span></div><h1>Question.java</h1><pre class="source lang-java linenums">package digital.srp.sreport.model;
+
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Lob;
+import javax.persistence.Table;
+import javax.persistence.Transient;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
+import javax.xml.bind.annotation.XmlElement;
+
+import org.springframework.hateoas.Link;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonView;
+
+import digital.srp.sreport.model.views.AnswerViews;
+import digital.srp.sreport.model.views.QuestionViews;
+import digital.srp.sreport.model.views.SurveyReturnViews;
+import digital.srp.sreport.model.views.SurveyViews;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
+import lombok.experimental.Accessors;
+
+/**
+ * Holds a single survey question.
+ *
+ * @author Tim Stephenson
+ */
+@Accessors(fluent=true)
+<span class="pc" id="L40">@Data</span>
+<span class="nc" id="L41">@ToString</span>
+<span class="pc bpc" id="L42" title="70 of 122 branches missed.">@EqualsAndHashCode(exclude = { &quot;id&quot; })</span>
+//@JsonIgnoreProperties(value={ &quot;optionNamesAsList&quot; }, allowGetters=true)
+<span class="fc" id="L44">@NoArgsConstructor</span>
+@Entity
+@Table(name= &quot;SR_QUESTION&quot;)
+public class Question {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    @JsonProperty
+    @JsonView( {SurveyViews.Detailed.class, SurveyReturnViews.Detailed.class} )
+    @Column(name = &quot;id&quot;, columnDefinition = &quot;int(11) NOT NULL&quot;)
+<span class="fc" id="L54">    protected Long id;</span>
+
+    @Transient
+    protected Q q;
+
+    @NotNull
+    @JsonProperty
+    @JsonView( { AnswerViews.Summary.class, QuestionViews.Summary.class, SurveyViews.Detailed.class, SurveyReturnViews.Detailed.class } )
+    @Column(name = &quot;name&quot;)
+<span class="fc" id="L63">    protected String name;</span>
+
+    @JsonProperty
+    @JsonView({ AnswerViews.Summary.class, QuestionViews.Summary.class, SurveyViews.Detailed.class })
+    @Column(name = &quot;label&quot;)
+<span class="fc" id="L68">    protected String label;</span>
+
+    @NotNull
+    @JsonProperty
+    @JsonView({ AnswerViews.Summary.class, QuestionViews.Summary.class, SurveyViews.Detailed.class, SurveyReturnViews.Detailed.class })
+    @Column(name = &quot;required&quot;)
+<span class="fc" id="L74">    protected boolean required;</span>
+
+    @JsonProperty
+    @JsonView({ QuestionViews.Detailed.class, SurveyViews.Detailed.class })
+    @Column(name = &quot;hint&quot;)
+    @Lob
+<span class="fc" id="L80">    protected String hint;</span>
+
+    @JsonProperty
+    @JsonView({ QuestionViews.Detailed.class, SurveyViews.Detailed.class })
+    @Column(name = &quot;placeholder&quot;)
+<span class="fc" id="L85">    protected String placeholder;</span>
+
+    @Size(max = 20)
+    @JsonProperty
+    @JsonView({ QuestionViews.Summary.class, SurveyViews.Detailed.class, SurveyReturnViews.Summary.class })
+    @Column(name = &quot;type&quot;)
+<span class="fc" id="L91">    protected String type;</span>
+
+    @Size(max = 20)
+    @JsonProperty
+    @JsonView({ QuestionViews.Detailed.class, SurveyViews.Detailed.class })
+    @Column(name = &quot;unit&quot;)
+<span class="fc" id="L97">    protected String unit;</span>
+
+    @Size(max = 50)
+    @JsonProperty
+    @JsonView({ QuestionViews.Detailed.class, SurveyViews.Detailed.class })
+    @Column(name = &quot;validation&quot;)
+<span class="fc" id="L103">    protected String validation;</span>
+
+    @Size(max = 50)
+    @JsonProperty
+    @JsonView({ QuestionViews.Summary.class, SurveyViews.Detailed.class })
+    @Column(name = &quot;source&quot;)
+<span class="fc" id="L109">    protected String source;</span>
+
+    @JsonProperty
+    @JsonView({ QuestionViews.Detailed.class, SurveyViews.Detailed.class })
+    @Column(name = &quot;def_val&quot;)
+<span class="fc" id="L114">    protected String defaultValue;</span>
+
+    @JsonProperty
+    @JsonView({ QuestionViews.Detailed.class, SurveyViews.Detailed.class })
+    @Column(name = &quot;options&quot;)
+    protected String optionNames;
+
+    @JsonProperty
+    @JsonView({ QuestionViews.Detailed.class })
+    @Column(name = &quot;tenant_id&quot;)
+<span class="fc" id="L124">    protected String tenantId;</span>
+
+    @Transient
+    @JsonProperty(&quot;categories&quot;)
+    @JsonView({ QuestionViews.Detailed.class, AnswerViews.Detailed.class })
+<span class="fc" id="L129">    protected List&lt;String&gt; categories;</span>
+
+    @Transient
+    @XmlElement(name = &quot;link&quot;, namespace = Link.ATOM_NAMESPACE)
+    @JsonProperty(&quot;links&quot;)
+    @JsonView(QuestionViews.Summary.class)
+<span class="fc" id="L135">    protected List&lt;Link&gt; links;</span>
+
+    public Question q(Q q) {
+<span class="fc" id="L138">        this.name = q.name();</span>
+<span class="fc" id="L139">        return this;</span>
+    }
+
+    public Q q() {
+<span class="fc" id="L143">        return Q.valueOf(name);</span>
+    }
+
+    @JsonProperty(&quot;optionNames&quot;)
+    @JsonView({ QuestionViews.Detailed.class, SurveyViews.Detailed.class })
+    public List&lt;String&gt; optionNames() {
+<span class="pc bpc" id="L149" title="1 of 2 branches missed.">        if (optionNames == null) {</span>
+<span class="fc" id="L150">            return Collections.emptyList();</span>
+        } else {
+<span class="nc" id="L152">            return Arrays.asList(optionNames.split(&quot;,&quot;));</span>
+        }
+    }
+
+    @JsonProperty(&quot;optionNames&quot;)
+    @JsonView({ QuestionViews.Detailed.class, SurveyViews.Detailed.class })
+    public Question optionNames(List&lt;String&gt; optionNames) {
+<span class="nc" id="L159">        this.optionNames = String.join(&quot;,&quot;, optionNames);</span>
+<span class="nc" id="L160">        return this;</span>
+    }
+
+    public Long getId() {
+<span class="fc" id="L164">        return id;</span>
+    }
+
+    public void setId(Long id) {
+<span class="fc" id="L168">        this.id = id;</span>
+<span class="fc" id="L169">    }</span>
+
+    public Q getQ() {
+<span class="fc" id="L172">        return q;</span>
+    }
+
+    public void setQ(Q q) {
+<span class="nc" id="L176">        this.q = q;</span>
+<span class="nc" id="L177">    }</span>
+
+    public String getName() {
+<span class="fc" id="L180">        return name;</span>
+    }
+
+    public void setName(String name) {
+<span class="fc" id="L184">        this.name = name;</span>
+<span class="fc" id="L185">    }</span>
+
+    public String getLabel() {
+<span class="fc" id="L188">        return label;</span>
+    }
+
+    public void setLabel(String label) {
+<span class="nc" id="L192">        this.label = label;</span>
+<span class="nc" id="L193">    }</span>
+
+    public boolean isRequired() {
+<span class="fc" id="L196">        return required;</span>
+    }
+
+    public void setRequired(boolean required) {
+<span class="fc" id="L200">        this.required = required;</span>
+<span class="fc" id="L201">    }</span>
+
+    public String getHint() {
+<span class="fc" id="L204">        return hint;</span>
+    }
+
+    public void setHint(String hint) {
+<span class="nc" id="L208">        this.hint = hint;</span>
+<span class="nc" id="L209">    }</span>
+
+    public String getPlaceholder() {
+<span class="fc" id="L212">        return placeholder;</span>
+    }
+
+    public void setPlaceholder(String placeholder) {
+<span class="nc" id="L216">        this.placeholder = placeholder;</span>
+<span class="nc" id="L217">    }</span>
+
+    public String getType() {
+<span class="fc" id="L220">        return type;</span>
+    }
+
+    public void setType(String type) {
+<span class="fc" id="L224">        this.type = type;</span>
+<span class="fc" id="L225">    }</span>
+
+    public String getUnit() {
+<span class="fc" id="L228">        return unit;</span>
+    }
+
+    public void setUnit(String unit) {
+<span class="nc" id="L232">        this.unit = unit;</span>
+<span class="nc" id="L233">    }</span>
+
+    public String getValidation() {
+<span class="fc" id="L236">        return validation;</span>
+    }
+
+    public void setValidation(String validation) {
+<span class="nc" id="L240">        this.validation = validation;</span>
+<span class="nc" id="L241">    }</span>
+
+    public String getSource() {
+<span class="fc" id="L244">        return source;</span>
+    }
+
+    public void setSource(String source) {
+<span class="nc" id="L248">        this.source = source;</span>
+<span class="nc" id="L249">    }</span>
+
+    public String getDefaultValue() {
+<span class="fc" id="L252">        return defaultValue;</span>
+    }
+
+    public void setDefaultValue(String defaultValue) {
+<span class="nc" id="L256">        this.defaultValue = defaultValue;</span>
+<span class="nc" id="L257">    }</span>
+
+    public String getOptionNames() {
+<span class="fc" id="L260">        return optionNames;</span>
+    }
+
+    public void setOptionNames(String optionNames) {
+<span class="nc" id="L264">        this.optionNames = optionNames;</span>
+<span class="nc" id="L265">    }</span>
+
+    public String getTenantId() {
+<span class="fc" id="L268">        return tenantId;</span>
+    }
+
+    public void setTenantId(String tenantId) {
+<span class="nc" id="L272">        this.tenantId = tenantId;</span>
+<span class="nc" id="L273">    }</span>
+
+    public List&lt;String&gt; getCategories() {
+<span class="fc" id="L276">        return categories;</span>
+    }
+
+    public void setCategories(List&lt;String&gt; categories) {
+<span class="nc" id="L280">        this.categories = categories;</span>
+<span class="nc" id="L281">    }</span>
+
+    public List&lt;Link&gt; getLinks() {
+<span class="fc" id="L284">        return links;</span>
+    }
+
+    public void setLinks(List&lt;Link&gt; links) {
+<span class="nc" id="L288">        this.links = links;</span>
+<span class="nc" id="L289">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.2.201808211720</span></div></body></html>

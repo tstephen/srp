@@ -1,0 +1,545 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>EricCsvImporter.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Sustainability Reporting</a> &gt; <a href="index.source.html" class="el_package">digital.srp.sreport.importers</a> &gt; <span class="el_source">EricCsvImporter.java</span></div><h1>EricCsvImporter.java</h1><pre class="source lang-java linenums">package digital.srp.sreport.importers;
+
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVParser;
+import org.apache.commons.csv.CSVRecord;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import digital.srp.sreport.model.Answer;
+import digital.srp.sreport.model.Q;
+import digital.srp.sreport.model.Question;
+import digital.srp.sreport.model.StatusType;
+import digital.srp.sreport.model.SurveyReturn;
+import digital.srp.sreport.model.returns.EricDataSet;
+import digital.srp.sreport.model.returns.EricQuestions;
+
+/**
+ * Import completed ERIC Trust level returns as published on
+ * &lt;a href=&quot;http://hefs.hscic.gov.uk/ERIC.asp&quot;&gt;Hospital Estates and Facilities Statistics&lt;/a&gt;.
+ *
+ * @author Tim Stephenson
+ */
+<span class="fc" id="L31">public class EricCsvImporter implements EricQuestions {</span>
+
+<span class="fc" id="L33">    private static final Logger LOGGER = LoggerFactory</span>
+<span class="fc" id="L34">            .getLogger(EricCsvImporter.class);</span>
+
+    private List&lt;Question&gt; questions;
+
+    public List&lt;SurveyReturn&gt; readEricReturns(EricDataSet ericDataSet) throws IOException {
+<span class="nc" id="L39">        try (InputStreamReader isr = new InputStreamReader(</span>
+<span class="nc" id="L40">                getClass().getResourceAsStream(ericDataSet.getDataFile()))) {</span>
+<span class="nc" id="L41">            return readEricReturns(isr, ericDataSet.getHeaders(), ericDataSet.getPeriod());</span>
+        }
+    }
+
+    public List&lt;SurveyReturn&gt; readEricReturns(Reader in, String[] headers, String period)
+            throws IOException {
+<span class="fc" id="L47">        final CSVParser parser = new CSVParser(in,</span>
+<span class="fc" id="L48">                CSVFormat.EXCEL.withHeader(headers).withDelimiter('$'));</span>
+<span class="fc" id="L49">        LOGGER.info(String.format(&quot;readEricReturns&quot;));</span>
+
+<span class="fc" id="L51">        questions = new ArrayList&lt;Question&gt;();</span>
+<span class="fc bfc" id="L52" title="All 2 branches covered.">        for (String hdr : headers) {</span>
+<span class="fc" id="L53">            questions.add(new Question().q(lookupQuestion(hdr)));</span>
+        }
+<span class="fc" id="L55">        LOGGER.debug(&quot;Found {} questions&quot;, questions.size());</span>
+
+<span class="fc" id="L57">        List&lt;SurveyReturn&gt; surveyResponses = new ArrayList&lt;SurveyReturn&gt;();</span>
+<span class="fc" id="L58">        Iterable&lt;CSVRecord&gt; records = parser.getRecords();</span>
+
+<span class="fc bfc" id="L60" title="All 2 branches covered.">        for (CSVRecord record : records) {</span>
+<span class="fc bfc" id="L61" title="All 2 branches covered.">            if (record.getRecordNumber() &gt; 2) { // skip headers</span>
+<span class="fc" id="L62">                Set&lt;Answer&gt; surveyAnswers = new HashSet&lt;Answer&gt;();</span>
+<span class="fc" id="L63">                String org = record.get(0);</span>
+<span class="fc bfc" id="L64" title="All 4 branches covered.">                for (int i = 0; (i &lt; record.size() &amp;&amp; i &lt; questions.size()); i++) {</span>
+<span class="fc" id="L65">                    surveyAnswers.add(new Answer()</span>
+<span class="fc" id="L66">                            .question(getQuestion(i)).response(record.get(i))</span>
+<span class="fc" id="L67">                            .applicablePeriod(period)</span>
+<span class="fc" id="L68">                            .status(StatusType.Published.name()));</span>
+                }
+
+<span class="fc" id="L71">                surveyResponses.add(new SurveyReturn()</span>
+<span class="fc" id="L72">                        .name(String.format(&quot;ERIC-%1$s-%2$s&quot;, period, org))</span>
+<span class="fc" id="L73">                        .applicablePeriod(period)</span>
+<span class="fc" id="L74">                        .org(org)</span>
+<span class="fc" id="L75">                        .status(StatusType.Published.name())</span>
+<span class="fc" id="L76">                        .answers(surveyAnswers));</span>
+            }
+<span class="fc" id="L78">        }</span>
+<span class="fc" id="L79">        parser.close();</span>
+
+<span class="fc" id="L81">        return surveyResponses;</span>
+    }
+
+    private Q lookupQuestion(String hdr) {
+<span class="pc bpc" id="L85" title="2 of 195 branches missed.">        switch (hdr) {</span>
+
+        case &quot;Organisation Code&quot;:
+<span class="fc" id="L88">            return Q.ORG_CODE;</span>
+        case &quot;Organisation Name&quot;:
+<span class="fc" id="L90">            return Q.ORG_NAME;</span>
+        case &quot;Commissioning Region&quot;:
+<span class="fc" id="L92">            return Q.COMMISSIONING_REGION;</span>
+        case &quot;Organisation Type&quot;:
+<span class="fc" id="L94">            return Q.ORG_TYPE;</span>
+        case &quot;Total number of staff employed (WTE)&quot;:
+<span class="fc" id="L96">            return Q.NO_STAFF;</span>
+        case &quot;Total number of staff employed in relation to the hard FM (estates) function (WTE)&quot;:
+<span class="fc" id="L98">            return Q.NO_HARD_FM_STAFF;</span>
+        case &quot;Total number of staff employed in relation to the soft FM (hotel services) function (WTE)&quot;:
+<span class="fc" id="L100">            return Q.NO_SOFT_FM_STAFF;</span>
+        case &quot;Total number of sites (No.)&quot;:
+<span class="fc" id="L102">            return Q.NO_SITES_TOTAL;</span>
+        case &quot;Number of sites - General acute hospital (No.)&quot;:
+<span class="fc" id="L104">            return Q.NO_ACUTE_SITES;</span>
+        case &quot;Number of sites - Specialist hospital (acute only) (No.)&quot;:
+        case &quot;Number of sites - Specialist hospital (No.)&quot;:
+<span class="fc" id="L107">            return Q.NO_SPECIALIST_SITES;</span>
+        case &quot;Number of sites - Mixed service hospital (No.)&quot;:
+        case &quot;Number of sites - Multi-service hospital (No.)&quot;:
+<span class="fc" id="L110">            return Q.NO_MIXED_SITES;</span>
+        case &quot;Number of sites - Mental Health (including Specialist services) (No.)&quot;:
+<span class="fc" id="L112">            return Q.NO_MENTAL_HEALTH_SITES;</span>
+        case &quot;Number of sites - Learning Disabilities (No.)&quot;:
+<span class="fc" id="L114">            return Q.NO_LD_SITES;</span>
+        case &quot;Number of sites - Mental Health and Learning Disabilities (No.)&quot;:
+<span class="fc" id="L116">            return Q.NO_MENTAL_HEALTH_LD_SITES;</span>
+        case &quot;Number of sites - Community hospital (with inpatient beds) (No.)&quot;:
+        case &quot;Number of sites - Community hospital (No.)&quot;:
+<span class="fc" id="L119">            return Q.NO_COMMUNITY_HOSPITAL_SITES;</span>
+        case &quot;Number of sites - Other inpatient (No.)&quot;:
+        case &quot;Number of sites - Short term non-acute hospital (No.)&quot;:
+<span class="fc" id="L122">            return Q.NO_OTHER_INPATIENT_SITES;</span>
+        case &quot;Number of sites - Long stay hospital (No.)&quot;:
+<span class="fc" id="L124">            return Q.NO_LONG_STAY_HOSPITAL_SITES;</span>
+        case &quot;Number of sites - Non inpatient (No.)&quot;:
+        case &quot;Number of sites - Non in-patient facilities (No.)&quot;:
+<span class="fc" id="L127">            return Q.NO_OUTPATIENT_SITES;</span>
+        case &quot;Number of sites - Non-hospital (patient) (No.)&quot;:
+<span class="fc" id="L129">            return Q.NO_NON_HOSPITAL_PATIENT_SITES;</span>
+        case &quot;Number of sites - Support facilities (No.)&quot;:
+<span class="fc" id="L131">            return Q.NO_SUPPORT_SITES;</span>
+        case &quot;Number of sites - Unreported sites (No.)&quot;:
+        case &quot;Number of sites - Not reported (No.)&quot;:
+<span class="fc" id="L134">            return Q.NO_OTHER_SITES;</span>
+        case &quot;Area of sites not reported (m²)&quot;:
+<span class="fc" id="L136">            return Q.OTHER_SITES_AREA;</span>
+        case &quot;Estates Development Strategy (Yes/No)&quot;:
+<span class="fc" id="L138">            return Q.ESTATES_DEV_STRATEGY;</span>
+        case &quot;Healthy transport plan (Yes/No)&quot;:
+        case &quot;Healthy transport plan (Yes/No/None)&quot;:
+<span class="fc" id="L141">            return Q.HEALTHY_TRANSPORT_PLAN;</span>
+        case &quot;Board approved Adaptation Plan (Yes/No)&quot;:
+<span class="fc" id="L143">            return Q.BOARD_ADAPTATION_PLAN;</span>
+        case &quot;Sustainable Development Management Plan/Carbon Reduction Management Plan (Yes/No)&quot;:
+        case &quot;Board approved Sustainable Development Management Plan (SDMP) (Yes/No)&quot;:
+<span class="fc" id="L146">            return Q.SDMP_CRMP;</span>
+        case &quot;Carbon reduction target (Select)&quot;:
+        case &quot;Carbon reduction target ()&quot;:
+<span class="fc" id="L149">            return Q.CARBON_REDUCTION_TARGET;</span>
+        case &quot;NHS Premises and Facilities Assurance - Assessment/Approval (Select)&quot;:
+        case &quot;NHS Premises Assurance Model ()&quot;:
+<span class="fc" id="L152">            return Q.PFA_ASSESSMENT;</span>
+        case &quot;NHS Premises and Facilities Assurance - action plan (Select)&quot;:
+        case &quot;NHS Premises Assurance Model - Action Plan ()&quot;:
+<span class="fc" id="L155">            return Q.PFA_ACTION_PLAN;</span>
+        case &quot;Value of contracted out services (£)&quot;:
+<span class="fc" id="L157">            return Q.CONTRACTING_OUT_VAL;</span>
+        case &quot;Percentage of hard FM (estates) and soft FM (hotel services) contracted out (%)&quot;:
+<span class="fc" id="L159">            return Q.CONTRACTING_OUT_PCT;</span>
+        case &quot;Capital investment for new build (£)&quot;:
+<span class="fc" id="L161">            return Q.CAPITAL_NEW_BUILD;</span>
+        case &quot;Capital investment for improving existing buildings (£)&quot;:
+<span class="fc" id="L163">            return Q.CAPITAL_IMPROVING_EXISTING;</span>
+        case &quot;Capital investment for equipment (£)&quot;:
+<span class="fc" id="L165">            return Q.CAPITAL_EQUIPMENT;</span>
+        case &quot;Private Sector investment (£)&quot;:
+<span class="fc" id="L167">            return Q.PRIVATE_SECTOR;</span>
+        case &quot;Investment to reduce backlog maintenance (£)&quot;:
+<span class="fc" id="L169">            return Q.BACKLOG_MAINTENANCE_VAL;</span>
+        case &quot;Cost to meet NHS Premises and Facilities Assurance action plan (£)&quot;:
+<span class="fc" id="L171">            return Q.PFA_ACTION_PLAN_VAL;</span>
+        case &quot;Non-emergency patient transport (£)&quot;:
+<span class="fc" id="L173">            return Q.NON_EMERGENCY_TRANSPORT_VAL;</span>
+        case &quot;Income from services provided to other organisations - catering (£)&quot;:
+<span class="fc" id="L175">            return Q.INCOME_CATERING;</span>
+        case &quot;Income from services provided to other organisations - laundry and linen (£)&quot;:
+<span class="fc" id="L177">            return Q.INCOME_LAUNDRY;</span>
+        case &quot;Income from services provided to other organisations (£)&quot;:
+<span class="fc" id="L179">            return Q.INCOME_ALL;</span>
+        case &quot;Income from services provided to other organisations - other (£)&quot;:
+<span class="fc" id="L181">            return Q.INCOME_OTHER;</span>
+        case &quot;Income from building and land sales (£)&quot;:
+<span class="fc" id="L183">            return Q.INCOME_PROPERTY;</span>
+        case &quot;Building and land area sold (Hectare)&quot;:
+<span class="fc" id="L185">            return Q.PROPERTY_AREA_SOLD;</span>
+        case &quot;Forecast income from building and land sales for the next financial year (£)&quot;:
+<span class="fc" id="L187">            return Q.FORECAST_INCOME_PROPERTY;</span>
+        case &quot;Forecast building and land area to be sold for the next finacial year (Hectare)&quot;:
+        case &quot;Forecast building and land area to be sold for the next financial year (Hectare)&quot;:
+<span class="fc" id="L190">            return Q.FORECAST_PROPERTY_AREA_SOLD;</span>
+        case &quot;RIDDOR incidents (No.)&quot;:
+<span class="fc" id="L192">            return Q.NO_RIDDOR_INCIDENTS;</span>
+        case &quot;Estates and facilities related incidents (No.)&quot;:
+<span class="fc" id="L194">            return Q.NO_FM_INCIDENTS;</span>
+        case &quot;Clinical service incidents caused by estates and infrastructure failure (No.)&quot;:
+<span class="fc" id="L196">            return Q.NO_FM_CLINICAL_INCIDENTS;</span>
+        case &quot;Fires recorded (No.)&quot;:
+<span class="fc" id="L198">            return Q.NO_FIRES;</span>
+        case &quot;False alarms (No.)&quot;:
+<span class="fc" id="L200">            return Q.NO_FALSE_ALARMS;</span>
+        case &quot;False alarms - Call out (No.)&quot;:
+<span class="fc" id="L202">            return Q.NO_FALSE_ALARMS_CALL_OUT;</span>
+        case &quot;False alarms - No call out (No.)&quot;:
+<span class="fc" id="L204">            return Q.NO_FALSE_ALARMS_NO_CALL_OUT;</span>
+        case &quot;Number of deaths resulting from fire(s) (No.)&quot;:
+<span class="fc" id="L206">            return Q.NO_FIRE_DEATHS;</span>
+        case &quot;Number of people injured resulting from fire(s) (No.)&quot;:
+<span class="fc" id="L208">            return Q.NO_FIRE_INJURIES;</span>
+        case &quot;Number of patients sustaining injuries during evacuation (No.)&quot;:
+<span class="fc" id="L210">            return Q.NO_EVAC_INJURIES;</span>
+        case &quot;Hard FM (Estates) costs (£)&quot;:
+        case &quot;Other Hard FM (Estates) costs (£)&quot;:
+        case &quot;Total hard FM (estates) costs (£)&quot;:
+<span class="fc" id="L214">            return Q.HARD_FM_COSTS;</span>
+        case &quot;Soft FM (Hotel Services) costs (£)&quot;:
+        case &quot;Soft FM (Hotel services) costs (£)&quot;:
+        case &quot;Other Soft FM (Hotel Services) costs (£)&quot;:
+        case &quot;Total soft FM (Hotel Services) costs (£)&quot;:
+<span class="fc" id="L219">            return Q.SOFT_FM_COSTS;</span>
+        case &quot;Estates and facilities finance costs (£)&quot;:
+<span class="fc" id="L221">            return Q.FM_FINANCE_COSTS;</span>
+        case &quot;Maintenance service costs (£)&quot;:
+        case &quot;Estates and property maintenance (£)&quot;:
+        case &quot;Total building and engineering maintenance costs (£)&quot;:
+<span class="fc" id="L225">            return Q.MAINT_COSTS;</span>
+        case &quot;Grounds and gardens maintenance (£)&quot;:
+        case &quot;Total grounds and gardens maintenance costs (£)&quot;:
+<span class="fc" id="L228">            return Q.GROUNDS_COSTS;</span>
+        case &quot;Income received for area leased out for retail sales (£)&quot;:
+<span class="fc" id="L230">            return Q.INCOME_RETAIL;</span>
+        case &quot;Area leased out for retail sales (m²)&quot;:
+<span class="fc" id="L232">            return Q.AREA_RETAIL;</span>
+        case &quot;Gross internal site floor area (m²)&quot;:
+        case &quot;Gross internal floor area (m²)&quot;:
+<span class="fc" id="L235">            return Q.FLOOR_AREA;</span>
+        case &quot;Occupied floor area (m²)&quot;:
+<span class="fc" id="L237">            return Q.OCCUPIED_FLOOR_AREA;</span>
+        case &quot;NHS estate occupied floor area (%)&quot;:
+<span class="fc" id="L239">            return Q.NHS_OCCUPIED_FLOOR_AREA;</span>
+        case &quot;Site heated volume (m³)&quot;:
+<span class="fc" id="L241">            return Q.HEATED_VOL;</span>
+        case &quot;Building footprint (m²)&quot;:
+<span class="fc" id="L243">            return Q.BLDG_FOOTPRINT;</span>
+        case &quot;Site footprint (m²)&quot;:
+        case &quot;Site land area (Hectare)&quot;:
+        case &quot;Land area owned (Hectares)&quot;:
+<span class="fc" id="L247">            return Q.SITE_FOOTPRINT;</span>
+        case &quot;Land area not delivering services (Hectares)&quot;:
+<span class="fc" id="L249">            return Q.SITE_UNUSED_FOOTPRINT;</span>
+        case &quot;Patient occupied floor area (m²)&quot;:
+<span class="fc" id="L251">            return Q.PATIENT_OCCUPIED_FLOOR_AREA;</span>
+        case &quot;Non-patient occupied floor area (m²)&quot;:
+<span class="fc" id="L253">            return Q.NON_PATIENT_OCCUPIED_FLOOR_AREA;</span>
+        case &quot;Clinical space (m²)&quot;:
+<span class="fc" id="L255">            return Q.CLINICAL_FLOOR_AREA;</span>
+        case &quot;Non-clinical space (m²)&quot;:
+<span class="fc" id="L257">            return Q.NON_CLINICAL_FLOOR_AREA;</span>
+        case &quot;Not functionally suitable - occupied floor area (%)&quot;:
+<span class="fc" id="L259">            return Q.UNSUITABLE_OCCUPIED_FLOOR_AREA;</span>
+        case &quot;Not functionally suitable - patient occupied floor area (%)&quot;:
+<span class="fc" id="L261">            return Q.UNSUITABLE_PATIENT_OCCUPIED_FLOOR_AREA;</span>
+        case &quot;Un-utilised space (%)&quot;:
+        case &quot;Floor area - empty (%)&quot;:
+<span class="fc" id="L264">            return Q.EMPTY_FLOOR_AREA;</span>
+        case &quot;Floor area - under used (%)&quot;:
+<span class="fc" id="L266">            return Q.UNDER_USED_FLOOR_AREA;</span>
+        case &quot;Available beds (No.)&quot;:
+<span class="fc" id="L268">            return Q.AVAIL_BEDS;</span>
+        case &quot;Occupied beds (No.)&quot;:
+<span class="fc" id="L270">            return Q.OCCUPIED_BEDS;</span>
+        case &quot;Single bedrooms for patients with en-suite facilities (No.)&quot;:
+<span class="fc" id="L272">            return Q.SINGLE_BED_WITH_EN_SUITE;</span>
+        case &quot;Single bedrooms for patients without en-suite facilities (No.)&quot;:
+<span class="fc" id="L274">            return Q.SINGLE_BED_WITHOUT_EN_SUITE;</span>
+        case &quot;Age profile - 2015 to present (%)&quot;:
+        case &quot;Age profile - 2015 to 2024 (%)&quot;:
+<span class="fc" id="L277">            return Q.AGE_PROFILE_2015_2024;</span>
+        case &quot;Age profile - 2005 to present (%)&quot;:
+        case &quot;Age profile - 2005 to 2014 (%)&quot;:
+<span class="fc" id="L280">            return Q.AGE_PROFILE_2005_2014;</span>
+        case &quot;Age profile - 1995 to 2004 (%)&quot;:
+<span class="fc" id="L282">            return Q.AGE_PROFILE_1995_2004;</span>
+        case &quot;Age profile - 1985 to 1994 (%)&quot;:
+<span class="fc" id="L284">            return Q.AGE_PROFILE_1985_1994;</span>
+        case &quot;Age profile - 1975 to 1984 (%)&quot;:
+<span class="fc" id="L286">            return Q.AGE_PROFILE_1975_1984;</span>
+        case &quot;Age profile - 1965 to 1974 (%)&quot;:
+<span class="fc" id="L288">            return Q.AGE_PROFILE_1965_1974;</span>
+        case &quot;Age profile - 1955 to 1964 (%)&quot;:
+<span class="fc" id="L290">            return Q.AGE_PROFILE_1955_1964;</span>
+        case &quot;Age profile - 1948 to 1954 (%)&quot;:
+<span class="fc" id="L292">            return Q.AGE_PROFILE_1948_1954;</span>
+        case &quot;Age profile - pre 1948 (%)&quot;:
+<span class="fc" id="L294">            return Q.AGE_PROFILE_PRE_1948;</span>
+        case &quot;Age profile - total (must equal 100%) (%)&quot;:
+<span class="fc" id="L296">            return Q.AGE_PROFILE_TOTAL;</span>
+        case &quot;Cost to eradicate high risk backlog (£)&quot;:
+<span class="fc" id="L298">            return Q.ERADICATE_HIGH_RISK_BACKLOG_COST;</span>
+        case &quot;Cost to eradicate significant risk backlog (£)&quot;:
+<span class="fc" id="L300">            return Q.ERADICATE_SIG_RISK_BACKLOG_COST;</span>
+        case &quot;Cost to eradicate moderate risk backlog (£)&quot;:
+<span class="fc" id="L302">            return Q.ERADICATE_MOD_RISK_BACKLOG_COST;</span>
+        case &quot;Cost to eradicate low risk backlog (£)&quot;:
+<span class="fc" id="L304">            return Q.ERADICATE_LOW_RISK_BACKLOG_COST;</span>
+        case &quot;Risk adjusted backlog cost (£)&quot;:
+<span class="fc" id="L306">            return Q.RISK_ADJUSTED_BACKLOG_COST;</span>
+        case &quot;Cost to eradicate backlog (£)&quot;:
+<span class="fc" id="L308">            return Q.ERADICATE_BACKLOG_COST;</span>
+        case &quot;Energy cost (all energy supplies) (£)&quot;:
+        case &quot;Total energy cost (all energy supplies, utility, local and renewable) (£)&quot;:
+        case &quot;Energy costs (all energy supplies) (£)&quot;:
+<span class="fc" id="L312">            return Q.TOTAL_ENERGY_COST;</span>
+        case &quot;Electricity consumed - utility (kWh)&quot;:
+        case &quot;Electricity consumed (kWh)&quot;:
+<span class="fc" id="L315">            return Q.ELEC_USED;</span>
+        case &quot;Gas consumed - utility (kWh)&quot;:
+        case &quot;Gas consumed (kWh)&quot;:
+<span class="fc" id="L318">            return Q.GAS_USED;</span>
+        case &quot;Oil consumed - utility (kWh)&quot;:
+        case &quot;Oil  consumed - utility (kWh)&quot;:
+        case &quot;Oil consumed (kWh)&quot;:
+<span class="fc" id="L322">            return Q.OIL_USED;</span>
+        case &quot;Coal consumed (kWh)&quot;:
+        case &quot;Coal consumed - utility (kWh)&quot;:
+<span class="fc" id="L325">            return Q.COAL_USED;</span>
+        case &quot;Steam consumed - local (kWh)&quot;:
+        case &quot;Steam consumed (kWh)&quot;:
+<span class="fc" id="L328">            return Q.STEAM_USED;</span>
+        case &quot;Hot water consumed - local (kWh)&quot;:
+        case &quot;Hot water consumed (kWh)&quot;:
+<span class="fc" id="L331">            return Q.HOT_WATER_USED;</span>
+        case &quot;Electricity consumed - local (kWh)&quot;:
+<span class="fc" id="L333">            return Q.ELEC_USED_LOCAL;</span>
+        case &quot;Electricity consumed - renewable (kWh)&quot;:
+<span class="fc" id="L335">            return Q.ELEC_RENEWABLE_USED;</span>
+        case &quot;Electricity consumed - green energy tariff (kWh)&quot;:
+<span class="fc" id="L337">            return Q.ELEC_USED_GREEN_TARIFF;</span>
+        case &quot;Electricity consumed - third party owned renewable (kWh)&quot;:
+<span class="fc" id="L339">            return Q.ELEC_3RD_PTY_RENEWABLE_USED;</span>
+        case &quot;Electrical energy output of owned onsite renewables (kWh)&quot;:
+<span class="fc" id="L341">            return Q.ELEC_OWNED_RENEWABLE_USED;</span>
+        case &quot;Non-fossil fuel consumed - renewable (kWh)&quot;:
+<span class="fc" id="L343">            return Q.RENEWABLE_USED;</span>
+        case &quot;Fossil energy input to the CHP system/s (kWh)&quot;:
+        case &quot;Total fossil energy input to the CHP system/s (kWh)&quot;:
+        case &quot;Fossil energy input to CHP system/s (kWh)&quot;:
+<span class="fc" id="L347">            return Q.FOSSIL_USED_IN_CHP;</span>
+        case &quot;Thermal energy output of the CHP system/s (kWh)&quot;:
+        case &quot;Total thermal energy output of the CHP system/s (kWh)&quot;:
+        case &quot;Thermal energy output of CHP system/s (kWh)&quot;:
+<span class="fc" id="L351">            return Q.CHP_THERMAL_OUTPUT;</span>
+        case &quot;Electrical energy output of the CHP system/s (kWh)&quot;:
+        case &quot;Total electrical energy output of the CHP system/s (kWh)&quot;:
+        case &quot;Electrical energy output of CHP system/s (kWh)&quot;:
+<span class="fc" id="L355">            return Q.CHP_ELECTRICAL_OUTPUT;</span>
+        case &quot;Exported electricity (kWh)&quot;:
+        case &quot;Total exported electricity for the site (kWh)&quot;:
+<span class="fc" id="L358">            return Q.ELEC_EXPORTED;</span>
+        case &quot;CHP units operated on the site (No.)&quot;:
+        case &quot;Number of CHP units operated on the site (No.)&quot;:
+<span class="fc" id="L361">            return Q.NO_CHP_UNITS;</span>
+        case &quot;Total exported thermal energy for the site (kWh)&quot;:
+        case &quot;Exported thermal energy (kWh)&quot;:
+<span class="fc" id="L364">            return Q.EXPORTED_THERMAL_ENERGY;</span>
+        case &quot;Full load rating of the electrical generator plant (kW)&quot;:
+        case &quot;Total full load rating of the electrical generator plant (kW)&quot;:
+<span class="fc" id="L367">            return Q.ELEC_GENERATION;</span>
+        case &quot;Water cost (£)&quot;:
+<span class="fc" id="L369">            return Q.WATER_COST;</span>
+        case &quot;Water and sewage cost (£)&quot;:
+<span class="fc" id="L371">            return Q.WATER_AND_SEWAGE_COST;</span>
+        case &quot;Sewage cost (£)&quot;:
+<span class="fc" id="L373">            return Q.SEWAGE_COST;</span>
+        case &quot;Water volume (including borehole) (m³)&quot;:
+<span class="fc" id="L375">            return Q.WATER_VOL;</span>
+        case &quot;Clinical waste cost (£)&quot;:
+<span class="fc" id="L377">            return Q.CLINICAL_WASTE_COST;</span>
+        case &quot;Clinical waste volume (Tonnes)&quot;:
+<span class="fc" id="L379">            return Q.CLINICAL_WASTE_WEIGHT;</span>
+        case &quot;Special waste cost (£)&quot;:
+<span class="fc" id="L381">            return Q.SPECIAL_WASTE_COST;</span>
+        case &quot;Special waste volume (Tonnes)&quot;:
+<span class="fc" id="L383">            return Q.SPECIAL_WASTE_WEIGHT;</span>
+        case &quot;Domestic waste cost (£)&quot;:
+<span class="fc" id="L385">            return Q.DOMESTIC_WASTE_COST;</span>
+        case &quot;Waste recycling, recovery cost (£)&quot;:
+        case &quot;Waste reycling cost (£)&quot;:
+<span class="fc" id="L388">            return Q.WASTE_RECYLING_COST;</span>
+        case &quot;Waste reycling volume (Tonnes)&quot;:
+<span class="fc" id="L390">            return Q.WASTE_RECYLING_WEIGHT;</span>
+        case &quot;Incineration disposal cost (£)&quot;:
+<span class="fc" id="L392">            return Q.WASTE_INCINERATION_COST;</span>
+        case &quot;Incineration disposal volume (Tonnes)&quot;:
+<span class="fc" id="L394">            return Q.WASTE_INCINERATION_WEIGHT;</span>
+        case &quot;High temperature disposal waste weight involving combustion with energy recovery (Tonnes)&quot;:
+<span class="fc" id="L396">            return Q.HIGH_TEMP_DISPOSAL_WITH_RECOVERY_WEIGHT;</span>
+        case &quot;High temperature disposal waste weight (Tonnes)&quot;:
+<span class="fc" id="L398">            return Q.HIGH_TEMP_DISPOSAL_WEIGHT;</span>
+        case &quot;Non burn treatment (alternative treatment plant) disposal waste weight (Tonnes)&quot;:
+<span class="fc" id="L400">            return Q.ALT_WASTE_DISPOSAL_WEIGHT;</span>
+        case &quot;Waste electrical and electronic equipment (WEEE) weight (Tonnes)&quot;:
+<span class="fc" id="L402">            return Q.WEEE_WEIGHT;</span>
+        case &quot;Preparing for re-use volume (Tonnes)&quot;:
+<span class="fc" id="L404">            return Q.REUSE_WEIGHT;</span>
+        case &quot;Landfill disposal waste weight (Tonnes)&quot;:
+        case &quot;Landfill disposal volume (Tonnes)&quot;:
+<span class="fc" id="L407">            return Q.LANDFILL_WEIGHT;</span>
+        case &quot;Landfill disposal cost (£)&quot;:
+<span class="fc" id="L409">            return Q.LANDFILL_COST;</span>
+        case &quot;Other recovery volume (Tonnes)&quot;:
+<span class="fc" id="L411">            return Q.OTHER_RECOVERY_WEIGHT;</span>
+        case &quot;Other recovery cost (£)&quot;:
+<span class="fc" id="L413">            return Q.OTHER_RECOVERY_COST;</span>
+        case &quot;Waste recycling volume (Tonnes)&quot;:
+<span class="fc" id="L415">            return Q.RECYCLING_WEIGHT;</span>
+        case &quot;Waste recycling, recovery and preparing for re-use cost (£)&quot;:
+<span class="fc" id="L417">            return Q.WASTE_RECYLING_COST;</span>
+        case &quot;Waste cost (£)&quot;:
+        case &quot;Total waste cost (£)&quot;:
+<span class="fc" id="L420">            return Q.TOTAL_WASTE_COST;</span>
+        case &quot;Patient/visitor concession scheme provided (Yes/No/None)&quot;:
+<span class="fc" id="L422">            return Q.PATIENT_AND_VISITOR_CONCESSION_SCHEME;</span>
+        case &quot;Total parking spaces available (No.)&quot;:
+        case &quot;Parking spaces available (No.)&quot;:
+<span class="fc" id="L425">            return Q.PARKING_SPACES;</span>
+        case &quot;Designated parking spaces available for patients/visitors (No.)&quot;:
+        case &quot;Designated disabled parking spaces (No.)&quot;:
+<span class="fc" id="L428">            return Q.DISABLED_PARKING_SPACES;</span>
+        case &quot;Designated parking spaces available for staff (No.)&quot;:
+<span class="fc" id="L430">            return Q.DISABLED_STAFF_PARKING_SPACES;</span>
+        case &quot;Average fee charged per hour for patient/visitor parking (£)&quot;:
+<span class="fc" id="L432">            return Q.AVG_PARKING_FEE;</span>
+        case &quot;Average fee charged per hour for Staff parking (£)&quot;:
+        case &quot;Average fee charged per hour for staff parking (£)&quot;:
+<span class="fc" id="L435">            return Q.AVG_STAFF_PARKING_FEE;</span>
+        case &quot;Cleaning service cost (£)&quot;:
+        case &quot;Cleaning services costs (£)&quot;:
+<span class="fc" id="L438">            return Q.CLEANING_COST;</span>
+        case &quot;Cleaning staff (WTE)&quot;:
+        case &quot;Number of cleaning staff (WTE)&quot;:
+<span class="fc" id="L441">            return Q.NO_CLEANING_STAFF;</span>
+        case &quot;Cost of cleaning occupied floor area assessed as Red/Very High Risk (£)&quot;:
+<span class="fc" id="L443">            return Q.VH_RISK_CLEANING_COST;</span>
+        case &quot;Occupied floor area assessed as Red/Very High Risk (%)&quot;:
+<span class="fc" id="L445">            return Q.VH_RISK_CLEANING_AREA;</span>
+        case &quot;Required standard for occupied floor area assessed as Red/Very High Risk (%)&quot;:
+<span class="fc" id="L447">            return Q.VH_RISK_CLEANING_AREA_REQD_PCT;</span>
+        case &quot;Achieved standard for occupied floor area identified as Red/Very High Risk (%)&quot;:
+<span class="fc" id="L449">            return Q.VH_RISK_CLEANING_AREA_ACTUAL_PCT;</span>
+        case &quot;Cost of cleaning occupied floor area assessed as Amber/High and Significant Risk (£)&quot;:
+<span class="fc" id="L451">            return Q.HS_RISK_CLEANING_COST;</span>
+        case &quot;Occupied floor area assessed as Amber/High and Significant Risk (%)&quot;:
+<span class="fc" id="L453">            return Q.HS_RISK_CLEANING_AREA;</span>
+        case &quot;Required standard for occupied floor area assessed as Amber/High and Significant Risk (%)&quot;:
+<span class="fc" id="L455">            return Q.HS_RISK_CLEANING_AREA_REQD_PCT;</span>
+        case &quot;Achieved standard for occupied floor area identified as Amber/High and Significant Risk (%)&quot;:
+<span class="fc" id="L457">            return Q.HS_RISK_CLEANING_AREA_ACTUAL_PCT;</span>
+        case &quot;Cost of cleaning occupied floor area assessed as Green/Low Risk (£)&quot;:
+<span class="fc" id="L459">            return Q.L_RISK_CLEANING_COST;</span>
+        case &quot;Occupied floor area assessed as Green/Low Risk (%)&quot;:
+<span class="fc" id="L461">            return Q.L_RISK_CLEANING_AREA;</span>
+        case &quot;Required standard for occupied floor area assessed as Green/Low Risk (%)&quot;:
+<span class="fc" id="L463">            return Q.L_RISK_CLEANING_AREA_REQD_PCT;</span>
+        case &quot;Achieved standard for occupied floor area identified as Green/Low Risk (%)&quot;:
+<span class="fc" id="L465">            return Q.L_RISK_CLEANING_AREA_ACTUAL_PCT;</span>
+        case &quot;Cost of cleaning the occupied floor area not requiring regular cleaning (£)&quot;:
+<span class="fc" id="L467">            return Q.INFREQ_CLEANING_COST;</span>
+        case &quot;Occupied floor area not requiring regular cleaning (%)&quot;:
+<span class="fc" id="L469">            return Q.INFREQ_CLEANING_AREA;</span>
+        case &quot;In-patient food services cost (£)&quot;:
+        case &quot;Gross cost of in-patient services (£)&quot;:
+        case &quot;Inpatient food service cost (£)&quot;:
+<span class="fc" id="L473">            return Q.CATERING_SPEND;</span>
+        case &quot;In-patient main meals requested (No.)&quot;:
+        case &quot;Total in-patient main meals requested (No.)&quot;:
+        case &quot;Inpatient main meals requested (No.)&quot;:
+<span class="fc" id="L477">            return Q.NO_MEALS;</span>
+        case &quot;Cost of feeding one in-patient per day (in-patient meal day) (£)&quot;:
+        case &quot;Cost of feeding one inpatient per day (inpatient meal day) (£)&quot;:
+<span class="fc" id="L480">            return Q.PER_PATIENT_DAY_MEAL_COST;</span>
+        case &quot;Ward food waste - unserved meals (%)&quot;:
+<span class="fc" id="L482">            return Q.WARD_FOOD_WASTE;</span>
+        case &quot;Laundry and linen service cost (£)&quot;:
+        case &quot;Laundry and linen services cost (£)&quot;:
+<span class="fc" id="L485">            return Q.LAUNDRY_COST;</span>
+        case &quot;Pieces per annum (No.)&quot;:
+<span class="fc" id="L487">            return Q.NO_LAUNDRY_ITEMS;</span>
+        case &quot;Returned to laundry (%)&quot;:
+<span class="fc" id="L489">            return Q.LAUNDRY_RETURN_PCT;</span>
+        case &quot;Portering (internal patient transport) service cost (£)&quot;:
+        case &quot;Portering service cost (£)&quot;:
+<span class="fc" id="L492">            return Q.PORTERING_COST;</span>
+        case &quot;Portering staff (WTE)&quot;:
+<span class="fc" id="L494">            return Q.NO_PORTERING_STAFF;</span>
+        case &quot;PFI Unitary charges (£)&quot;:
+<span class="nc" id="L496">            return Q.PFI_CHARGES;</span>
+        case NO_NHS_PROPERTY_SVCS_SITES:
+<span class="fc" id="L498">            return Q.NO_NHS_PROPERTY_SVCS_SITES;</span>
+        case CIP_ACTUAL_VAL:
+<span class="fc" id="L500">            return Q.CIP_ACTUAL_VAL;</span>
+        case CIP_PLANNED_VAL:
+<span class="fc" id="L502">            return Q.CIP_PLANNED_VAL;</span>
+        case OVERHEATING_EVENTS:
+<span class="fc" id="L504">            return Q.OVERHEATING_EVENTS;</span>
+        case PCT_TEMP_MONITORED:
+<span class="fc" id="L506">            return Q.PCT_TEMP_MONITORED;</span>
+        case &quot;Electro Bio Medical Equipment maintenance cost (£)&quot;:
+<span class="fc" id="L508">            return Q.ELECTRO_BIO_MEDICAL_EQUIPT;</span>
+        case &quot;Isolation rooms (No.)&quot;:
+<span class="fc" id="L510">            return Q.ISOLATION_ROOMS;</span>
+        case &quot;Cost to eradicate Safety related Critical Infrastructure Risk (£)&quot;:
+<span class="fc" id="L512">            return Q.COST_SAFETY_RISK;</span>
+        case &quot;Cost to eradicate non-compliance related Critical Infrastructure Risk (£)&quot;:
+<span class="fc" id="L514">            return Q.COST_COMPLIANCE_RISK;</span>
+        case &quot;Cost to eradicate continuity related Critical Infrastructure Risk (£)&quot;:
+<span class="fc" id="L516">            return Q.COST_CONTINUITY_RISK;</span>
+        case &quot;CHP unit/s size (Watts)&quot;:
+<span class="fc" id="L518">            return Q.CHP_SIZE;</span>
+        case &quot;CHP unit/s efficiency (%)&quot;:
+<span class="fc" id="L520">            return Q.CHP_EFFICIENCY;</span>
+        case &quot;Peak electrical load (MW)&quot;:
+<span class="fc" id="L522">            return Q.ELEC_PEAK_LOAD;</span>
+        case &quot;Maximum electrical load (MW)&quot;:
+<span class="fc" id="L524">            return Q.ELEC_MAX_LOAD;</span>
+        case &quot;Amount paid to patients and visitors through the Healthcare Travel Costs Scheme (£)&quot;:
+<span class="fc" id="L526">            return Q.HEALTHCARE_TRAVEL_CLAIMS_COST;</span>
+        case &quot;Number of claims paid through the Healthcare Travel Costs Scheme (No.)&quot;:
+<span class="fc" id="L528">            return Q.NO_HEALTHCARE_TRAVEL_CLAIMS;</span>
+        case &quot;Business mileage (Miles)&quot;:
+<span class="fc" id="L530">            return Q.BIZ_MILEAGE;</span>
+        case &quot;Patient transport mileage (Miles)&quot;:
+<span class="fc" id="L532">            return Q.PATIENT_MILEAGE;</span>
+        case &quot;Patient taxi cost (£)&quot;:
+<span class="fc" id="L534">            return Q.TAXI_COST;</span>
+        }
+<span class="nc" id="L536">        throw new IllegalArgumentException(</span>
+<span class="nc" id="L537">                String.format(&quot;ERIC data not expected to include %1$s&quot;, hdr));</span>
+    }
+
+    private Question getQuestion(int i) {
+<span class="fc" id="L541">        return questions.get(i);</span>
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.2.201808211720</span></div></body></html>

@@ -1,0 +1,303 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Sdu1516.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Sustainability Reporting</a> &gt; <a href="index.source.html" class="el_package">digital.srp.sreport.model.surveys</a> &gt; <span class="el_source">Sdu1516.java</span></div><h1>Sdu1516.java</h1><pre class="source lang-java linenums">package digital.srp.sreport.model.surveys;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+
+import digital.srp.sreport.model.Q;
+import digital.srp.sreport.model.Survey;
+import digital.srp.sreport.model.SurveyCategory;
+
+/**
+ *
+ * @author Tim Stephenson
+ */
+public class Sdu1516 implements SurveyFactory {
+
+    public static final String PERIOD = &quot;2015-16&quot;;
+    public static final String ID = &quot;SDU-&quot;+PERIOD;
+<span class="fc" id="L18">    private static final Sdu1516 sdu1516 = new Sdu1516();</span>
+
+    /**
+     * Private constructor to prevent instantiation.
+     */
+    private Sdu1516() {
+    }
+
+    public static SurveyFactory getInstance() {
+<span class="fc" id="L27">        return sdu1516;</span>
+    }
+
+    public Survey getSurvey() {
+<span class="nc" id="L31">        SurveyCategory catOrg = new SurveyCategory()</span>
+<span class="nc" id="L32">                .name(&quot;Organisation&quot;)</span>
+<span class="nc" id="L33">                .questionEnums(</span>
+                        Q.ORG_NAME,
+                        Q.ORG_CODE,
+                        Q.ORG_NICKNAME,
+                        Q.ORG_TYPE,
+                        Q.FLOOR_AREA,
+                        Q.POPULATION,
+                        Q.NO_STAFF,
+                        Q.OCCUPIED_BEDS,
+                        Q.NO_PATIENT_CONTACTS,
+                        Q.PATIENT_CONTACT_MEASURE
+                );
+
+<span class="nc" id="L46">        SurveyCategory catPolicy = new SurveyCategory()</span>
+<span class="nc" id="L47">                .name(&quot;Policy&quot;)</span>
+<span class="nc" id="L48">                .questionEnums(</span>
+                        Q.SDMP_CRMP,
+                        Q.SDMP_BOARD_REVIEW_WITHIN_12_MONTHS,
+                        Q.SDMP_MISSION_STATEMENT,
+                        Q.HEALTHY_TRANSPORT_PLAN,
+                        Q.PROMOTE_HEALTHY_TRAVEL,
+                        Q.PROC_ENV_ASSESSMENT,
+                        Q.PROC_SOC_ASSESSMENT,
+                        Q.PROC_SUPPLIER_SUSTAINABILITY,
+                        Q.STRATEGIC_SUSTAINABILITY_PARTNERSHIPS,
+                        Q.STRATEGIC_SUSTAINABILITY_PARTNERS,
+                        Q.GCC_USER,
+                        Q.LAST_GCC_DATE,
+                        Q.LAST_GCC_SCORE,
+                        Q.SDG_STARTING,
+                        Q.SDG_CLEAR,
+                        Q.PROMOTE_SUSTAINABILITY_TO_STAFF,
+                        Q.QUANT_ES_IMPACTS,
+                        Q.QUANT_TRAVEL_IMPACTS,
+                        Q.MOD_SLAVERY,
+                        Q.SIA
+                );
+
+<span class="nc" id="L71">        SurveyCategory catPerf = new SurveyCategory()</span>
+<span class="nc" id="L72">                .name(&quot;Performance&quot;)</span>
+<span class="nc" id="L73">                .questionEnums(</span>
+                        Q.CARBON_REDUCTION_TARGET,
+                        Q.CARBON_REDUCTION_BASELINE_USED,
+                        Q.CARBON_REDUCTION_BASE_YEAR,
+                        Q.CARBON_REDUCTION_TARGET_PCT,
+                        Q.CARBON_REDUCTION_DEADLINE_YEAR,
+                        Q.BOARD_LEAD_FOR_SUSTAINABILITY,
+                        Q.BOARD_SUSTAINABILITY_AS_RISK,
+                        Q.ADAPTATION_PLAN_INC,
+                        Q.CCG1_SERVED, Q.CCG2_SERVED, Q.CCG3_SERVED,
+                        Q.CCG4_SERVED, Q.CCG5_SERVED, Q.CCG6_SERVED,
+                        Q.PROVIDER1_COMMISSIONED, Q.PROVIDER2_COMMISSIONED,
+                        Q.PROVIDER3_COMMISSIONED, Q.PROVIDER4_COMMISSIONED,
+                        Q.PROVIDER5_COMMISSIONED, Q.PROVIDER6_COMMISSIONED,
+                        Q.PROVIDER7_COMMISSIONED, Q.PROVIDER8_COMMISSIONED
+                );
+
+<span class="nc" id="L90">        SurveyCategory catFinancial = new SurveyCategory()</span>
+<span class="nc" id="L91">                .name(&quot;Spend&quot;)</span>
+<span class="nc" id="L92">                .questionEnums(</span>
+                        // TODO could be calculated? Or used as check?
+                        Q.TOTAL_ENERGY_COST,
+                        Q.WATER_AND_SEWAGE_COST,
+                        Q.WASTE_RECYLING_COST,
+                        Q.OP_EX,
+                        Q.TOTAL_BIZ_TRAVEL_COST,
+                        Q.NON_PAY_SPEND,
+                        Q.CAPITAL_SPEND
+                );
+
+<span class="nc" id="L103">        SurveyCategory catEnergy = new SurveyCategory()</span>
+<span class="nc" id="L104">                .name(&quot;Energy&quot;)</span>
+<span class="nc" id="L105">                .questionEnums(</span>
+                        Q.ELEC_USED,
+                        Q.GAS_USED,
+                        Q.OIL_USED,
+                        Q.COAL_USED,
+                        Q.STEAM_USED,
+                        Q.HOT_WATER_USED,
+                        Q.ELEC_USED_GREEN_TARIFF,
+                        Q.ELEC_3RD_PTY_RENEWABLE_USED,
+                        Q.ELEC_RENEWABLE_USED,
+                        Q.ELEC_EXPORTED
+                );
+
+<span class="nc" id="L118">        SurveyCategory catWaste = new SurveyCategory()</span>
+<span class="nc" id="L119">                .name(&quot;Waste&quot;)</span>
+<span class="nc" id="L120">                .questionEnums(</span>
+                        Q.DURABLES_INTERNAL_REUSE,
+                        Q.DURABLES_EXTERNAL_REUSE,
+                        Q.PAPER_USED,
+                        Q.OTHER_RECOVERY_WEIGHT,
+                        Q.INCINERATION_WEIGHT,
+                        Q.LANDFILL_WEIGHT,
+                        Q.RECYCLING_WEIGHT
+                );
+
+<span class="nc" id="L130">        SurveyCategory catWater = new SurveyCategory()</span>
+<span class="nc" id="L131">                .name(&quot;Water&quot;)</span>
+<span class="nc" id="L132">                .questionEnums(</span>
+                        Q.WATER_VOL,
+                        Q.WASTE_WATER
+                );
+
+<span class="nc" id="L137">        SurveyCategory catBizTravel = new SurveyCategory()</span>
+<span class="nc" id="L138">                .name(&quot;Business Travel&quot;)</span>
+<span class="nc" id="L139">                .questionEnums(</span>
+                        Q.BIZ_MILEAGE_ROAD,
+                        Q.FLEET_ROAD_MILES,
+                        Q.BIZ_MILEAGE_ROAD_COST,
+                        Q.OWNED_LEASED_LOW_CARBON_MILES,
+                        Q.OWNED_LEASED_LOW_CARBON_COST,
+                        Q.RAIL_MILES,
+                        Q.RAIL_COST,
+                        Q.BUS_COST,
+                        Q.BUS_MILES,
+                        Q.TAXI_COST,
+                        Q.TAXI_MILES,
+                        Q.CYCLE_MILES,
+                        Q.DOMESTIC_AIR_MILES,
+                        Q.SHORT_HAUL_AIR_MILES,
+                        Q.LONG_HAUL_AIR_MILES
+                );
+
+<span class="nc" id="L157">        SurveyCategory catOtherTravel = new SurveyCategory()</span>
+<span class="nc" id="L158">                .name(&quot;Other Travel&quot;)</span>
+<span class="nc" id="L159">                .questionEnums(</span>
+                        Q.PATIENT_MILEAGE,
+                        Q.VISITOR_MILEAGE,
+                        Q.STAFF_COMMUTE_MILES_PP,
+                        Q.STAFF_COMMUTE_MILES_TOTAL,
+                        Q.HEALTH_IMPACT_OF_TRAVEL
+                );
+
+<span class="nc" id="L167">        SurveyCategory catGases = new SurveyCategory()</span>
+<span class="nc" id="L168">                .name(&quot;Gases&quot;)</span>
+<span class="nc" id="L169">                .questionEnums(</span>
+                        Q.DESFLURANE,
+                        Q.ISOFLURANE,
+                        Q.SEVOFLURANE,
+                        Q.NITROUS_OXIDE,
+                        Q.PORTABLE_NITROUS_OXIDE_MIX,
+                        Q.PORTABLE_NITROUS_OXIDE_MIX_MATERNITY
+                );
+
+<span class="nc" id="L178">        SurveyCategory catAdditional = new SurveyCategory()</span>
+<span class="nc" id="L179">                .name(&quot;Additional&quot;)</span>
+<span class="nc" id="L180">                .questionEnums(</span>
+                        Q.CHP_ELECTRICAL_OUTPUT,
+                        Q.EXPORTED_THERMAL_ENERGY,
+                        Q.WOOD_LOGS_USED,
+                        Q.WOOD_CHIPS_USED,
+                        Q.WOOD_PELLETS_USED,
+                        Q.ELEC_OWNED_RENEWABLE_USED_SDU,
+                        Q.LEASED_ASSETS_ENERGY_USE,
+                        Q.GREEN_TARIFF_ADDITIONAL_PCT,
+                        Q.THIRD_PARTY_ADDITIONAL_PCT
+                );
+
+<span class="nc" id="L192">        SurveyCategory catSpendProfile = new SurveyCategory()</span>
+<span class="nc" id="L193">                .name(&quot;Spend Profile&quot;)</span>
+<span class="nc" id="L194">                .questionEnums(SduQuestions.SDU_PROFILE_HDRS);</span>
+
+<span class="nc" id="L196">        SurveyCategory catEClassProfile = new SurveyCategory()</span>
+<span class="nc" id="L197">                .name(&quot;Procurement&quot;)</span>
+<span class="nc" id="L198">                .questionEnums(</span>
+                        Q.ECLASS_USER,
+                        Q.PROVISIONS, Q.STAFF_CLOTHING,
+                        Q.PATIENTS_CLOTHING_AND_FOOTWEAR,
+                        Q.PHARMA_BLOOD_PROD_AND_MED_GASES, Q.DRESSINGS,
+                        Q.MEDICAL_AND_SURGICAL_EQUIPT, Q.PATIENTS_APPLIANCES,
+                        Q.CHEMICALS_AND_REAGENTS, Q.DENTAL_AND_OPTICAL_EQUIPT,
+                        Q.IMAGING_AND_RADIOTHERAPY_EQUIPT_AND_SVCS,
+                        Q.LAB_EQUIPT_AND_SVCS, Q.HOTEL_EQUIPT_MATERIALS_AND_SVCS,
+                        Q.BLDG_AND_ENG_PROD_AND_SVCS, Q.PURCHASED_HEALTHCARE,
+                        Q.GARDENING_AND_FARMING, Q.FURNITURE_FITTINGS,
+                        Q.HARDWARE_CROCKERY, Q.BEDDING_LINEN_AND_TEXTILES,
+                        Q.OFFICE_EQUIPT_TELCO_COMPUTERS_AND_STATIONERY,
+                        Q.REC_EQUIPT_AND_SOUVENIRS,
+                        Q.CONSULTING_SVCS_AND_EXPENSES
+                );
+<span class="nc" id="L214">        SurveyCategory catQual = new SurveyCategory()</span>
+<span class="nc" id="L215">                .name(&quot;Qualitative questions&quot;)</span>
+<span class="nc" id="L216">                .questionEnums(SduQuestions.QUALITATIVE_QS);</span>
+<span class="nc" id="L217">        Survey survey = new Survey().name(ID).status(&quot;Draft&quot;)</span>
+<span class="nc" id="L218">                .applicablePeriod(&quot;2016-17&quot;)</span>
+<span class="nc" id="L219">                .categories(catOrg, catPolicy, catPerf,</span>
+                        catFinancial, catEnergy, catWaste,
+                        catWater, catBizTravel, catOtherTravel, catGases,
+                        catAdditional, catEClassProfile, catSpendProfile, catQual);
+<span class="nc" id="L223">        return survey;</span>
+    }
+
+    // NOTE some of those below are not actually derived but if not supplied
+    // with at least a default (e.g. empty string) will cause cruncher to fail
+    public Q[] getDerivedQs() {
+<span class="nc" id="L229">        return getQs();</span>
+    }
+
+    @SuppressWarnings(&quot;deprecation&quot;)
+    @Override
+    public Q[] getQs() {
+<span class="fc" id="L235">        ArrayList&lt;Q&gt; list = new ArrayList&lt;Q&gt;();</span>
+<span class="fc" id="L236">        list.addAll(Arrays.asList(SduQuestions.SDU_PROFILE_HDRS));</span>
+<span class="fc" id="L237">        list.addAll(Arrays.asList(SduQuestions.FOOTPRINT_PCT_HDRS));</span>
+<span class="fc" id="L238">        list.addAll(Arrays.asList(SduQuestions.FOOTPRINT_2017_PCT_HDRS));</span>
+<span class="fc" id="L239">        list.add(Q.WASTE_WATER);</span>
+<span class="fc" id="L240">        list.addAll(Arrays.asList(SduQuestions.WATER_CO2E_HDRS));</span>
+<span class="fc" id="L241">        list.add(Q.PAPER_USED);</span>
+<span class="fc" id="L242">        list.addAll(Arrays.asList(SduQuestions.WASTE_HDRS));</span>
+<span class="fc" id="L243">        list.addAll(Arrays.asList(SduQuestions.WASTE_CO2E_HDRS));</span>
+<span class="fc" id="L244">        list.addAll(Arrays.asList(SduQuestions.TRAVEL_CO2E_HDRS));</span>
+<span class="fc" id="L245">        list.addAll(Arrays.asList(SduQuestions.ENERGY_HDRS));</span>
+<span class="fc" id="L246">        list.add(Q.ELEC_USED_GREEN_TARIFF);</span>
+<span class="fc" id="L247">        list.add(Q.ELEC_3RD_PTY_RENEWABLE_USED);</span>
+<span class="fc" id="L248">        list.add(Q.ELEC_NON_RENEWABLE_GREEN_TARIFF);</span>
+<span class="fc" id="L249">        list.add(Q.GREEN_TARIFF_ADDITIONAL_PCT);</span>
+<span class="fc" id="L250">        list.add(Q.ELEC_NON_RENEWABLE_3RD_PARTY);</span>
+<span class="fc" id="L251">        list.add(Q.THIRD_PARTY_ADDITIONAL_PCT);</span>
+<span class="fc" id="L252">        list.addAll(Arrays.asList(SduQuestions.ENERGY_CO2E_HDRS));</span>
+<span class="fc" id="L253">        list.add(Q.ELEC_NON_RENEWABLE_GREEN_TARIFF_CO2E);</span>
+<span class="fc" id="L254">        list.add(Q.ELEC_NON_RENEWABLE_3RD_PARTY_CO2E);</span>
+<span class="fc" id="L255">        list.addAll(Arrays.asList(SduQuestions.SUMMARY_SCOPE_HDRS));</span>
+<span class="fc" id="L256">        list.add(Q.SCOPE_ALL);</span>
+<span class="fc" id="L257">        list.addAll(Arrays.asList(SduQuestions.ANAESTHETIC_GASES_CO2E_HDRS));</span>
+<span class="fc" id="L258">        list.addAll(Arrays.asList(SduQuestions.SCOPE_1_HDRS));</span>
+<span class="fc" id="L259">        list.addAll(Arrays.asList(SduQuestions.SCOPE_2_HDRS));</span>
+<span class="fc" id="L260">        list.addAll(Arrays.asList(SduQuestions.SCOPE_3_HDRS));</span>
+<span class="fc" id="L261">        list.add(Q.OWNED_BUILDINGS);</span>
+<span class="fc" id="L262">        list.add(Q.SCOPE_3_BIOMASS_WTT);</span>
+<span class="fc" id="L263">        list.addAll(Arrays.asList(SduQuestions.BIOMASS_CO2E_WTT_HDRS));</span>
+<span class="fc" id="L264">        list.addAll(Arrays.asList(SduQuestions.BIOMASS_CO2E_NOSCOPE_HDRS));</span>
+<span class="fc" id="L265">        list.addAll(Arrays.asList(SduQuestions.SDU_PROFILE_CO2E_HDRS));</span>
+        // #203 not displayed but still calculated
+<span class="fc" id="L267">        list.add(Q.OTHER_PROCUREMENT_CO2E);</span>
+<span class="fc" id="L268">        list.addAll(Arrays.asList(SduQuestions.ECLASS_PROFILE_HDRS));</span>
+<span class="fc" id="L269">        list.addAll(Arrays.asList(SduQuestions.CORE_CO2E_HDRS));</span>
+<span class="fc" id="L270">        list.addAll(Arrays.asList(SduQuestions.ECLASS_PROFILE_HDRS));</span>
+<span class="fc" id="L271">        list.addAll(Arrays.asList(SduQuestions.BIZ_MILEAGE_ACTIVE_PUBLIC_HDRS));</span>
+<span class="fc" id="L272">        list.addAll(Arrays.asList(SduQuestions.BIZ_MILEAGE_HDRS));</span>
+<span class="fc" id="L273">        list.add(Q.BIZ_MILEAGE);</span>
+<span class="fc" id="L274">        list.addAll(Arrays.asList(SduQuestions.TRAVEL_HDRS));</span>
+<span class="fc" id="L275">        list.addAll(Arrays.asList(SduQuestions.CITIZEN_CO2E_HDRS));</span>
+<span class="fc" id="L276">        list.add(Q.TOTAL_CO2E);</span>
+<span class="fc" id="L277">        list.add(Q.TOTAL_CO2E_BY_POP);</span>
+<span class="fc" id="L278">        list.add(Q.TOTAL_CO2E_BY_FLOOR);</span>
+<span class="fc" id="L279">        list.add(Q.TOTAL_CO2E_BY_WTE);</span>
+<span class="fc" id="L280">        list.add(Q.TOTAL_CO2E_BY_BEDS);</span>
+<span class="fc" id="L281">        list.add(Q.TOTAL_CO2E_BY_PATIENT_CONTACT);</span>
+<span class="fc" id="L282">        list.add(Q.TOTAL_CO2E_BY_OPEX);</span>
+<span class="fc" id="L283">        list.addAll(Arrays.asList(SduQuestions.BENCHMARK_HDRS));</span>
+<span class="fc" id="L284">        list.addAll(Arrays.asList(SduQuestions.BENCHMARK_2017_HDRS));</span>
+<span class="fc" id="L285">        list.addAll(Arrays.asList(SduQuestions.BENCHMARK_BY_POPULATION_HDRS));</span>
+<span class="fc" id="L286">        list.addAll(Arrays.asList(SduQuestions.BENCHMARK_BY_FLOOR_AREA_HDRS));</span>
+<span class="fc" id="L287">        list.addAll(Arrays.asList(SduQuestions.BENCHMARK_BY_WTE_HDRS));</span>
+<span class="fc" id="L288">        list.addAll(Arrays.asList(SduQuestions.BENCHMARK_BY_BEDS_HDRS));</span>
+<span class="fc" id="L289">        list.addAll(Arrays.asList(SduQuestions.BENCHMARK_BY_PATIENT_CONTACTS_HDRS));</span>
+<span class="fc" id="L290">        list.add(Q.NON_PAY_SPEND);</span>
+<span class="fc" id="L291">        list.addAll(Arrays.asList(SduQuestions.SPEND_HDRS));</span>
+<span class="fc" id="L292">        list.addAll(Arrays.asList(SduQuestions.BENCHMARK_BY_OPEX_HDRS));</span>
+<span class="fc" id="L293">        list.add(Q.TOTAL_ENERGY);</span>
+<span class="fc" id="L294">        list.add(Q.TOTAL_ENERGY_COST);</span>
+<span class="fc" id="L295">        list.add(Q.ENERGY_COST_CHANGE_PCT);</span>
+<span class="fc" id="L296">        list.add(Q.TOTAL_ENERGY_BY_WTE);</span>
+<span class="fc" id="L297">        list.add(Q.WATER_VOL_BY_WTE);</span>
+<span class="fc" id="L298">        list.add(Q.NO_STAFF);</span>
+<span class="fc" id="L299">        list.addAll(Arrays.asList(SduQuestions.QUALITATIVE_QS));</span>
+<span class="fc" id="L300">        return list.toArray(new Q[list.size()]);</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.2.201808211720</span></div></body></html>
