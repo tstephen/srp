@@ -107,13 +107,13 @@ public class OrganisationTypeController {
             @PathVariable("tenantId") String tenantId,
             @RequestParam(value = "file", required = true) MultipartFile file)
             throws IOException {
-        LOGGER.info(String.format("Uploading org types for: %1$s", tenantId));
+        LOGGER.info("Uploading org types for: {}", tenantId);
         String content = new String(file.getBytes());
 
         List<OrganisationType> list = objectMapper.readValue(content,
                 new TypeReference<List<OrganisationType>>() {
                 });
-        LOGGER.info(String.format("  found %1$d org types", list.size()));
+        LOGGER.info("  found {} org types", list.size());
         for (OrganisationType orgType : list) {
             orgType.setTenantId(tenantId);
         }
@@ -180,9 +180,8 @@ public class OrganisationTypeController {
     public @ResponseBody EntityModel<OrganisationType> findById(
             @PathVariable("tenantId") String tenantId,
             @PathVariable("id") Long orgTypeId) {
-        LOGGER.info(String.format(
-                "Find organisation types for tenant %1$s with id %2$d",
-                tenantId, orgTypeId));
+        LOGGER.info("Find organisation types for tenant {} with id {}",
+                tenantId, orgTypeId);
 
         return addLinks(tenantId, organisationTypeRepo.findById(orgTypeId)
                 .orElseThrow(() -> new ObjectNotFoundException(orgTypeId,
@@ -200,13 +199,12 @@ public class OrganisationTypeController {
     public @ResponseBody List<EntityModel<OrganisationType>> findByStatusForTenant(
             @PathVariable("tenantId") String tenantId,
             @PathVariable("status") String status) {
-        LOGGER.info(String.format(
-                "List organisation types for tenant %1$s with status %2$s",
-                tenantId, status));
+        LOGGER.info("List organisation types for tenant {} with status {}",
+                tenantId, status);
 
         List<OrganisationType> list = organisationTypeRepo
                 .findByStatusForTenant(tenantId, status.toLowerCase());
-        LOGGER.info(String.format("Found %1$s organisation types", list.size()));
+        LOGGER.info("Found {} organisation types", list.size());
 
         return addLinks(tenantId, list);
     }
@@ -219,7 +217,7 @@ public class OrganisationTypeController {
             @PathVariable("tenantId") String tenantId,
             @RequestParam(value = "page", required = false) Integer page,
             @RequestParam(value = "limit", required = false) Integer limit) {
-        LOGGER.info(String.format("Export organisation types for tenant %1$s", tenantId));
+        LOGGER.info("Export organisation types for tenant {}", tenantId);
 
         List<OrganisationType> list;
         if (limit == null) {
@@ -228,8 +226,8 @@ public class OrganisationTypeController {
             Pageable pageable = PageRequest.of(page == null ? 0 : page, limit);
             list = organisationTypeRepo.findPageForTenant(tenantId, pageable);
         }
-        LOGGER.info(String.format("Found %1$s organisation types", list.size()));
 
+        LOGGER.info("Found {} organisation types", list.size());
         return list;
     }
 

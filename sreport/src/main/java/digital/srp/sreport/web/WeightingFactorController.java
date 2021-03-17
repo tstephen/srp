@@ -178,7 +178,7 @@ public class WeightingFactorController {
     public @ResponseBody void update(
             @PathVariable("id") Long cfactorId,
             @RequestBody WeightingFactor updatedWeightingFactor) {
-//        WeightingFactor cfactor = cfactorRepo.findOne(cfactorId);
+//        WeightingFactor cfactor = cfactorRepo.findById(cfactorId);
 //
 //        NullAwareBeanUtils.copyNonNullProperties(updatedOrder, cfactor, "id");
 

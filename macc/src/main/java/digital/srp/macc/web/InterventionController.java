@@ -116,14 +116,13 @@ public class InterventionController {
             @PathVariable("tenantId") String tenantId,
             @RequestParam(value = "file", required = true) MultipartFile file)
             throws IOException {
-        LOGGER.info(String
-                .format("Uploading interventions for: %1$s", tenantId));
+        LOGGER.info("Uploading interventions for: {}", tenantId);
         String content = new String(file.getBytes());
 
         List<Intervention> list = objectMapper.readValue(content,
                 new TypeReference<List<Intervention>>() {
                 });
-        LOGGER.info(String.format("  found %1$d interventions", list.size()));
+        LOGGER.info("  found {} interventions", list.size());
         ArrayList<Intervention> result = new ArrayList<Intervention>();
         for (Intervention intervention : list) {
             intervention.setTenantId(tenantId);
@@ -131,13 +130,12 @@ public class InterventionController {
             try {
                 interventionRepo.save(intervention);
             } catch (Exception e) {
-                LOGGER.error(String.format("Problem saving %1$s", intervention
-                        .getInterventionType().getName()));
+                LOGGER.error("Problem saving {}", intervention
+                        .getInterventionType().getName());
             }
             result.add(intervention);
         }
 
-        // Iterable<Intervention> result = interventionRepo.save(list);
         LOGGER.info("  saved.");
         return result;
     }
@@ -186,8 +184,7 @@ public class InterventionController {
 
     protected List<EntityModel<digital.srp.macc.model.Intervention>> listForTenant(String tenantId, Integer page,
             Integer limit) {
-        LOGGER.info(String.format("List interventions for tenant %1$s",
-                tenantId));
+        LOGGER.info("List interventions for tenant {}", tenantId);
 
         List<Intervention> list;
         if (limit == null) {
@@ -197,7 +194,7 @@ public class InterventionController {
             list = interventionRepo.findPageForTenant(tenantId, pageable);
         }
 
-        LOGGER.info(String.format("Found %1$s interventions", list.size()));
+        LOGGER.info("Found {} interventions", list.size());
         return addLinks(list);
     }
 
@@ -220,7 +217,7 @@ public class InterventionController {
 
         List<Intervention> list = interventionRepo
                 .findByStatusForTenantAndOrgType(tenantId, status, orgTypeName);
-        LOGGER.info(String.format("Found %1$s interventions", list.size()));
+        LOGGER.info("Found {} interventions", list.size());
 
         return addLinks(list);
     }
@@ -232,7 +229,7 @@ public class InterventionController {
     public @ResponseBody EntityModel<digital.srp.macc.model.Intervention> findById(
             @PathVariable("tenantId") String tenantId,
             @PathVariable("id") Long interventionId) {
-        LOGGER.info(String.format("findById %1$s", interventionId));
+        LOGGER.info("findById {}", interventionId);
 
         Intervention intvn = interventionRepo.findById(interventionId)
                 .orElseThrow(() -> new ObjectNotFoundException(interventionId,

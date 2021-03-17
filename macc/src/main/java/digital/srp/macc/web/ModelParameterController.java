@@ -72,7 +72,7 @@ public class ModelParameterController {
             @PathVariable("tenantId") String tenantId,
             @RequestParam(value = "page", required = false) Integer page,
             @RequestParam(value = "limit", required = false) Integer limit) {
-        LOGGER.info(String.format("List messages for tenant %1$s", tenantId));
+        LOGGER.info("List messages for tenant {}", tenantId);
 
         List<ModelParameter> list;
         if (limit == null) {
@@ -81,8 +81,7 @@ public class ModelParameterController {
             Pageable pageable = PageRequest.of(page == null ? 0 : page, limit);
             list = modelParamRepo.findPageForTenant(tenantId, pageable);
         }
-        LOGGER.info(String.format("Found %1$s messages", list.size()));
-
+        LOGGER.info("Found {} messages", list.size());
         return addLinks(tenantId, list);
     }
 
@@ -93,7 +92,7 @@ public class ModelParameterController {
     public @ResponseBody EntityModel<digital.srp.macc.model.ModelParameter> findById(
             @PathVariable("tenantId") String tenantId,
             @PathVariable("idOrName") String param) {
-        LOGGER.info(String.format("findById %1$s", param));
+        LOGGER.info("findById {}", param);
 
         ModelParameter parameter;
         try {
@@ -121,7 +120,8 @@ public class ModelParameterController {
             @RequestHeader String Authorization,
             @RequestBody ModelParameter param) {
 
-        EntityModel<ModelParameter> model = addLinks(tenantId, modelParamRepo.save(param));
+        EntityModel<ModelParameter> model = addLinks(
+                tenantId, modelParamRepo.save(param));
 
         HttpHeaders headers = new HttpHeaders();
         headers.setLocation(model.getLink("self").get().toUri());
@@ -138,7 +138,7 @@ public class ModelParameterController {
             @PathVariable("tenantId") String tenantId,
             @RequestParam(value = "page", required = false) Integer page,
             @RequestParam(value = "limit", required = false) Integer limit) {
-        LOGGER.info(String.format("Export messages for tenant %1$s", tenantId));
+        LOGGER.info("Export messages for tenant {}", tenantId);
 
         List<ModelParameter> list;
         if (limit == null) {
@@ -147,7 +147,7 @@ public class ModelParameterController {
             Pageable pageable = PageRequest.of(page == null ? 0 : page, limit);
             list = modelParamRepo.findPageForTenant(tenantId, pageable);
         }
-        LOGGER.info(String.format("Found %1$s messages", list.size()));
+        LOGGER.info("Found {} messages", list.size());
 
         return list;
     }

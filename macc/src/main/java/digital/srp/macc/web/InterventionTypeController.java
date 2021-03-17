@@ -118,7 +118,7 @@ public class InterventionTypeController {
         List<InterventionType> list = objectMapper.readValue(content,
                 new TypeReference<List<InterventionType>>() {
                 });
-        LOGGER.info(String.format("  found %1$d interventions", list.size()));
+        LOGGER.info("  found {} interventions", list.size());
         for (InterventionType message : list) {
             message.setTenantId(tenantId);
         }
@@ -142,14 +142,13 @@ public class InterventionTypeController {
             @PathVariable("tenantId") String tenantId,
             @RequestParam(value = "file", required = true) MultipartFile file)
             throws IOException {
-        LOGGER.info(String.format("Uploading CSV interventionTypes for: %1$s",
-                tenantId));
+        LOGGER.info("Uploading CSV interventionTypes for: {}", tenantId);
         String content = new String(file.getBytes());
         List<InterventionType> list = new CsvImporter().readInterventionTypes(
                 new StringReader(
                 content), content.substring(0, content.indexOf('\n'))
                 .split(","));
-        LOGGER.info(String.format("  found %1$d interventionTypes", list.size()));
+        LOGGER.info("  found {} interventionTypes", list.size());
         for (InterventionType interventionType : list) {
             interventionType.setTenantId(tenantId);
         }
@@ -171,7 +170,8 @@ public class InterventionTypeController {
             @RequestHeader String Authorization,
             @RequestBody InterventionType param) {
 
-        EntityModel<InterventionType> model = addLinks(tenantId, interventionTypeRepo.save(param));
+        EntityModel<InterventionType> model = addLinks(
+                tenantId, interventionTypeRepo.save(param));
 
         HttpHeaders headers = new HttpHeaders();
         headers.setLocation(model.getLink("self").get().toUri());
@@ -188,8 +188,7 @@ public class InterventionTypeController {
             @PathVariable("tenantId") String tenantId,
             @RequestParam(value = "page", required = false) Integer page,
             @RequestParam(value = "limit", required = false) Integer limit) {
-        LOGGER.info(String.format("List interventions for tenant %1$s",
-                tenantId));
+        LOGGER.info("List interventions for tenant {}", tenantId);
 
         List<InterventionType> list;
         if (limit == null) {
@@ -198,7 +197,7 @@ public class InterventionTypeController {
             Pageable pageable = PageRequest.of(page == null ? 0 : page, limit);
             list = interventionTypeRepo.findPageForTenant(tenantId, pageable);
         }
-        LOGGER.info(String.format("Found %1$s intervention types", list.size()));
+        LOGGER.info("Found {} intervention types", list.size());
 
         return addLinks(tenantId, list);
     }
