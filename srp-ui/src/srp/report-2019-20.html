@@ -586,6 +586,7 @@
           {{#if isEClassUser()}}
             <section id="eclassCarbonProfileSect" style="clear:both">
               <h2>E-Class Procurement Profile</h2>
+              {{#if parseInt(formatAnswer('ECLASS_SPEND'))==0}}<p class="alert alert-danger">ERROR: You have selected E-Class analysis but have not entered any E-Class spend data, the table below will be laregly empty. Instead, please select &apos;No&apos; on Procurement question 1 to display the SDU analysis.</p>{{/if}}
               <p>Calculated from the e-class spend you entered, which totalled
                 <em>&pound; {{formatDecimalAnswer('ECLASS_SPEND', period, 0)}}{{#if haveAnswer('ECLASS_SPEND')}},000{{else}}0{{/if}}</em> in the current year.<br/><br/>
               </p>
@@ -598,13 +599,13 @@
               <h2>SDU whole organisation carbon profile</h2>
               <p>Calculated from operating expenditure of <em>&pound;{{formatAnswer('OP_EX')}},000</em> of which <em>&pound;{{formatAnswer('NON_PAY_SPEND')}},000</em> is non-pay spend based on typical values for an {{formatAnswer('ORG_TYPE')}} organisation.</p>
               <p>CO<sub>2</sub> Emissions (tCO<sub>2</sub>e)</p>
-          <div class="rpt table2" id="sduProfileRptTable2" data-total="true" data-qs="PATIENT_AND_VISITOR_MILEAGE_CO2E,STAFF_COMMUTE_MILES_CO2E,BIZ_SVCS_CO2E,CAPITAL_CO2E,CONSTRUCTION_CO2E,CATERING_CO2E,FREIGHT_CO2E,ICT_CO2E,CHEM_AND_GAS_CO2E,MED_INSTR_CO2E,OTHER_MANUFACTURED_CO2E,PAPER_AND_CARD_CO2E,PHARMA_CO2E,OWNED_BUILDINGS_COAL,NET_ELEC_CO2E,OWNED_BUILDINGS_GAS,OWNED_BUILDINGS_OIL,NET_THERMAL_ENERGY_CO2E,LEASED_ASSETS_ENERGY_USE,BIZ_MILEAGE_CO2E,ANAESTHETIC_GASES_CO2E,WASTE_AND_WATER_CO2E,TOTAL_COMMISSIONING_CO2E" data-periods="4"
-               data-share="http://localhost:8083/reports/{{formatAnswer('ORG_CODE')}}/{{surveyReturn.applicablePeriod}}/sdu-carbon-profile.html"></div>
+              <div class="rpt table2" id="sduProfileRptTable2" data-total="true" data-qs="PATIENT_AND_VISITOR_MILEAGE_CO2E,STAFF_COMMUTE_MILES_CO2E,BIZ_SVCS_CO2E,CAPITAL_CO2E,CONSTRUCTION_CO2E,CATERING_CO2E,FREIGHT_CO2E,ICT_CO2E,CHEM_AND_GAS_CO2E,MED_INSTR_CO2E,OTHER_MANUFACTURED_CO2E,PAPER_AND_CARD_CO2E,PHARMA_CO2E,OWNED_BUILDINGS_COAL,NET_ELEC_CO2E,OWNED_BUILDINGS_GAS,OWNED_BUILDINGS_OIL,NET_THERMAL_ENERGY_CO2E,LEASED_ASSETS_ENERGY_USE,BIZ_MILEAGE_CO2E,ANAESTHETIC_GASES_CO2E,WASTE_AND_WATER_CO2E,TOTAL_COMMISSIONING_CO2E" data-periods="4"
+                   data-share="http://localhost:8083/reports/{{formatAnswer('ORG_CODE')}}/{{surveyReturn.applicablePeriod}}/sdu-carbon-profile.html"></div>
             </section>
           {{/if}}
         </section>
 
-        <section id="trajectorySect" class="rpt section">
+        <section id="trajectorySect" class="rpt section" style="clear:both">
           <h3>Carbon emissions progress</h3>
           <p class="narrative performance {{#if !haveAnswer('TRAJECTORY_PERF')}}hidden-print{{/if}}" data-q="TRAJECTORY_PERF">{{formatAnswer('TRAJECTORY_PERF')}}</p>
           <p>
@@ -685,7 +686,7 @@
   <script src="./vsn/js/string-functions.js"></script>
   <script src="./vsn/js/i18n.js"></script>
 
-  <script src="http://localhost:8083/js/env.js"></script>
+  <script src="https://api.srp.digital/js/env.js"></script>
   <script src="./vsn/js/client.js"></script>
   <script src="./vsn/js/base.js"></script>
   <script src="./vsn/js/report.js"></script>
