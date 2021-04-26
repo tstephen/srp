@@ -30,6 +30,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import digital.srp.macc.model.OrganisationType;
 import digital.srp.sreport.api.Calculator;
 import digital.srp.sreport.api.exceptions.ObjectNotFoundException;
 import digital.srp.sreport.internal.PeriodUtil;
@@ -1146,7 +1147,7 @@ public class Cruncher extends AbstractEmissionsService
 
     protected BigDecimal calcNonPaySpendFromOpEx(String period,
             SurveyReturn rtn) {
-        LOGGER.info(String.format("Need to calc non pay spend from op ex"));
+        LOGGER.info("Need to calc non pay spend from op ex for '{}' of '{}", period, rtn.id());
         // Intentionally use rtn period for org type
         Answer orgTypeA = rtn.answer(rtn.applicablePeriod(), Q.ORG_TYPE)
                 .orElseThrow(() -> new IllegalArgumentException(String.format(
@@ -1545,6 +1546,8 @@ public class Cruncher extends AbstractEmissionsService
     }
 
     private WeightingFactor wFactor(WeightingFactors wName, String period, String orgType) {
+        LOGGER.info("Looking up weighting factor '{}' for '{}' in '{}'",
+                wName, orgType, period);
         switch (orgType.toLowerCase()) {
         case "acute":
         case "acute - small":
@@ -1582,7 +1585,9 @@ public class Cruncher extends AbstractEmissionsService
         case "social enterprise":
             break;
         default:
-            LOGGER.warn("Unhandled org type when looking up weighting factor {}: {}", wName, orgType);
+            LOGGER.error("Unhandled org type when looking up weighting factor '{}' for '{}' in '{}'",
+                    wName, orgType, period);
+            throw new ObjectNotFoundException(OrganisationType.class, orgType);
         }
 
         for (WeightingFactor wfactor : wfactors) {
@@ -1593,7 +1598,7 @@ public class Cruncher extends AbstractEmissionsService
             }
         }
         LOGGER.info(
-                "Unable to find exact Weighting Factor, now looking for {} and org type {} alone",
+                "Unable to find exact Weighting Factor, now looking for '{}' and org type '{}' alone",
                 wName, orgType);
         for (WeightingFactor wfactor : wfactors) {
             if (wName.name().equals(wfactor.category())
@@ -1601,9 +1606,10 @@ public class Cruncher extends AbstractEmissionsService
                 return wfactor;
             }
         }
-        LOGGER.error("Unable to find any Weighting Factor {} for period {} and org type {}",
-                wName, period, orgType);
-        throw new ObjectNotFoundException(WeightingFactor.class, wName.name());
+        LOGGER.error("No weighting factor '{}' found for '{}' in '{}'",
+                wName, orgType, period);
+        throw new ObjectNotFoundException(WeightingFactor.class,
+                String.format("%1$s-%2$s-%3$s", wName, period, orgType));
     }
 
 }
