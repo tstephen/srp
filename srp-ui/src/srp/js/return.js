@@ -1,3 +1,4 @@
+var EASING_DURATION = 500;
 var $r = (function ($, ractive, $auth) {
   var me = {
     dirty: false,
