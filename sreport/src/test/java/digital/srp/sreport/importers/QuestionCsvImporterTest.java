@@ -41,7 +41,7 @@ public class QuestionCsvImporterTest {
             Question question = getQuestion(questions, "TOTAL_ENERGY_COST");
             assertEquals("TOTAL_ENERGY_COST", question.name());
             assertEquals("Total Energy Cost (all energy supplies)", question.label());
-            assertEquals("£", question.unit());
+            assertEquals("&pound;", question.unit());
             assertEquals("ERIC S08_01", question.source());
             assertEquals("The total cost of electricity, gas, oil, and coal from all sources (including utility supplier, local source, renewable source), net of any costs that are charged to other organisations for which the trust provides energy (see apportionment rules).", question.hint());
             assertEquals("number", question.type());
