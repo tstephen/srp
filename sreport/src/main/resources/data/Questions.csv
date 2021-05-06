@@ -66,7 +66,9 @@ MOD_SLAVERY$If your organisation has a Modern Slavery statement, what is it?$$SD
 SIA$Does your business case process include a Sustainability Impact Assessment?$$SDU$$yesno$$$$
 CARBON_REDUCTION_BASE_YEAR$What is your organisation's baseline year?$$SDU$$number$yyyy$$[\\d]{4}$2007
 CARBON_REDUCTION_TARGET_PCT$What is the percentage reduction target?$%$SDU$$number$$$$34
+CARBON_REDUCTION_TARGET2_PCT$What is the percentage reduction target post 2020?$%$SDU$$number$$$$34
 CARBON_REDUCTION_DEADLINE_YEAR$What is the deadline year for this target?$$SDU$$number$yyyy$$[\\d]{4}$2020
+CARBON_REDUCTION_DEADLINE2_YEAR$What is the deadline year for your post-2020 target?$$SDU$$number$yyyy$$[\\d]{4}$2020
 PATIENT_CONTACT_MEASURE$Define the measure you have used for patient contacts$$SDU$$$$$$
 BOARD_LEAD_FOR_SUSTAINABILITY$If you have a Board Level lead for Sustainability, please enter their name and/or role here$$SDU$$$$$$
 BOARD_SUSTAINABILITY_AS_RISK$Does your board consider sustainability issues as part of its risk management process?$$SDU$$yesno$$$$

@@ -83,8 +83,8 @@ public class Sdu2021 implements SurveyFactory {
                 .name("Performance")
                 .questionEnums(
                         Q.CARBON_REDUCTION_BASE_YEAR,
-                        Q.CARBON_REDUCTION_TARGET_PCT,
-                        Q.CARBON_REDUCTION_DEADLINE_YEAR,
+                        Q.CARBON_REDUCTION_TARGET2_PCT,
+                        Q.CARBON_REDUCTION_DEADLINE2_YEAR,
                         Q.BOARD_LEAD_FOR_SUSTAINABILITY,
                         Q.BOARD_SUSTAINABILITY_AS_RISK,
                         Q.ADAPTATION_PLAN_INC,
