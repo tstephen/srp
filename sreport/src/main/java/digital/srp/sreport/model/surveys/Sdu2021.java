@@ -201,13 +201,13 @@ public class Sdu2021 implements SurveyFactory {
         SurveyCategory catBizTravel = new SurveyCategory()
                 .name("Business Travel")
                 .questionEnums(
-                        Q.PRIVATE_CAR_MILES_UNKOWN_FUEL,
+                        Q.BIZ_MILEAGE_ROAD,
                         Q.RAIL_MILES,
                         Q.RAIL_COST,
-                        Q.BUS_COST,
                         Q.BUS_MILES,
-                        Q.TAXI_COST,
+                        Q.BUS_COST,
                         Q.TAXI_MILES,
+                        Q.TAXI_COST,
                         Q.CYCLE_MILES,
                         Q.DOMESTIC_AIR_MILES,
                         Q.SHORT_HAUL_AIR_MILES,
@@ -328,7 +328,7 @@ public class Sdu2021 implements SurveyFactory {
         list.add(Q.PAPER_USED);
         list.addAll(Arrays.asList(SduQuestions.WASTE_HDRS));
         list.addAll(Arrays.asList(SduQuestions.WASTE_CO2E_HDRS_POST2020));
-        list.addAll(Arrays.asList(SduQuestions.TRAVEL_CO2E_HDRS_POST2020));
+        list.addAll(Arrays.asList(SduQuestions.TRAVEL_CO2E_HDRS));
         list.add(Q.CAR_DIESEL_USED_CO2E);
         list.add(Q.CAR_DIESEL_WTT_CO2E);
         list.add(Q.CAR_PETROL_USED_CO2E);
@@ -370,6 +370,7 @@ public class Sdu2021 implements SurveyFactory {
         list.addAll(Arrays.asList(SduQuestions.BIZ_MILEAGE_ACTIVE_PUBLIC_HDRS));
         list.addAll(Arrays.asList(SduQuestions.BIZ_MILEAGE_HDRS));
         list.add(Q.BIZ_MILEAGE);
+        list.add(Q.AIR_MILES);
         list.addAll(Arrays.asList(SduQuestions.TRAVEL_HDRS));
         list.add(Q.TRAVEL_CO2E);
         list.addAll(Arrays.asList(SduQuestions.CITIZEN_CO2E_HDRS));

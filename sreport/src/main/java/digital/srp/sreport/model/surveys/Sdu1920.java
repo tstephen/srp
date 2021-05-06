@@ -338,6 +338,7 @@ public class Sdu1920 implements SurveyFactory {
         list.addAll(Arrays.asList(SduQuestions.BIZ_MILEAGE_ACTIVE_PUBLIC_HDRS));
         list.addAll(Arrays.asList(SduQuestions.BIZ_MILEAGE_HDRS));
         list.add(Q.BIZ_MILEAGE);
+        list.add(Q.AIR_MILES);
         list.addAll(Arrays.asList(SduQuestions.TRAVEL_HDRS));
         list.add(Q.TRAVEL_CO2E);
         list.addAll(Arrays.asList(SduQuestions.CITIZEN_CO2E_HDRS));

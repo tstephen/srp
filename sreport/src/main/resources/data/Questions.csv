@@ -66,7 +66,9 @@ MOD_SLAVERY$If your organisation has a Modern Slavery statement, what is it?$$SD
 SIA$Does your business case process include a Sustainability Impact Assessment?$$SDU$$yesno$$$$
 CARBON_REDUCTION_BASE_YEAR$What is your organisation's baseline year?$$SDU$$number$yyyy$$[\\d]{4}$2007
 CARBON_REDUCTION_TARGET_PCT$What is the percentage reduction target?$%$SDU$$number$$$$34
+CARBON_REDUCTION_TARGET2_PCT$What is the percentage reduction target post 2020?$%$SDU$$number$$$$34
 CARBON_REDUCTION_DEADLINE_YEAR$What is the deadline year for this target?$$SDU$$number$yyyy$$[\\d]{4}$2020
+CARBON_REDUCTION_DEADLINE2_YEAR$What is the deadline year for your post-2020 target?$$SDU$$number$yyyy$$[\\d]{4}$2020
 PATIENT_CONTACT_MEASURE$Define the measure you have used for patient contacts$$SDU$$$$$$
 BOARD_LEAD_FOR_SUSTAINABILITY$If you have a Board Level lead for Sustainability, please enter their name and/or role here$$SDU$$$$$$
 BOARD_SUSTAINABILITY_AS_RISK$Does your board consider sustainability issues as part of its risk management process?$$SDU$$yesno$$$$
@@ -123,8 +125,8 @@ FLEET_COST$Business mileage - Owned, pool, leased and managed vehicles Cost$&pou
 BIZ_MILEAGE_ROAD_COST$Cost of Non-organisation Owned Fleet/Pool/Third party provided used by the organisation (excluding leased vehicles) Road Travel (Hire etc.)$&pound;$SDU$Vehicles not owned but used by the organisation$number$$$$
 OWNED_LEASED_LOW_CARBON_MILES$Business Mileage - Owned, pool, leased or managed vehicles that are electric or plug in hybrid (on Go Ultra Low approved list)$miles$SDU$GoUltraLow approved list$number$$$$
 OWNED_LEASED_LOW_CARBON_COST$Business Mileage - Owned, pool, leased or managed vehicles that are electric or plug in hybrid (on Go Ultra Low approved list) Cost$&pound;$SDU$GoUltraLow approved list$number$$$$
-RAIL_MILES$Rail/Underground/Tram cost$&pound;$SDU$Provide the cost figure for expense claims and directly purchased rail/underground/tram journeys$number$$$$
-RAIL_COST$Rail/Underground/Tram business mileage$miles$SDU$Calculation takes into account an estimated average cost per mile of 30p/mile for rail travel, Please note that if the majority of travel is in London/Underground then the average fare per mile will be higher even with the use of an oyster card. Please override if local information is accessible and accurate$number$$$$
+RAIL_COST$Rail/Underground/Tram cost$&pound;$SDU$Provide the cost figure for expense claims and directly purchased rail/underground/tram journeys$number$$$$
+RAIL_MILES$Rail/Underground/Tram business mileage$miles$SDU$Calculation takes into account an estimated average cost per mile of 30p/mile for rail travel, Please note that if the majority of travel is in London/Underground then the average fare per mile will be higher even with the use of an oyster card. Please override if local information is accessible and accurate$number$$$$
 BUS_COST$Bus/Coach cost$&pound;$SDU$Provide the cost figure for expense claims and directly purchased bus/coach journeys$number$$$$
 BUS_MILES$Bus/Coach business miles$miles$SDU$Calculation takes into account an estimated average cost per mile of 12p/mile for bus travel Please override if local information is accessible and accurate$number$$$$
 TAXI_COST$Taxi cost$&pound;$SDU$Provide the cost figure for expense claims and directly purchased taxi journeys$number$$$$

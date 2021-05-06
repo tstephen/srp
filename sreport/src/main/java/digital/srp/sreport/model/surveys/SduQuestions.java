@@ -103,10 +103,6 @@ public interface SduQuestions {
     };
 
     Q[] TRAVEL_CO2E_HDRS = new Q[] { Q.PATIENT_AND_VISITOR_MILEAGE_CO2E,
-            Q.BIZ_MILEAGE_ROAD_CO2E, Q.STAFF_COMMUTE_MILES_CO2E
-    };
-
-    Q[] TRAVEL_CO2E_HDRS_POST2020 = new Q[] { Q.PATIENT_AND_VISITOR_MILEAGE_CO2E,
             Q.FLEET_AND_BIZ_ROAD_CO2E, Q.STAFF_COMMUTE_MILES_CO2E
     };
 
@@ -148,7 +144,7 @@ public interface SduQuestions {
     };
 
     Q[] SCOPE_3_TRAVEL_HDRS = new Q[] {
-        Q.BIZ_MILEAGE_ROAD_CO2E,
+        Q.BIZ_MILEAGE_ALL_ROAD_CO2E,
         Q.BIZ_MILEAGE_RAIL_CO2E,
         Q.BIZ_MILEAGE_AIR_CO2E,
         Q.OWNED_FLEET_TRAVEL_WTT_CO2E,
@@ -306,7 +302,7 @@ public interface SduQuestions {
              * all travel excepting individual citizens (patients, visitors and
              * staff)
              */
-            Q.BIZ_MILEAGE_CO2E, Q.BIZ_MILEAGE_ROAD_CO2E,
+            Q.BIZ_MILEAGE_CO2E, Q.BIZ_MILEAGE_ALL_ROAD_CO2E,
             Q.BIZ_MILEAGE_RAIL_CO2E, Q.BIZ_MILEAGE_AIR_CO2E,
             Q.OWNED_FLEET_TRAVEL_CO2E };
 

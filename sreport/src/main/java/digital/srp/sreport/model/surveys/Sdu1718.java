@@ -292,6 +292,7 @@ public class Sdu1718 implements SurveyFactory {
         list.addAll(Arrays.asList(SduQuestions.BIZ_MILEAGE_ACTIVE_PUBLIC_HDRS));
         list.addAll(Arrays.asList(SduQuestions.BIZ_MILEAGE_HDRS));
         list.add(Q.BIZ_MILEAGE);
+        list.add(Q.AIR_MILES);
         list.addAll(Arrays.asList(SduQuestions.TRAVEL_HDRS));
         list.addAll(Arrays.asList(SduQuestions.CITIZEN_CO2E_HDRS));
         list.add(Q.TOTAL_CO2E);
