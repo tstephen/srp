@@ -500,6 +500,12 @@ public class Cruncher extends AbstractEmissionsService
                 rtn.answerResponseAsBigDecimal(period, Q.RECYCLING_WEIGHT),
                 cFactor(CarbonFactors.CLOSED_LOOP_OR_OPEN_LOOP, period),
                 getAnswer(period, rtn, Q.RECYCLING_CO2E));
+        if (rtn.answer(period, Q.WASTE_CONFIDENTIAL).isPresent()) {
+            wasteEmissionsService.calcRecylingCo2e(
+                    getAnswer(period, rtn, Q.WASTE_CONFIDENTIAL).responseAsBigDecimal(),
+                    cFactor(CarbonFactors.CLOSED_LOOP_OR_OPEN_LOOP, period),
+                    getAnswer(period, rtn, Q.WASTE_CONFIDENTIAL_CO2E));
+        }
         // factor changed from weighted avg of industrial and domestic to solely domestic in 2020-21
         wasteEmissionsService.calcLandfillCo2e(
                 getAnswer(period, rtn, Q.LANDFILL_WEIGHT).responseAsBigDecimal(),

@@ -42,7 +42,7 @@ public class Sdu2021SurveyServiceIntegrationTest {
             assertThat(survey.applicablePeriod()).isEqualTo(Sdu2021.PERIOD);
             assertThat(survey.categories().size()).isEqualTo(20);
             // h2 database used for tests does not default create time
-            assertThat(survey.questionCodes().size()).isEqualTo(195);
+            assertThat(survey.questionCodes().size()).isEqualTo(196);
             assertThat(survey.questions().size()).isEqualTo(survey.questionCodes().size());
 
             // repeat to test idempotence and pre-existing survey path

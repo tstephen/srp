@@ -159,6 +159,7 @@ public class Sdu2021 implements SurveyFactory {
                         Q.WASTE_OFFENSIVE,
                         Q.LANDFILL_WEIGHT,
                         Q.RECYCLING_WEIGHT,
+                        Q.WASTE_CONFIDENTIAL,
                         Q.WASTE_FOOD,
                         Q.WASTE_TEXTILES,
                         Q.INCINERATION_WEIGHT,
