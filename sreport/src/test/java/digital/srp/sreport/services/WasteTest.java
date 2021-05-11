@@ -45,6 +45,7 @@ public class WasteTest {
     private static final String OTHER_RECOVERY_CO2E = "13.06";
     private static final String RECYCLING_CO2E = "15.23";
     private static final String RECYCLING_CO2E_2020_21 = "14.92";
+    private static final String CONFIENTIAL_CO2E = "0.98";
     private static final String DURABLES_INTERNAL_REUSE_CO2E = "0.00";
     private static final String DURABLES_EXTERNAL_REUSE_CO2E = "0.00";
     private static final String PAPER_USED_CO2E = "0.00";
@@ -58,6 +59,7 @@ public class WasteTest {
 
     private static final String OTHER_RECOVERY_WEIGHT = "600.00";
     private static final String RECYCLING_WEIGHT = "700.00";
+    private static final String WASTE_CONFIDENTIAL = "46.00";
     private static final String INCINERATION_WEIGHT = "500.00";
     private static final String LANDFILL_WEIGHT = "100.00";
     private static final String DURABLES_INTERNAL_REUSE = "5.00";
@@ -71,7 +73,7 @@ public class WasteTest {
     private static final String WASTE_PROCESSED_ON_SITE = "1.50";
     private static final String WEEE_WEIGHT = "1.00";
     private static final String SCOPE_3_WASTE = "184.12";
-    private static final String SCOPE_3_WASTE_2020_21 = "241.90";
+    private static final String SCOPE_3_WASTE_2020_21 = "242.88";
 
     private static final String PERIOD = Sdu1718.PERIOD;
     private static final String PERIOD_2020_21 = Sdu2021.PERIOD;
@@ -127,6 +129,7 @@ public class WasteTest {
         rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD_2020_21).question(Q.INCINERATION_WEIGHT).response(INCINERATION_WEIGHT));
         rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD_2020_21).question(Q.LANDFILL_WEIGHT).response(LANDFILL_WEIGHT));
         rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD_2020_21).question(Q.RECYCLING_WEIGHT).response(RECYCLING_WEIGHT));
+        rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD_2020_21).question(Q.WASTE_CONFIDENTIAL).response(WASTE_CONFIDENTIAL));
         rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD_2020_21).question(Q.DURABLES_INTERNAL_REUSE).response(DURABLES_INTERNAL_REUSE));
         rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD_2020_21).question(Q.DURABLES_EXTERNAL_REUSE).response(DURABLES_EXTERNAL_REUSE));
         rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD_2020_21).question(Q.PAPER_USED).response(PAPER_USED));
@@ -141,6 +144,7 @@ public class WasteTest {
         rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD_2020_21).question(Q.INCINERATION_CO2E));
         rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD_2020_21).question(Q.LANDFILL_CO2E));
         rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD_2020_21).question(Q.RECYCLING_CO2E));
+        rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD_2020_21).question(Q.WASTE_CONFIDENTIAL_CO2E));
         rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD_2020_21).question(Q.DURABLES_INTERNAL_REUSE_CO2E));
         rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD_2020_21).question(Q.DURABLES_EXTERNAL_REUSE_CO2E));
         rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD_2020_21).question(Q.PAPER_USED_CO2E));
@@ -157,6 +161,7 @@ public class WasteTest {
         assertEquals(new BigDecimal(INCINERATION_CO2E_2020_21), rtn.answer(PERIOD_2020_21, Q.INCINERATION_CO2E).get().responseAsBigDecimal().setScale(2, RoundingMode.HALF_UP));
         assertEquals(new BigDecimal(LANDFILL_CO2E_2020_21), rtn.answer(PERIOD_2020_21, Q.LANDFILL_CO2E).get().responseAsBigDecimal());
         assertEquals(new BigDecimal(RECYCLING_CO2E_2020_21), rtn.answer(PERIOD_2020_21, Q.RECYCLING_CO2E).get().responseAsBigDecimal().setScale(2, RoundingMode.HALF_UP));
+        assertEquals(new BigDecimal(CONFIENTIAL_CO2E), rtn.answer(PERIOD_2020_21, Q.WASTE_CONFIDENTIAL_CO2E).get().responseAsBigDecimal().setScale(2, RoundingMode.HALF_UP));
         assertEquals(new BigDecimal(DURABLES_INTERNAL_REUSE_CO2E), rtn.answer(PERIOD_2020_21, Q.DURABLES_INTERNAL_REUSE_CO2E).get().responseAsBigDecimal().setScale(2, RoundingMode.HALF_UP));
         assertEquals(new BigDecimal(DURABLES_EXTERNAL_REUSE_CO2E), rtn.answer(PERIOD_2020_21, Q.DURABLES_EXTERNAL_REUSE_CO2E).get().responseAsBigDecimal().setScale(2, RoundingMode.HALF_UP));
         assertEquals(new BigDecimal(PAPER_USED_CO2E), rtn.answer(PERIOD_2020_21, Q.PAPER_USED_CO2E).get().responseAsBigDecimal().setScale(2, RoundingMode.HALF_UP));

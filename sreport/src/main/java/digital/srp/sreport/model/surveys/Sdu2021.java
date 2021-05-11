@@ -327,7 +327,6 @@ public class Sdu2021 implements SurveyFactory {
         list.add(Q.WASTE_WATER);
         list.addAll(Arrays.asList(SduQuestions.WATER_CO2E_HDRS));
         list.add(Q.PAPER_USED);
-        list.addAll(Arrays.asList(SduQuestions.WASTE_HDRS));
         list.addAll(Arrays.asList(SduQuestions.WASTE_CO2E_HDRS_POST2020));
         list.addAll(Arrays.asList(SduQuestions.TRAVEL_CO2E_HDRS));
         list.add(Q.CAR_DIESEL_USED_CO2E);

@@ -263,7 +263,7 @@ SITE_UNUSED_FOOTPRINT$$$ERIC$$number$$$$
 ISOLATION_ROOMS$$$ERIC$$number$$$$
 WASTE_RECYLING_WEIGHT$$$ERIC$$number$$$$
 WASTE_INCINERATION_COST$$$ERIC$$number$$$$
-INCINERATION_WEIGHT$Domestic waste (incineration) volume$tonnes$ERIC$$number$$$$
+INCINERATION_WEIGHT$Domestic waste (incineration) volume$tonnes$ERIC$<p>Amount of all Domestic waste sent to waste to energy or municipal incineration. All domestic waste processed on Trusts' own sites.</p><ul><li>20-03-01: Mixed municipal waste (black bag)</li></ul><p>Detailed information can be found on the Government website for waste classification; <a href="https://www.gov.uk/how-to-classify-different-types-of-waste/healthcare-and-related-wastes">https://www.gov.uk/how-to-classify-different-types-of-waste/healthcare-and-related-wastes</a></p>$number$$$$
 WASTE_INCINERATION_WEIGHT$Domestic waste (incineration) volume$tonnes$ERIC$<p>Amount of all Domestic waste sent to waste to energy or municipal incineration. All domestic waste processed on Trusts' own sites.</p><ul><li>20-03-01: Mixed municipal waste (black bag)</li></ul><p>Detailed information can be found on the Government website for waste classification; <a href="https://www.gov.uk/how-to-classify-different-types-of-waste/healthcare-and-related-wastes">https://www.gov.uk/how-to-classify-different-types-of-waste/healthcare-and-related-wastes</a></p>$number$$$$
 OTHER_RECOVERY_COST$$$ERIC$$number$$$$
 COST_SAFETY_RISK$$$ERIC$$number$$$$

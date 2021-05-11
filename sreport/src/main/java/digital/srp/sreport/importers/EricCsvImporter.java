@@ -406,7 +406,7 @@ public class EricCsvImporter implements EricQuestions {
         case "Incineration disposal cost (£)":
             return Q.WASTE_INCINERATION_COST;
         case "Incineration disposal volume (Tonnes)":
-            return Q.WASTE_INCINERATION_WEIGHT;
+            return Q.INCINERATION_WEIGHT;
         case "High temperature disposal waste weight involving combustion with energy recovery (Tonnes)":
             return Q.HIGH_TEMP_DISPOSAL_WITH_RECOVERY_WEIGHT;
         case "High temperature disposal waste weight (Tonnes)":
