@@ -138,6 +138,7 @@ var $r = (function ($, ractive) {
 		      || me.rtn.answers[k].response != undefined) {
                 $('#'+me.rtn.answers[k].question.name).attr('readonly','readonly').attr('disabled','disabled');
               }
+              ractive.addSelectOptions('#ORG_TYPE', ractive.get('orgTypes'), _orgType);
               break;
             case 'PROC_SUPPLIER_SUSTAINABILITY':
               ractive.set('q.categories.'+i+'.questions.'+j+'.response', me.rtn.answers[k].response);
