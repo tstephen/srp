@@ -26,9 +26,9 @@
             <ol>
               <li><a href="#organisationSect">Organisation</a></li>
               <li><a href="#energySect">Energy</a></li>
-              <li><a href="#paperSect">Paper</a></li>
               <li><a href="#travelSect">Travel</a></li>
               <li><a href="#airPollutionSect">Air pollution</a></li>
+              <li><a href="#paperSect">Paper</a></li>
               <li><a href="#wasteSect">Waste</a></li>
               <li><a href="#plasticsSect">Plastics use</a></li>
               <li><a href="#waterSect">Water</a></li>
@@ -450,18 +450,6 @@
           <p class="narrative context {{#if !haveAnswer('ENERGY_CTXT')}}hidden-print{{/if}}" contenteditable data-q="ENERGY_CTXT">{{formatAnswer('ENERGY_CTXT')}}</p>
         </section>
 
-        <section id="paperSect" class="rpt section">
-          <h3>Paper <a href="#contentSect" class="govuk-back-link">Back to top</a></h3>
-          <p>The movement to a Paperless NHS can be supported by staff reducing the use of paper at all levels, this reduces the environmental impact of paper, reducing cost of paper to the NHS and can help improve information security.</p>
-
-          <h4>Paper consumed</h4>
-          <span class="glyphicon glyphicon-question-sign no-print pull-right" onclick="ractive.toggleFieldHint('PAPER')" title="{{formatHint('PAPER')}}"></span>
-          <p class="help-block no-print hidden" id="PAPERHint">{{{formatHint('PAPER')}}}</p>
-          <p>Cost is in pounds and weight in tonnes.</p>
-          <div class="rpt table2" id="paperRptTable2" data-qs="PAPER_SPEND,PAPER_USED" data-periods="4"
-               data-share="http://localhost:8083/reports/{{formatAnswer('ORG_CODE')}}/{{surveyReturn.applicablePeriod}}/paper.html"></div>
-        </section>
-
         <section id="travelSect" class="rpt section">
           <h3>Travel <a href="#contentSect" class="govuk-back-link">Back to top</a></h3>
           {{#formatAnswer('HEALTHY_TRANSPORT_PLAN')==false || formatAnswer('HEALTHY_TRANSPORT_PLAN').indexOf('0')==-1}}
@@ -538,6 +526,18 @@
           <p class="narrative context {{#if !haveAnswer('AIR_POLLUTION_CTXT')}}hidden-print{{/if}}" data-q="AIR_POLLUTION_CTXT">{{formatAnswer('AIR_POLLUTION_CTXT')}}</p>
         </section>
 
+        <section id="paperSect" class="rpt section">
+          <h3>Paper <a href="#contentSect" class="govuk-back-link">Back to top</a></h3>
+          <p>The movement to a Paperless NHS can be supported by staff reducing the use of paper at all levels, this reduces the environmental impact of paper, reducing cost of paper to the NHS and can help improve information security.</p>
+
+          <h4>Paper consumed</h4>
+          <span class="glyphicon glyphicon-question-sign no-print pull-right" onclick="ractive.toggleFieldHint('PAPER')" title="{{formatHint('PAPER')}}"></span>
+          <p class="help-block no-print hidden" id="PAPERHint">{{{formatHint('PAPER')}}}</p>
+          <p>Cost is in pounds and weight in tonnes.</p>
+          <div class="rpt table2" id="paperRptTable2" data-qs="PAPER_SPEND,PAPER_USED" data-periods="4"
+               data-share="http://localhost:8083/reports/{{formatAnswer('ORG_CODE')}}/{{surveyReturn.applicablePeriod}}/paper.html"></div>
+        </section>
+
         <section id="wasteSect" class="rpt section">
           <h3>Waste <a href="#contentSect" class="govuk-back-link">Back to top</a></h3>
           <h4>Waste produced</h4>
@@ -548,13 +548,13 @@
                data-share="http://localhost:8083/reports/{{formatAnswer('ORG_CODE')}}/{{surveyReturn.applicablePeriod}}/waste.html"></div>
           <h4>Carbon emissions resulting</h4>
           <p>
-            <svg data-qs="DURABLES_INTERNAL_REUSE_CO2E,DURABLES_EXTERNAL_REUSE_CO2E,PAPER_USED_CO2E,WASTE_CLINICAL_INCINERATED_CO2E,ALT_WASTE_DISPOSAL_WEIGHT_CO2E,WASTE_OFFENSIVE_CO2E,LANDFILL_WEIGHT_CO2E,RECYCLING_WEIGHT_CO2E,WASTE_CONFIDENTIAL_CO2E,WASTE_FOOD_CO2E,WASTE_TEXTILES_CO2E,INCINERATION_WEIGHT_CO2E,WASTE_PROCESSED_ON_SITE_CO2E,WEEE_WEIGHT_CO2E"
+            <svg data-qs="PAPER_CO2E,WASTE_CLINICAL_INCINERATED_CO2E,ALT_WASTE_DISPOSAL_WEIGHT_CO2E,WASTE_OFFENSIVE_CO2E,LANDFILL_WEIGHT_CO2E,RECYCLING_WEIGHT_CO2E,WASTE_CONFIDENTIAL_CO2E,WASTE_FOOD_CO2E,WASTE_TEXTILES_CO2E,INCINERATION_WEIGHT_CO2E,WASTE_PROCESSED_ON_SITE_CO2E,WEEE_WEIGHT_CO2E"
                  data-colors="#0B4BE5,#0BBDE5,#00F299,#A2FC00,#FFEB00,#FFAD00" data-periods="4"
                  class="rpt stacked2" id="wasteGraph2" width="600" height="400"></svg>
           </p>
           <p>CO<sub>2</sub> Emissions (tCO<sub>2</sub>e)</p>
 
-          <div class="rpt table2" id="wasteCo2eRptTable2" data-total="true" data-qs="DURABLES_INTERNAL_REUSE_CO2E,DURABLES_EXTERNAL_REUSE_CO2E,PAPER_USED_CO2E,WASTE_CLINICAL_INCINERATED_CO2E,ALT_WASTE_DISPOSAL_WEIGHT_CO2E,WASTE_OFFENSIVE_CO2E,LANDFILL_WEIGHT_CO2E,RECYCLING_WEIGHT_CO2E,WASTE_CONFIDENTIAL_CO2E,WASTE_FOOD_CO2E,WASTE_TEXTILES_CO2E,INCINERATION_WEIGHT_CO2E,WASTE_PROCESSED_ON_SITE_CO2E,WEEE_WEIGHT_CO2E" data-periods="4"
+          <div class="rpt table2" id="wasteCo2eRptTable2" data-total="true" data-qs="PAPER_CO2E,WASTE_CLINICAL_INCINERATED_CO2E,ALT_WASTE_DISPOSAL_WEIGHT_CO2E,WASTE_OFFENSIVE_CO2E,LANDFILL_WEIGHT_CO2E,RECYCLING_WEIGHT_CO2E,WASTE_CONFIDENTIAL_CO2E,WASTE_FOOD_CO2E,WASTE_TEXTILES_CO2E,INCINERATION_WEIGHT_CO2E,WASTE_PROCESSED_ON_SITE_CO2E,WEEE_WEIGHT_CO2E" data-periods="4"
                data-share="http://localhost:8083/reports/{{formatAnswer('ORG_CODE')}}/{{surveyReturn.applicablePeriod}}/waste-c2oe.html"></div>
           <p class="narrative performance {{#if !haveAnswer('WASTE_PERF')}}hidden-print{{/if}}" data-q="WASTE_PERF">{{formatAnswer('WASTE_PERF')}}</p>
           <p class="narrative context {{#if !haveAnswer('WASTE_CONTEXT')}}hidden-print{{/if}}" data-q="WASTE_CONTEXT">{{formatAnswer('WASTE_CONTEXT')}}</p>
