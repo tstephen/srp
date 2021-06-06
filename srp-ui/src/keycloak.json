@@ -1,6 +1,6 @@
 {
   "realm": "knowprocess",
-  "auth-server-url": "https://auth.knowprocess.com/auth/",
+  "auth-server-url": "https://auth.srp.digital/auth/",
   "ssl-required": "external",
   "resource": "srp",
   "public-client": true,
