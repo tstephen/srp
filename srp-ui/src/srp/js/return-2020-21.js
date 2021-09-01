@@ -324,7 +324,7 @@ var $r = (function ($, ractive) {
   me.complete = function() {
     ractive.showMessage("Redirecting to your report... Don't forget to submit it when you're done. <br/>Unsubmitted reports will be submited automatically on 1st October after year end.");
     setTimeout(function() {
-      window.location.href = '/srp/report.html';
+      window.location.href = '/srp/report-2020-21.html';
     },5000);
   }
 
