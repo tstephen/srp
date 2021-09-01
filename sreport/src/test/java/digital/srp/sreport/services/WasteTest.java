@@ -34,6 +34,7 @@ import digital.srp.sreport.model.Q;
 import digital.srp.sreport.model.SurveyReturn;
 import digital.srp.sreport.model.WeightingFactor;
 import digital.srp.sreport.model.surveys.Sdu1718;
+import digital.srp.sreport.model.surveys.Sdu1920;
 import digital.srp.sreport.model.surveys.Sdu2021;
 
 public class WasteTest {
@@ -76,6 +77,7 @@ public class WasteTest {
     private static final String SCOPE_3_WASTE_2020_21 = "242.88";
 
     private static final String PERIOD = Sdu1718.PERIOD;
+    private static final String PERIOD_2019_20 = Sdu1920.PERIOD;
     private static final String PERIOD_2020_21 = Sdu2021.PERIOD;
     private static Cruncher svc;
 
@@ -177,6 +179,90 @@ public class WasteTest {
         // check inputs unchanged
         assertEquals(INCINERATION_WEIGHT, rtn.answer(PERIOD_2020_21, Q.INCINERATION_WEIGHT).get().response());
         assertEquals(LANDFILL_WEIGHT, rtn.answer(PERIOD_2020_21, Q.LANDFILL_WEIGHT).get().response());
+    }
+
+    @Test
+    public void testCalcRCUWasteCo2e() {
+        SurveyReturn rtn = new SurveyReturn().applicablePeriod(PERIOD_2020_21).org("RCU");
+        rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD_2020_21).question(Q.INCINERATION_WEIGHT).response("317.00"));
+        rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD_2019_20).question(Q.INCINERATION_WEIGHT).response("309.00"));
+        rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD_2020_21).question(Q.LANDFILL_WEIGHT).response("0.00"));
+        rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD_2019_20).question(Q.LANDFILL_WEIGHT).response("0.00"));
+        rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD_2020_21).question(Q.RECYCLING_WEIGHT).response("125"));
+        rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD_2019_20).question(Q.RECYCLING_WEIGHT).response("131"));
+        rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD_2020_21).question(Q.WASTE_CONFIDENTIAL).response("19"));
+        rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD_2019_20).question(Q.WASTE_CONFIDENTIAL).response("16"));
+        rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD_2020_21).question(Q.WASTE_CLINICAL_INCINERATED).response("48.00"));
+        rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD_2019_20).question(Q.WASTE_CLINICAL_INCINERATED).response("42.00"));
+        rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD_2020_21).question(Q.ALT_WASTE_DISPOSAL_WEIGHT).response("70.00"));
+        rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD_2019_20).question(Q.ALT_WASTE_DISPOSAL_WEIGHT).response("55.00"));
+        rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD_2020_21).question(Q.WASTE_OFFENSIVE).response("48.00"));
+        rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD_2019_20).question(Q.WASTE_OFFENSIVE).response("68.00"));
+        rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD_2020_21).question(Q.WASTE_FOOD).response("0.00"));
+        rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD_2019_20).question(Q.WASTE_FOOD).response("2.00"));
+        rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD_2020_21).question(Q.WASTE_TEXTILES).response("0.00"));
+        rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD_2019_20).question(Q.WASTE_TEXTILES).response("0.00"));
+        rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD_2020_21).question(Q.WASTE_PROCESSED_ON_SITE).response("0.00"));
+        rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD_2019_20).question(Q.WASTE_PROCESSED_ON_SITE).response("0.00"));
+        rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD_2020_21).question(Q.WEEE_WEIGHT).response("2.00"));
+        rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD_2019_20).question(Q.WEEE_WEIGHT).response("8.00"));
+
+        rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD_2020_21).question(Q.INCINERATION_CO2E));
+        rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD_2019_20).question(Q.INCINERATION_CO2E));
+        rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD_2020_21).question(Q.LANDFILL_CO2E));
+        rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD_2019_20).question(Q.LANDFILL_CO2E));
+        rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD_2020_21).question(Q.RECYCLING_CO2E));
+        rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD_2019_20).question(Q.RECYCLING_CO2E));
+        rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD_2020_21).question(Q.WASTE_CONFIDENTIAL_CO2E));
+        rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD_2019_20).question(Q.WASTE_CONFIDENTIAL_CO2E));
+        rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD_2020_21).question(Q.WASTE_CLINICAL_INCINERATED_CO2E));
+        rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD_2019_20).question(Q.WASTE_CLINICAL_INCINERATED_CO2E));
+        rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD_2020_21).question(Q.ALT_WASTE_DISPOSAL_WEIGHT_CO2E));
+        rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD_2019_20).question(Q.ALT_WASTE_DISPOSAL_WEIGHT_CO2E));
+        rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD_2020_21).question(Q.WASTE_OFFENSIVE_CO2E));
+        rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD_2019_20).question(Q.WASTE_OFFENSIVE_CO2E));
+        rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD_2020_21).question(Q.WASTE_FOOD_CO2E));
+        rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD_2019_20).question(Q.WASTE_FOOD_CO2E));
+        rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD_2020_21).question(Q.WASTE_TEXTILES_CO2E));
+        rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD_2019_20).question(Q.WASTE_TEXTILES_CO2E));
+        rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD_2020_21).question(Q.WASTE_PROCESSED_ON_SITE_CO2E));
+        rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD_2019_20).question(Q.WASTE_PROCESSED_ON_SITE_CO2E));
+        rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD_2020_21).question(Q.WEEE_WEIGHT_CO2E));
+        rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD_2019_20).question(Q.WEEE_WEIGHT_CO2E));
+        rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD_2020_21).question(Q.SCOPE_3_WASTE));
+        rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD_2019_20).question(Q.SCOPE_3_WASTE));
+
+        svc.crunchScope3Waste(PERIOD_2020_21, rtn);
+        svc.crunchScope3Waste(PERIOD_2019_20, rtn);
+
+        // Some of these are 0.00 because there are no Carbon factors for that year
+        assertEquals(new BigDecimal("11.52"), rtn.answer(PERIOD_2020_21, Q.WASTE_CLINICAL_INCINERATED_CO2E).get().responseAsBigDecimal().setScale(2, RoundingMode.HALF_UP));
+        assertEquals(new BigDecimal("0.00"), rtn.answer(PERIOD_2019_20, Q.WASTE_CLINICAL_INCINERATED_CO2E).get().responseAsBigDecimal().setScale(2, RoundingMode.HALF_UP));
+        assertEquals(new BigDecimal("16.80"), rtn.answer(PERIOD_2020_21, Q.ALT_WASTE_DISPOSAL_WEIGHT_CO2E).get().responseAsBigDecimal().setScale(2, RoundingMode.HALF_UP));
+        assertEquals(new BigDecimal("0.00"), rtn.answer(PERIOD_2019_20, Q.ALT_WASTE_DISPOSAL_WEIGHT_CO2E).get().responseAsBigDecimal().setScale(2, RoundingMode.HALF_UP));
+        assertEquals(new BigDecimal("11.52"), rtn.answer(PERIOD_2020_21, Q.WASTE_OFFENSIVE_CO2E).get().responseAsBigDecimal().setScale(2, RoundingMode.HALF_UP));
+        assertEquals(new BigDecimal("0.00"), rtn.answer(PERIOD_2019_20, Q.WASTE_OFFENSIVE_CO2E).get().responseAsBigDecimal().setScale(2, RoundingMode.HALF_UP));
+        assertEquals(new BigDecimal("0.00"), rtn.answer(PERIOD_2020_21, Q.LANDFILL_CO2E).get().responseAsBigDecimal());
+        assertEquals(new BigDecimal("0.00"), rtn.answer(PERIOD_2019_20, Q.LANDFILL_CO2E).get().responseAsBigDecimal());
+        assertEquals(new BigDecimal("2.66"), rtn.answer(PERIOD_2020_21, Q.RECYCLING_CO2E).get().responseAsBigDecimal().setScale(2, RoundingMode.HALF_UP));
+        assertEquals(new BigDecimal("2.80"), rtn.answer(PERIOD_2019_20, Q.RECYCLING_CO2E).get().responseAsBigDecimal().setScale(2, RoundingMode.HALF_UP));
+        assertEquals(new BigDecimal("0.41"), rtn.answer(PERIOD_2020_21, Q.WASTE_CONFIDENTIAL_CO2E).get().responseAsBigDecimal().setScale(2, RoundingMode.HALF_UP));
+        assertEquals(new BigDecimal("0.34"), rtn.answer(PERIOD_2019_20, Q.WASTE_CONFIDENTIAL_CO2E).get().responseAsBigDecimal().setScale(2, RoundingMode.HALF_UP));
+        assertEquals(new BigDecimal("0.00"), rtn.answer(PERIOD_2020_21, Q.WASTE_FOOD_CO2E).get().responseAsBigDecimal().setScale(2, RoundingMode.HALF_UP));
+        assertEquals(new BigDecimal("0.02"), rtn.answer(PERIOD_2019_20, Q.WASTE_FOOD_CO2E).get().responseAsBigDecimal().setScale(2, RoundingMode.HALF_UP));
+        assertEquals(new BigDecimal("0.00"), rtn.answer(PERIOD_2020_21, Q.WASTE_TEXTILES_CO2E).get().responseAsBigDecimal().setScale(2, RoundingMode.HALF_UP));
+        assertEquals(new BigDecimal("0.00"), rtn.answer(PERIOD_2019_20, Q.WASTE_TEXTILES_CO2E).get().responseAsBigDecimal().setScale(2, RoundingMode.HALF_UP));
+        assertEquals(new BigDecimal("111.20"), rtn.answer(PERIOD_2020_21, Q.INCINERATION_CO2E).get().responseAsBigDecimal().setScale(2, RoundingMode.HALF_UP));
+        assertEquals(new BigDecimal("0.00"), rtn.answer(PERIOD_2019_20, Q.INCINERATION_CO2E).get().responseAsBigDecimal().setScale(2, RoundingMode.HALF_UP));
+        assertEquals(new BigDecimal("0.00"), rtn.answer(PERIOD_2020_21, Q.WASTE_PROCESSED_ON_SITE_CO2E).get().responseAsBigDecimal().setScale(2, RoundingMode.HALF_UP));
+        assertEquals(new BigDecimal("0.00"), rtn.answer(PERIOD_2019_20, Q.WASTE_PROCESSED_ON_SITE_CO2E).get().responseAsBigDecimal().setScale(2, RoundingMode.HALF_UP));
+        assertEquals(new BigDecimal("0.04"), rtn.answer(PERIOD_2020_21, Q.WEEE_WEIGHT_CO2E).get().responseAsBigDecimal().setScale(2, RoundingMode.HALF_UP));
+        assertEquals(new BigDecimal("0.17"), rtn.answer(PERIOD_2019_20, Q.WEEE_WEIGHT_CO2E).get().responseAsBigDecimal().setScale(2, RoundingMode.HALF_UP));
+        assertEquals(new BigDecimal("154.15"), rtn.answer(PERIOD_2020_21, Q.SCOPE_3_WASTE).get().responseAsBigDecimal().setScale(2, RoundingMode.HALF_UP));
+        assertEquals(new BigDecimal("3.33"), rtn.answer(PERIOD_2019_20, Q.SCOPE_3_WASTE).get().responseAsBigDecimal().setScale(2, RoundingMode.HALF_UP));
+
+        // check inputs unchanged
+        assertEquals("317.00", rtn.answer(PERIOD_2020_21, Q.INCINERATION_WEIGHT).get().response());
     }
 
     @Test
