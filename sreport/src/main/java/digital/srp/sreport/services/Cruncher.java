@@ -1032,7 +1032,7 @@ public class Cruncher extends AbstractEmissionsService
     }
 
     protected void calcCarbonProfileSimplifiedSduMethod(String period, SurveyReturn rtn) {
-        LOGGER.info("calcCarbonProfileSduMethod for {} in {}", rtn.getOrg(), rtn.applicablePeriod());
+        LOGGER.info("calcCarbonProfileSimplifiedSduMethod for {} in {}", rtn.getOrg(), rtn.applicablePeriod());
 
         calcCarbonProfileSduMethod(period, rtn);
 
@@ -1540,14 +1540,16 @@ public class Cruncher extends AbstractEmissionsService
             Q srcQ, WeightingFactor wFactor, Q trgtQ) {
         BigDecimal calcVal = new BigDecimal("0.00");
         try {
-            if (BigDecimal.ZERO.equals(getAnswer(period, rtn, srcQ).responseAsBigDecimal())) {
+            Answer ans = getAnswer(period, rtn, srcQ);
+            if (ans.derived()
+                    && BigDecimal.ZERO.equals(ans.responseAsBigDecimal().setScale(0, RoundingMode.HALF_UP))) {
                 LOGGER.info("No directly entered spend {}, estimate from non-pay spend", srcQ);
                 calcVal = nonPaySpend.multiply(wFactor.proportionOfTotal());
                 LOGGER.info("Estimated {} from non-pay spend as {}", srcQ, calcVal);
-                getAnswer(period, rtn, srcQ).derived(true).response(calcVal.toPlainString());
+                ans.derived(true).response(calcVal.toPlainString());
             } else {
                 LOGGER.info("Have directly entered spend {}, no need to estimate", srcQ);
-                calcVal = getAnswer(period, rtn, srcQ).responseAsBigDecimal();
+                calcVal = ans.responseAsBigDecimal();
             }
             calcVal = calcVal.multiply(wFactor.intensityValue());
         } catch (NumberFormatException e) {
