@@ -25,13 +25,17 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
+import digital.srp.sreport.api.exceptions.ObjectNotFoundException;
 import digital.srp.sreport.importers.CarbonFactorCsvImporter;
 import digital.srp.sreport.importers.WeightingFactorCsvImporter;
 import digital.srp.sreport.model.Answer;
 import digital.srp.sreport.model.CarbonFactor;
 import digital.srp.sreport.model.Q;
+import digital.srp.sreport.model.Question;
 import digital.srp.sreport.model.SurveyReturn;
 import digital.srp.sreport.model.WeightingFactor;
+import digital.srp.sreport.model.surveys.Sdu2021;
+import digital.srp.sreport.model.surveys.SduQuestions;
 
 public class SduProfileTest {
     private static final String OP_EX = "275000";
@@ -80,10 +84,13 @@ public class SduProfileTest {
         rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD)
                 .question(Q.OP_EX).response(OP_EX));
 
-        rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD).question(Q.NON_PAY_SPEND).response(""));
-        rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD).question(Q.CAPITAL_SPEND).response(""));
+        rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD).question(Q.NON_PAY_SPEND).response("").derived(true));
 
         initAnswers(rtn);
+        Answer capitalSpend = rtn.getAnswers().stream()
+                .filter(e -> e.question().q().equals(Q.CAPITAL_SPEND)).findFirst()
+                .orElseThrow(() -> new ObjectNotFoundException(Question.class, Q.CAPITAL_SPEND.toString()));
+        capitalSpend.derived(false).response("");
 
         svc.calcCarbonProfileSduMethod(PERIOD, rtn);
 
@@ -93,46 +100,49 @@ public class SduProfileTest {
     }
 
     private void initAnswers(SurveyReturn rtn) {
-        rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD).question(Q.BIZ_SVCS_SPEND).response(""));
-        rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD).question(Q.CONSTRUCTION_SPEND));
-        rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD).question(Q.CATERING_SPEND));
-        rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD).question(Q.FREIGHT_SPEND));
-        rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD).question(Q.ICT_SPEND));
-        rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD).question(Q.CHEM_AND_GAS_SPEND));
-        rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD).question(Q.MED_INSTR_SPEND));
-        rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD).question(Q.OTHER_MANUFACTURED_SPEND));
-        rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD).question(Q.OTHER_SPEND));
-        rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD).question(Q.PAPER_AND_CARD_SPEND));
-        rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD).question(Q.PHARMA_SPEND));
-        rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD).question(Q.TRAVEL_SPEND));
-        rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD).question(Q.COMMISSIONING_SPEND));
+        // E-Class
+        for (Q q : SduQuestions.ECLASS_PROFILE_SPEND_HDRS) {
+            rtn.getAnswers().add(new Answer().applicablePeriod(rtn.applicablePeriod()).question(q).derived(true));
+        }
+        for (Q q : SduQuestions.ECLASS_PROFILE2_HDRS) {
+            rtn.getAnswers().add(new Answer().applicablePeriod(rtn.applicablePeriod()).question(q).derived(true));
+        }
+        for (Q q : SduQuestions.ECLASS_PROFILE_CO2E_HDRS) {
+            rtn.getAnswers().add(new Answer().applicablePeriod(rtn.applicablePeriod()).question(q).derived(true));
+        }
+        for (Q q : SduQuestions.ECLASS_PROFILE2_CO2E_HDRS) {
+            rtn.getAnswers().add(new Answer().applicablePeriod(rtn.applicablePeriod()).question(q).derived(true));
+        }
 
-        rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD).question(Q.BIZ_SVCS_CO2E));
-        rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD).question(Q.CAPITAL_CO2E));
-        rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD).question(Q.CONSTRUCTION_CO2E));
-        rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD).question(Q.CATERING_CO2E));
-        rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD).question(Q.FREIGHT_CO2E));
-        rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD).question(Q.ICT_CO2E));
-        rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD).question(Q.CHEM_AND_GAS_CO2E));
-        rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD).question(Q.MED_INSTR_CO2E));
-        rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD).question(Q.OTHER_MANUFACTURED_CO2E));
-        rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD).question(Q.OTHER_PROCUREMENT_CO2E));
-        rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD).question(Q.PAPER_AND_CARD_CO2E));
-        rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD).question(Q.PHARMA_CO2E));
-        rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD).question(Q.TRAVEL_CO2E));
-        rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD).question(Q.COMMISSIONING_CO2E));
-        rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD).question(Q.WASTE_AND_WATER_CO2E));
-        rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD).question(Q.PROCUREMENT_CO2E));
+        // Greener NHS
+        for (Q q : SduQuestions.SDU_PROFILE_HDRS) {
+            rtn.getAnswers().add(new Answer().applicablePeriod(rtn.applicablePeriod()).question(q).derived(true));
+        }
+        for (Q q : SduQuestions.SDU_PROFILE2_HDRS) {
+            rtn.getAnswers().add(new Answer().applicablePeriod(rtn.applicablePeriod()).question(q).derived(true));
+        }
+        for (Q q : SduQuestions.SDU_PROFILE_CO2E_HDRS) {
+            rtn.getAnswers().add(new Answer().applicablePeriod(rtn.applicablePeriod()).question(q).derived(true));
+        }
+        for (Q q : SduQuestions.SDU_PROFILE2_CO2E_HDRS) {
+            rtn.getAnswers().add(new Answer().applicablePeriod(rtn.applicablePeriod()).question(q).derived(true));
+        }
+        rtn.getAnswers().add(new Answer().applicablePeriod(rtn.applicablePeriod()).question(Q.PROCUREMENT_CO2E));
+        rtn.getAnswers().add(new Answer().applicablePeriod(rtn.applicablePeriod()).question(Q.OTHER_PROCUREMENT_CO2E));
+        rtn.getAnswers().add(new Answer().applicablePeriod(rtn.applicablePeriod()).question(Q.COMMISSIONING_CO2E));
     }
 
     @Test
-    public void testCalcCo2eProfileFromNonPaySpend() {
+    public void testCalcAcuteTrustCo2eProfileFromNonPaySpend() {
         SurveyReturn rtn = new SurveyReturn().applicablePeriod(PERIOD).org("ZZ1");
         rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD).question(Q.ORG_TYPE).response("Acute Trust"));
         rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD).question(Q.NON_PAY_SPEND).response(NON_PAY_SPEND));
-        rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD).question(Q.CAPITAL_SPEND).response(CAPITAL_SPEND));
 
         initAnswers(rtn);
+        Answer capitalSpend = rtn.getAnswers().stream()
+                .filter(e -> e.question().q().equals(Q.CAPITAL_SPEND)).findFirst()
+                .orElseThrow(() -> new ObjectNotFoundException(Question.class, Q.CAPITAL_SPEND.toString()));
+        capitalSpend.derived(false).response(CAPITAL_SPEND);
 
         svc.calcCarbonProfileSduMethod(PERIOD, rtn);
 
@@ -159,5 +169,50 @@ public class SduProfileTest {
 
         assertEquals(CAPITAL_SPEND, rtn.answer(PERIOD, Q.CAPITAL_SPEND).get().response());
         assertEquals(new BigDecimal(CAPITAL_CO2E), rtn.answer(PERIOD, Q.CAPITAL_CO2E).get().responseAsBigDecimal().setScale(0, RoundingMode.HALF_UP));
+    }
+
+    @Test
+    public void testCalcMentalHealthTrustCo2eProfileFromNonPaySpend() {
+        SurveyReturn rtn = new SurveyReturn().applicablePeriod(Sdu2021.PERIOD).org("RWV");
+        rtn.getAnswers().add(new Answer().applicablePeriod(Sdu2021.PERIOD).question(Q.ORG_TYPE).response("Mental Health"));
+        String nonPaySpend = "99949";
+        rtn.getAnswers().add(new Answer().applicablePeriod(Sdu2021.PERIOD).question(Q.NON_PAY_SPEND).response(nonPaySpend));
+        rtn.getAnswers().add(new Answer().applicablePeriod(Sdu2021.PERIOD).question(Q.ECLASS_SPEND));
+
+        initAnswers(rtn);
+        Answer capitalSpend = rtn.getAnswers().stream()
+                .filter(e -> e.question().q().equals(Q.CAPITAL_SPEND)).findFirst()
+                .orElseThrow(() -> new ObjectNotFoundException(Question.class, Q.CAPITAL_SPEND.toString()));
+        capitalSpend.response("16748000");
+
+        svc.calcCarbonProfileSimplifiedEClassMethod(Sdu2021.PERIOD, rtn);
+        svc.calcCarbonProfileSimplifiedSduMethod(Sdu2021.PERIOD, rtn);
+
+        assertEquals(new BigDecimal("5211"), rtn.answer(Sdu2021.PERIOD, Q.BIZ_SVCS_CO2E).get().responseAsBigDecimal().setScale(0, RoundingMode.HALF_UP));
+        assertEquals(new BigDecimal("2211"), rtn.answer(Sdu2021.PERIOD, Q.CONSTRUCTION_CO2E).get().responseAsBigDecimal().setScale(0, RoundingMode.HALF_UP));
+        assertEquals(new BigDecimal("2412"), rtn.answer(Sdu2021.PERIOD, Q.CATERING_CO2E).get().responseAsBigDecimal().setScale(0, RoundingMode.HALF_UP));
+        assertEquals(new BigDecimal("2632"), rtn.answer(Sdu2021.PERIOD, Q.FREIGHT_CO2E).get().responseAsBigDecimal().setScale(0, RoundingMode.HALF_UP));
+        assertEquals(new BigDecimal("1377"), rtn.answer(Sdu2021.PERIOD, Q.ICT_CO2E).get().responseAsBigDecimal().setScale(0, RoundingMode.HALF_UP));
+        assertEquals(new BigDecimal("2286"), rtn.answer(Sdu2021.PERIOD, Q.CHEM_AND_GAS_CO2E).get().responseAsBigDecimal().setScale(0, RoundingMode.HALF_UP));
+        assertEquals(new BigDecimal("3171"), rtn.answer(Sdu2021.PERIOD, Q.MED_INSTR_CO2E).get().responseAsBigDecimal().setScale(0, RoundingMode.HALF_UP));
+        assertEquals(new BigDecimal("448"), rtn.answer(Sdu2021.PERIOD, Q.OTHER_MANUFACTURED_CO2E).get().responseAsBigDecimal().setScale(0, RoundingMode.HALF_UP));
+        assertEquals(new BigDecimal("0"), rtn.answer(Sdu2021.PERIOD, Q.OTHER_PROCUREMENT_CO2E).get().responseAsBigDecimal().setScale(0, RoundingMode.HALF_UP));
+        assertEquals(new BigDecimal("847"), rtn.answer(Sdu2021.PERIOD, Q.PAPER_AND_CARD_CO2E).get().responseAsBigDecimal().setScale(0, RoundingMode.HALF_UP));
+        assertEquals(new BigDecimal("1053"), rtn.answer(Sdu2021.PERIOD, Q.PHARMA_CO2E).get().responseAsBigDecimal().setScale(0, RoundingMode.HALF_UP));
+        assertEquals(new BigDecimal("5348"), rtn.answer(Sdu2021.PERIOD, Q.TRAVEL_CO2E).get().responseAsBigDecimal().setScale(0, RoundingMode.HALF_UP));
+        assertEquals(new BigDecimal("2720"), rtn.answer(Sdu2021.PERIOD, Q.COMMISSIONING_CO2E).get().responseAsBigDecimal().setScale(0, RoundingMode.HALF_UP));
+        assertEquals(new BigDecimal("0"), rtn.answer(Sdu2021.PERIOD, Q.WASTE_AND_WATER_CO2E).get().responseAsBigDecimal().setScale(0, RoundingMode.HALF_UP));
+        assertEquals(new BigDecimal("29427"), rtn.answer(Sdu2021.PERIOD, Q.PROCUREMENT_CO2E).get().responseAsBigDecimal().setScale(0, RoundingMode.HALF_UP));
+
+        assertEquals(new BigDecimal("3339"), rtn.answer(Sdu2021.PERIOD, Q.SDU_MEDICINES_AND_CHEMICALS_CO2E).get().responseAsBigDecimal().setScale(0, RoundingMode.HALF_UP));
+        assertEquals(new BigDecimal("7696"), rtn.answer(Sdu2021.PERIOD, Q.SDU_MEDICAL_EQUIPMENT).get().responseAsBigDecimal().setScale(0, RoundingMode.HALF_UP));
+        assertEquals(new BigDecimal("9195"), rtn.answer(Sdu2021.PERIOD, Q.SDU_NON_MEDICAL_EQUIPMENT).get().responseAsBigDecimal().setScale(0, RoundingMode.HALF_UP));
+        assertEquals(new BigDecimal("34283"), rtn.answer(Sdu2021.PERIOD, Q.SDU_BUSINESS_SERVICES).get().responseAsBigDecimal().setScale(0, RoundingMode.HALF_UP));
+        assertEquals(new BigDecimal("8796"), rtn.answer(Sdu2021.PERIOD, Q.SDU_CONSTRUCTION_AND_FREIGHT).get().responseAsBigDecimal().setScale(0, RoundingMode.HALF_UP));
+        assertEquals(new BigDecimal("3798"), rtn.answer(Sdu2021.PERIOD, Q.SDU_FOOD_AND_CATERING).get().responseAsBigDecimal().setScale(0, RoundingMode.HALF_UP));
+        assertEquals(new BigDecimal("14393"), rtn.answer(Sdu2021.PERIOD, Q.SDU_COMMISSIONED_HEALTH_SERVICES).get().responseAsBigDecimal().setScale(0, RoundingMode.HALF_UP));
+
+        assertEquals(capitalSpend.response(), rtn.answer(Sdu2021.PERIOD, Q.CAPITAL_SPEND).get().response());
+        assertEquals(new BigDecimal("7780"), rtn.answer(Sdu2021.PERIOD, Q.CAPITAL_CO2E).get().responseAsBigDecimal().setScale(0, RoundingMode.HALF_UP));
     }
 }

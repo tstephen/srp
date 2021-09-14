@@ -23,6 +23,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.util.Collections;
 import java.util.List;
 
 import org.hamcrest.Matchers;
@@ -42,6 +44,7 @@ import digital.srp.sreport.model.Survey;
 import digital.srp.sreport.model.SurveyReturn;
 import digital.srp.sreport.model.WeightingFactor;
 import digital.srp.sreport.model.surveys.Sdu1617;
+import digital.srp.sreport.model.surveys.Sdu1920;
 import digital.srp.sreport.model.surveys.Sdu2021;
 import digital.srp.sreport.model.surveys.SduQuestions;
 
@@ -462,4 +465,90 @@ public class CruncherTest {
         }
     }
 
+    /**
+     * Tests that <em>both</em> E-Class and SDU profiles are calculated from 2020-21.
+     */
+    @Test
+    public void testCrunchRWV() {
+        SurveyReturn rwv = helper.readSurveyReturn("RWV")
+                .orElseThrow(IllegalStateException::new);
+        Survey survey = new Survey()
+                .applicablePeriod(rwv.applicablePeriod())
+                .name(rwv.getName().substring(0, rwv.getName().length()-4));
+        rwv.survey(survey);
+        healthChecker.ensureInitialised(YEARS_TO_CALC,
+                String.format(SURVEY_FORMAT, rwv.applicablePeriod()), rwv);
+        SurveyReturn rtn = cruncher.calculate(rwv, YEARS_TO_CALC);
+
+        assertNotNull(rtn);
+        System.out.println("  ASSERTING RESULTS FOR 2020-21");
+        assertEquals("RWV", rtn.answer(Sdu2021.PERIOD, Q.ORG_CODE)
+                .orElseThrow(() -> new IllegalStateException()).response());
+
+        // check have new simplified procurement categories from both eClass and SDU methods
+        System.out.println(rtn.answer(Sdu2021.PERIOD, Q.SDU_MEDICINES_AND_CHEMICALS)
+              .orElseThrow(() -> new IllegalStateException()).responseAsBigDecimal());
+        assertEquals(new BigDecimal("9"), rtn.answer(Sdu2021.PERIOD, Q.SDU_MEDICINES_AND_CHEMICALS).get().responseAsBigDecimal().setScale(0, RoundingMode.HALF_UP));
+        assertEquals(new BigDecimal("2"), rtn.answer(Sdu2021.PERIOD, Q.CHEM_AND_GAS_CO2E).get().responseAsBigDecimal().setScale(0, RoundingMode.HALF_UP));
+        assertEquals(new BigDecimal("1"), rtn.answer(Sdu2021.PERIOD, Q.PHARMA_CO2E).get().responseAsBigDecimal().setScale(0, RoundingMode.HALF_UP));
+        assertEquals(new BigDecimal("3"), rtn.answer(Sdu2021.PERIOD, Q.SDU_MEDICINES_AND_CHEMICALS_CO2E).get().responseAsBigDecimal().setScale(0, RoundingMode.HALF_UP));
+        System.out.println(rtn.answer(Sdu2021.PERIOD, Q.EC_MEDICINES_AND_CHEMICALS)
+                .orElseThrow(() -> new IllegalStateException()).responseAsBigDecimal());
+        assertEquals(new BigDecimal("1"), rtn.answer(Sdu2021.PERIOD, Q.EC_MEDICINES_AND_CHEMICALS).get().responseAsBigDecimal().setScale(0, RoundingMode.HALF_UP));
+        assertEquals(new BigDecimal("1"), rtn.answer(Sdu2021.PERIOD, Q.EC_MEDICINES_AND_CHEMICALS_CO2E).get().responseAsBigDecimal().setScale(0, RoundingMode.HALF_UP));
+
+        assertEquals(new BigDecimal("8"), rtn.answer(Sdu2021.PERIOD, Q.SDU_MEDICAL_EQUIPMENT).get().responseAsBigDecimal().setScale(0, RoundingMode.HALF_UP));
+        assertEquals(new BigDecimal("9"), rtn.answer(Sdu2021.PERIOD, Q.SDU_NON_MEDICAL_EQUIPMENT).get().responseAsBigDecimal().setScale(0, RoundingMode.HALF_UP));
+        assertEquals(new BigDecimal("34"), rtn.answer(Sdu2021.PERIOD, Q.SDU_BUSINESS_SERVICES).get().responseAsBigDecimal().setScale(0, RoundingMode.HALF_UP));
+        assertEquals(new BigDecimal("9"), rtn.answer(Sdu2021.PERIOD, Q.SDU_CONSTRUCTION_AND_FREIGHT).get().responseAsBigDecimal().setScale(0, RoundingMode.HALF_UP));
+        assertEquals(new BigDecimal("4"), rtn.answer(Sdu2021.PERIOD, Q.SDU_FOOD_AND_CATERING).get().responseAsBigDecimal().setScale(0, RoundingMode.HALF_UP));
+        assertEquals(new BigDecimal("14"), rtn.answer(Sdu2021.PERIOD, Q.SDU_COMMISSIONED_HEALTH_SERVICES).get().responseAsBigDecimal().setScale(0, RoundingMode.HALF_UP));
+
+        System.out.println("  ASSERTING RESULTS FOR 2019-20");
+        System.out.println(rtn.answer(Sdu1920.PERIOD, Q.SDU_MEDICINES_AND_CHEMICALS)
+                .orElseThrow(() -> new IllegalStateException()).responseAsBigDecimal());
+        assertEquals(new BigDecimal("8"), rtn.answer(Sdu1920.PERIOD, Q.SDU_MEDICINES_AND_CHEMICALS).get().responseAsBigDecimal().setScale(0, RoundingMode.HALF_UP));
+        assertEquals(new BigDecimal("3"), rtn.answer(Sdu1920.PERIOD, Q.SDU_MEDICINES_AND_CHEMICALS_CO2E).get().responseAsBigDecimal().setScale(0, RoundingMode.HALF_UP));
+        System.out.println(rtn.answer(Sdu1920.PERIOD, Q.EC_MEDICINES_AND_CHEMICALS)
+                .orElseThrow(() -> new IllegalStateException()).responseAsBigDecimal());
+        assertEquals(new BigDecimal("3"), rtn.answer(Sdu1920.PERIOD, Q.EC_MEDICINES_AND_CHEMICALS).get().responseAsBigDecimal().setScale(0, RoundingMode.HALF_UP));
+        assertEquals(new BigDecimal("2"), rtn.answer(Sdu1920.PERIOD, Q.EC_MEDICINES_AND_CHEMICALS_CO2E).get().responseAsBigDecimal().setScale(0, RoundingMode.HALF_UP));
+    }
+
+    @Test
+    public void testCrunchRWV2021() {
+        SurveyReturn rwv = helper.readSurveyReturn("RWV")
+                .orElseThrow(IllegalStateException::new);
+        Survey survey = new Survey()
+                .applicablePeriod(rwv.applicablePeriod())
+                .name(rwv.getName().substring(0, rwv.getName().length()-4));
+        rwv.survey(survey);
+        healthChecker.ensureInitialised(1,
+                String.format(SURVEY_FORMAT, rwv.applicablePeriod()), rwv);
+        SurveyReturn rtn = cruncher.calculate(rwv, Collections.singletonList(Sdu2021.PERIOD));
+
+        assertNotNull(rtn);
+        System.out.println("  ASSERTING RESULTS FOR 2020-21");
+        assertEquals("RWV", rtn.answer(Sdu2021.PERIOD, Q.ORG_CODE)
+                .orElseThrow(() -> new IllegalStateException()).response());
+
+        // check have new simplified procurement categories from both eClass and SDU methods
+        System.out.println(rtn.answer(Sdu2021.PERIOD, Q.SDU_MEDICINES_AND_CHEMICALS)
+              .orElseThrow(() -> new IllegalStateException()).responseAsBigDecimal());
+        assertEquals(new BigDecimal("9"), rtn.answer(Sdu2021.PERIOD, Q.SDU_MEDICINES_AND_CHEMICALS).get().responseAsBigDecimal().setScale(0, RoundingMode.HALF_UP));
+        assertEquals(new BigDecimal("2"), rtn.answer(Sdu2021.PERIOD, Q.CHEM_AND_GAS_CO2E).get().responseAsBigDecimal().setScale(0, RoundingMode.HALF_UP));
+        assertEquals(new BigDecimal("1"), rtn.answer(Sdu2021.PERIOD, Q.PHARMA_CO2E).get().responseAsBigDecimal().setScale(0, RoundingMode.HALF_UP));
+        assertEquals(new BigDecimal("3"), rtn.answer(Sdu2021.PERIOD, Q.SDU_MEDICINES_AND_CHEMICALS_CO2E).get().responseAsBigDecimal().setScale(0, RoundingMode.HALF_UP));
+        System.out.println(rtn.answer(Sdu2021.PERIOD, Q.EC_MEDICINES_AND_CHEMICALS)
+                .orElseThrow(() -> new IllegalStateException()).responseAsBigDecimal());
+        assertEquals(new BigDecimal("1"), rtn.answer(Sdu2021.PERIOD, Q.EC_MEDICINES_AND_CHEMICALS).get().responseAsBigDecimal().setScale(0, RoundingMode.HALF_UP));
+        assertEquals(new BigDecimal("1"), rtn.answer(Sdu2021.PERIOD, Q.EC_MEDICINES_AND_CHEMICALS_CO2E).get().responseAsBigDecimal().setScale(0, RoundingMode.HALF_UP));
+
+        assertEquals(new BigDecimal("8"), rtn.answer(Sdu2021.PERIOD, Q.SDU_MEDICAL_EQUIPMENT).get().responseAsBigDecimal().setScale(0, RoundingMode.HALF_UP));
+        assertEquals(new BigDecimal("9"), rtn.answer(Sdu2021.PERIOD, Q.SDU_NON_MEDICAL_EQUIPMENT).get().responseAsBigDecimal().setScale(0, RoundingMode.HALF_UP));
+        assertEquals(new BigDecimal("34"), rtn.answer(Sdu2021.PERIOD, Q.SDU_BUSINESS_SERVICES).get().responseAsBigDecimal().setScale(0, RoundingMode.HALF_UP));
+        assertEquals(new BigDecimal("9"), rtn.answer(Sdu2021.PERIOD, Q.SDU_CONSTRUCTION_AND_FREIGHT).get().responseAsBigDecimal().setScale(0, RoundingMode.HALF_UP));
+        assertEquals(new BigDecimal("4"), rtn.answer(Sdu2021.PERIOD, Q.SDU_FOOD_AND_CATERING).get().responseAsBigDecimal().setScale(0, RoundingMode.HALF_UP));
+        assertEquals(new BigDecimal("14"), rtn.answer(Sdu2021.PERIOD, Q.SDU_COMMISSIONED_HEALTH_SERVICES).get().responseAsBigDecimal().setScale(0, RoundingMode.HALF_UP));
+    }
 }
