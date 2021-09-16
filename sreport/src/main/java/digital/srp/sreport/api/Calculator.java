@@ -15,9 +15,13 @@
  ******************************************************************************/
 package digital.srp.sreport.api;
 
+import java.util.List;
+
 import digital.srp.sreport.model.SurveyReturn;
 
 public interface Calculator {
 
     SurveyReturn calculate(final SurveyReturn rtn, final int yearsToCalc);
+
+    SurveyReturn calculate(final SurveyReturn rtn, final List<String> periods);
 }

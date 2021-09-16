@@ -73,7 +73,7 @@ public class Cruncher extends AbstractEmissionsService
     public Cruncher() {
     }
 
-    protected Cruncher(final List<CarbonFactor> cfactors2,
+    public Cruncher(final List<CarbonFactor> cfactors2,
             final List<WeightingFactor> wfactors2) {
         this();
         init(cfactors2, wfactors2);
@@ -94,11 +94,17 @@ public class Cruncher extends AbstractEmissionsService
     }
 
     @Override
-    public synchronized SurveyReturn calculate(SurveyReturn rtn, int yearsToCalc) {
-        long start = System.currentTimeMillis();
+    public SurveyReturn calculate(SurveyReturn rtn, int yearsToCalc) {
         healthChecker.ensureInitialised(yearsToCalc, rtn.survey().name(), rtn);
-        LOGGER.info("Calculating for {} in {}", rtn.org(), rtn.applicablePeriod());
         List<String> periods = PeriodUtil.fillBackwards(rtn.applicablePeriod(), yearsToCalc);
+        calculate(rtn, periods);
+        return rtn;
+    }
+
+    @Override
+    public synchronized SurveyReturn calculate(SurveyReturn rtn, List<String> periods) {
+        LOGGER.info("Calculating for {} in {}", rtn.org(), rtn.applicablePeriod());
+        long start = System.currentTimeMillis();
         for (String period : periods) {
             calcEnergyConsumption(period, rtn);
 
@@ -1538,25 +1544,22 @@ public class Cruncher extends AbstractEmissionsService
 
     private Answer crunchWeighting(String period, SurveyReturn rtn, BigDecimal nonPaySpend,
             Q srcQ, WeightingFactor wFactor, Q trgtQ) {
-        BigDecimal calcVal = new BigDecimal("0.00");
+        Answer emissions = getAnswer(period, rtn, trgtQ);
         try {
-            Answer ans = getAnswer(period, rtn, srcQ);
-            if (ans.derived()
-                    && BigDecimal.ZERO.equals(ans.responseAsBigDecimal().setScale(0, RoundingMode.HALF_UP))) {
-                LOGGER.info("No directly entered spend {}, estimate from non-pay spend", srcQ);
-                calcVal = nonPaySpend.multiply(wFactor.proportionOfTotal());
-                LOGGER.info("Estimated {} from non-pay spend as {}", srcQ, calcVal);
-                ans.derived(true).response(calcVal.toPlainString());
+            Answer spend = getAnswer(period, rtn, srcQ);
+            if (spend.derived()) {
+                spend.derived(true).response(nonPaySpend.multiply(wFactor.proportionOfTotal()).toPlainString());
+                LOGGER.info("Estimated {} from non-pay spend as {}", srcQ, spend.response());
             } else {
                 LOGGER.info("Have directly entered spend {}, no need to estimate", srcQ);
-                calcVal = ans.responseAsBigDecimal();
             }
-            calcVal = calcVal.multiply(wFactor.intensityValue());
+            emissions.derived(true)
+                    .response(spend.responseAsBigDecimal().multiply(wFactor.intensityValue()).toPlainString());
+            LOGGER.info("Calculated {} emissions as {}", trgtQ, emissions.response());
         } catch (NumberFormatException e) {
             LOGGER.error("Cannot estimate CO2e from spend");
         }
-        LOGGER.info("Calculated {} emissions as {}", trgtQ, calcVal);
-        return getAnswer(period, rtn, trgtQ).derived(true).response(calcVal.toPlainString());
+        return emissions;
     }
 
     private WeightingFactor wFactor(WeightingFactors wName, String period, String orgType) {
