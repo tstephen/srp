@@ -237,11 +237,11 @@ public class WasteTest {
 
         // Some of these are 0.00 because there are no Carbon factors for that year
         assertEquals(new BigDecimal("11.52"), rtn.answer(PERIOD_2020_21, Q.WASTE_CLINICAL_INCINERATED_CO2E).get().responseAsBigDecimal().setScale(2, RoundingMode.HALF_UP));
-        assertEquals(new BigDecimal("0.00"), rtn.answer(PERIOD_2019_20, Q.WASTE_CLINICAL_INCINERATED_CO2E).get().responseAsBigDecimal().setScale(2, RoundingMode.HALF_UP));
+        assertEquals(new BigDecimal("10.08"), rtn.answer(PERIOD_2019_20, Q.WASTE_CLINICAL_INCINERATED_CO2E).get().responseAsBigDecimal().setScale(2, RoundingMode.HALF_UP));
         assertEquals(new BigDecimal("16.80"), rtn.answer(PERIOD_2020_21, Q.ALT_WASTE_DISPOSAL_WEIGHT_CO2E).get().responseAsBigDecimal().setScale(2, RoundingMode.HALF_UP));
-        assertEquals(new BigDecimal("0.00"), rtn.answer(PERIOD_2019_20, Q.ALT_WASTE_DISPOSAL_WEIGHT_CO2E).get().responseAsBigDecimal().setScale(2, RoundingMode.HALF_UP));
+        assertEquals(new BigDecimal("13.20"), rtn.answer(PERIOD_2019_20, Q.ALT_WASTE_DISPOSAL_WEIGHT_CO2E).get().responseAsBigDecimal().setScale(2, RoundingMode.HALF_UP));
         assertEquals(new BigDecimal("11.52"), rtn.answer(PERIOD_2020_21, Q.WASTE_OFFENSIVE_CO2E).get().responseAsBigDecimal().setScale(2, RoundingMode.HALF_UP));
-        assertEquals(new BigDecimal("0.00"), rtn.answer(PERIOD_2019_20, Q.WASTE_OFFENSIVE_CO2E).get().responseAsBigDecimal().setScale(2, RoundingMode.HALF_UP));
+        assertEquals(new BigDecimal("16.32"), rtn.answer(PERIOD_2019_20, Q.WASTE_OFFENSIVE_CO2E).get().responseAsBigDecimal().setScale(2, RoundingMode.HALF_UP));
         assertEquals(new BigDecimal("0.00"), rtn.answer(PERIOD_2020_21, Q.LANDFILL_CO2E).get().responseAsBigDecimal());
         assertEquals(new BigDecimal("0.00"), rtn.answer(PERIOD_2019_20, Q.LANDFILL_CO2E).get().responseAsBigDecimal());
         assertEquals(new BigDecimal("2.66"), rtn.answer(PERIOD_2020_21, Q.RECYCLING_CO2E).get().responseAsBigDecimal().setScale(2, RoundingMode.HALF_UP));
@@ -253,13 +253,13 @@ public class WasteTest {
         assertEquals(new BigDecimal("0.00"), rtn.answer(PERIOD_2020_21, Q.WASTE_TEXTILES_CO2E).get().responseAsBigDecimal().setScale(2, RoundingMode.HALF_UP));
         assertEquals(new BigDecimal("0.00"), rtn.answer(PERIOD_2019_20, Q.WASTE_TEXTILES_CO2E).get().responseAsBigDecimal().setScale(2, RoundingMode.HALF_UP));
         assertEquals(new BigDecimal("111.20"), rtn.answer(PERIOD_2020_21, Q.INCINERATION_CO2E).get().responseAsBigDecimal().setScale(2, RoundingMode.HALF_UP));
-        assertEquals(new BigDecimal("0.00"), rtn.answer(PERIOD_2019_20, Q.INCINERATION_CO2E).get().responseAsBigDecimal().setScale(2, RoundingMode.HALF_UP));
+        assertEquals(new BigDecimal("108.40"), rtn.answer(PERIOD_2019_20, Q.INCINERATION_CO2E).get().responseAsBigDecimal().setScale(2, RoundingMode.HALF_UP));
         assertEquals(new BigDecimal("0.00"), rtn.answer(PERIOD_2020_21, Q.WASTE_PROCESSED_ON_SITE_CO2E).get().responseAsBigDecimal().setScale(2, RoundingMode.HALF_UP));
         assertEquals(new BigDecimal("0.00"), rtn.answer(PERIOD_2019_20, Q.WASTE_PROCESSED_ON_SITE_CO2E).get().responseAsBigDecimal().setScale(2, RoundingMode.HALF_UP));
         assertEquals(new BigDecimal("0.04"), rtn.answer(PERIOD_2020_21, Q.WEEE_WEIGHT_CO2E).get().responseAsBigDecimal().setScale(2, RoundingMode.HALF_UP));
         assertEquals(new BigDecimal("0.17"), rtn.answer(PERIOD_2019_20, Q.WEEE_WEIGHT_CO2E).get().responseAsBigDecimal().setScale(2, RoundingMode.HALF_UP));
         assertEquals(new BigDecimal("154.15"), rtn.answer(PERIOD_2020_21, Q.SCOPE_3_WASTE).get().responseAsBigDecimal().setScale(2, RoundingMode.HALF_UP));
-        assertEquals(new BigDecimal("3.33"), rtn.answer(PERIOD_2019_20, Q.SCOPE_3_WASTE).get().responseAsBigDecimal().setScale(2, RoundingMode.HALF_UP));
+        assertEquals(new BigDecimal("151.33"), rtn.answer(PERIOD_2019_20, Q.SCOPE_3_WASTE).get().responseAsBigDecimal().setScale(2, RoundingMode.HALF_UP));
 
         // check inputs unchanged
         assertEquals("317.00", rtn.answer(PERIOD_2020_21, Q.INCINERATION_WEIGHT).get().response());
