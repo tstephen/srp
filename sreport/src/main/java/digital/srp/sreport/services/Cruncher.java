@@ -106,27 +106,32 @@ public class Cruncher extends AbstractEmissionsService
         LOGGER.info("Calculating for {} in {}", rtn.org(), rtn.applicablePeriod());
         long start = System.currentTimeMillis();
         for (String period : periods) {
-            calcEnergyConsumption(period, rtn);
+            try {
+                calcEnergyConsumption(period, rtn);
 
-            calcScope1(period, rtn);
-            calcScope2(period, rtn);
-            calcScope3(period, rtn);
+                calcScope1(period, rtn);
+                calcScope2(period, rtn);
+                calcScope3(period, rtn);
 
-            calcCarbonProfileSimplifiedEClassMethod(period, rtn);
-            calcCarbonProfileSimplifiedSduMethod(period, rtn);
+                calcCarbonProfileSimplifiedEClassMethod(period, rtn);
+                calcCarbonProfileSimplifiedSduMethod(period, rtn);
 
-            sumAnswers(period, rtn, Q.SCOPE_1, SduQuestions.SCOPE_1_HDRS);
-            sumAnswers(period, rtn, Q.SCOPE_2, SduQuestions.SCOPE_2_HDRS);
-            sumAnswers(period, rtn, Q.SCOPE_3, SduQuestions.SCOPE_3_HDRS);
-            sumAnswers(period, rtn, Q.SCOPE_ALL, Q.SCOPE_1, Q.SCOPE_2,
-                    Q.SCOPE_3);
+                sumAnswers(period, rtn, Q.SCOPE_1, SduQuestions.SCOPE_1_HDRS);
+                sumAnswers(period, rtn, Q.SCOPE_2, SduQuestions.SCOPE_2_HDRS);
+                sumAnswers(period, rtn, Q.SCOPE_3, SduQuestions.SCOPE_3_HDRS);
+                sumAnswers(period, rtn, Q.SCOPE_ALL, Q.SCOPE_1, Q.SCOPE_2,
+                        Q.SCOPE_3);
 
-            crunchEnergyCostChange(period, rtn);
+                crunchEnergyCostChange(period, rtn);
 
-            crunchSocialValue(period, rtn);
-            crunchSocialInvestmentRecorded(period, rtn);
+                crunchSocialValue(period, rtn);
+                crunchSocialInvestmentRecorded(period, rtn);
 
-            calcBenchmarking(period, rtn);
+                calcBenchmarking(period, rtn);
+            } catch (Exception e) {
+                LOGGER.error("Unable to calc emissions for {}-{} in {}. Cause: {}",
+                        rtn.survey().name(), rtn.org(), period, e.getMessage());
+            }
         }
         rtn.setLastUpdated(new Date());
         LOGGER.warn("Calculations took {}ms", (System.currentTimeMillis() - start));
