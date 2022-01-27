@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *******************************************************************************/
-function SrpClient(o) {
+function SrpClient(o) { // jshint ignore:line
   var me = {
     options: o
   };
@@ -23,12 +23,12 @@ function SrpClient(o) {
       "Accept": "application/json, text/javascript",
       "X-Requested-With": "XMLHttpRequest",
       "Authorization": "Bearer "+me.options.token
-    }
+    };
   }
 
   me.deleteCarbonFactor = function(cfactor) {
     return deleteEntity(cfactor, 'cfactors');
-  }
+  };
 
   function deleteEntity(entity, entityPath) {
     return fetch(uriFromEntity(entity, entityPath), {
@@ -41,42 +41,42 @@ function SrpClient(o) {
 
   me.deleteIntervention = function(intervention) {
     return deleteEntity(intervention, 'interventions');
-  }
+  };
 
   me.deleteInterventionType = function(interventionType) {
     return deleteEntity(interventionType, 'intervention-types');
-  }
+  };
 
   me.deleteOrgType = function(orgType) {
     return deleteEntity(orgType, 'organisation-types');
-  }
+  };
 
   me.deleteParameter = function(param) {
     return deleteEntity(param, 'parameters');
-  }
+  };
 
   me.deleteQuestion = function(question) {
     return deleteEntity(question, 'question');
-  }
+  };
 
   me.deleteWeightingFactor = function(wfactor) {
     return deleteEntity(wfactor, 'wfactors');
-  }
+  };
 
   me.fetchCarbonFactor = function(uri) {
     return fetchEntity(uri);
-  }
+  };
 
   me.fetchCarbonFactors = function() {
     return fetchEntities('cfactors');
-  }
+  };
 
   function fetchEntities(entityPath, tenantId, params) {
     return fetch(me.options.server+'/' + (tenantId === undefined ? '' : tenantId + '/') + entityPath +'/'+(params === undefined ? '' : params), {
       "headers": commonHeaders(),
       "method": "GET",
       "mode": "cors"
-    })
+    });
   }
 
   function fetchEntity(uri) {
@@ -84,40 +84,44 @@ function SrpClient(o) {
       "headers": commonHeaders(),
       "method": "GET",
       "mode": "cors"
-    })
+    });
   }
+
+  me.fetchIntervention = function(uri) {
+    return fetchEntity(uri);
+  };
 
   me.fetchInterventions = function(tenantId) {
     return fetchEntities('interventions', tenantId);
-  }
+  };
 
   me.fetchInterventionTypes = function(tenantId) {
     return fetchEntities('intervention-types', tenantId);
-  }
+  };
 
   me.fetchOrgTypes = function(tenantId) {
     return fetchEntities('organisation-types', tenantId);
-  }
+  };
 
   me.fetchOrgTypesForReporting = function(tenantId) {
     return fetchEntities('organisation-types', tenantId, '?filter=reportingType');
-  }
+  };
 
   me.fetchParameter = function(uri) {
     return fetchEntity(uri);
-  }
+  };
 
   me.fetchParameters = function(tenantId) {
     return fetchEntities('parameters', tenantId);
-  }
+  };
 
   me.fetchQuestion = function(uri) {
     return fetchEntity(uri);
-  }
+  };
 
   me.fetchQuestions = function(tenantId) {
     return fetchEntities('questions', tenantId);
-  }
+  };
 
   me.fetchReturn = function(surveyName, org) {
     return fetch(me.options.server+'/returns/findCurrentBySurveyNameAndOrg/'+surveyName+'/'+org, {
@@ -131,7 +135,7 @@ function SrpClient(o) {
       "method": "GET",
       "mode": "cors"
     });
-  }
+  };
 
   me.fetchSurvey = function(surveyName) {
     return fetch(me.options.server+'/surveys/findByName/'+surveyName, {
@@ -139,15 +143,15 @@ function SrpClient(o) {
       "method": "GET",
       "mode": "cors"
     });
-  }
+  };
 
   me.fetchWeightingFactor = function(uri) {
     return fetchEntity(uri);
-  }
+  };
 
   me.fetchWeightingFactors = function() {
     return fetchEntities('wfactors');
-  }
+  };
 
   me.saveAnswer = function(rtn, answer, successHandler) {
     fetch(me.options.server+'/returns/'+rtn.id+'/answers/'+answer.question.name+'/'+answer.applicablePeriod, {
@@ -161,17 +165,17 @@ function SrpClient(o) {
       "method": "POST",
       "mode": "cors"
     })
-    .then(() => successHandler());
-  }
+    .then(function() { return successHandler(); });
+  };
 
   me.saveCarbonFactor = function(cFactor, tenantId) {
     return saveEntity(cFactor, 'cfactors', tenantId);
-  }
+  };
 
   function saveEntity(entity, entityPath, tenantId) {
     var headers = commonHeaders();
     headers["Content-Type"] = "application/json";
-    let uri = uriFromEntity(entity, entityPath);
+    var uri = uriFromEntity(entity, entityPath);
     return fetch(uri === undefined ? me.options.server + '/' + tenantId + '/'+ entityPath +'/' : uri, {
       "headers": headers,
       "body": JSON.stringify(entity),
@@ -182,39 +186,39 @@ function SrpClient(o) {
 
   me.saveIntervention = function(intervention, tenantId) {
     return saveEntity(intervention, 'intervention', tenantId);
-  }
+  };
 
   me.saveInterventionType = function(interventionType, tenantId) {
     return saveEntity(interventionType, 'intervention-types', tenantId);
-  }
+  };
 
   me.saveOrgType = function(orgType, tenantId) {
     return saveEntity(orgType, 'organisation-types', tenantId);
-  }
+  };
 
   me.saveParameter = function(param, tenantId) {
     return saveEntity(param, 'parameters', tenantId);
-  }
+  };
 
   me.saveQuestion = function(question, tenantId) {
     return saveEntity(question, 'questions', tenantId);
-  }
+  };
 
   me.saveWeightingFactor = function(wFactor, tenantId) {
     return saveEntity(wFactor, 'wfactors', tenantId);
-  }
+  };
 
   function uriFromEntity(entity, entityPath) {
     var uri;
-    if (entity['links']!=undefined) {
+    if ('links' in entity) {
       $.each(entity.links, function(i,d) {
         if (d.rel == 'self') {
           uri = d.href;
         }
       });
-    } else if (entity['_links']!=undefined) {
+    } else if ('_links' in entity) {
       uri = entity._links.self.href;
-    } else if (entity['id']!=undefined) {
+    } else if ('id' in entity) {
       uri = entityPath+'/'+entity.id;
     }
 

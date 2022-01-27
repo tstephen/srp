@@ -13,27 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *******************************************************************************/
-var EASING_DURATION = 500;
-fadeOutMessages = true;
-var newLineRegEx = /\n/g;
-
 var ractive = new BaseRactive({
   el: 'container',
   lazy: true,
   template: '#template',
   data: {
     filter: { },
-    //saveObserver:false,
-    // username: localStorage['username'],
     server: $env.server,
-    age: function(timeString) {
-      return i18n.getAgeString(new Date(timeString))
-    },
-    hash: function(email) {
-      if (email == undefined) return '';
-      //console.log('hash '+email+' = '+ractive.hash(email));
-      return '<img class="img-rounded" src="//www.gravatar.com/avatar/'+ractive.hash(email)+'?s=36"/>'
-    },
     haveOverlaps: function(interventions) {
       console.info('haveOverlaps:'+interventions.length);
       var specificMsgs = '<ul>';
@@ -59,9 +45,6 @@ var ractive = new BaseRactive({
         return number.sigFigs(3);
       }
     },
-    matchFilter: function(obj) {
-
-    },
     scaleTypes: [ { idx: 0, name: "Linear" },{ idx: 1, name: "Square Root" } ],
     shortId: function(uri) {
       return uri.substring(uri.lastIndexOf('/')+1);
@@ -85,7 +68,7 @@ var ractive = new BaseRactive({
     sorted: function(column) {
       console.info('sorted');
       if (ractive.get('sortColumn') == column && ractive.get('sortAsc')) return 'sort-asc';
-      else if (ractive.get('sortColumn') == column && !ractive.get('sortAsc')) return 'sort-desc'
+      else if (ractive.get('sortColumn') == column && !ractive.get('sortAsc')) return 'sort-desc';
       else return 'hidden';
     },
     stdPartials: [
@@ -99,7 +82,7 @@ var ractive = new BaseRactive({
       if (ractive.get('interventions').length==0) return;
       var interventions = ractive.get('interventions');
       var sum = 0;
-      for (i = 0 ; i < interventions.length ; i++) {
+      for (var i = 0 ; i < interventions.length ; i++) {
         sum += interventions[i][column];
       }
       return sum;
@@ -125,24 +108,21 @@ var ractive = new BaseRactive({
     $.ajax({
       dataType: "json",
       url: ractive.getServer()+'/'+ractive.get('tenant.id')+'/intervention-types/status/green',
-//      url: ractive.getServer()+'/interventions/status/green',
       crossDomain: true,
       success: function( data ) {
         $.each(data, function(i,d) {
           console.log('costPerTonneCo2e: '+d.costPerTonneCo2e);
           // 2010 data diff to 2015 so need to calc MAC here
-          if (d['modellingYear']==2010) {
+          if ('modellingYear' in d && d.modellingYear==2010) {
             d.tonnesCo2eSavedTargetYear = d.tonnesCo2eSaved;
             console.log(' (re-)calculating cost per tonne co2 for ...'+d.name+':'+d.financialSavings+'/'+d.tonnesCo2eSavedTargetYear);
-            d['costPerTonneCo2e'] = d.financialSavings/d.tonnesCo2eSavedTargetYear;
-            console.log('  '+d['costPerTonneCo2e']);
+            d.costPerTonneCo2e = d.financialSavings/d.tonnesCo2eSavedTargetYear;
+            console.log('  '+d.costPerTonneCo2e);
           }
           console.log('  updated costPerTonneCo2e: '+d.costPerTonneCo2e);
           d.slug  = d.name.toSlug();
-//          d.  = d.classification.replace(/ /g,'');
-        })
+        });
         ractive.merge('interventions',data.sort(ractive.sortByCostPerTonneCo2e));
-//        ractive.group();
         if (ractive.hasRole('admin')) $('.admin').show();
         if (ractive.fetchCallbacks!=null) ractive.fetchCallbacks.fire();
         ractive.replaceGraph();
@@ -226,10 +206,6 @@ var ractive = new BaseRactive({
     macc.options.yPosLimit = limit;
     ractive.replaceGraph();
   },
-  showActivityIndicator: function(msg, addClass) {
-    document.body.style.cursor='progress';
-    this.showMessage(msg, addClass);
-  },
   sortByCostPerTonneCo2e: function (a, b) {
     if (a.costPerTonneCo2e > b.costPerTonneCo2e) {
       return 1;
@@ -243,11 +219,13 @@ var ractive = new BaseRactive({
 });
 
 ractive.observe('yNegLimit', function(newValue, oldValue, keypath) {
+  console.log("'"+keypath+"' changed from '"+oldValue+"' to '"+newValue+"'");
   if (newValue!=undefined && newValue!='') {
     ractive.setYNegLimit(newValue);
   }
 });
 ractive.observe('yPosLimit', function(newValue, oldValue, keypath) {
+  console.log("'"+keypath+"' changed from '"+oldValue+"' to '"+newValue+"'");
   if (newValue!=undefined && newValue!='') {
     ractive.setYPosLimit(newValue);
   }
@@ -263,22 +241,10 @@ ractive.on( 'filterOrgType', function ( event, orgType ) {
   ractive.set('optOrgType',orgType);
   ractive.replaceGraph();
 });
-ractive.on( 'sort', function ( event, column ) {
-  console.info('sort on '+column);
-  // if already sorted by this column reverse order
-  if (this.get('sortColumn')==column) this.set('sortAsc', !this.get('sortAsc'));
-  this.set( 'sortColumn', column );
-});
-
 $(document).ready(function() {
   $('head').append('<link href="/sdu/css/sdu-1.0.0.css" rel="stylesheet">');
   $(window).bind('resize', function () {
     //console.log('resized to '+window.innerWidth);
     ractive.replaceGraph();
   });
-})
-
-String.prototype.toSlug = function() {
-  if (this == undefined) return this;
-  return this.replace(/[.,()'"&%\/]/g,'').toLeadingCaps().replace(/ /g,'');
-}
+});

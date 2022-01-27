@@ -19,73 +19,12 @@ var ractive = new BaseRactive({
   template: '#template',
   data: {
     discountRate:0.035,
+    entityName: 'interventionType',
     interventionTypes: [],
     filter: undefined,
-    //saveObserver:false,
     tenant: { id: 'sdu' },
-    username: localStorage['username'],
-    age: function(timeString) {
-      return i18n.getAgeString(new Date(timeString))
-    },
-    chars: function(string) {
-      console.info('chars: '+string);
-      var len = string == undefined ? 0 : string.length;
-      console.log('  returning: '+len);
-      return len;
-    },
-    customField: function(obj, name) {
-      if (obj['customFields']==undefined) {
-        return undefined;
-      } else if (!Array.isArray(obj['customFields'])) {
-        return obj.customFields[name];
-      } else {
-        //console.error('customField 30');
-        var val;
-        $.each(obj['customFields'], function(i,d) {
-          if (d.name == name) val = d.value;
-        });
-        return val;
-      }
-    },
-    formatDate: function(timeString) {
-      return new Date(timeString).toLocaleDateString(navigator.languages).replace('Invalid Date','n/a').replace('01/01/1970','n/a');
-    },
-    formatJson: function(json) {
-      console.log('formatJson: '+json);
-      try {
-        var obj = JSON.parse(json);
-        var html = '';
-        $.each(Object.keys(obj), function(i,d) {
-          html += (typeof obj[d] == 'object' ? '' : '<b>'+d+'</b>: '+obj[d]+'<br/>');
-        });
-        return html;
-      } catch (e) {
-        // So it wasn't JSON
-        return json;
-      }
-    },
-    hash: function(email) {
-      if (email == undefined) return '';
-      console.log('hash '+email+' = '+ractive.hash(email));
-      return '<img class="img-rounded" src="//www.gravatar.com/avatar/'+ractive.hash(email)+'?s=36"/>'
-    },
-    help: '<p>This page allows the management of a single list of interventionTypes and their associated data requirements</p>\
-      <h2>Key concepts</h2>\
-      <ul>\
-        <li>\
-          <h3 id="">Concept 1</h3>\
-          <p>Lorem ipsum.</p>\
-        </li>\
-        <li>\
-          <h3 id="">Concept 2</h3>\
-          <p>Lorem ipsum.</p>\
-        </li>\
-        <li>\
-          <h3 id="">Concept 3</h3>\
-          <p>Lorem ipsum.</p>\
-        </li>\
-        </ul>\
-      </ul>',
+    username: localStorage.getItem('username'),
+    help: '<p>This page allows the management of a single list of interventionTypes and their associated data requirements</p>',
     matchFilter: function(obj) {
       if (ractive.get('filter')==undefined) return true;
       else return ractive.get('filter').value.toLowerCase()==obj[ractive.get('filter').field].toLowerCase();
@@ -132,7 +71,7 @@ var ractive = new BaseRactive({
     sorted: function(column) {
 //      console.info('sorted:'+column);
       if (ractive.get('sortColumn') == column && ractive.get('sortAsc')) return 'sort-asc';
-      else if (ractive.get('sortColumn') == column && !ractive.get('sortAsc')) return 'sort-desc'
+      else if (ractive.get('sortColumn') == column && !ractive.get('sortAsc')) return 'sort-desc';
       else return 'hidden';
     },
     stdPartials: [
@@ -178,8 +117,7 @@ var ractive = new BaseRactive({
       crossDomain: true,
       success: function( data ) {
         console.warn('response;'+data);
-        something = window.open("data:text/csv," + encodeURIComponent(data),"_blank");
-        //something.focus();
+        window.open("data:text/csv," + encodeURIComponent(data),"_blank");
       }
     });
   },
@@ -187,7 +125,9 @@ var ractive = new BaseRactive({
     console.log('edit'+interventionType+'...');
     $('h2.edit-form,h2.edit-field').show();
     $('.create-form,create-field').hide();
-    ractive.select(interventionType);
+    ractive.srp.fetchQuestion(ractive.tenantUri(interventionType))
+      .then(function(response) { return response.json(); })
+      .then(ractive.select);
   },
   editField: function (selector, path) {
     console.log('editField '+path+'...');
@@ -196,7 +136,7 @@ var ractive = new BaseRactive({
   delete: function (obj) {
     console.log('delete '+obj+'...');
     ractive.srp.deleteInterventionType(ractive.get('current'))
-    .then(response => {
+    .then(function(response) {
       switch (response.status) {
       case 204:
         ractive.fetch();
@@ -213,55 +153,28 @@ var ractive = new BaseRactive({
     if (ractive.keycloak.token === undefined) return;
     ractive.set('saveObserver', false);
     ractive.srp.fetchInterventionTypes(ractive.get('tenant.id'))
-    .then(response => response.json()) // catch (e) { console.error('unable to parse response as JSON') } })
-    .then(data => {
-      if (data['_embedded'] == undefined) {
-        ractive.merge('interventionTypes', data);
+    .then(function(response) { return response.json(); }) // catch (e) { console.error('unable to parse response as JSON') } })
+    .then(function(data) {
+      if ('_embedded' in data) {
+        ractive.merge('interventionTypes', data._embedded.interventionTypes);
       } else {
-        ractive.merge('interventionTypes', data['_embedded'].interventionTypes);
+        ractive.merge('interventionTypes', data);
       }
       if (ractive.hasRole('admin')) $('.admin').show();
       if (ractive.fetchCallbacks!=null) ractive.fetchCallbacks.fire();
       ractive.set('searchMatched',$('#interventionTypesTable tbody tr:visible').length);
       ractive.set('saveObserver', true);
-    })
-  },
-  filter: function(filter) {
-    console.log('filter: '+JSON.stringify(filter));
-    ractive.set('filter',filter);
-    $('.omny-dropdown.dropdown-menu li').removeClass('selected')
-    $('.omny-dropdown.dropdown-menu li:nth-child('+filter.idx+')').addClass('selected')
-    ractive.set('searchMatched',$('#interventionTypesTable tbody tr:visible').length);
-    $('input[type="search"]').blur();
+    });
   },
   find: function(interventionTypeId) {
     console.log('find: '+interventionTypeId);
     var c;
     $.each(ractive.get('interventionTypes'), function(i,d) {
-      if (interventionTypeId.endsWith(ractive.getId(d))) {
+      if (interventionTypeId.endsWith(ractive.id(d))) {
         c = d;
       }
     });
     return c;
-  },
-  getId: function(interventionType) {
-    console.log('getId: '+interventionTypeType);
-    var uri;
-    if (interventionType['links']!=undefined) {
-      $.each(interventionType.links, function(i,d) {
-        if (d.rel == 'self') {
-          uri = d.href;
-        }
-      });
-    } else if (interventionType['_links']!=undefined) {
-      uri = interventionType._links.self.href.indexOf('?')==-1 ? interventionType._links.self.href : interventionType._links.self.href.substr(0,interventionType._links.self.href.indexOf('?')-1);
-    }
-    return uri;
-  },
-  hideResults: function() {
-    $('#interventionTypesTableToggle').addClass('kp-icon-caret-right').removeClass('kp-icon-caret-down');
-    $('#interventionTypesTable').slideUp();
-    $('#currentSect').slideDown({ queue: true });
   },
   hideUpload: function () {
     console.log('hideUpload...');
@@ -273,7 +186,7 @@ var ractive = new BaseRactive({
     if (ractive.get('current.'+field+'TimeSeries')==undefined) ractive.set('current.'+field+'TimeSeries',[]);
     if (ractive.get('current.'+field+'TimeSeries').length<ractive.get('current.lifetime')) {
       var val;
-      for (i=0;i<ractive.get('current.lifetime');i++) {
+      for (var i=0;i<ractive.get('current.lifetime');i++) {
         switch (loadingStrategy) {
         case 'average':
           val = ractive.get('current.'+field);
@@ -287,22 +200,7 @@ var ractive = new BaseRactive({
         }
         ractive.get('current.'+field+'TimeSeries').push(val);
       }
-//      ractive.set('timeSeries',ractive.get(field+'TimeSeries'));
     }
-  },
-  oninit: function() {
-    console.log('oninit');
-  },
-  postSelect: function(interventionType) {
-    ractive.set('saveObserver', false);
-    console.log('found interventionType '+interventionType);
-    ractive.set('current', interventionType);
-    ractive.initControls();
-    // who knows why this is needed, but it is, at least for first time rendering
-    $('.autoNumeric').autoNumeric('update',{});
-    ractive.hideResults();
-    $('#currentSect').slideDown();
-    ractive.set('saveObserver',true);
   },
   save: function () {
     console.log('save interventionType: '+ractive.get('current').name+'...');
@@ -332,7 +230,7 @@ var ractive = new BaseRactive({
       tmp.tenantId = ractive.get('tenant.id');
 //      console.log('ready to save interventionType'+JSON.stringify(tmp)+' ...');
       ractive.srp.saveInterventionType(tmp, ractive.get('tenant.id'))
-          .then(response => {
+          .then(function(response) {
             ractive.set('saveObserver',false);
             switch(response.status) {
             case 201:
@@ -340,7 +238,7 @@ var ractive = new BaseRactive({
               return response.json();
             }
           })
-          .then(data => {
+          .then(function(data) {
             if (data !== undefined) ractive.set('current', data);
             ractive.splice('interventionTypes',ractive.get('currentIdx'),1,ractive.get('current'));
             $('.autoNumeric').autoNumeric('update');
@@ -358,7 +256,7 @@ var ractive = new BaseRactive({
     console.log('saveRef '+JSON.stringify(ractive.get('current.ref'))+' ...');
     var n = ractive.get('current.ref');
     n.url = $('#ref').val();
-    var url = ractive.getId(ractive.get('current'))+'/references';
+    var url = ractive.id(ractive.get('current'))+'/references';
     url = url.replace('interventionTypes/',ractive.get('tenant.id')+'/intervention-types/');
     if (n.url.trim().length > 0) {
       $('#refsTable tr:nth-child(1)').slideUp();
@@ -368,7 +266,7 @@ var ractive = new BaseRactive({
         url: url,
         type: 'POST',
         data: n,
-        success: completeHandler = function(data) {
+        success: function(data) {
           console.log('data: '+ data);
           ractive.showMessage('Reference link saved successfully');
           ractive.fetchRefs();
@@ -380,25 +278,15 @@ var ractive = new BaseRactive({
   select: function(interventionType) {
     console.log('select: '+JSON.stringify(interventionType));
     ractive.set('saveObserver',false);
-    var url = ractive.tenantUri(interventionType);
-    if (url == undefined) {
-      console.log('Skipping load as no uri.');
-      ractive.postSelect(interventionType);
-    } else {
-      console.log('loading detail for '+url);
-      ractive.srp.fetchInterventionType(url)
-      .then(response => response.json())
-      .then(data => ractive.postSelect(data));
-    }
-  },
-  showActivityIndicator: function(msg, addClass) {
-    document.body.style.cursor='progress';
-    this.showMessage(msg, addClass);
-  },
-  showResults: function() {
-    $('#interventionTypesTableToggle').addClass('kp-icon-caret-down').removeClass('kp-icon-caret-right');
-    $('#currentSect').slideUp();
-    $('#interventionTypesTable').slideDown({ queue: true });
+    ractive.set('saveObserver', false);
+    console.log('found interventionType '+interventionType);
+    ractive.set('current', interventionType);
+    ractive.initControls();
+    // who knows why this is needed, but it is, at least for first time rendering
+    $('.autoNumeric').autoNumeric('update',{});
+    ractive.hideResults();
+    $('#currentSect').slideDown();
+    ractive.set('saveObserver',true);
   },
   showUpload: function () {
     console.log('showUpload...');
@@ -406,11 +294,6 @@ var ractive = new BaseRactive({
   },
   sortInterventions: function() {
     ractive.get('interventionTypes').sort(function(a,b) { return new Date(b.lastUpdated)-new Date(a.lastUpdated); });
-  },
-  toggleResults: function() {
-    console.info('toggleResults');
-    $('#interventionTypesTableToggle').toggleClass('kp-icon-caret-down').toggleClass('kp-icon-caret-right');
-    $('#interventionTypesTable').slideToggle();
   },
   updateTimeSeriesSummary: function() {
     console.info('updateTimeSeriesSummary');
@@ -434,7 +317,7 @@ var ractive = new BaseRactive({
         cache: false,
         contentType: false,
         processData: false,
-        success: function(response) {
+        success: function() {
           console.log('successfully uploaded resource');
           ractive.fetch();
           ractive.hideUpload();
@@ -456,20 +339,12 @@ ractive.observe('resourceFiles', function(newValue, oldValue, keypath) {
     console.warn  ('Nothing to do: '+keypath+': '+newValue);
   }
 });
-ractive.observe('searchTerm', function(newValue, oldValue, keypath) {
-  console.log('searchTerm changed');
-  ractive.showResults();
-  setTimeout(function() {
-    ractive.set('searchMatched',$('#interventionTypesTable tbody tr').length);
-  }, 500);
-});
-
 
 // Save on model change
 // done this way rather than with on-* attributes because autocomplete
 // controls done that way save the oldValue
 ractive.observe('current.*', function(newValue, oldValue, keypath) {
-  ignored=['current.references'];
+  var ignored=['current.references'];
   if (ractive.get('saveObserver') && ignored.indexOf(keypath)==-1) {
     console.log('current prop change: '+newValue +','+oldValue+' '+keypath);
     ractive.save();
@@ -482,12 +357,6 @@ ractive.observe('current.*', function(newValue, oldValue, keypath) {
 ractive.on( 'filter', function ( event, filter ) {
   console.info('filter on '+JSON.stringify(event)+','+filter.idx);
   ractive.filter(filter);
-});
-ractive.on( 'sort', function ( event, column ) {
-  console.info('sort on '+column);
-  // if already sorted by this column reverse order
-  if (this.get('sortColumn')==column) this.set('sortAsc', !this.get('sortAsc'));
-  this.set( 'sortColumn', column );
 });
 
 function presentValue(futureValue,years) {

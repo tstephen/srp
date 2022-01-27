@@ -43,10 +43,12 @@ gulp.task('scripts', function() {
   .pipe(gulp.dest(buildDir+'/srp/'+vsn+'/js'));
 });
 
-gulp.task('test', function() {
+gulp.task('lint', function() {
   return gulp.src([
     'src/srp/js/**/*.js',
-    '!src/srp/js/vendor/**/*.js'
+    '!src/srp/js/report.js', // legacy
+    '!src/srp/js/return.js', // legacy
+    '!src/srp/js/toast*.js'
   ])
   .pipe(jshint())
   .pipe(jshint.reporter('default'))
@@ -67,7 +69,7 @@ gulp.task('styles', function() {
 });
 
 gulp.task('compile',
-  gulp.series(/*'test',*/ 'scripts', 'styles')
+  gulp.series('lint', 'scripts', 'styles')
 );
 
 gulp.task('server', function(done) {

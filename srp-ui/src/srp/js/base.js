@@ -13,15 +13,276 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *******************************************************************************/
-var EASING_DURATION = 500;
-fadeOutMessages = true;
-var newLineRegEx = /\n/g;
 
+/* Object extensions */
+
+Array.prototype.clean = function(deleteValue) {
+  for (var i = 0; i < this.length; i++) {
+    if (this[i] == deleteValue) {
+      this.splice(i, 1);
+      i--;
+    }
+  }
+  return this;
+};
+
+/**
+ * @return The first array element whose 'k' field equals 'v'.
+ */
+Array.prototype.findBy = function(k,v,arr) {
+  for (var idx in arr) {
+    if (arr[idx][k]==v) return arr[idx];
+    else if ('selfRef'==k && arr[idx][k] != undefined && arr[idx][k].endsWith(v)) return arr[idx];
+  }
+};
+
+/**
+ * @return All  array elements whose 'k' field equals 'v'.
+ */
+Array.prototype.findAll = function(k,v,arr) {
+  var retArr = [];
+  for (var idx in arr) {
+    if (arr[idx][k]==v) retArr.push(arr[idx]);
+    else if ('selfRef'==k && arr[idx][k] != undefined && arr[idx][k].endsWith(v)) return retArr.push(arr[idx]);
+  }
+  return retArr;
+};
+Array.prototype.uniq = function() {
+  return this.sort().filter(function(el,i,a){if(i==a.indexOf(el))return 1;return 0;});
+};
+/******************************** Polyfills **********************************/
+// ref https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/String/endsWith
+if (!String.prototype.endsWith) {
+  String.prototype.endsWith = function(searchString, position) {
+      var subjectString = this.toString();
+      if (typeof position !== 'number' || !isFinite(position) || Math.floor(position) !== position || position > subjectString.length) {
+        position = subjectString.length;
+      }
+      position -= searchString.length;
+      var lastIdx = subjectString.indexOf(searchString, position);
+      return lastIdx !== -1 && lastIdx === position;
+  };
+}
+
+function parseDateIEPolyFill(timeString) {
+  var start = timeString.substring(0,timeString.indexOf('.'));
+  var offset;
+  if (timeString.indexOf('-',timeString.indexOf('T'))!=-1) {
+    offset = timeString.substr(timeString.indexOf('-',timeString.indexOf('T')),3)+':'+timeString.substr(timeString.indexOf('-',timeString.indexOf('T'))+3,2);
+  } else if (timeString.indexOf('+')!=-1) {
+    offset = timeString.substr(timeString.indexOf('+'),3)+':'+timeString.substr(timeString.indexOf('+')+3,2);
+  }
+  return new Date(Date.parse(start+offset));
+}
+
+/************************************************************
+ * MD5 (Message-Digest Algorithm) http://www.webtoolkit.info/
+ ***********************************************************/
+function md5(string) {
+ function RotateLeft(lValue, iShiftBits) {
+ return (lValue<<iShiftBits) | (lValue>>>(32-iShiftBits));
+ }
+
+ function AddUnsigned(lX,lY) {
+ var lX4,lY4,lX8,lY8,lResult;
+ lX8 = (lX & 0x80000000);
+ lY8 = (lY & 0x80000000);
+ lX4 = (lX & 0x40000000);
+ lY4 = (lY & 0x40000000);
+ lResult = (lX & 0x3FFFFFFF)+(lY & 0x3FFFFFFF);
+ if (lX4 & lY4) {
+ return (lResult ^ 0x80000000 ^ lX8 ^ lY8);
+ }
+ if (lX4 | lY4) {
+ if (lResult & 0x40000000) {
+ return (lResult ^ 0xC0000000 ^ lX8 ^ lY8);
+ } else {
+ return (lResult ^ 0x40000000 ^ lX8 ^ lY8);
+ }
+ } else {
+ return (lResult ^ lX8 ^ lY8);
+ }
+ }
+
+ function F(x,y,z) { return (x & y) | ((~x) & z); }
+ function G(x,y,z) { return (x & z) | (y & (~z)); }
+ function H(x,y,z) { return (x ^ y ^ z); }
+ function I(x,y,z) { return (y ^ (x | (~z))); }
+
+ function FF(a,b,c,d,x,s,ac) {
+ a = AddUnsigned(a, AddUnsigned(AddUnsigned(F(b, c, d), x), ac));
+ return AddUnsigned(RotateLeft(a, s), b);
+ }
+
+ function GG(a,b,c,d,x,s,ac) {
+ a = AddUnsigned(a, AddUnsigned(AddUnsigned(G(b, c, d), x), ac));
+ return AddUnsigned(RotateLeft(a, s), b);
+ }
+
+ function HH(a,b,c,d,x,s,ac) {
+ a = AddUnsigned(a, AddUnsigned(AddUnsigned(H(b, c, d), x), ac));
+ return AddUnsigned(RotateLeft(a, s), b);
+ }
+
+ function II(a,b,c,d,x,s,ac) {
+ a = AddUnsigned(a, AddUnsigned(AddUnsigned(I(b, c, d), x), ac));
+ return AddUnsigned(RotateLeft(a, s), b);
+ }
+
+ function ConvertToWordArray(string) {
+ var lWordCount;
+ var lMessageLength = string.length;
+ var lNumberOfWords_temp1=lMessageLength + 8;
+ var lNumberOfWords_temp2=(lNumberOfWords_temp1-(lNumberOfWords_temp1 % 64))/64;
+ var lNumberOfWords = (lNumberOfWords_temp2+1)*16;
+ var lWordArray=Array(lNumberOfWords-1);
+ var lBytePosition = 0;
+ var lByteCount = 0;
+ while ( lByteCount < lMessageLength ) {
+ lWordCount = (lByteCount-(lByteCount % 4))/4;
+ lBytePosition = (lByteCount % 4)*8;
+ lWordArray[lWordCount] = (lWordArray[lWordCount] | (string.charCodeAt(lByteCount)<<lBytePosition));
+ lByteCount++;
+ }
+ lWordCount = (lByteCount-(lByteCount % 4))/4;
+ lBytePosition = (lByteCount % 4)*8;
+ lWordArray[lWordCount] = lWordArray[lWordCount] | (0x80<<lBytePosition);
+ lWordArray[lNumberOfWords-2] = lMessageLength<<3;
+ lWordArray[lNumberOfWords-1] = lMessageLength>>>29;
+ return lWordArray;
+ }
+
+ function WordToHex(lValue) {
+ var WordToHexValue='',WordToHexValue_temp='',lByte,lCount;
+ for (lCount = 0;lCount<=3;lCount++) {
+ lByte = (lValue>>>(lCount*8)) & 255;
+ WordToHexValue_temp = '0' + lByte.toString(16);
+ WordToHexValue = WordToHexValue + WordToHexValue_temp.substr(WordToHexValue_temp.length-2,2);
+ }
+ return WordToHexValue;
+ }
+
+ function Utf8Encode(string) {
+ string = string.replace(/\r\n/g,'\n');
+ var utftext = '';
+
+ for (var n = 0; n < string.length; n++) {
+ var c = string.charCodeAt(n);
+
+ if (c < 128) {
+ utftext += String.fromCharCode(c);
+ }
+ else if((c > 127) && (c < 2048)) {
+ utftext += String.fromCharCode((c >> 6) | 192);
+ utftext += String.fromCharCode((c & 63) | 128);
+ }
+ else {
+ utftext += String.fromCharCode((c >> 12) | 224);
+ utftext += String.fromCharCode(((c >> 6) & 63) | 128);
+ utftext += String.fromCharCode((c & 63) | 128);
+ }
+ }
+
+ return utftext;
+ }
+
+ var x=Array();
+ var k,AA,BB,CC,DD,a,b,c,d;
+ var S11=7, S12=12, S13=17, S14=22;
+ var S21=5, S22=9 , S23=14, S24=20;
+ var S31=4, S32=11, S33=16, S34=23;
+ var S41=6, S42=10, S43=15, S44=21;
+
+ string = Utf8Encode(string);
+
+ x = ConvertToWordArray(string);
+
+ a = 0x67452301; b = 0xEFCDAB89; c = 0x98BADCFE; d = 0x10325476;
+
+ for (k=0;k<x.length;k+=16) {
+ AA=a; BB=b; CC=c; DD=d;
+ a=FF(a,b,c,d,x[k+0], S11,0xD76AA478);
+ d=FF(d,a,b,c,x[k+1], S12,0xE8C7B756);
+ c=FF(c,d,a,b,x[k+2], S13,0x242070DB);
+ b=FF(b,c,d,a,x[k+3], S14,0xC1BDCEEE);
+ a=FF(a,b,c,d,x[k+4], S11,0xF57C0FAF);
+ d=FF(d,a,b,c,x[k+5], S12,0x4787C62A);
+ c=FF(c,d,a,b,x[k+6], S13,0xA8304613);
+ b=FF(b,c,d,a,x[k+7], S14,0xFD469501);
+ a=FF(a,b,c,d,x[k+8], S11,0x698098D8);
+ d=FF(d,a,b,c,x[k+9], S12,0x8B44F7AF);
+ c=FF(c,d,a,b,x[k+10],S13,0xFFFF5BB1);
+ b=FF(b,c,d,a,x[k+11],S14,0x895CD7BE);
+ a=FF(a,b,c,d,x[k+12],S11,0x6B901122);
+ d=FF(d,a,b,c,x[k+13],S12,0xFD987193);
+ c=FF(c,d,a,b,x[k+14],S13,0xA679438E);
+ b=FF(b,c,d,a,x[k+15],S14,0x49B40821);
+ a=GG(a,b,c,d,x[k+1], S21,0xF61E2562);
+ d=GG(d,a,b,c,x[k+6], S22,0xC040B340);
+ c=GG(c,d,a,b,x[k+11],S23,0x265E5A51);
+ b=GG(b,c,d,a,x[k+0], S24,0xE9B6C7AA);
+ a=GG(a,b,c,d,x[k+5], S21,0xD62F105D);
+ d=GG(d,a,b,c,x[k+10],S22,0x2441453);
+ c=GG(c,d,a,b,x[k+15],S23,0xD8A1E681);
+ b=GG(b,c,d,a,x[k+4], S24,0xE7D3FBC8);
+ a=GG(a,b,c,d,x[k+9], S21,0x21E1CDE6);
+ d=GG(d,a,b,c,x[k+14],S22,0xC33707D6);
+ c=GG(c,d,a,b,x[k+3], S23,0xF4D50D87);
+ b=GG(b,c,d,a,x[k+8], S24,0x455A14ED);
+ a=GG(a,b,c,d,x[k+13],S21,0xA9E3E905);
+ d=GG(d,a,b,c,x[k+2], S22,0xFCEFA3F8);
+ c=GG(c,d,a,b,x[k+7], S23,0x676F02D9);
+ b=GG(b,c,d,a,x[k+12],S24,0x8D2A4C8A);
+ a=HH(a,b,c,d,x[k+5], S31,0xFFFA3942);
+ d=HH(d,a,b,c,x[k+8], S32,0x8771F681);
+ c=HH(c,d,a,b,x[k+11],S33,0x6D9D6122);
+ b=HH(b,c,d,a,x[k+14],S34,0xFDE5380C);
+ a=HH(a,b,c,d,x[k+1], S31,0xA4BEEA44);
+ d=HH(d,a,b,c,x[k+4], S32,0x4BDECFA9);
+ c=HH(c,d,a,b,x[k+7], S33,0xF6BB4B60);
+ b=HH(b,c,d,a,x[k+10],S34,0xBEBFBC70);
+ a=HH(a,b,c,d,x[k+13],S31,0x289B7EC6);
+ d=HH(d,a,b,c,x[k+0], S32,0xEAA127FA);
+ c=HH(c,d,a,b,x[k+3], S33,0xD4EF3085);
+ b=HH(b,c,d,a,x[k+6], S34,0x4881D05);
+ a=HH(a,b,c,d,x[k+9], S31,0xD9D4D039);
+ d=HH(d,a,b,c,x[k+12],S32,0xE6DB99E5);
+ c=HH(c,d,a,b,x[k+15],S33,0x1FA27CF8);
+ b=HH(b,c,d,a,x[k+2], S34,0xC4AC5665);
+ a=II(a,b,c,d,x[k+0], S41,0xF4292244);
+ d=II(d,a,b,c,x[k+7], S42,0x432AFF97);
+ c=II(c,d,a,b,x[k+14],S43,0xAB9423A7);
+ b=II(b,c,d,a,x[k+5], S44,0xFC93A039);
+ a=II(a,b,c,d,x[k+12],S41,0x655B59C3);
+ d=II(d,a,b,c,x[k+3], S42,0x8F0CCC92);
+ c=II(c,d,a,b,x[k+10],S43,0xFFEFF47D);
+ b=II(b,c,d,a,x[k+1], S44,0x85845DD1);
+ a=II(a,b,c,d,x[k+8], S41,0x6FA87E4F);
+ d=II(d,a,b,c,x[k+15],S42,0xFE2CE6E0);
+ c=II(c,d,a,b,x[k+6], S43,0xA3014314);
+ b=II(b,c,d,a,x[k+13],S44,0x4E0811A1);
+ a=II(a,b,c,d,x[k+4], S41,0xF7537E82);
+ d=II(d,a,b,c,x[k+11],S42,0xBD3AF235);
+ c=II(c,d,a,b,x[k+2], S43,0x2AD7D2BB);
+ b=II(b,c,d,a,x[k+9], S44,0xEB86D391);
+ a=AddUnsigned(a,AA);
+ b=AddUnsigned(b,BB);
+ c=AddUnsigned(c,CC);
+ d=AddUnsigned(d,DD);
+ }
+
+ var temp = WordToHex(a)+WordToHex(b)+WordToHex(c)+WordToHex(d);
+
+ return temp.toLowerCase();
+}
+
+var EASING_DURATION = 500;
+var fadeOutMessages = true;
 
 /**
  * Extends Ractive to handle offers some standard controls and a re-branding mechanism.
  */
-var BaseRactive = Ractive.extend({
+var BaseRactive = Ractive.extend({ // jshint ignore:line
   CSRF_TOKEN: 'XSRF-TOKEN',
   srp: new SrpClient({
     server: $env.server,
@@ -84,26 +345,13 @@ var BaseRactive = Ractive.extend({
       ractive.set('server',data.clientContext);
     });
   },
-  fetchDocs: function() {
-    $.getJSON(ractive.uri(ractive.get('current'))+'/documents',  function( data ) {
-      if (data['_embedded'] != undefined) {
-        console.log('found docs '+data);
-        ractive.merge('current.documents', data['_embedded'].documents);
-        // sort most recent first
-        ractive.get('current.documents').sort(function(a,b) { return new Date(b.created)-new Date(a.created); });
-      }
-      ractive.set('saveObserver',true);
-    });
-  },
-  fetchNotes: function() {
-    $.getJSON(ractive.uri(ractive.get('current'))+'/notes',  function( data ) {
-      if (data['_embedded'] != undefined) {
-        console.log('found notes '+data);
-        ractive.merge('current.notes', data['_embedded'].notes);
-        // sort most recent first
-        ractive.get('current.notes').sort(function(a,b) { return new Date(b.created)-new Date(a.created); });
-      }
-    });
+  filter: function(filter) {
+    console.log('filter: '+JSON.stringify(filter));
+    ractive.set('filter',filter);
+    $('.omny-dropdown.dropdown-menu li').removeClass('selected');
+    $('.omny-dropdown.dropdown-menu li:nth-child('+filter.idx+')').addClass('selected');
+    ractive.showSearchMatched();
+    $('input[type="search"]').blur();
   },
   getCookie: function(name) {
     //console.log('getCookie: '+name)
@@ -115,7 +363,7 @@ var BaseRactive = Ractive.extend({
     return ractive.getProfile().attributes[attr];
   },
   getProfile: function() {
-    var profile = localStorage['profile'];
+    var profile = localStorage.getItem('profile');
     if (profile == undefined) {
       alert('Unable to authenticate you at the moment, please try later');
       return;
@@ -159,7 +407,7 @@ var BaseRactive = Ractive.extend({
     if (this && this.get('profile')) {
       var hasRole;
       if (ractive.get('profile.groups')!= undefined) {
-        hasRole = ractive.get('profile.groups').filter(function(g) {return g.id==role});
+        hasRole = ractive.get('profile.groups').filter(function(g) { return g.id==role; });
       }
       return hasRole!=undefined && hasRole.length>0;
     }
@@ -170,6 +418,12 @@ var BaseRactive = Ractive.extend({
   },
   hideMessage: function() {
     $('#messages, .messages').hide();
+  },
+  hideResults: function() {
+    var entityName = ractive.get('entityName');
+    $('#'+entityName+'sTableToggle').addClass('kp-icon-caret-right').removeClass('kp-icon-caret-down');
+    $('#'+entityName+'sTable').slideUp();
+    $('#currentSect').slideDown({ queue: true });
   },
   hideUpload: function () {
     console.log('hideUpload...');
@@ -279,10 +533,10 @@ var BaseRactive = Ractive.extend({
       allowSpaces: true,
       placeholderText: "Comma separated tags",
       showAutocompleteOnFocus: true,
-      afterTagAdded: function(event, ui) {
+      afterTagAdded: function(event) {
         ractive.set($(event.target).data('bind'),$(event.target).val());
       },
-      afterTagRemoved: function(event, ui) {
+      afterTagRemoved: function(event) {
         ractive.set($(event.target).data('bind'),$(event.target).val());
       }
     });
@@ -311,7 +565,7 @@ var BaseRactive = Ractive.extend({
     });
   },
   loadTenantConfig: function(tenant) {
-    if (this['keycloak']===undefined && $auth.loginInProgress) {
+    if ('$auth' in window && $auth.loginInProgress) {
       console.info('skip tenant load while logging in');
       return;
     }
@@ -344,59 +598,9 @@ var BaseRactive = Ractive.extend({
     if (d == 'Invalid Date') d = parseDateIEPolyFill(timeString);
     return d;
   },
-  saveDoc: function () {
-    console.log('saveDoc '+JSON.stringify(ractive.get('current.doc'))+' ...');
-    var n = ractive.get('current.doc');
-    n.name = $('#docName').val();
-    n.url = $('#doc').val();
-    var url = ractive.uri(ractive.get('current'))+'/documents';
-    url = url.replace(ractive.entityName(ractive.get('current')),ractive.get('tenant.id')+'/'+ractive.entityName(ractive.get('current')));
-    if (n.url.trim().length > 0) {
-      $('#docsTable tr:nth-child(1)').slideUp();
-      $.ajax({
-        /*url: '/documents',
-        contentType: 'application/json',*/
-        url: url,
-        type: 'POST',
-        data: n,
-        success: completeHandler = function(data) {
-          console.log('data: '+ data);
-          ractive.showMessage('Document link saved successfully');
-          ractive.fetchDocs();
-          $('#doc').val(undefined);
-        }
-      });
-    }
-  },
-  saveNote: function () {
-    console.info('saveNote '+JSON.stringify(ractive.get('current.note'))+' ...');
-    var n = ractive.get('current.note');
-    n.content = $('#note').val();
-    var url = ractive.uri(ractive.get('current'))+'/notes';
-    url = url.replace(ractive.entityName(ractive.get('current')),ractive.get('tenant.id')+'/'+ractive.entityName(ractive.get('current')));
-    console.log('  url:'+url);
-    if (n.content.trim().length > 0) {
-      $('#notesTable tr:nth-child(1)').slideUp();
-      $.ajax({
-        /*url: '/notes',
-        contentType: 'application/json',*/
-        url: url,
-        type: 'POST',
-        data: n,
-        success: completeHandler = function(data) {
-          console.log('response: '+ data);
-          ractive.showMessage('Note saved successfully');
-          ractive.fetchNotes();
-          $('#note').val(undefined);
-        }
-      });
-    }
-  },
   showDisconnected: function(msg) {
     console.log('showDisconnected: '+msg);
-    if ($('#connectivityMessages.alert-info').length>0) {
-      ; // Due to ordering of methods, actually reconnected now
-    } else {
+    if ($('#connectivityMessages').length>0) {
       $('#connectivityMessages').remove();
       $('body').append('<div id="connectivityMessages" class="alert-warning">'+msg+'</div>').show();
     }
@@ -443,12 +647,33 @@ var BaseRactive = Ractive.extend({
       }, EASING_DURATION*10);
     }
   },
+  showResults: function() {
+    var entityName = ractive.get('entityName');
+    $('#'+entityName+'sTableToggle').addClass('kp-icon-caret-down').removeClass('kp-icon-caret-right');
+    $('#currentSect').slideUp();
+    $('#'+entityName+'sTable').slideDown({ queue: true });
+  },
+  showSearchMatched: function() {
+    var entityName = ractive.get('entityName');
+    ractive.set('searchMatched',$('#'+entityName+'sTable tbody tr').length);
+    if ($('#'+entityName+'sTable tbody tr:visible').length==1) {
+      var id = $('#'+entityName+'sTable tbody tr:visible').data('href');
+      var q = Array.findBy('selfRef',id,ractive.get(entityName+'s'));
+      ractive.select( q );
+    }
+  },
   showUpload: function () {
     console.log('showUpload...');
     $('#upload').slideDown();
   },
   showWarning: function(msg) {
     this.showMessage(msg, 'alert-warning');
+  },
+  sortRecords: function() {
+    var entityName = ractive.get('entityName');
+    ractive.get(entityName+'s').sort(function(a,b) {
+      return new Date(b.lastUpdated)-new Date(a.lastUpdated);
+    });
   },
   stripProjection: function(link) {
     if (link==undefined) return;
@@ -470,14 +695,14 @@ var BaseRactive = Ractive.extend({
       return false;
     }
     console.log('switchToTenant: '+tenant);
-    var username = this['keycloak'] == undefined ? $auth.getClaim('sub') : ractive.getProfile().username;
+    var username = 'keycloak' in ractive ? $auth.getClaim('sub') : ractive.getProfile().username;
     $.ajax({
       method: 'PUT',
       url: ractive.getServer()+"/admin/tenant/"+username+'/'+tenant,
       success: function() {
         window.location.reload();
       }
-    })
+    });
   },
   tenantUri: function(entity) {
     console.log('tenantUri: '+entity);
@@ -499,10 +724,9 @@ var BaseRactive = Ractive.extend({
     // write title on first row
     csv += title + '\n\n';
 
+    var row = '';
     if (headings === undefined || headings == true) {
       // extract label from json fields in array idx 0
-      var row = '';
-
       for (var idx in arr[0]) {
           row += idx + ',';
       }
@@ -514,14 +738,15 @@ var BaseRactive = Ractive.extend({
 
     var propNames = headings.split(',');
     for (var i = 0; i < arr.length; i++) {
-        var row = '';
+        row = '';
 
         for (var j = 0 ; j < propNames.length ; j++) {
           try {
             var getNestedObject = function(nestedObj, pathArr) {
               return pathArr.reduce(function(obj, key) {
-                  (obj && obj[key] !== 'undefined') ? obj[key] : undefined, nestedObj});
-            }
+                (obj && obj[key] !== 'undefined') ? obj[key] : undefined, nestedObj;// jshint ignore:line
+              });
+            };
             var val = getNestedObject(arr[i], propNames[j].split('.'));
             row += '"' + (val == undefined ? '' : val) + '",';
           } catch (err) {
@@ -562,6 +787,12 @@ var BaseRactive = Ractive.extend({
     link.click();
     document.body.removeChild(link);
   },
+  toggleResults: function() {
+    console.info('toggleResults');
+    var entityName = ractive.get('entityName');
+    $('#'+entityName+'sTableToggle').toggleClass('kp-icon-caret-down').toggleClass('kp-icon-caret-right');
+    $('#'+entityName+'sTable').slideToggle();
+  },
   toggleSection: function(sect) {
     console.info('toggleSection: '+$(sect).attr('id'));
     $('#'+$(sect).attr('id')+'>div').toggle();
@@ -586,7 +817,7 @@ var BaseRactive = Ractive.extend({
         cache: false,
         contentType: false,
         processData: false,
-        success: function(response) {
+        success: function() {
           console.log('successfully uploaded resource');
           ractive.fetch();
           ractive.hideUpload();
@@ -599,15 +830,15 @@ var BaseRactive = Ractive.extend({
     var saveObserver = ractive.get('saveObserver');
     ractive.set('saveObserver', false);
     var uri;
-    if (entity['links']!=undefined) {
+    if ('links' in entity) {
       $.each(entity.links, function(i,d) {
         if (d.rel == 'self') {
           uri = d.href;
         }
       });
-    } else if (entity['_links']!=undefined) {
+    } else if ('_links' in entity) {
       uri = ractive.stripProjection(entity._links.self.href);
-    } else if (entity['id']!=undefined) {
+    } else if ('id' in entity) {
       uri = ractive.get('entityPath')+'/'+entity.id;
     }
     // work around for sub-dir running
@@ -629,7 +860,7 @@ var BaseRactive = Ractive.extend({
 $( document ).bind('keypress', function(e) {
   switch (e.keyCode) {
   case 13: // Enter key
-    if (window['ractive'] && ractive['enter']) ractive['enter']();
+    if ('ractive' in window && 'enter' in ractive) ractive.enter();
     break;
   case 63:   // ? key
     console.log('help requested');
@@ -645,9 +876,9 @@ $(document).ready(function() {
     ractive.keycloak.init({ onLoad: 'login-required' })
     .then(function(authenticated) {
       console.info(authenticated ? 'authenticated' : 'not authenticated');
-      if (ractive['srp'] != undefined) ractive.srp.options.token = ractive.keycloak.token;
+      if ('srp' in ractive) ractive.srp.options.token = ractive.keycloak.token;
       ractive.keycloak.loadUserProfile().then(function(profile) {
-        localStorage['profile'] = JSON.stringify(profile);
+        localStorage.setItem('profile', JSON.stringify(profile));
         ractive.getProfile();
         ractive.fetch();
       }).catch(function(e) {
@@ -663,10 +894,10 @@ $(document).ready(function() {
   ractive.set('saveObserver', false);
   if (document.location.href.indexOf('https://srp.digital/srp')!=-1) {
     (function() {
-      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-      })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){// jshint ignore:line
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),// jshint ignore:line
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)// jshint ignore:line
+      })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');// jshint ignore:line
 
       ga('create', 'UA-39960834-3', 'auto');
       ga('send', 'pageview');
@@ -684,15 +915,20 @@ $(document).ready(function() {
 
   ractive.loadStandardPartials(ractive.get('stdPartials'));
 
-  $( document ).ajaxComplete(function( event, jqXHR, ajaxOptions ) {
-    if (jqXHR.status > 0) ractive.showReconnected();
+  $( document ).ajaxComplete(function(event, jqXHR) {
+    if (jqXHR.status > 0 && jqXHR < 400) ractive.showReconnected();
   });
 
   ractive.observe('tenant', function(newValue, oldValue, keypath) {
-    console.log('tenant changed');
-    if ((oldValue == undefined || oldValue.id == '') && newValue != undefined && newValue.id != '' && ractive['fetch'] != undefined) {
+    console.log("'"+keypath+"' changing from '"+oldValue+"' to '"+newValue+"'");
+    if ((oldValue == undefined || oldValue.id == '') && newValue != undefined && newValue.id != '' && 'fetch' in ractive) {
       ractive.fetch();
     }
+  });
+
+  ractive.on( 'filter', function ( event, filter ) {
+    console.info('filter on '+JSON.stringify(event)+','+filter.idx);
+    ractive.filter(filter);
   });
 
   ractive.on( 'sort', function ( event, column ) {
@@ -703,35 +939,27 @@ $(document).ready(function() {
   });
 
   ractive.observe('title', function(newValue, oldValue, keypath) {
-    console.log('title changing from '+oldValue+' to '+newValue);
+    console.log("'"+keypath+"' changing from '"+oldValue+"' to '"+newValue+"'");
     if (newValue!=undefined && newValue!='') {
       $('title').empty().append(newValue);
     }
   });
 
   ractive.observe('searchTerm', function(newValue, oldValue, keypath) {
-    console.log('searchTerm changed');
-    if (typeof ractive['showResults'] == 'function') ractive.showResults();
+    console.log("'"+keypath+"' changed from '"+oldValue+"' to '"+newValue+"'");
+    if ('showResults' in ractive && typeof ractive.showResults === 'function') ractive.showResults();
     setTimeout(ractive.showSearchMatched, 1000);
   });
 
   var params = getSearchParameters();
-  if (params['searchTerm']!=undefined) {
-    ractive.set('searchTerm',decodeURIComponent(params['searchTerm']));
-  } else if (params['q']!=undefined) {
-    ractive.set('searchTerm',decodeURIComponent(params['q']));
+  if ('searchTerm' in params) {
+    ractive.set('searchTerm',decodeURIComponent(params.searchTerm));
+  } else if ('q' in params) {
+    ractive.set('searchTerm',decodeURIComponent(params.q));
   }
 
   ractive.set('saveObserver', true);
 });
-
-// TODO remove the redundancy of having this in base Ractive and here
-function getCookie(name) {
-  //console.log('getCookie: '+name)
-  var value = "; " + document.cookie;
-  var parts = value.split("; " + name + "=");
-  if (parts.length == 2) return parts.pop().split(";").shift();
-}
 
 function selectElementContents(el) {
   var range = document.createRange();
@@ -739,6 +967,11 @@ function selectElementContents(el) {
   var sel = window.getSelection();
   sel.removeAllRanges();
   sel.addRange(range);
+}
+
+function getSearchParameter(k) { // jshint ignore:line
+  var params = getSearchParameters();
+  return k in params ? params[k] : undefined;
 }
 
 function getSearchParameters() {
@@ -755,265 +988,3 @@ function transformToAssocArray( prmstr ) {
   }
   return params;
 }
-
-/* Object extensions */
-
-Array.prototype.clean = function(deleteValue) {
-  for (var i = 0; i < this.length; i++) {
-    if (this[i] == deleteValue) {
-      this.splice(i, 1);
-      i--;
-    }
-  }
-  return this;
-};
-
-/**
- * @return The first array element whose 'k' field equals 'v'.
- */
-Array.prototype.findBy = function(k,v,arr) {
-  for (idx in arr) {
-    if (arr[idx][k]==v) return arr[idx];
-    else if ('selfRef'==k && arr[idx][k] != undefined && arr[idx][k].endsWith(v)) return arr[idx];
-  }
-}
-/**
- * @return All  array elements whose 'k' field equals 'v'.
- */
-Array.prototype.findAll = function(k,v,arr) {
-  var retArr = [];
-  for (idx in arr) {
-    if (arr[idx][k]==v) retArr.push(arr[idx]);
-    else if ('selfRef'==k && arr[idx][k] != undefined && arr[idx][k].endsWith(v)) return retArr.push(arr[idx]);
-  }
-  return retArr;
-}
-Array.prototype.uniq = function() {
-  return this.sort().filter(function(el,i,a){if(i==a.indexOf(el))return 1;return 0});
-}
-/******************************** Polyfills **********************************/
-// ref https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/String/endsWith
-if (!String.prototype.endsWith) {
-  String.prototype.endsWith = function(searchString, position) {
-      var subjectString = this.toString();
-      if (typeof position !== 'number' || !isFinite(position) || Math.floor(position) !== position || position > subjectString.length) {
-        position = subjectString.length;
-      }
-      position -= searchString.length;
-      var lastIdx = subjectString.indexOf(searchString, position);
-      return lastIdx !== -1 && lastIdx === position;
-  };
-}
-
-function parseDateIEPolyFill(timeString) {
-  var start = timeString.substring(0,timeString.indexOf('.'));
-  var offset;
-  if (timeString.indexOf('-',timeString.indexOf('T'))!=-1) {
-    offset = timeString.substr(timeString.indexOf('-',timeString.indexOf('T')),3)+':'+timeString.substr(timeString.indexOf('-',timeString.indexOf('T'))+3,2);
-  } else if (timeString.indexOf('+')!=-1) {
-    offset = timeString.substr(timeString.indexOf('+'),3)+':'+timeString.substr(timeString.indexOf('+')+3,2);
-  }
-  return new Date(Date.parse(start+offset));
-}
-
-/************************************************************
- * MD5 (Message-Digest Algorithm) http://www.webtoolkit.info/
- ***********************************************************/
-function md5(string) {
- function RotateLeft(lValue, iShiftBits) {
- return (lValue<<iShiftBits) | (lValue>>>(32-iShiftBits));
- }
-
- function AddUnsigned(lX,lY) {
- var lX4,lY4,lX8,lY8,lResult;
- lX8 = (lX & 0x80000000);
- lY8 = (lY & 0x80000000);
- lX4 = (lX & 0x40000000);
- lY4 = (lY & 0x40000000);
- lResult = (lX & 0x3FFFFFFF)+(lY & 0x3FFFFFFF);
- if (lX4 & lY4) {
- return (lResult ^ 0x80000000 ^ lX8 ^ lY8);
- }
- if (lX4 | lY4) {
- if (lResult & 0x40000000) {
- return (lResult ^ 0xC0000000 ^ lX8 ^ lY8);
- } else {
- return (lResult ^ 0x40000000 ^ lX8 ^ lY8);
- }
- } else {
- return (lResult ^ lX8 ^ lY8);
- }
- }
-
- function F(x,y,z) { return (x & y) | ((~x) & z); }
- function G(x,y,z) { return (x & z) | (y & (~z)); }
- function H(x,y,z) { return (x ^ y ^ z); }
- function I(x,y,z) { return (y ^ (x | (~z))); }
-
- function FF(a,b,c,d,x,s,ac) {
- a = AddUnsigned(a, AddUnsigned(AddUnsigned(F(b, c, d), x), ac));
- return AddUnsigned(RotateLeft(a, s), b);
- };
-
- function GG(a,b,c,d,x,s,ac) {
- a = AddUnsigned(a, AddUnsigned(AddUnsigned(G(b, c, d), x), ac));
- return AddUnsigned(RotateLeft(a, s), b);
- };
-
- function HH(a,b,c,d,x,s,ac) {
- a = AddUnsigned(a, AddUnsigned(AddUnsigned(H(b, c, d), x), ac));
- return AddUnsigned(RotateLeft(a, s), b);
- };
-
- function II(a,b,c,d,x,s,ac) {
- a = AddUnsigned(a, AddUnsigned(AddUnsigned(I(b, c, d), x), ac));
- return AddUnsigned(RotateLeft(a, s), b);
- };
-
- function ConvertToWordArray(string) {
- var lWordCount;
- var lMessageLength = string.length;
- var lNumberOfWords_temp1=lMessageLength + 8;
- var lNumberOfWords_temp2=(lNumberOfWords_temp1-(lNumberOfWords_temp1 % 64))/64;
- var lNumberOfWords = (lNumberOfWords_temp2+1)*16;
- var lWordArray=Array(lNumberOfWords-1);
- var lBytePosition = 0;
- var lByteCount = 0;
- while ( lByteCount < lMessageLength ) {
- lWordCount = (lByteCount-(lByteCount % 4))/4;
- lBytePosition = (lByteCount % 4)*8;
- lWordArray[lWordCount] = (lWordArray[lWordCount] | (string.charCodeAt(lByteCount)<<lBytePosition));
- lByteCount++;
- }
- lWordCount = (lByteCount-(lByteCount % 4))/4;
- lBytePosition = (lByteCount % 4)*8;
- lWordArray[lWordCount] = lWordArray[lWordCount] | (0x80<<lBytePosition);
- lWordArray[lNumberOfWords-2] = lMessageLength<<3;
- lWordArray[lNumberOfWords-1] = lMessageLength>>>29;
- return lWordArray;
- };
-
- function WordToHex(lValue) {
- var WordToHexValue='',WordToHexValue_temp='',lByte,lCount;
- for (lCount = 0;lCount<=3;lCount++) {
- lByte = (lValue>>>(lCount*8)) & 255;
- WordToHexValue_temp = '0' + lByte.toString(16);
- WordToHexValue = WordToHexValue + WordToHexValue_temp.substr(WordToHexValue_temp.length-2,2);
- }
- return WordToHexValue;
- };
-
- function Utf8Encode(string) {
- string = string.replace(/\r\n/g,'\n');
- var utftext = '';
-
- for (var n = 0; n < string.length; n++) {
- var c = string.charCodeAt(n);
-
- if (c < 128) {
- utftext += String.fromCharCode(c);
- }
- else if((c > 127) && (c < 2048)) {
- utftext += String.fromCharCode((c >> 6) | 192);
- utftext += String.fromCharCode((c & 63) | 128);
- }
- else {
- utftext += String.fromCharCode((c >> 12) | 224);
- utftext += String.fromCharCode(((c >> 6) & 63) | 128);
- utftext += String.fromCharCode((c & 63) | 128);
- }
- }
-
- return utftext;
- };
-
- var x=Array();
- var k,AA,BB,CC,DD,a,b,c,d;
- var S11=7, S12=12, S13=17, S14=22;
- var S21=5, S22=9 , S23=14, S24=20;
- var S31=4, S32=11, S33=16, S34=23;
- var S41=6, S42=10, S43=15, S44=21;
-
- string = Utf8Encode(string);
-
- x = ConvertToWordArray(string);
-
- a = 0x67452301; b = 0xEFCDAB89; c = 0x98BADCFE; d = 0x10325476;
-
- for (k=0;k<x.length;k+=16) {
- AA=a; BB=b; CC=c; DD=d;
- a=FF(a,b,c,d,x[k+0], S11,0xD76AA478);
- d=FF(d,a,b,c,x[k+1], S12,0xE8C7B756);
- c=FF(c,d,a,b,x[k+2], S13,0x242070DB);
- b=FF(b,c,d,a,x[k+3], S14,0xC1BDCEEE);
- a=FF(a,b,c,d,x[k+4], S11,0xF57C0FAF);
- d=FF(d,a,b,c,x[k+5], S12,0x4787C62A);
- c=FF(c,d,a,b,x[k+6], S13,0xA8304613);
- b=FF(b,c,d,a,x[k+7], S14,0xFD469501);
- a=FF(a,b,c,d,x[k+8], S11,0x698098D8);
- d=FF(d,a,b,c,x[k+9], S12,0x8B44F7AF);
- c=FF(c,d,a,b,x[k+10],S13,0xFFFF5BB1);
- b=FF(b,c,d,a,x[k+11],S14,0x895CD7BE);
- a=FF(a,b,c,d,x[k+12],S11,0x6B901122);
- d=FF(d,a,b,c,x[k+13],S12,0xFD987193);
- c=FF(c,d,a,b,x[k+14],S13,0xA679438E);
- b=FF(b,c,d,a,x[k+15],S14,0x49B40821);
- a=GG(a,b,c,d,x[k+1], S21,0xF61E2562);
- d=GG(d,a,b,c,x[k+6], S22,0xC040B340);
- c=GG(c,d,a,b,x[k+11],S23,0x265E5A51);
- b=GG(b,c,d,a,x[k+0], S24,0xE9B6C7AA);
- a=GG(a,b,c,d,x[k+5], S21,0xD62F105D);
- d=GG(d,a,b,c,x[k+10],S22,0x2441453);
- c=GG(c,d,a,b,x[k+15],S23,0xD8A1E681);
- b=GG(b,c,d,a,x[k+4], S24,0xE7D3FBC8);
- a=GG(a,b,c,d,x[k+9], S21,0x21E1CDE6);
- d=GG(d,a,b,c,x[k+14],S22,0xC33707D6);
- c=GG(c,d,a,b,x[k+3], S23,0xF4D50D87);
- b=GG(b,c,d,a,x[k+8], S24,0x455A14ED);
- a=GG(a,b,c,d,x[k+13],S21,0xA9E3E905);
- d=GG(d,a,b,c,x[k+2], S22,0xFCEFA3F8);
- c=GG(c,d,a,b,x[k+7], S23,0x676F02D9);
- b=GG(b,c,d,a,x[k+12],S24,0x8D2A4C8A);
- a=HH(a,b,c,d,x[k+5], S31,0xFFFA3942);
- d=HH(d,a,b,c,x[k+8], S32,0x8771F681);
- c=HH(c,d,a,b,x[k+11],S33,0x6D9D6122);
- b=HH(b,c,d,a,x[k+14],S34,0xFDE5380C);
- a=HH(a,b,c,d,x[k+1], S31,0xA4BEEA44);
- d=HH(d,a,b,c,x[k+4], S32,0x4BDECFA9);
- c=HH(c,d,a,b,x[k+7], S33,0xF6BB4B60);
- b=HH(b,c,d,a,x[k+10],S34,0xBEBFBC70);
- a=HH(a,b,c,d,x[k+13],S31,0x289B7EC6);
- d=HH(d,a,b,c,x[k+0], S32,0xEAA127FA);
- c=HH(c,d,a,b,x[k+3], S33,0xD4EF3085);
- b=HH(b,c,d,a,x[k+6], S34,0x4881D05);
- a=HH(a,b,c,d,x[k+9], S31,0xD9D4D039);
- d=HH(d,a,b,c,x[k+12],S32,0xE6DB99E5);
- c=HH(c,d,a,b,x[k+15],S33,0x1FA27CF8);
- b=HH(b,c,d,a,x[k+2], S34,0xC4AC5665);
- a=II(a,b,c,d,x[k+0], S41,0xF4292244);
- d=II(d,a,b,c,x[k+7], S42,0x432AFF97);
- c=II(c,d,a,b,x[k+14],S43,0xAB9423A7);
- b=II(b,c,d,a,x[k+5], S44,0xFC93A039);
- a=II(a,b,c,d,x[k+12],S41,0x655B59C3);
- d=II(d,a,b,c,x[k+3], S42,0x8F0CCC92);
- c=II(c,d,a,b,x[k+10],S43,0xFFEFF47D);
- b=II(b,c,d,a,x[k+1], S44,0x85845DD1);
- a=II(a,b,c,d,x[k+8], S41,0x6FA87E4F);
- d=II(d,a,b,c,x[k+15],S42,0xFE2CE6E0);
- c=II(c,d,a,b,x[k+6], S43,0xA3014314);
- b=II(b,c,d,a,x[k+13],S44,0x4E0811A1);
- a=II(a,b,c,d,x[k+4], S41,0xF7537E82);
- d=II(d,a,b,c,x[k+11],S42,0xBD3AF235);
- c=II(c,d,a,b,x[k+2], S43,0x2AD7D2BB);
- b=II(b,c,d,a,x[k+9], S44,0xEB86D391);
- a=AddUnsigned(a,AA);
- b=AddUnsigned(b,BB);
- c=AddUnsigned(c,CC);
- d=AddUnsigned(d,DD);
- }
-
- var temp = WordToHex(a)+WordToHex(b)+WordToHex(c)+WordToHex(d);
-
- return temp.toLowerCase();
-}
-

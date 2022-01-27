@@ -1,3 +1,18 @@
+/*******************************************************************************
+ * Copyright 2015-2020 Tim Stephenson and contributors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ ******************************************************************************/
 var $r = (function ($, ractive) {
   var me = {
     dirty: false,
@@ -6,21 +21,16 @@ var $r = (function ($, ractive) {
     }),
     rtn: undefined
   };
-  // var _org = 'RDR';
   var _isCcg = false;
   var _isIE = false;
   var _orgType;
   var _server = $env.server;
-  //var _server = 'http://localhost:8083';
   var _survey;
   var _surveyPeriod = '2020-21'; // TODO read system param
   var _now = new Date();
-  var _period = getSearchParameters()['p'] == undefined
-      ? _surveyPeriod
-      : getSearchParameters()['p'];
-  var _surveyName = getSearchParameters()['s'] == undefined
-      ? 'SDU-'+_period
-      : getSearchParameters()['s'];
+  var _params = getSearchParameters();
+  var _period = 'p' in _params ? _surveyPeriod : _params.p;
+  var _surveyName = 's' in _params ? 'SDU'+_period : _params.s;
 
   function _bindLists() {
     if ($('#ORG_NAME')!=undefined && $('#ORG_NAME[list]').length!=0) $('#ORG_NAME').attr('list','orgs');
@@ -34,9 +44,9 @@ var $r = (function ($, ractive) {
   function _disableHeadSections() {
     console.info('disableHeadSections');
     if ($('#Organisation h3 .title').length==0) {
-      $('#Organisation h3').wrapInner('<span class="title"></span>').append(' - <em>Please enter these details only for the current year</em>')
-      $('#Policy h3').wrapInner('<span class="title"></span>').append(' - <em>Please enter these details only for the current year</em>')
-      $('#Performance h3').wrapInner('<span class="title"></span>').append(' - <em>Please enter these details only for the current year</em>')
+      $('#Organisation h3').wrapInner('<span class="title"></span>').append(' - <em>Please enter these details only for the current year</em>');
+      $('#Policy h3').wrapInner('<span class="title"></span>').append(' - <em>Please enter these details only for the current year</em>');
+      $('#Performance h3').wrapInner('<span class="title"></span>').append(' - <em>Please enter these details only for the current year</em>');
       //$('#Organisation input,#Organisation select,#Policy input,#Policy select,#Performance input,#Performance select').removeAttr('readonly').removeAttr('disabled');
       $('#Organisation ol,#Policy ol,#Performance ol').hide();
     }
@@ -63,8 +73,8 @@ var $r = (function ($, ractive) {
       _bindLists();
     });
     me.srp.fetchOrgTypes('sdu')
-    .then(response => response.json())
-    .then(data => {
+    .then(function(response) { return response.json(); })
+    .then(function(data) {
       ractive.set('orgTypes', data);
       _bindLists();
     });
@@ -81,11 +91,11 @@ var $r = (function ($, ractive) {
     }
 
     me.srp.fetchReturn(_surveyName, $r.getProfileAttribute('org'))
-        .then(response => response.json())
-        .then(data => {
+        .then(function(response) { return response.json(); })
+        .then(function(data) {
           me.rtn = data;
           if (_survey!=undefined) _fill(_survey);
-        })
+        });
   }
 
   function _fill(survey) {
@@ -93,9 +103,9 @@ var $r = (function ($, ractive) {
     if ($r.rtn.status != 'Draft') {
       ractive.showError('This return has been submitted and cannot be changed. If you detect a problem you may create a new version from the report pages');
     }
-    for(i in survey.categories) {
+    for(var i in survey.categories) {
 
-      for(j in survey.categories[i].questions) {
+      for(var j in survey.categories[i].questions) {
         console.log('  fill: '+survey.categories[i].questions[j].name);
 
         // reset question
@@ -103,12 +113,13 @@ var $r = (function ($, ractive) {
         $('#'+survey.categories[i].questions[j].name).removeAttr('readonly').removeAttr('disabled');
 
         // fill answer
-        for (k in me.rtn.answers) {
+        for (var k in me.rtn.answers) {
           if (_period != me.rtn.answers[k].applicablePeriod) continue;
           if (me.rtn.answers[k].question.name==survey.categories[i].questions[j].name) {
             if (me.rtn.answers[k].question.type=='checkbox' && typeof me.rtn.answers[k].response == 'string') {
               me.rtn.answers[k].response = me.rtn.answers[k].response.split(',');
             }
+            var idx = 0;
             switch (me.rtn.answers[k].question.name) {
             // special handling for organisation ...
             case 'ECLASS_USER':
@@ -134,8 +145,8 @@ var $r = (function ($, ractive) {
               }
               $('#ORG_TYPE').attr('list','orgTypes');
               _orgType = me.rtn.answers[k].response;
-              if ('Submitted'==me.rtn.answers[k].status || 'Published'==me.rtn.answers[k].status
-		      || me.rtn.answers[k].response != undefined) {
+              if ('Submitted'==me.rtn.answers[k].status || 'Published'==me.rtn.answers[k].status ||
+		      me.rtn.answers[k].response != undefined) {
                 $('#'+me.rtn.answers[k].question.name).attr('readonly','readonly').attr('disabled','disabled');
               }
               ractive.addSelectOptions('#ORG_TYPE', ractive.get('orgTypes'), _orgType);
@@ -143,21 +154,21 @@ var $r = (function ($, ractive) {
             case 'PROC_SUPPLIER_SUSTAINABILITY':
               ractive.set('q.categories.'+i+'.questions.'+j+'.response', me.rtn.answers[k].response);
               if (me.rtn.answers[k].response == undefined) break;
-              for (var idx = 0 ; idx < me.rtn.answers[k].response.length ; idx++) {
+              for (idx = 0 ; idx < me.rtn.answers[k].response.length ; idx++) {
                 $('[data-id="PROC_SUPPLIER_SUSTAINABILITY"][value="'+me.rtn.answers[k].response[idx]+'"]').attr('checked','checked');
               } 
               break;
             case 'SDG_CLEAR':
               ractive.set('q.categories.'+i+'.questions.'+j+'.response', me.rtn.answers[k].response);
               if (me.rtn.answers[k].response == undefined) break;
-              for (var idx = 0 ; idx < me.rtn.answers[k].response.length ; idx++) {
+              for (idx = 0 ; idx < me.rtn.answers[k].response.length ; idx++) {
                 $('[data-id="SDG_CLEAR"][value="'+me.rtn.answers[k].response[idx]+'"]').attr('checked','checked');
               } 
               break;
             case 'SDG_STARTING':
               ractive.set('q.categories.'+i+'.questions.'+j+'.response', me.rtn.answers[k].response);
               if (me.rtn.answers[k].response == undefined) break;
-              for (var idx = 0 ; idx < me.rtn.answers[k].response.length ; idx++) {
+              for (idx = 0 ; idx < me.rtn.answers[k].response.length ; idx++) {
                 $('[data-id="SDG_STARTING"][value="'+me.rtn.answers[k].response[idx]+'"]').attr('checked','checked');
               } 
               break;
@@ -302,6 +313,7 @@ var $r = (function ($, ractive) {
 
   function _notifyParent() {
     console.info('notify parent to resize');
+    /* jshint -W069 */
     if (parent!=undefined && parent['notifyClick']!=undefined) {
       parent.notifyClick();
       // allow time for notify click to scroll to top and for iframe to calc new height
@@ -310,6 +322,7 @@ var $r = (function ($, ractive) {
         parent.notifyIFrameSize($('#containerSect').height());
       },400);
     }
+    /* jshint +W069 */
   }
 
   function _toggleSdmp() {
@@ -326,14 +339,14 @@ var $r = (function ($, ractive) {
     setTimeout(function() {
       window.location.href = '/srp/report-2020-21.html';
     },5000);
-  }
+  };
 
   me.loginSuccessful = function() {
     ractive.fetch(); // delegate to questionnaire to fetch survey
     if (me.rtn == undefined) _fetchReturn();
     if (ractive.get('orgTypes') == undefined) _fetchLists();
     _showQuestionnaire();
-  }
+  };
 
   function _showQuestionnaire() {
     $('section.questionnaire').slideDown();
@@ -350,33 +363,35 @@ var $r = (function ($, ractive) {
 
   me.getAnswer = function(qName,period) {
     if ($r.rtn!=undefined) {
-      for (idx in $r.rtn.answers) {
+      for (var idx in $r.rtn.answers) {
         if ($r.rtn.answers[idx].question.name == qName && $r.rtn.answers[idx].applicablePeriod == period) {
           return $r.rtn.answers[idx];
         }
       }
     }
-  }
+  };
 
   me.getProfile = function() {
-    var profile = localStorage['profile'];
+    var profile = localStorage.getItem('profile');
     if (profile == undefined) {
       alert('Unable to authenticate you at the moment, please try later');
       return;
     } else {
       return JSON.parse(profile);
     }
-  }
+  };
+
   me.getProfileAttribute = function(attr) {
     if (Array.isArray(me.getProfile().attributes[attr])) {
       return me.getProfile().attributes[attr][0];
     } else {
       return me.getProfile().attributes[attr];
     }
-  },
+  };
+
   me.getSurveyName = function() {
     return _surveyName;
-  },
+  };
 
   me.moveNext = function() {
     console.info('_moveNext');
@@ -392,7 +407,7 @@ var $r = (function ($, ractive) {
     _fill(_survey);
     if (_period == _surveyPeriod) _enableHeadSections();
     else _disableHeadSections();
-  }
+  };
 
   me.movePrevious = function() {
     console.info('_movePrevious');
@@ -404,7 +419,7 @@ var $r = (function ($, ractive) {
     _fill(_survey);
     if (_period == _surveyPeriod) _enableHeadSections();
     else _disableHeadSections();
-  }
+  };
 
   me.saveAnswer = function(answer) {
     if ($r.dirty == false || $r.rtn.status != 'Draft' || $r.getProfile() == undefined) {
@@ -416,12 +431,12 @@ var $r = (function ($, ractive) {
     }
 
     var response = answer.response;
-    if (answer.question.type = 'radio' && Array.isArray(answer.response)) {
+    if (answer.question.type == 'radio' && Array.isArray(answer.response)) {
       response = answer.response.join();
     }
 
     $('.save-indicator').show();
-    me.srp.saveAnswer(me.rtn, answer, function(data) {
+    me.srp.saveAnswer(me.rtn, answer, function() {
       console.log('updated ok');
       $('.save-indicator span').toggleClass('save-indicator-animation glyphicon-save glyphicon-saved');
       setTimeout(function() {
@@ -431,7 +446,7 @@ var $r = (function ($, ractive) {
       }, 3000);
       $r.dirty = false;
     });
-  }
+  };
 
   me.submit = function() {
     if ($r.dirty == false || $r.rtn.status != 'Draft' || $r.getProfile() == undefined) {
@@ -449,10 +464,12 @@ var $r = (function ($, ractive) {
       me.rtn.selfRef = me.rtn.selfRef.replace(/localhost/, 'api.srp.digital');
     }
     // handle checkbox options
-    for (idx = 0 ; idx< me.rtn.answers.length ; idx++) {
+    for (var idx = 0 ; idx< me.rtn.answers.length ; idx++) {
       // console.warn(idx);
       if (Array.isArray(me.rtn.answers[idx].response)) me.rtn.answers[idx].response = me.rtn.answers[idx].response.join();
-      delete me.rtn.answers[idx].question['optionNames'];
+      if ('optionNames' in me.rtn.answers[idx].question) {
+        delete me.rtn.answers[idx].question.optionNames;
+      }
     }
     $('.save-indicator').show();
     return $.ajax({
@@ -461,8 +478,8 @@ var $r = (function ($, ractive) {
         contentType: 'application/json',
         data: JSON.stringify(me.rtn),
         dataType:'text',
-        success: function(data, textStatus, jqXHR) {
-          console.log('updated ok, data: '+ data);
+        success: function(data, textStatus) {
+          console.log('updated '+ textStatus +', data: '+ data);
           $('.save-indicator span').toggleClass('save-indicator-animation glyphicon-save glyphicon-saved');
           setTimeout(function() {
             $('.save-indicator').fadeOut(function() {
@@ -492,6 +509,7 @@ var $r = (function ($, ractive) {
   };
 
   ractive.observe('q.activeCategory', function (newValue, oldValue, keypath) {
+    console.log("'"+keypath+"' changing from '"+oldValue+"' to '"+newValue+"'");
     if (newValue!=oldValue) {
       _hideNotApplicable();
       _notifyParent();
@@ -500,8 +518,8 @@ var $r = (function ($, ractive) {
 
   ractive.observe('q.categories.*.questions.*.response', function(newValue, oldValue, keypath) {
     if (newValue === oldValue) return;
-    console.log('change '+keypath+' from '+oldValue+' to '+newValue);
-    var q = ractive.get(keypath.substring(0, keypath.indexOf('.response')));
+    console.log("'"+keypath+"' changing from '"+oldValue+"' to '"+newValue+"'");
+    ractive.get(keypath.substring(0, keypath.indexOf('.response')));
     // after #226 not sure if this is still needed
     if ($r.rtn!=undefined && oldValue!=undefined && oldValue!='') {
       //var found = false;
@@ -525,59 +543,45 @@ var $r = (function ($, ractive) {
       { "name": "questionnaireContact", "url": "/questionnaire/partials/questionnaire-contact.html"},
       { "name": "sidebar", "url": "/partials/sidebar.html"},
       { "name": "toolbar", "url": "/partials/toolbar.html"}
-    ])
+    ]);
   ractive.loadStandardPartials(ractive.get('stdPartials'));
 
   $('head').append('<link href="/sdu/css/sdu-1.0.0.css" rel="stylesheet">');
   $('head').append('<link rel="icon" type="image/png" href="/srp/images/icon/sdu-icon-16x16.png">');
 
-  if (ractive['fetchCallbacks']==undefined) ractive.fetchCallbacks = $.Callbacks();
+  if ('fetchCallbacks' in ractive) ractive.fetchCallbacks = $.Callbacks();
   ractive.fetchCallbacks.add(_hideCalcs);
   ractive.fetchCallbacks.add(me.fill);
   ractive.fetchCallbacks.add(_showQuestionnaire);
   ractive.toggleSidebar = function() {
     console.info('toggleSidebar');
     $('.toolbar-left').toggle(ractive.get('easingDuration'));
-  }
+  };
   ractive.toggleSubMenu = function(entry) {
     console.info('toggleSubMenu');
     $(entry.nextElementSibling).toggle(ractive.get('easingDuration'));
-  }
+  };
 
   try { _isIE = navigator.userAgent.match(/trident/i)!=null; } catch (e) {
-    document.write('<script src="ie-polyfill.js"><\/script>');
+    document.write('<script src="ie-polyfill.js"><\/script>'); // jshint ignore:line
   }
 
   return me;
 }($, ractive));
 
-$( document ).bind('keypress', function(e) {
-  switch (e.keyCode) {
-  case 13: // Enter key
-    if (window['ractive'] && ractive['enter']) ractive['enter']();
-    break;
-  case 63:   // ? key
-    console.log('help requested');
-    $('#helpModal').modal({});
-    break;
-  }
-});
-
 $(document).ready(function() {
   ractive.sendMessage = $r.complete;
 
   $r.keycloak = Keycloak('/keycloak.json');
-  $r.keycloak.init({ onLoad: 'login-required' })
-      .then(function(authenticated) {
+  $r.keycloak.init({ onLoad: 'login-required' }).then(function(authenticated) {
     console.info(authenticated ? 'authenticated' : 'not authenticated');
-      if ($r['srp'] !== undefined) $r.srp.options.token = $r.keycloak.token;
-    // $r.srpOptions.token = $r.keycloak.token;
+    if ('srp' in $r) $r.srp.options.token = $r.keycloak.token;
     // now safe to set and load questionnaire
     ractive.set('questionnaireDef',$env.server+'/surveys/findByName/'+$r.getSurveyName());
-    localStorage['token'] = $r.keycloak.token; // used by questionnaire
+    localStorage.setItem('token', $r.keycloak.token); // used by questionnaire
 
     $r.keycloak.loadUserProfile().then(function(profile) {
-      localStorage['profile'] = JSON.stringify(profile);
+      localStorage.setItem('profile', JSON.stringify(profile));
       $r.loginSuccessful();
     }).catch(function(e) {
       alert('Failed to load user profile: '+e);

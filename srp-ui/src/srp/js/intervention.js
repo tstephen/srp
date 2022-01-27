@@ -19,33 +19,15 @@ var ractive = new BaseRactive({
   template: '#template',
   data: {
     discountRate:0.035,
+    entityName: 'intervention',
+    entityPath: '/interventions',
     interventions: [],
     interventionTypes: [],
     organisationTypes: [],
     filter: undefined,
     //saveObserver:false,
     tenant: { id: 'sdu' },
-    username: localStorage['username'],
-    chars: function(string) {
-      console.info('chars: '+string);
-      var len = string == undefined ? 0 : string.length;
-      console.log('  returning: '+len);
-      return len;
-    },
-    customField: function(obj, name) {
-      if (obj['customFields']==undefined) {
-        return undefined;
-      } else if (!Array.isArray(obj['customFields'])) {
-        return obj.customFields[name];
-      } else {
-        //console.error('customField 30');
-        var val;
-        $.each(obj['customFields'], function(i,d) {
-          if (d.name == name) val = d.value;
-        });
-        return val;
-      }
-    },
+    username: localStorage.getItem('username'),
     findShareOfCarbon: function(i,j) {
       console.info('findShareOfCarbon: '+i+','+j);
       // NOTE: this only works because intvn types, org types and interventions all sorted by name
@@ -60,52 +42,10 @@ var ractive = new BaseRactive({
       console.info('findShareOfTotal: '+i+','+j);
       console.log('  intervention type: '+ractive.get('interventionTypes')[i].name);
       console.log('  org type: '+ractive.get('organisationTypes')[j].name);
-//      for(idx in ractive.get('interventions')) {
-//
-//      }
-      //console.log('  intvn: '+JSON.stringify(ractive.get('interventions.'+(i*j))));
       // NOTE: this only works because intvn types, org types and interventions all sorted by name
       return ractive.get('interventions.'+(i*j)+'.shareOfTotal');
     },
-    formatDate: function(timeString) {
-      return new Date(timeString).toLocaleDateString(navigator.languages).replace('Invalid Date','n/a').replace('01/01/1970','n/a');
-    },
-    formatJson: function(json) {
-      console.log('formatJson: '+json);
-      try {
-        var obj = JSON.parse(json);
-        var html = '';
-        $.each(Object.keys(obj), function(i,d) {
-          html += (typeof obj[d] == 'object' ? '' : '<b>'+d+'</b>: '+obj[d]+'<br/>');
-        });
-        return html;
-      } catch (e) {
-        // So it wasn't JSON
-        return json;
-      }
-    },
-    hash: function(email) {
-      if (email == undefined) return '';
-      console.log('hash '+email+' = '+ractive.hash(email));
-      return '<img class="img-rounded" src="//www.gravatar.com/avatar/'+ractive.hash(email)+'?s=36"/>'
-    },
-    help: '<p>This page allows the management of a single list of interventions and their associated data requirements</p>\
-      <h2>Key concepts</h2>\
-      <ul>\
-        <li>\
-          <h3 id="">Concept 1</h3>\
-          <p>Lorem ipsum.</p>\
-        </li>\
-        <li>\
-          <h3 id="">Concept 2</h3>\
-          <p>Lorem ipsum.</p>\
-        </li>\
-        <li>\
-          <h3 id="">Concept 3</h3>\
-          <p>Lorem ipsum.</p>\
-        </li>\
-        </ul>\
-      </ul>',
+    help: '<p>This page allows the management of a single list of interventions and their associated data requirements</p>',
     matchFilter: function(obj) {
       if (ractive.get('filter')==undefined) return true;
       else return ractive.get('filter').value.toLowerCase()==obj[ractive.get('filter').field].toLowerCase();
@@ -125,10 +65,10 @@ var ractive = new BaseRactive({
       if (searchTerm==undefined || searchTerm.length==0) {
         return true;
       } else {
-        return obj.organisationType.name.toLowerCase().indexOf(searchTerm.toLowerCase())>=0
-          || obj.interventionType.name.toLowerCase().indexOf(searchTerm.toLowerCase())>=0
-          || obj.interventionType.status.toLowerCase().indexOf(searchTerm.toLowerCase())>=0
-          || obj.organisationType.name.toLowerCase().indexOf(searchTerm.toLowerCase())>=0;
+        return obj.organisationType.name.toLowerCase().indexOf(searchTerm.toLowerCase())>=0 ||
+          obj.interventionType.name.toLowerCase().indexOf(searchTerm.toLowerCase())>=0 ||
+          obj.interventionType.status.toLowerCase().indexOf(searchTerm.toLowerCase())>=0 ||
+          obj.organisationType.name.toLowerCase().indexOf(searchTerm.toLowerCase())>=0;
       }
     },
     pv: function(futureValue, years) {
@@ -155,7 +95,7 @@ var ractive = new BaseRactive({
     sorted: function(column) {
 //      console.info('sorted:'+column);
       if (ractive.get('sortColumn') == column && ractive.get('sortAsc')) return 'sort-asc';
-      else if (ractive.get('sortColumn') == column && !ractive.get('sortAsc')) return 'sort-desc'
+      else if (ractive.get('sortColumn') == column && !ractive.get('sortAsc')) return 'sort-desc';
       else return 'hidden';
     },
     stdPartials: [
@@ -175,7 +115,7 @@ var ractive = new BaseRactive({
       var itName = ractive.get('interventionTypes.'+i+'.name');
       console.log('  intervention type: '+itName);
       var total=0;
-      for(idx in ractive.get('interventions')) {
+      for(var idx in ractive.get('interventions')) {
         if (itName==ractive.get('interventions.'+idx+'.name')) {
           total+=ractive.get('interventions.'+idx+'.shareOfTotal');
         }
@@ -187,7 +127,7 @@ var ractive = new BaseRactive({
       var itName = ractive.get('interventionTypes.'+i+'.name');
       console.log('  intervention type: '+itName);
       var total=0;
-      for(idx in ractive.get('interventions')) {
+      for(var idx in ractive.get('interventions')) {
         if (itName==ractive.get('interventions.'+idx+'.name')) {
           total+=ractive.get('interventions.'+idx+'.tonnesCo2eSavedTargetYear');
         }
@@ -198,7 +138,7 @@ var ractive = new BaseRactive({
       var itName = ractive.get('interventionTypes.'+i+'.name');
       console.log('  intervention type: '+itName);
       var total=0;
-      for(idx in ractive.get('interventions')) {
+      for(var idx in ractive.get('interventions')) {
         if (itName==ractive.get('interventions.'+idx+'.name')) {
           total+=ractive.get('interventions.'+idx+'.targetYearSavings');
         }
@@ -238,8 +178,7 @@ var ractive = new BaseRactive({
       crossDomain: true,
       success: function( data ) {
         console.warn('response;'+data);
-        something = window.open("data:text/csv," + encodeURIComponent(data),"_blank");
-        //something.focus();
+        window.open("data:text/csv," + encodeURIComponent(data),"_blank");
       }
     });
   },
@@ -247,11 +186,13 @@ var ractive = new BaseRactive({
     console.log('edit'+intervention+'...');
     $('h2.edit-form,h2.edit-field').show();
     $('.create-form,create-field').hide();
-    ractive.select(intervention);
+    ractive.srp.fetchIntervention(ractive.tenantUri(intervention))
+      .then(function(response) { return response.json(); })
+      .then(ractive.select);
   },
   delete: function (obj) {
-    ractive.srp.delete(ractive.get('current'))
-    .then(response => {
+    ractive.srp.delete(obj)
+    .then(function(response) {
       switch (response.status) {
       case 204:
         ractive.fetch();
@@ -274,18 +215,18 @@ var ractive = new BaseRactive({
     if (ractive.keycloak.token === undefined) return;
     ractive.set('saveObserver', false);
     ractive.srp.fetchInterventions(ractive.get('tenant.id'))
-    .then(response => response.json()) // catch (e) { console.error('unable to parse response as JSON') } })
-    .then(data => {
-        if (data['_embedded'] == undefined) {
-          ractive.merge('interventions', data);
+    .then(function(response) { return response.json(); }) // catch (e) { console.error('unable to parse response as JSON') } })
+    .then(function(data) {
+        if ('_embedded' in data) {
+          ractive.merge('interventions', data._embedded.interventions);
         }else{
-          ractive.merge('interventions', data['_embedded'].interventions);
+          ractive.merge('interventions', data);
         }
         if (ractive.hasRole('admin')) $('.admin').show();
         if (ractive.fetchCallbacks!=null) ractive.fetchCallbacks.fire();
         ractive.set('searchMatched',$('#interventionsTable tbody tr:visible').length);
         ractive.set('saveObserver', true);
-    })
+    });
   },
   fetchInterventionTypes: function () {
     console.log('fetchInterventionTypes...');
@@ -295,10 +236,10 @@ var ractive = new BaseRactive({
       url: ractive.getServer()+'/'+ractive.get('tenant.id')+'/intervention-types/',
       crossDomain: true,
       success: function( data ) {
-        if (data['_embedded'] == undefined) {
-          ractive.merge('interventionTypes', data);
+        if ('_embedded' in data) {
+          ractive.merge('interventionTypes', data._embedded.interventionTypes);
         }else{
-          ractive.merge('interventionTypes', data['_embedded'].interventionTypes);
+          ractive.merge('interventionTypes', data);
         }
         ractive.initInterventionTypes();
         ractive.set('saveObserver', true);
@@ -313,29 +254,21 @@ var ractive = new BaseRactive({
       url: ractive.getServer()+'/'+ractive.get('tenant.id')+'/organisation-types/?projection=complete',
       crossDomain: true,
       success: function( data ) {
-        if (data['_embedded'] == undefined) {
-          ractive.merge('organisationTypes', data);
+        if ('_embedded' in data) {
+          ractive.merge('organisationTypes', data._embedded.organisationTypes);
         }else{
-          ractive.merge('organisationTypes', data['_embedded'].organisationTypes);
+          ractive.merge('organisationTypes', data);
         }
         ractive.initOrganisationTypes();
         ractive.set('saveObserver', true);
       }
     });
   },
-  filter: function(filter) {
-    console.log('filter: '+JSON.stringify(filter));
-    ractive.set('filter',filter);
-    $('.omny-dropdown.dropdown-menu li').removeClass('selected')
-    $('.omny-dropdown.dropdown-menu li:nth-child('+filter.idx+')').addClass('selected')
-    ractive.set('searchMatched',$('#interventionsTable tbody tr:visible').length);
-    $('input[type="search"]').blur();
-  },
   find: function(interventionId) {
     console.info('find: '+interventionId);
     var c;
     $.each(ractive.get('interventions'), function(i,d) {
-      if (interventionId.endsWith(ractive.getId(d))) {
+      if (interventionId.endsWith(ractive.id(d))) {
         c = d;
       }
     });
@@ -360,25 +293,6 @@ var ractive = new BaseRactive({
       }
     });
     return c;
-  },
-  getId: function(intervention) {
-    console.log('getId: '+intervention);
-    var uri;
-    if (intervention['links']!=undefined) {
-      $.each(intervention.links, function(i,d) {
-        if (d.rel == 'self') {
-          uri = d.href;
-        }
-      });
-    } else if (intervention['_links']!=undefined) {
-      uri = intervention._links.self.href.indexOf('?')==-1 ? intervention._links.self.href : intervention._links.self.href.substr(0,intervention._links.self.href.indexOf('?')-1);
-    }
-    return uri;
-  },
-  hideResults: function() {
-    $('#interventionsTableToggle').addClass('kp-icon-caret-right').removeClass('kp-icon-caret-down');
-    $('#interventionsTable').slideUp();
-    $('#currentSect').slideDown({ queue: true });
   },
   hideUpload: function () {
     console.log('hideUpload...');
@@ -406,7 +320,7 @@ var ractive = new BaseRactive({
     if (ractive.get('current.'+field+'TimeSeries')==undefined) ractive.set('current.'+field+'TimeSeries',[]);
     if (ractive.get('current.'+field+'TimeSeries').length<ractive.get('current.lifetime')) {
       var val;
-      for (i=0;i<ractive.get('current.lifetime');i++) {
+      for (var i=0;i<ractive.get('current.lifetime');i++) {
         switch (loadingStrategy) {
         case 'average':
           val = ractive.get('current.'+field);
@@ -420,11 +334,7 @@ var ractive = new BaseRactive({
         }
         ractive.get('current.'+field+'TimeSeries').push(val);
       }
-//      ractive.set('timeSeries',ractive.get(field+'TimeSeries'));
     }
-  },
-  oninit: function() {
-    console.log('oninit');
   },
   save: function () {
     console.log('save intervention: '+ractive.get('current.interventionType.name')+'...');
@@ -437,8 +347,8 @@ var ractive = new BaseRactive({
       // loading... ignore
     } else if(document.getElementById('currentForm').checkValidity()) {
       var tmp = JSON.parse(JSON.stringify(ractive.get('current')));
-      tmp.interventionType = ractive.getServer()+'/interventionTypes/'+ractive.getId(ractive.findInterventionType(tmp.interventionType.name));
-      tmp.organisationType = ractive.getServer()+'/organisationTypes/'+ractive.getId(ractive.findOrganisationType(tmp.organisationType.name));
+      tmp.interventionType = ractive.getServer()+'/interventionTypes/'+ractive.id(ractive.findInterventionType(tmp.interventionType.name));
+      tmp.organisationType = ractive.getServer()+'/organisationTypes/'+ractive.id(ractive.findOrganisationType(tmp.organisationType.name));
       tmp.tenantId = ractive.get('tenant.id');
       console.log('ready to save intervention'+JSON.stringify(tmp)+' ...');
       $.ajax({
@@ -446,7 +356,7 @@ var ractive = new BaseRactive({
         type: id === undefined ? 'POST' : 'PUT',
         contentType: 'application/json',
         data: JSON.stringify(tmp),
-        success: completeHandler = function(data, textStatus, jqXHR) {
+        success: function(data, textStatus, jqXHR) {
           console.log(jqXHR.status+': '+JSON.stringify(data));
           var location = jqXHR.getResponseHeader('Location');
           ractive.set('saveObserver',false);
@@ -472,22 +382,13 @@ var ractive = new BaseRactive({
     console.log('select: '+JSON.stringify(intervention));
     ractive.set('saveObserver',false);
 
-    var url = ractive.tenantUri(intervention);
-    console.log('loading detail for '+url);
-    $.getJSON(url,  function( data ) {
-      console.log('found intervention '+data);
-      ractive.set('current', data);
-      ractive.initControls();
-      // who knows why this is needed, but it is, at least for first time rendering
-      $('.autoNumeric').autoNumeric('update',{});
-      ractive.toggleResults();
-      $('#currentSect').slideDown();
-      ractive.set('saveObserver',true);
-    });
-  },
-  showActivityIndicator: function(msg, addClass) {
-    document.body.style.cursor='progress';
-    this.showMessage(msg, addClass);
+    ractive.set('current', intervention);
+    ractive.initControls();
+    // who knows why this is needed, but it is, at least for first time rendering
+    $('.autoNumeric').autoNumeric('update',{});
+    ractive.toggleResults();
+    $('#currentSect').slideDown();
+    ractive.set('saveObserver',true);
   },
   showUpload: function () {
     console.log('showUpload...');
@@ -525,7 +426,7 @@ var ractive = new BaseRactive({
         cache: false,
         contentType: false,
         processData: false,
-        success: function(response) {
+        success: function() {
           console.log('successfully uploaded resource');
           ractive.fetch();
           ractive.hideUpload();
@@ -534,20 +435,11 @@ var ractive = new BaseRactive({
   }
 });
 
-ractive.observe('searchTerm', function(newValue, oldValue, keypath) {
-  console.log('searchTerm changed');
-  ractive.showResults();
-  setTimeout(function() {
-    ractive.set('searchMatched',$('#interventionsTable tbody tr').length);
-  }, 500);
-});
-
-
 // Save on model change
 // done this way rather than with on-* attributes because autocomplete
 // controls done that way save the oldValue
 ractive.observe('current.*', function(newValue, oldValue, keypath) {
-  ignored=['current.references'];
+  var ignored=['current.references'];
   if (ractive.get('saveObserver') && ignored.indexOf(keypath)==-1) {
     console.log('current prop change: '+newValue +','+oldValue+' '+keypath);
     ractive.save();
@@ -569,16 +461,6 @@ ractive.observe('resourceFiles', function(newValue, oldValue, keypath) {
   } else {
     console.warn  ('Nothing to do: '+keypath+': '+newValue);
   }
-});
-ractive.on( 'filter', function ( event, filter ) {
-  console.info('filter on '+JSON.stringify(event)+','+filter.idx);
-  ractive.filter(filter);
-});
-ractive.on( 'sort', function ( event, column ) {
-  console.info('sort on '+column);
-  // if already sorted by this column reverse order
-  if (this.get('sortColumn')==column) this.set('sortAsc', !this.get('sortAsc'));
-  this.set( 'sortColumn', column );
 });
 
 function presentValue(futureValue,years) {

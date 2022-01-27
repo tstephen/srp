@@ -29,7 +29,7 @@ var ractive = new BaseRactive({
     server: $env.server,
     survey: 'SDU-2020-21',
     tenant: { id: 'sdu' },
-    username: localStorage['username'],
+    username: localStorage.getItem('username'),
     formatAbsAnswer: function(qName, period) {
       try {
         var answer = ractive.getAnswer(qName, period);
@@ -77,8 +77,8 @@ var ractive = new BaseRactive({
       }
     },
     formatHint: function(qName) {
-      for (i in ractive.get('q.categories')) {
-        for (j in ractive.get('q.categories.'+i+'.questions')) {
+      for (var i in ractive.get('q.categories')) {
+        for (var j in ractive.get('q.categories.'+i+'.questions')) {
           if (ractive.get('q.categories.'+i+'.questions.'+j+'.name')==qName) return 'This is based on your response to '+ractive.get('q.categories.'+i+'.name')+' question '+(parseInt(j)+1);
         }
       }
@@ -99,9 +99,7 @@ var ractive = new BaseRactive({
     haveAnswer: function(qName) {
       try {
         var a = ractive.getAnswer(qName);
-        return (a == undefined || a == '' || a == ractive.get('narrativeCtxtPrompt') || a == ractive.get('narrativePerfPrompt'))
-            ? false
-            : true;
+        return (a == undefined || a == '' || a == ractive.get('narrativeCtxtPrompt') || a == ractive.get('narrativePerfPrompt')) ? false : true;
       } catch (e) {
         return false;
       }
@@ -113,28 +111,12 @@ var ractive = new BaseRactive({
       return ractive.isEClassUser();
     },
     matchRole: function(role) {
-      console.info('matchRole: '+role)
+      console.info('matchRole: '+role);
       if (role==undefined || ractive.hasRole(role)) {
         $('.'+role).show();
         return true;
       } else {
         return false;
-      }
-    },
-    matchSearch: function(obj) {
-      var searchTerm = ractive.get('searchTerm');
-      //console.info('matchSearch: '+searchTerm);
-      if (searchTerm==undefined || searchTerm.length==0) {
-        return true;
-      } else {
-        return obj.question.name.toLowerCase().indexOf(searchTerm.toLowerCase())>=0
-          || obj.applicablePeriod.toLowerCase().indexOf(searchTerm.toLowerCase())>=0
-          || obj.status.toLowerCase().indexOf(searchTerm.toLowerCase())>=0
-          || (searchTerm.startsWith('revision:') && obj.revision==searchTerm.substring(9))
-          || (searchTerm.startsWith('updated>') && new Date(obj.lastUpdated)>new Date(searchTerm.substring(8)))
-          || (searchTerm.startsWith('created>') && new Date(obj.created)>new Date(searchTerm.substring(8)))
-          || (searchTerm.startsWith('updated<') && new Date(obj.lastUpdated)<new Date(searchTerm.substring(8)))
-          || (searchTerm.startsWith('created<') && new Date(obj.created)<new Date(searchTerm.substring(8)));
       }
     },
     sort: function (array, column, asc) {
@@ -143,8 +125,8 @@ var ractive = new BaseRactive({
 
       return array.sort( function ( a, b ) {
         console.log('sort '+a+','+b);
-        var aVal = eval('a.'+column);
-        var bVal = eval('b.'+column);
+        var aVal = eval('a.'+column); // jshint ignore:line
+        var bVal = eval('b.'+column); // jshint ignore:line
         if (bVal==undefined || bVal==null || bVal=='') {
           return (aVal==undefined || aVal==null || aVal=='') ? 0 : -1;
         } else if (asc) {
@@ -157,11 +139,11 @@ var ractive = new BaseRactive({
     sortAsc: true,
     sortColumn: 'id',
     sorted: function(column) {
-//      console.info('sorted:'+column);
+      console.info('sorted by :'+column+' currently disabled for performance');
       return 'hidden'; // hide as sorting is disabled due to perf
-      if (ractive.get('sortColumn') == column && ractive.get('sortAsc')) return 'sort-asc';
+      /*if (ractive.get('sortColumn') == column && ractive.get('sortAsc')) return 'sort-asc';
       else if (ractive.get('sortColumn') == column && !ractive.get('sortAsc')) return 'sort-desc'
-      else return 'hidden';
+      else return 'hidden';*/
     },
     stdPartials: [
       { "name": "sidebar", "url": "/partials/sidebar.html"},
@@ -174,11 +156,7 @@ var ractive = new BaseRactive({
     'sidebarSect': '',
     'toolbarSect': '',
     'nhsCarbonProfileSect': '',
-    'shareCtrl': '<div class="controls pull-right" style="display:none">'
-                +'  <span class="glyphicon icon-btn kp-icon-share"></span>'
-                +'  <!--span class="glyphicon icon-btn kp-icon-link"></span-->'
-                +'  <!--span class="glyphicon icon-btn kp-icon-copy"></span-->'
-                +'</div>',
+    'shareCtrl': '',
     'statusSect': ''
   },
   calculate: function () {
@@ -200,16 +178,16 @@ var ractive = new BaseRactive({
     });
   },
   copyLink: function(ev) {
-    if (navigator['clipboard'] == undefined) {
-      alert('Please upgrade your browser to be able to copy links');
-    } else {
+    if ('clipboard' in navigator) {
       navigator.clipboard.writeText(ev.target.getAttribute('data-share'));
       console.info('copied link');
-      var toast = new iqwerty.toast.Toast('Copied!', { style: { main: {
+      new iqwerty.toast.Toast('Copied!', { style: { main: {
 	  background: '#0078c1',
 	  color: 'white',
 	  'box-shadow': '0 0 50px rgba(0, 120, 193, .7)'
 	}}});
+    } else {
+      alert('Please upgrade your browser to be able to copy links');
     }
     return false;
   },
@@ -219,13 +197,13 @@ var ractive = new BaseRactive({
   fetch: function() {
     console.info('fetch...');
     ractive.fetchMessages();
-    if (getSearchParameters()['id']==undefined || !ractive.hasRole('analyst')) ractive.fetchImplicit();
-    else ractive.fetchExplicit();
+    if (getSearchParameter('id')==undefined || !ractive.hasRole('analyst')) ractive.fetchImplicit();
+    else ractive.fetchExplicit(getSearchParameter('id'));
   },
-  fetchExplicit: function() {
+  fetchExplicit: function(id) {
     $.ajax({
       dataType: "json",
-      url: ractive.getServer()+'/returns/'+getSearchParameters()['id'],
+      url: ractive.getServer()+'/returns/'+id,
       crossDomain: true,
       headers: {
         "X-Requested-With": "XMLHttpRequest",
@@ -252,46 +230,6 @@ var ractive = new BaseRactive({
       success: ractive.fetchSuccessHandler
     });
   },
-  fetchCsv: function(ctrl, callback) {
-    var url = $(ctrl)
-        .data('src').indexOf('//')==-1
-            ? ractive.getServer()+$(ctrl).data('src')
-            : $(ctrl).data('src').replace(/host:port/,window.location.host)
-        .attr('width', '1024')
-        .attr('width', '400')
-    $.ajax({
-      dataType: "text",
-      url: url,
-      crossDomain: true,
-      headers: {
-        "X-Requested-With": "XMLHttpRequest",
-        "X-Authorization": "Bearer "+ractive.keycloak.token,
-        "Authorization": "Bearer "+ractive.keycloak.token,
-        "Cache-Control": "no-cache"
-      },
-      success: function( data ) {
-        ractive.set('saveObserver', false);
-        //ractive.set(keypath,data);
-        var options = {};
-        if ($(ctrl).data('colors') != undefined) options.colors = $(ctrl).data('colors').split(',');
-        if ($(ctrl).data('labels') != undefined) options.labels = $(ctrl).data('labels');
-        if ($(ctrl).data('other') != undefined) options.other = parseFloat($(ctrl).data('other'));
-        if ($(ctrl).data('x-axis-label') != undefined) options.xAxisLabel = $(ctrl).data('x-axis-label');
-        if ($(ctrl).data('y-axis-label') != undefined) options.yAxisLabel = $(ctrl).data('y-axis-label');
-
-        $(ctrl)
-          .on('mouseover', function(ev) {
-            $('#'+ev.currentTarget.id+' .controls').show();
-          })
-          .on('mouseout', function(ev) {
-            $('#'+ev.currentTarget.id+' .controls').hide();
-          });
-        $('#'+ctrl.id+' .controls .kp-icon-new-tab').wrap('<a href="'+ractive.getServer()+$(ctrl).data('src')+'" target="_blank"></a>');
-        callback('#'+ctrl.id, data, options);
-        ractive.set('saveObserver', true);
-      }
-    });
-  },
   fetchMessages: function() {
     $.ajax({
       dataType: "json",
@@ -313,7 +251,7 @@ var ractive = new BaseRactive({
     $( "#ajax-loader" ).show();
     ractive.set('saveObserver', false);
     ractive.set('surveyReturn.orgs', []);
-    var orgs = ractive.get('orgAnswerNames').filter(function(el, idx) {
+    var orgs = ractive.get('orgAnswerNames').filter(function(el) {
       return (ractive.isCcg() && el.startsWith('PROVIDER')) || (!ractive.isCcg() && el.startsWith('CCG'));
     });
     for (var idx = 0 ; idx < orgs.length ; idx++) {
@@ -330,9 +268,9 @@ var ractive = new BaseRactive({
             "Authorization": "Bearer "+ractive.keycloak.token,
             "Cache-Control": "no-cache"
           },
-          success: function( data ) {
+          success: function( data ) { // jshint ignore:line
             ractive.set('saveObserver', false);
-            for (j = 0 ; j < ractive.get('surveyReturn.orgs').length ; j++) {
+            for (var j = 0 ; j < ractive.get('surveyReturn.orgs').length ; j++) {
               if (ractive.get('surveyReturn.orgs.'+j+'.name') == data.name) {
                 ractive.splice('surveyReturn.orgs',j,1);
               }
@@ -341,7 +279,7 @@ var ractive = new BaseRactive({
             $( "#ajax-loader" ).hide();
             ractive.set('saveObserver', true);
           },
-          error: function(jqXHR, textStatus, errorThrown ) {
+          error: function(jqXHR, textStatus, errorThrown) { // jshint ignore:line
             var org = this.url.substring(this.url.lastIndexOf('/')+1);
             console.warn('Unable to fetch data for '+org+'.'+jqXHR.status+':'+textStatus+','+errorThrown);
             $( "#ajax-loader" ).hide();
@@ -362,33 +300,26 @@ var ractive = new BaseRactive({
     //if (ractive.hasRole('admin')) $('.admin').show();
     //if (ractive.hasRole('power-user')) $('.power-user').show();
     if (ractive.fetchCallbacks!=null) ractive.fetchCallbacks.fire();
-    //ractive.set('searchMatched',$('#contactsTable tbody tr:visible').length);
-    $('.rpt.pie').each(function(i,d) {
-      ractive.fetchCsv(d, renderPie);
-    });
     $('.rpt.pie2').each(function(i,d) {
       ractive.renderCsvForPie(d, renderPie);
     });
-    $('.rpt.stacked,.rpt.stacked2').each(function(i,d) {
+    $('.rpt.stacked2').each(function(i,d) {
       switch (true) {
       case (window.innerWidth < 480):
-        $(d).attr('width',440).attr('height', window.innerHeight* .4);
+        $(d).attr('width',440).attr('height', window.innerHeight*0.4);
         break;
       case (window.innerWidth < 768):
-        $(d).attr('width',720).attr('height', window.innerHeight* .4);
+        $(d).attr('width',720).attr('height', window.innerHeight*0.4);
         break;
       case (window.innerWidth < 980):
-        $(d).attr('width',720).attr('height', window.innerHeight* .4);
+        $(d).attr('width',720).attr('height', window.innerHeight*0.4);
         break;
       case (window.innerWidth < 1200):
-        $(d).attr('width',window.innerWidth* .8).attr('height', window.innerHeight* .4);
+        $(d).attr('width',window.innerWidth*0.8).attr('height', window.innerHeight*0.4);
         break;
       default:
-        $(d).attr('width',1140).attr('height', window.innerHeight* .4);
+        $(d).attr('width',1140).attr('height', window.innerHeight*0.4);
       }
-    });
-    $('.rpt.stacked').each(function(i,d) {
-      ractive.fetchCsv(d, renderStacked);
     });
     $('.rpt.stacked2').each(function(i,d) {
       ractive.renderCsv(d, renderStacked);
@@ -416,13 +347,14 @@ var ractive = new BaseRactive({
     var answeredCoreQs=0;
     var answeredQs=0;
     var periods = [];
+    var idx = 0;
     for (idx = 0 ; idx < ractive.get('surveyReturn.answers').length ; idx++) {
       qs++;
       if (ractive.get('surveyReturn.answers.'+idx+'.question.required')==true) coreQs++;
-      if (ractive.get('surveyReturn.answers.'+idx+'.response')!=undefined
-          && ractive.get('surveyReturn.answers.'+idx+'.response')!=''
-          && ractive.get('surveyReturn.answers.'+idx+'.derived')==false
-          && ractive.get('surveyReturn.answers.'+idx+'.status')!='Superseded') {
+      if (ractive.get('surveyReturn.answers.'+idx+'.response')!=undefined &&
+          ractive.get('surveyReturn.answers.'+idx+'.response')!='' &&
+          ractive.get('surveyReturn.answers.'+idx+'.derived')==false &&
+          ractive.get('surveyReturn.answers.'+idx+'.status')!='Superseded') {
         answeredQs++;
         if (ractive.get('surveyReturn.answers.'+idx+'.question.required')==true) answeredCoreQs++;
         periods.push(ractive.get('surveyReturn.answers.'+idx+'.applicablePeriod'));
@@ -448,8 +380,8 @@ var ractive = new BaseRactive({
   fetchSurvey: function() {
     console.info('fetchSurvey');
     ractive.srp.fetchSurvey(ractive.get('survey'))
-    .then(response => response.json())
-    .then(data => {
+    .then(function(response) { return response.json(); })
+    .then(function(data) {
       console.log('success:'+data);
       ractive.set('q', data);
     });
@@ -508,8 +440,8 @@ var ractive = new BaseRactive({
       } else if (a.question.name == qName && a.applicablePeriod == period) {
         return a.response;
       }
+      return a.question.type == 'number' ? 0 : undefined;
     }
-    return a.question.type == 'number' ? 0 : undefined;
   },
   getAttribute: function(attr) {
     return ractive.getProfile().attributes[attr];
@@ -521,12 +453,11 @@ var ractive = new BaseRactive({
     return period;
   },
   getProfile: function() {
-    var profile = localStorage['profile'];
-    if (profile == undefined) {
+    if ('profile' in localStorage) {
       alert('Unable to authenticate you at the moment, please try later');
       return;
     } else {
-      return JSON.parse(profile);
+      return JSON.parse(localStorage.getItem('profile'));
     }
   },
   initNarrative: function() {
@@ -590,9 +521,9 @@ var ractive = new BaseRactive({
       var period = ractive.getPeriod(idx-periods+1);
       csv += period;
       csv += ',';
-      for (var i = 0 ; i < qs.length ; i++) {
-        csv += ractive.getAnswerFromArray(qs[i], period, answers, true);
-        if (i+1 < qs.length) csv += ',';
+      for (var j = 0 ; j < qs.length ; j++) {
+        csv += ractive.getAnswerFromArray(qs[j], period, answers, true);
+        if (j+1 < qs.length) csv += ',';
         else csv += '\n';
       }
     }
@@ -657,8 +588,8 @@ var ractive = new BaseRactive({
     for (var idx = 0 ; idx < qs.length ; idx++) {
       table += '<th>'+ractive.renderLabel(qs[idx])+'</th>';
       table += '<th class="legend '+qs[idx].toLowerCase()+'">&nbsp;</th>';
-      for (var i = 1 ; i <= periods ; i++) {
-        var ans = ractive.getAnswer(qs[idx], ractive.getPeriod(i-periods));
+      for (var j = 1 ; j <= periods ; j++) {
+        var ans = ractive.getAnswer(qs[idx], ractive.getPeriod(j-periods));
         table += '<td class="number">';
         table += ans == undefined ? 'n/a' : isNaN(ans) ? ans : parseFloat(ans).sigFigs(3);
         table += '</td>';
@@ -669,18 +600,18 @@ var ractive = new BaseRactive({
     table += '</tbody><tfoot>';
     if (d.getAttribute('data-total')=='true') {
       table += '<th>Total</th><th>&nbsp;</th>';
-      for (var i = 1 ; i <= periods ; i++) {
-        table += '<td class="number">'+ractive.total(qs, ractive.getPeriod(i-periods))+'</td>';
+      for (var k = 1 ; k <= periods ; k++) {
+        table += '<td class="number">'+ractive.total(qs, ractive.getPeriod(k-periods))+'</td>';
       }
     }
     if (d.hasAttribute('data-share')) {
-      table += '<tr><td colspan="'+(periods+2)+'">'
-            +'<a href="#" title="Copy link to this table" data-share="'+d.getAttribute('data-share')
-            +'" onclick="return ractive.copyLink(event);" '
-            +'class="pull-right no-print"><span class="glyphicon glyphicon-copy"></span>Copy</a>'
-            +'<a href="'+d.getAttribute('data-share')+'" target="_blank" title="Open the table in a new window" '
-            +'class="pull-right no-print"><span class="glyphicon glyphicon-share-alt"></span>Share</a>'
-            +'</td></tr>';
+      table += '<tr><td colspan="'+(periods+2)+'">';
+      table += '<a href="#" title="Copy link to this table" data-share="'+d.getAttribute('data-share');
+      table += '" onclick="return ractive.copyLink(event);" ';
+      table += 'class="pull-right no-print"><span class="glyphicon glyphicon-copy"></span>Copy</a>';
+      table += '<a href="'+d.getAttribute('data-share')+'" target="_blank" title="Open the table in a new window" ';
+      table += 'class="pull-right no-print"><span class="glyphicon glyphicon-share-alt"></span>Share</a>';
+      table += '</td></tr>';
     }
     table += '</tfoot></table>';
     $(d).empty().append(table);
@@ -696,7 +627,7 @@ var ractive = new BaseRactive({
         type: 'POST',
         data: { json: JSON.stringify({ email: addr, tenantId: 'srp' }) },
         dataType: 'text',
-        success: function(data) {
+        success: function() {
           ractive.showMessage('A reset link has been sent to '+addr);
         },
       });
@@ -741,7 +672,7 @@ var ractive = new BaseRactive({
         type: 'POST',
         contentType: 'application/json',
         data: JSON.stringify(val),
-        success: function(data) {
+        success: function() {
           console.info('...saved');
           $('.save-indicator span').toggleClass('save-indicator-animation glyphicon-save glyphicon-saved');
           setTimeout(function() {
@@ -796,7 +727,7 @@ var ractive = new BaseRactive({
   total: function(qs, period) {
     var total = 0;
     var answers = ractive.get('surveyReturn.answers');
-    for (i = 0 ; i < qs.length ; i++) {
+    for (var i = 0 ; i < qs.length ; i++) {
       var val = ractive.getAnswerFromArray(qs[i], period, answers, true);
       if (!isNaN(val)) total += parseFloat(val);
     }
@@ -808,18 +739,4 @@ var ractive = new BaseRactive({
 $(document).ready(function() {
   $('head').append('<link href="/sdu/css/sdu-1.0.0.css" rel="stylesheet">');
   $('.menu-burger, .toolbar').addClass('no-print');
-})
-
-ractive.observe('searchTerm', function(newValue, oldValue, keypath) {
-  console.log('searchTerm changed');
-  //ractive.showResults();
-  setTimeout(function() {
-    ractive.set('searchMatched',$('#answersTable tbody tr').length);
-  }, 500);
-});
-ractive.on( 'sort', function ( event, column ) {
-  console.info('sort on '+column);
-  // if already sorted by this column reverse order
-  if (this.get('sortColumn')==column) this.set('sortAsc', !this.get('sortAsc'));
-  this.set( 'sortColumn', column );
 });
