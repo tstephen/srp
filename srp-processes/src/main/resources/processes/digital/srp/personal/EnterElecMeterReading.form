@@ -1,0 +1,20 @@
+{
+  "name": "EnterElecMeterReading",
+  "key": "EnterElecMeterReading",
+  "version": 0,
+  "fields": [
+    {
+      "fieldType": "FormField",
+      "id": "",
+      "name": "",
+      "type": "text",
+      "value": null,
+      "required": false,
+      "readOnly": false,
+      "overrideId": true,
+      "placeholder": "",
+      "layout": null
+    }
+  ],
+  "outcomes": []
+}
