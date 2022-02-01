@@ -1,5 +1,21 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:tns="http://srp.digital/returns" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:yaoqiang="http://bpmn.sourceforge.net" exporter="Yaoqiang BPMN Editor" exporterVersion="4.0" expressionLanguage="http://www.w3.org/1999/XPath" id="_1446819276528" name="" targetNamespace="http://srp.digital/returns" typeLanguage="http://www.w3.org/2001/XMLSchema" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL http://bpmn.sourceforge.net/schemas/BPMN20.xsd">
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+        xmlns:activiti="http://activiti.org/bpmn"
+        xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+        xmlns:dc="http://www.omg.org/spec/DD/20100524/DC"
+        xmlns:di="http://www.omg.org/spec/DD/20100524/DI"
+        xmlns:flowable="http://flowable.org/bpmn"
+	xmlns:kp="http://knowprocess.com/returns"
+        xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns:yaoqiang="http://bpmn.sourceforge.net"
+        exporter="Yaoqiang BPMN Editor" exporterVersion="4.0"
+        expressionLanguage="http://www.w3.org/1999/XPath"
+        id="_1446819276528"
+        name=""
+        targetNamespace="http://srp.digital/returns"
+        typeLanguage="http://www.w3.org/2001/XMLSchema"
+        xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL http://bpmn.sourceforge.net/schemas/BPMN20.xsd">
   <process id="RestateSustainabilityReturn" isClosed="false" isExecutable="true" name="Open a new revision of an SDU Sustainability Return" processType="None">
     <extensionElements>
       <yaoqiang:description/>
@@ -19,13 +35,13 @@
       <outgoing>_4</outgoing>
       <outputSet/>
     </startEvent>
-    <serviceTask activiti:class="com.knowprocess.resource.spi.RestPost" completionQuantity="1" id="_3" implementation="##WebService" isForCompensation="false" name="Open a new revision of the return" startQuantity="1">
+    <serviceTask flowable:class="com.knowprocess.resource.spi.RestPost" completionQuantity="1" id="_3" implementation="##WebService" isForCompensation="false" name="Open a new revision of the return" startQuantity="1">
       <extensionElements>
-        <activiti:field name="resourceUsername" stringValue="userInfo('tenant-bot')"/>
-        <activiti:field name="resourcePassword" expression="userInfo('cust-mgmt-secret')"/>
-        <activiti:field name="jwtLoginResource" expression="userInfo('jwt-login-url')"/>
-        <activiti:field name="globalResource" expression="userInfo('cust-mgmt-url')/returns/${returnId}/restate"/>
-        <activiti:field name="headers" stringValue="Content-Type:application/json,Accept:application/json,X-RunAs:${initiator}"/>
+        <flowable:field name="resourceUsername" stringValue="userInfo('tenant-bot')"/>
+        <flowable:field name="resourcePassword" expression="userInfo('cust-mgmt-secret')"/>
+        <flowable:field name="jwtLoginResource" expression="userInfo('jwt-login-url')"/>
+        <flowable:field name="globalResource" expression="userInfo('cust-mgmt-url')/returns/${returnId}/restate"/>
+        <flowable:field name="headers" stringValue="Content-Type:application/json,Accept:application/json,X-RunAs:${initiator}"/>
       </extensionElements>
       <incoming>_4</incoming>
       <outgoing>_5</outgoing>
@@ -52,10 +68,10 @@
     <sequenceFlow id="_10" sourceRef="alertNewRevision" targetRef="_9"/>
     <callActivity calledElement="SendAlert" completionQuantity="1" id="alertNewRevision" isForCompensation="false" name="Alert new revision created" startQuantity="1">
       <extensionElements>
-        <activiti:in sourceExpression="SRP: New revision for ${org} ${applicablePeriod} created" target="subject"/>
-        <activiti:in sourceExpression="tim@srp.digital" target="addressee"/>
-        <activiti:in sourceExpression="SRP: &lt;a href=https://srp.digital/srp/accounts.html?q=${org}>Click to view&lt;/a>" target="message"/>
-        <activiti:in sourceExpression="${tenantId}" target="tenantId"/>
+        <flowable:in sourceExpression="SRP: New revision for ${org} ${applicablePeriod} created" target="subject"/>
+        <flowable:in sourceExpression="tim@srp.digital" target="addressee"/>
+        <flowable:in sourceExpression="SRP: &lt;a href=https://srp.digital/srp/accounts.html?q=${org}>Click to view&lt;/a>" target="message"/>
+        <flowable:in sourceExpression="${tenantId}" target="tenantId"/>
       </extensionElements>
       <incoming>_5</incoming>
       <outgoing>_10</outgoing>
