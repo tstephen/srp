@@ -135,7 +135,7 @@ gulp.task('fix-paths', function() {
 });
 
 gulp.task('package', () =>
-  gulp.src([buildDir+'/*','!'+buildDir+'/*.zip'])
+  gulp.src([buildDir+'/*','!'+buildDir+'/*.jar','!'+buildDir+'/*.zip'])
       .pipe(zip(finalName))
       .pipe(gulp.dest(buildDir))
 );
