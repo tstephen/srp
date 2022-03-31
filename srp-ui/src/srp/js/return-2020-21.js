@@ -29,8 +29,8 @@ var $r = (function ($, ractive) {
   var _surveyPeriod = '2020-21'; // TODO read system param
   var _now = new Date();
   var _params = getSearchParameters();
-  var _period = 'p' in _params ? _surveyPeriod : _params.p;
-  var _surveyName = 's' in _params ? 'SDU'+_period : _params.s;
+  var _period = 'p' in _params ? _params.p : _surveyPeriod;
+  var _surveyName = 's' in _params ? _params.s : 'SDU-'+_period;
 
   function _bindLists() {
     if ($('#ORG_NAME')!=undefined && $('#ORG_NAME[list]').length!=0) $('#ORG_NAME').attr('list','orgs');
@@ -549,7 +549,7 @@ var $r = (function ($, ractive) {
   $('head').append('<link href="/sdu/css/sdu-1.0.0.css" rel="stylesheet">');
   $('head').append('<link rel="icon" type="image/png" href="/srp/images/icon/sdu-icon-16x16.png">');
 
-  if ('fetchCallbacks' in ractive) ractive.fetchCallbacks = $.Callbacks();
+  if (!('fetchCallbacks' in ractive)) ractive.fetchCallbacks = $.Callbacks();
   ractive.fetchCallbacks.add(_hideCalcs);
   ractive.fetchCallbacks.add(me.fill);
   ractive.fetchCallbacks.add(_showQuestionnaire);

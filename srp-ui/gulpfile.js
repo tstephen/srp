@@ -9,7 +9,7 @@ var replace     = require('gulp-replace');
 var rsync       = require('gulp-rsync');
 var through2    = require('through2');
 var zip         = require('gulp-zip');
-var vsn         = '3.0.0-SNAPSHOT';
+var vsn         = '3.1.0';
 
 var buildDir = 'target/classes';
 var finalName = 'srp-ui-'+vsn+'.jar'
@@ -35,6 +35,10 @@ gulp.task('assets', function() {
 gulp.task('scripts', function() {
   //gulp.src([ 'src/sw.js' ])
   //    .pipe(gulp.dest(buildDir));
+  gulp.src([
+    'src/srp/js/**/*.min.js'
+  ])
+  .pipe(gulp.dest(buildDir+'/srp/'+vsn+'/js'));
   return gulp.src([
     'src/srp/js/**/*.js', '!src/srp/js/**/toast.js', '!src/srp/js/**/*.min.js'
   ])

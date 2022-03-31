@@ -288,11 +288,18 @@ var BaseRactive = Ractive.extend({ // jshint ignore:line
     server: $env.server,
   }),
   addDataList: function(d, data) {
+    if (d.name == undefined) {
+      console.warn('Data list with selector "'+d.ref+'" has no name, please add one to use as a datalist');
+      return;
+    }
     $('datalist#'+d.name).remove();
     $('body').append('<datalist id="'+d.name+'">');
     if (data == null) {
       console.error('No data for datalist: '+d.name+', please fix configuration');
     } else {
+      ractive.set('saveObserver', false);
+      ractive.set(d.name, data);
+      ractive.set('saveObserver', true);
       $.each(data, function (i,e) {
         $('datalist#'+d.name).append('<option value="'+e.name+'">'+e.name+'</option>');
       });
@@ -323,10 +330,12 @@ var BaseRactive = Ractive.extend({ // jshint ignore:line
         $.get(d.url, function(response){
 //          console.log('partial '+d.url+' response: '+response);
           try {
-          ractive.resetPartial(d.name,response);
+            ractive.set('saveObserver', false);
+            ractive.resetPartial(d.name,response);
           } catch (e) {
             console.error('Unable to reset partial '+d.name+': '+e);
           }
+          ractive.set('saveObserver', true);
         });
       });
       ractive.applyAccessControl();
@@ -453,9 +462,11 @@ var BaseRactive = Ractive.extend({ // jshint ignore:line
     });
   },
   initAutoNumeric: function() {
-    if ($('.autoNumeric')!=undefined && $('.autoNumeric').length>0) {
-      $('.autoNumeric').autoNumeric('init', {});
-    }
+    console.log('initAutoNumeric');
+    document.querySelectorAll('.autoNumeric').forEach(function(d) {
+      $(d).autoNumeric('destroy');
+      $(d).autoNumeric('init');
+    });
   },
   initContentEditable: function() {
     console.log('initContentEditable');
@@ -543,14 +554,14 @@ var BaseRactive = Ractive.extend({ // jshint ignore:line
   },
   loadStandardPartial: function(name,url) {
     //console.log('loading...: '+d.name)
-      $.get(url, function(response){
+      $.get(url, function(response) {
         //console.log('... loaded: '+d.name)
         //console.log('response: '+response)
         if (ractive != undefined) {
           try {
-            ractive.set('saveObserver',false);
+            ractive.set('saveObserver', false);
             ractive.resetPartial(name,response);
-            ractive.set('saveObserver',true);
+            ractive.set('saveObserver', true);
           } catch (e) {
             console.warn('Unable to reset partial '+name+': '+e);
           }
@@ -695,7 +706,7 @@ var BaseRactive = Ractive.extend({ // jshint ignore:line
       return false;
     }
     console.log('switchToTenant: '+tenant);
-    var username = 'keycloak' in ractive ? $auth.getClaim('sub') : ractive.getProfile().username;
+    var username = 'keycloak' in ractive ? ractive.getProfile().username : $auth.getClaim('sub');
     $.ajax({
       method: 'PUT',
       url: ractive.getServer()+"/admin/tenant/"+username+'/'+tenant,
