@@ -26,7 +26,7 @@ var $r = (function ($, ractive) {
   var _orgType;
   var _server = $env.server;
   var _survey;
-  var _surveyPeriod = '2020-21'; // TODO read system param
+  var _surveyPeriod = $env.period;
   var _now = new Date();
   var _params = getSearchParameters();
   var _period = 'p' in _params ? _params.p : _surveyPeriod;
