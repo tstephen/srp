@@ -61,7 +61,7 @@ public class SurveyControllerTest {
         assertEquals(0, svc.list(1, 10).size());
         svc.init();
         List<EntityModel<Survey>> surveys = svc.list(1, 10);
-        assertEquals(6, surveys.size());
+        assertEquals(7, surveys.size());
         assertTrue(surveys.stream().allMatch(
                 (s) -> StatusType.Published.name().equals(s.getContent().status())));
         assertEquals("/surveys/1", surveys.get(0).getLinks().getLink("self").get().getHref());
