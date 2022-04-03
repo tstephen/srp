@@ -34,6 +34,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -41,6 +43,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
+import com.fasterxml.jackson.annotation.JsonView;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import digital.srp.sreport.api.SrpRoles;
@@ -49,6 +52,7 @@ import digital.srp.sreport.model.Q;
 import digital.srp.sreport.model.Survey;
 import digital.srp.sreport.model.SurveyCategory;
 import digital.srp.sreport.model.SurveyReturn;
+import digital.srp.sreport.model.views.SurveyViews;
 import digital.srp.sreport.repositories.QuestionRepository;
 import digital.srp.sreport.repositories.SurveyCategoryRepository;
 import digital.srp.sreport.repositories.SurveyRepository;
@@ -94,7 +98,8 @@ public class SurveyController {
     /**
      * @return The specified survey.
      */
-    @RequestMapping(value = "/{id}", method = RequestMethod.GET)
+    @JsonView(SurveyViews.Detailed.class)
+    @GetMapping(value = "/{id}")
     @Transactional
     public @ResponseBody EntityModel<Survey> findById(
             @PathVariable("id") Long surveyId) {
@@ -112,7 +117,8 @@ public class SurveyController {
     /**
      * @return The specified survey.
      */
-    @RequestMapping(value = "/findByName/{name}", method = RequestMethod.GET)
+    @JsonView(SurveyViews.Detailed.class)
+    @GetMapping(value = "/findByName/{name}")
     public @ResponseBody EntityModel<Survey> findByName(
             @PathVariable("name") String name) {
         LOGGER.info("findByName {}", name);
@@ -137,8 +143,9 @@ public class SurveyController {
     /**
      * @return list of surveys, optionally paged.
      */
+    @JsonView(SurveyViews.Summary.class)
     @RolesAllowed(SrpRoles.ADMIN)
-    @RequestMapping(value = "/", method = RequestMethod.GET)
+    @GetMapping(value = "/")
     public @ResponseBody List<EntityModel<Survey>> list(
             @RequestParam(value = "page", required = false) Integer page,
             @RequestParam(value = "limit", required = false) Integer limit) {
@@ -159,8 +166,9 @@ public class SurveyController {
     /**
      * @return a list of survey returns, optionally paged.
      */
+    @JsonView(SurveyViews.Summary.class)
     @RolesAllowed(SrpRoles.ADMIN)
-    @RequestMapping(value = "/{id}/returns", method = RequestMethod.GET)
+    @GetMapping(value = "/{id}/returns")
     public @ResponseBody List<SurveyReturn> listReturns(
             @PathVariable("id") Long surveyId,
             @RequestParam(value = "page", required = false) Integer page,
@@ -183,7 +191,7 @@ public class SurveyController {
      */
     @RolesAllowed(SrpRoles.ADMIN)
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
-    @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
+    @DeleteMapping(value = "/{id}")
     @Transactional
     public @ResponseBody void delete(@PathVariable("id") Long surveyId) {
         surveyRepo.deleteById(surveyId);

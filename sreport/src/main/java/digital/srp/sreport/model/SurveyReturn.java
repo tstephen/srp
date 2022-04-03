@@ -50,9 +50,11 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import org.springframework.hateoas.RepresentationModel;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonView;
 
 import digital.srp.sreport.api.MandatoryCurrentPeriodAnswersProvided;
 import digital.srp.sreport.internal.EntityAuditorListener;
+import digital.srp.sreport.model.views.SurveyReturnViews;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -84,12 +86,14 @@ public class SurveyReturn extends RepresentationModel<SurveyReturn>{
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @JsonProperty
+    @JsonView(SurveyReturnViews.Summary.class)
     @Column(name = "id")
     private Long id;
 
     @NotNull
     @Size(max = 50)
     @JsonProperty
+    @JsonView(SurveyReturnViews.Summary.class)
     @Column(name = "name")
     private String name;
 
@@ -100,12 +104,14 @@ public class SurveyReturn extends RepresentationModel<SurveyReturn>{
     @NotNull
     @Size(max = 50)
     @JsonProperty
+    @JsonView(SurveyReturnViews.Summary.class)
     @Column(name = "org")
     private String org;
 
     @NotNull
     @Size(max = 50)
     @JsonProperty
+    @JsonView(SurveyReturnViews.Summary.class)
     @Column(name = "status")
     private String status = StatusType.Draft.name();
 
@@ -116,6 +122,7 @@ public class SurveyReturn extends RepresentationModel<SurveyReturn>{
      */
     @NotNull
     @JsonProperty
+    @JsonView(SurveyReturnViews.Summary.class)
     @Size(max = 20)
     @Column(name = "applicable_period")
     private String applicablePeriod;
@@ -125,12 +132,14 @@ public class SurveyReturn extends RepresentationModel<SurveyReturn>{
      * allows for a re-statement if needed.
      */
     @JsonProperty
+    @JsonView(SurveyReturnViews.Summary.class)
     @Column(name = "revision")
     private Short revision = 1;
 
 
     @Temporal(TemporalType.TIMESTAMP)
     @JsonProperty
+    @JsonView(SurveyReturnViews.Summary.class)
     @Column(name = "submitted_date")
     private Date submittedDate;
 
@@ -138,34 +147,41 @@ public class SurveyReturn extends RepresentationModel<SurveyReturn>{
      * Username of submitter.
      */
     @JsonProperty
+    @JsonView(SurveyReturnViews.Summary.class)
     @Column(name = "submitted_by")
     private String submittedBy;
 
     @JsonProperty
+    @JsonView(SurveyReturnViews.Summary.class)
     @Column(name = "created", nullable = false, updatable = false)
     @CreatedDate
     private Date created;
 
     @JsonProperty
+    @JsonView(SurveyReturnViews.Summary.class)
     @Column(name = "created_by")
     @CreatedBy
     private String createdBy;
 
     @JsonProperty
+    @JsonView(SurveyReturnViews.Summary.class)
     @Column(name = "last_updated")
     @LastModifiedDate
     private Date lastUpdated;
 
     @JsonProperty
+    @JsonView(SurveyReturnViews.Summary.class)
     @Column(name = "updated_by")
     @LastModifiedBy
     private String updatedBy;
 
     @JsonProperty
+    @JsonView(SurveyReturnViews.Detailed.class)
     @ManyToOne(fetch = FetchType.EAGER)
     private Survey survey;
 
     @JsonProperty
+    @JsonView(SurveyReturnViews.Detailed.class)
 //    @Transient
     @ManyToMany(cascade=CascadeType.ALL, fetch = FetchType.EAGER, mappedBy = "surveyReturns")
     private Set<Answer> answers;
@@ -376,5 +392,4 @@ public class SurveyReturn extends RepresentationModel<SurveyReturn>{
     public void setAnswers(Set<Answer> answers) {
         this.answers = answers;
     }
-
 }

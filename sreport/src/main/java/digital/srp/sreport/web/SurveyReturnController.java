@@ -37,7 +37,10 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -46,6 +49,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+
+import com.fasterxml.jackson.annotation.JsonView;
 
 import digital.srp.sreport.api.Calculator;
 import digital.srp.sreport.api.SrpRoles;
@@ -58,6 +63,7 @@ import digital.srp.sreport.model.StatusType;
 import digital.srp.sreport.model.Survey;
 import digital.srp.sreport.model.SurveyCategory;
 import digital.srp.sreport.model.SurveyReturn;
+import digital.srp.sreport.model.views.SurveyReturnViews;
 import digital.srp.sreport.repositories.AnswerRepository;
 import digital.srp.sreport.repositories.QuestionRepository;
 import digital.srp.sreport.repositories.SurveyRepository;
@@ -126,7 +132,8 @@ public class SurveyReturnController {
      *
      * @return the specified survey.
      */
-    @RequestMapping(value = "/{id}", method = RequestMethod.GET)
+    @JsonView(SurveyReturnViews.Detailed.class)
+    @GetMapping(value = "/{id}")
     @Transactional
     public @ResponseBody EntityModel<SurveyReturn> findById(@PathVariable("id") Long returnId) {
         LOGGER.info("findById {}", returnId);
@@ -144,9 +151,10 @@ public class SurveyReturnController {
     /**
      * Returns matching the specified survey and organisation.
      *
-     * @return returns. May be more than one because occasionally returns are restated. .
+     * @return returns. May be more than one because occasionally returns are restated.
      */
-    @RequestMapping(value = "/findBySurveyName/{surveyName}", method = RequestMethod.GET)
+    @JsonView(SurveyReturnViews.Detailed.class)
+    @GetMapping(value = "/findBySurveyName/{surveyName}")
     @Transactional
     public @ResponseBody List<EntityModel<SurveyReturn>> findBySurvey(
             @PathVariable("surveyName") String surveyName) {
@@ -159,7 +167,8 @@ public class SurveyReturnController {
      *
      * @return returns. May be more than one because occasionally returns are restated.
      */
-    @RequestMapping(value = "/findBySurveyNameAndOrg/{surveyName}/{org}", method = RequestMethod.GET)
+    @JsonView(SurveyReturnViews.Detailed.class)
+    @GetMapping(value = "/findBySurveyNameAndOrg/{surveyName}/{org}")
     public @ResponseBody List<EntityModel<SurveyReturn>> findEntityBySurveyAndOrg(
             @PathVariable("surveyName") String surveyName,
             @PathVariable("org") String org) {
@@ -245,7 +254,7 @@ public class SurveyReturnController {
         returnRepo.save(rtn);
     }
 
-    @RequestMapping(value = "/findCurrentBySurveyNameAndOrg/{surveyName}/{org}", method = RequestMethod.GET)
+    @GetMapping(value = "/findCurrentBySurveyNameAndOrg/{surveyName}/{org}")
     public @ResponseBody EntityModel<SurveyReturn> findCurrentEntityBySurveyNameAndOrg(
             @PathVariable("surveyName") String surveyName,
             @PathVariable("org") String org) {
@@ -283,7 +292,7 @@ public class SurveyReturnController {
         return answer.get(0).surveyReturns().iterator().next().org();
     }
 
-    @RequestMapping(value = "/importEric/{surveyName}/{org}", method = RequestMethod.GET)
+    @GetMapping(value = "/importEric/{surveyName}/{org}")
     @Transactional
     public @ResponseBody SurveyReturn importEricAnswers(
             @PathVariable("surveyName") String surveyName,
@@ -302,7 +311,7 @@ public class SurveyReturnController {
     }
 
     @RolesAllowed(SrpRoles.ADMIN)
-    @RequestMapping(value = "/import/{sourceReturnName}/{targetReturnName}", method = RequestMethod.POST)
+    @PostMapping(value = "/import/{sourceReturnName}/{targetReturnName}")
     @ResponseStatus(HttpStatus.OK)
     @Transactional
     public void importFromOtherReturn(
@@ -332,8 +341,9 @@ public class SurveyReturnController {
     /**
      * @return list of survey returns, optionally paged.
      */
+    @JsonView(SurveyReturnViews.Summary.class)
     @RolesAllowed(SrpRoles.ANALYST)
-    @RequestMapping(value = "/", method = RequestMethod.GET)
+    @GetMapping(value = "/")
     public @ResponseBody List<EntityModel<SurveyReturn>> list(
             @RequestParam(value = "page", required = false) Integer page,
             @RequestParam(value = "limit", required = false) Integer limit) {
@@ -356,8 +366,9 @@ public class SurveyReturnController {
      *
      * @return survey returns.
      */
+    @JsonView(SurveyReturnViews.Summary.class)
     @RolesAllowed(SrpRoles.ANALYST)
-    @RequestMapping(value = "/findByOrg/{org}", method = RequestMethod.GET)
+    @GetMapping(value = "/findByOrg/{org}")
     public @ResponseBody List<EntityModel<SurveyReturn>> findByOrg(
             @PathVariable("org") String org) {
         LOGGER.info("List returns for {}", org);
@@ -378,7 +389,7 @@ public class SurveyReturnController {
      *
      */
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
-    @RequestMapping(value = "/{id}/answers/{q}", method = RequestMethod.POST, consumes = "application/json")
+    @PostMapping(value = "/{id}/answers/{q}", consumes = "application/json")
     public @ResponseBody void updateCurrentAnswer(
             @PathVariable("id") Long returnId,
             @PathVariable("q") String q,
@@ -397,7 +408,7 @@ public class SurveyReturnController {
      * @param period The period of this answer, if omitted the period of the return is assumed.
      */
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
-    @RequestMapping(value = "/{id}/answers/{q}/{period}", method = RequestMethod.POST, consumes = "application/json")
+    @PostMapping(value = "/{id}/answers/{q}/{period}", consumes = "application/json")
     public @ResponseBody void updateAnswer(
             @PathVariable("id") Long returnId,
             @PathVariable("q") String q,
@@ -442,10 +453,10 @@ public class SurveyReturnController {
     /**
      * Re-stating a return preserves the existing one and saves the updates as a new revision.
      */
-    @ResponseStatus(value = HttpStatus.NO_CONTENT)
-    @RequestMapping(value = "/{id}/restate", method = RequestMethod.POST, consumes = { "application/json" })
+    @JsonView(SurveyReturnViews.Summary.class)
+    @PostMapping(value = "/{id}/restate", consumes = { "application/json" })
     @Transactional
-    public @ResponseBody void restate(
+    public @ResponseBody EntityModel<SurveyReturn> restate(
             @PathVariable("id") Long returnId) {
         SurveyReturn existing = returnRepo.findById(returnId)
                 .orElseThrow(()-> new ObjectNotFoundException(SurveyReturn.class, returnId));
@@ -471,14 +482,15 @@ public class SurveyReturnController {
                     .question(a.question())
                     .addSurveyReturn(restatedRtn));
         }
-        returnRepo.save(restatedRtn);
+        return addLinks(returnRepo.save(returnRepo.save(restatedRtn)));
     }
 
     /**
      * Change the status the return has reached.
      * @return The updated return
      */
-    @RequestMapping(value = "/{returnId}/status/{status}", method = RequestMethod.POST, consumes = "application/json")
+    @JsonView(SurveyReturnViews.Summary.class)
+    @PostMapping(value = "/{returnId}/status/{status}", consumes = "application/json")
     public @ResponseBody EntityModel<SurveyReturn> setStatus(
             @PathVariable("returnId") Long returnId,
             @PathVariable("status") String status,
@@ -504,9 +516,9 @@ public class SurveyReturnController {
     }
 
     protected void submit(SurveyReturn survey, String submitter) {
-        survey.updatedBy(submitter);
-        survey.submittedBy(submitter);
-        survey.submittedDate(new Date());
+        survey.setUpdatedBy(submitter);
+        survey.setSubmittedBy(submitter);
+        survey.setSubmittedDate(new Date());
         survey.status(StatusType.Submitted.name());
         for (Answer a : survey.answers()) {
             // Cannot overwrite published answers without calling restate
@@ -530,7 +542,7 @@ public class SurveyReturnController {
      */
     @RolesAllowed(SrpRoles.ADMIN)
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
-    @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
+    @DeleteMapping(value = "/{id}")
     @Transactional
     public @ResponseBody void delete(
             @PathVariable("id") Long returnId) {
@@ -546,10 +558,10 @@ public class SurveyReturnController {
     }
 
     protected EntityModel<SurveyReturn> addLinks(SurveyReturn rtn) {
-        return EntityModel.of(rtn,
+        EntityModel<SurveyReturn> model = EntityModel.of(rtn,
                 linkTo(methodOn(SurveyReturnController.class).findById(rtn.id())).withSelfRel()
-//                ,
-//                linkTo(methodOn(SurveyReturnController.class).list()).withRel("returns")
                 );
+        model.add(linkTo(methodOn(SurveyController.class).findById(rtn.survey().id())).withRel("survey"));
+        return model;
     }
 }

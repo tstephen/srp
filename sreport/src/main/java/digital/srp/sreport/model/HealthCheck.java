@@ -116,11 +116,11 @@ public class HealthCheck {
 
     public HealthCheck(SurveyReturn rtn) {
         this();
-        this.name = rtn.name();
-        this.org = rtn.org();
-        this.status = rtn.status();
-        this.applicablePeriod = rtn.applicablePeriod();
-        this.revision = rtn.revision();
+        this.name = rtn.getName();
+        this.org = rtn.getOrg();
+        this.status = rtn.getStatus();
+        this.applicablePeriod = rtn.getApplicablePeriod();
+        this.revision = rtn.getRevision();
         this.answerCount = rtn.answers().size();
         this.issues = Collections.emptySet();
     }
