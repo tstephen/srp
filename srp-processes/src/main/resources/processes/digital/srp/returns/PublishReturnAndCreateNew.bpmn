@@ -1,173 +1,182 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+<definitions
+  xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
   xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
   xmlns:dc="http://www.omg.org/spec/DD/20100524/DC"
   xmlns:di="http://www.omg.org/spec/DD/20100524/DI"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xmlns:activiti="http://activiti.org/bpmn"
   xmlns:color="http://www.omg.org/spec/BPMN/non-normative/color/1.0"
+  xmlns:flowable="http://flowable.org/bpmn"
+  xmlns:kp="http://knowprocess.com/bpmn"
   xmlns:tns="http://srp.digital/returns"
-  xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-  id="PublishReturnAndCreateNewDefs" name="PublishReturnAndCreateNewDefs"
-  targetNamespace="http://srp.digital/returns"
-  exporter="KnowProcess Modeler" exporterVersion="3.0.0"
-  xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL http://bpmn.sourceforge.net/schemas/BPMN20.xsd">
+  xmlns:xsd="http://www.w3.org/2001/XMLSchema" id="PublishReturnAndCreateNewDefs" name="PublishReturnAndCreateNewDefs" targetNamespace="http://srp.digital/returns" exporter="KnowProcess Modeler" exporterVersion="3.0.0" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL http://bpmn.sourceforge.net/schemas/BPMN20.xsd">
   <process id="PublishReturnAndCreateNew" name="Publish return and create new" processType="None" isClosed="false" isExecutable="true">
+    <documentation>Publish one year's return and create the next year's</documentation>
     <ioSpecification>
-      <dataInput id="returnId" name="returnId" />
-      <dataInput id="submitter" name="submitter" />
-      <dataInput id="currentSurvey" name="currentSurvey" />
-      <dataInput id="newSurvey" name="newSurvey" />
-      <dataInput id="org" name="org" />
+      <dataInput id="returnId" name="returnId"/>
+      <dataInput id="newSurvey" name="newSurvey"/>
       <inputSet>
         <dataInputRefs>returnId</dataInputRefs>
-        <dataInputRefs>submitter</dataInputRefs>
-        <dataInputRefs>currentSurvey</dataInputRefs>
         <dataInputRefs>newSurvey</dataInputRefs>
-        <dataInputRefs>org</dataInputRefs>
       </inputSet>
-      <outputSet />
+      <outputSet/>
     </ioSpecification>
-    <startEvent id="startEvent" name="Start Event">
+    <startEvent id="startEvent" name="Start Event" kp:initiator="initiator" kp:formKey="PublishReturn">
       <outgoing>_4</outgoing>
-      <outputSet />
+      <outputSet/>
     </startEvent>
-    <serviceTask id="setStatusToPublished" name="Set return&#10;status to&#10;published" implementation="##WebService" activiti:async="true" activiti:class="com.knowprocess.resource.spi.RestPost">
+    <serviceTask id="setStatusToPublished" name="Set return&#xA;status to&#xA;published" implementation="kp:http" kp:async="true">
       <extensionElements>
-        <activiti:field name="resourceUsername" stringValue="userInfo(&#39;tenant-bot&#39;)" />
-        <activiti:field name="resourcePassword" expression="userInfo(&#39;cust-mgmt-secret&#39;)" />
-        <activiti:field name="jwtLoginResource" expression="userInfo(&#39;jwt-login-url&#39;)" />
-        <activiti:field name="globalResource" expression="userInfo(&#39;cust-mgmt-url&#39;)/returns/${returnId}/status/Published" />
-        <activiti:field name="headers" stringValue="Content-Type:application/json,Accept:application/json,X-RunAs:${initiator}" />
+        <kp:field name="requestMethod" stringValue="POST"/>
+        <kp:field name="requestUrl" expression="${srpServer}/returns/${returnId}/status/Published"/>
+        <kp:field name="requestHeaders">
+          <kp:expression>Content-Type:application/json
+Accept:application/json
+X-RunAs:${initiator}</kp:expression>
+        </kp:field>
+        <kp:field name="responseVariableName" stringValue="surveyReturn"/>
+        <kp:field name="saveRequestVariables" stringValue="false"/>
+        <kp:field name="saveResponseParameters" stringValue="false"/>
+        <kp:field name="saveResponseVariableAsJson" stringValue="true"/>
       </extensionElements>
       <incoming>_4</incoming>
       <outgoing>setStatusToPublished_to_getAccountDetails</outgoing>
       <ioSpecification>
-        <dataInput id="Din_setStatusToPublished_returnId" name="returnId" />
-        <dataInput id="Din_setStatusToPublished_submitter" name="submitter" />
+        <dataInput id="Din_setStatusToPublished_returnId" name="returnId"/>
+        <dataOutput id="do_setStatusToPublished_org"/>
         <inputSet>
           <dataInputRefs>Din_setStatusToPublished_returnId</dataInputRefs>
-          <dataInputRefs>Din_setStatusToPublished_submitter</dataInputRefs>
         </inputSet>
-        <outputSet />
+        <outputSet>
+          <dataOutputRefs>do_setStatusToPublished_org</dataOutputRefs>
+        </outputSet>
       </ioSpecification>
-      <property id="Property_0r99hr0" name="__targetRef_placeholder" />
-      <dataInputAssociation id="_7">
+      <dataInputAssociation id="dia_setStatusToPublished_returnId">
         <sourceRef>returnId</sourceRef>
-        <targetRef>Property_0r99hr0</targetRef>
+        <targetRef>Din_setStatusToPublished_returnId</targetRef>
       </dataInputAssociation>
-      <dataInputAssociation id="_11">
-        <sourceRef>submitter</sourceRef>
-        <targetRef>Property_0r99hr0</targetRef>
-      </dataInputAssociation>
+      <dataOutputAssociation id="doa_setStatusToPublished_org">
+        <sourceRef>do_setStatusToPublished_org</sourceRef>
+        <targetRef>dor_org</targetRef>
+      </dataOutputAssociation>
     </serviceTask>
-    <callActivity id="recordPublication" name="Record&#10;publication&#10;on account" calledElement="AddActivityToAccount">
+    <callActivity id="recordPublication" name="Record&#xA;publication&#xA;on account" calledElement="AddActivityToAccount">
       <extensionElements>
-        <activiti:in sourceExpression="publishReturn" target="activityType" />
-        <activiti:in sourceExpression="Published return from ${org} (${returnId}) for ${currentSurvey}" target="activityContent" />
-        <activiti:in sourceExpression="${accounts.getJsonObject(0).getJsonNumber(&#39;id&#39;).longValue()}" target="accountId" />
-        <activiti:in source="tenantId" target="tenantId" />
-        <activiti:out source="activityId" target="activityId" />
+        <kp:in sourceExpression="publishReturn" target="activityType"/>
+        <kp:in sourceExpression="Published return ${variables:getOrDefault('surveyReturn','n/a').findValue('org').asText()} ${variables:getOrDefault('surveyReturn','n/a').findValue('applicablePeriod').asText()} (${returnId})" target="activityContent"/>
+        <kp:in sourceExpression="${accounts.get((0).intValue()).findValue('id').asLong()}" target="accountId"/>
+        <kp:in source="tenantId" target="tenantId"/>
+        <kp:out source="activityId" target="activityId"/>
       </extensionElements>
       <incoming>setStatusToPublished_to_recordPublication</incoming>
       <ioSpecification>
-        <dataInput id="Din_recordPublication_org" name="org" />
+        <dataInput id="Din_recordPublication_org" name="org"/>
         <inputSet>
           <dataInputRefs>Din_recordPublication_org</dataInputRefs>
         </inputSet>
-        <outputSet />
+        <outputSet/>
       </ioSpecification>
-      <dataInputAssociation id="_34">
+      <dataInputAssociation id="dia_recordPublication_org">
         <sourceRef>org</sourceRef>
         <targetRef>Din_recordPublication_org</targetRef>
       </dataInputAssociation>
     </callActivity>
-    <sequenceFlow id="setStatusToPublished_to_recordPublication" sourceRef="parallelGatewaySplit" targetRef="recordPublication" />
-    <serviceTask id="requestNewYearReturn" name="Request new&#10;year&#39;s return" activiti:async="true" activiti:class="com.knowprocess.resource.spi.RestGet">
+    <sequenceFlow id="setStatusToPublished_to_recordPublication" sourceRef="parallelGatewaySplit" targetRef="recordPublication"/>
+    <serviceTask id="requestNewYearReturn" name="Request new&#xA;year's return" implementation="kp:http" kp:async="true">
       <extensionElements>
-        <activiti:field name="resourceUsername" stringValue="userInfo(&#39;tenant-bot&#39;)" />
-        <activiti:field name="resourcePassword" expression="userInfo(&#39;cust-mgmt-secret&#39;)" />
-        <activiti:field name="jwtLoginResource" expression="userInfo(&#39;jwt-login-url&#39;)" />
-        <activiti:field name="globalResource" expression="userInfo(&#39;cust-mgmt-url&#39;)/returns/findCurrentBySurveyNameAndOrg/${newSurvey}/${org}" />
-        <activiti:field name="headers" stringValue="Content-Type:application/json,Accept:application/json" />
-        <activiti:field name="responseVar" expression="newReturn" />
+        <kp:field name="requestMethod" stringValue="GET"/>
+        <kp:field name="requestUrl" expression="${srpServer}/returns/findCurrentBySurveyNameAndOrg/${newSurvey}/${surveyReturn.findValue('org').asText()}"/>
+        <kp:field name="requestHeaders">
+          <kp:string>Content-Type:application/json
+Accept:application/json</kp:string>
+        </kp:field>
+        <kp:field name="responseVariableName" expression="newReturn"/>
+        <kp:field name="saveRequestVariables" stringValue="false"/>
+        <kp:field name="saveResponseParameters" stringValue="false"/>
+        <kp:field name="saveResponseVariableAsJson" stringValue="true"/>
       </extensionElements>
       <incoming>setStatusToPublished_to_requestNewYearReturn</incoming>
       <outgoing>requestNewYearReturn_to_importPreviousReturn</outgoing>
       <ioSpecification>
-        <dataInput id="Din_requestNewYearReturn_newSurvey" name="newSurvey" />
-        <dataInput id="Din_requestNewYearReturn_org" name="org" />
+        <dataInput id="Din_requestNewYearReturn_newSurvey" name="newSurvey"/>
+        <dataInput id="Din_requestNewYearReturn_org" name="org"/>
         <inputSet>
           <dataInputRefs>Din_requestNewYearReturn_newSurvey</dataInputRefs>
           <dataInputRefs>Din_requestNewYearReturn_org</dataInputRefs>
         </inputSet>
-        <outputSet />
+        <outputSet/>
       </ioSpecification>
-      <property id="Property_06dwgas" name="__targetRef_placeholder" />
       <dataInputAssociation id="dia_requestNewYearReturn_newSurvey">
         <sourceRef>newSurvey</sourceRef>
-        <targetRef>Property_06dwgas</targetRef>
+        <targetRef>Din_requestNewYearReturn_newSurvey</targetRef>
       </dataInputAssociation>
       <dataInputAssociation id="dia_requestNewYearReturn_org">
         <sourceRef>org</sourceRef>
         <targetRef>Din_requestNewYearReturn_org</targetRef>
       </dataInputAssociation>
     </serviceTask>
-    <serviceTask id="importPreviousReturn" name="Import&#10;previous&#10;return" activiti:async="true" activiti:class="com.knowprocess.resource.spi.RestPost">
+    <serviceTask id="importPreviousReturn" name="Import&#xA;previous&#xA;return" implementation="kp:http" kp:async="true">
       <extensionElements>
-        <activiti:field name="resourceUsername" stringValue="userInfo(&#39;tenant-bot&#39;)" />
-        <activiti:field name="resourcePassword" expression="userInfo(&#39;cust-mgmt-secret&#39;)" />
-        <activiti:field name="jwtLoginResource" expression="userInfo(&#39;jwt-login-url&#39;)" />
-        <activiti:field name="globalResource" expression="userInfo(&#39;cust-mgmt-url&#39;)/returns/import/${currentSurvey}-${org}/${newSurvey}-${org}" />
-        <activiti:field name="headers" stringValue="Content-Type:application/json,Accept:application/json" />
+        <kp:field name="requestMethod" stringValue="POST"/>
+        <kp:field name="requestUrl" expression="${srpServer}/returns/import/${surveyReturn.findValue('name').asText()}/${newSurvey}-${surveyReturn.findValue('org').asText()}"/>
+        <kp:field name="requestHeaders">
+          <kp:string>Content-Type:application/json
+Accept:application/json</kp:string>
+        </kp:field>
+        <kp:field name="responseVariableName" stringValue="importCount"/>
+        <kp:field name="saveRequestVariables" stringValue="false"/>
+        <kp:field name="saveResponseParameters" stringValue="false"/>
+        <kp:field name="saveResponseVariableAsJson" stringValue="false"/>
       </extensionElements>
       <incoming>requestNewYearReturn_to_importPreviousReturn</incoming>
       <outgoing>importPreviousReturn_to_alertNewReturn</outgoing>
       <ioSpecification>
-        <dataInput id="Din_importPreviousReturn_currentSurvey" name="currentSurvey" />
-        <dataInput id="Din_importPreviousReturn_newSurvey" name="newSurvey" />
-        <dataInput id="Din_importPreviousReturn_org" name="org" />
+        <dataInput id="Din_importPreviousReturn_newSurvey" name="newSurvey"/>
+        <dataInput id="Din_importPreviousReturn_org" name="org"/>
+        <dataOutput id="dout_importPreviousReturn_newReturn" name="newReturn"/>
         <inputSet>
-          <dataInputRefs>Din_importPreviousReturn_currentSurvey</dataInputRefs>
           <dataInputRefs>Din_importPreviousReturn_newSurvey</dataInputRefs>
           <dataInputRefs>Din_importPreviousReturn_org</dataInputRefs>
         </inputSet>
-        <outputSet />
+        <outputSet>
+          <dataOutputRefs>dout_importPreviousReturn_newReturn</dataOutputRefs>
+        </outputSet>
       </ioSpecification>
-      <property id="Property_154qi4i" name="__targetRef_placeholder" />
-      <dataInputAssociation id="dia_importPreviousReturn_currentSurvey">
-        <sourceRef>currentSurvey</sourceRef>
-        <targetRef>Property_154qi4i</targetRef>
-      </dataInputAssociation>
       <dataInputAssociation id="dia_importPreviousReturn_newSurvey">
         <sourceRef>newSurvey</sourceRef>
-        <targetRef>Property_154qi4i</targetRef>
+        <targetRef>Din_importPreviousReturn_newSurvey</targetRef>
       </dataInputAssociation>
       <dataInputAssociation id="dia_importPreviousReturn_org">
         <sourceRef>org</sourceRef>
         <targetRef>Din_importPreviousReturn_org</targetRef>
       </dataInputAssociation>
-      <dataOutputAssociation id="DataOutputAssociation_10ejit9">
+      <dataOutputAssociation id="doa_importPreviousReturn_newReturn">
+        <sourceRef>dout_importPreviousReturn_newReturn</sourceRef>
         <targetRef>newReturn</targetRef>
       </dataOutputAssociation>
     </serviceTask>
-    <serviceTask id="performCalculations" name="Perform&#10;calculations" activiti:async="true" activiti:class="com.knowprocess.resource.spi.RestPost">
+    <serviceTask id="performCalculations" name="Perform&#xA;calculations" implementation="kp:http" kp:async="true">
       <extensionElements>
-        <activiti:field name="resourceUsername" stringValue="userInfo(&#39;tenant-bot&#39;)" />
-        <activiti:field name="resourcePassword" expression="userInfo(&#39;cust-mgmt-secret&#39;)" />
-        <activiti:field name="jwtLoginResource" expression="userInfo(&#39;jwt-login-url&#39;)" />
-        <activiti:field name="globalResource" expression="userInfo(&#39;cust-mgmt-url&#39;)/calculations/${newSurvey}/${org}" />
-        <activiti:field name="headers" stringValue="Content-Type:application/json,Accept:application/json" />
+        <kp:field name="requestMethod" stringValue="POST"/>
+        <kp:field name="requestTimeout" stringValue="0"/>
+        <kp:field name="requestUrl" expression="${srpServer}/calculations/${newSurvey}/${surveyReturn.findValue('org').asText()}"/>
+        <kp:field name="requestHeaders">
+          <kp:string>Content-Type:application/json
+Accept:application/json</kp:string>
+        </kp:field>
+        <kp:field name="saveRequestVariables" stringValue="false"/>
+        <kp:field name="saveResponseParameters" stringValue="false"/>
+        <kp:field name="saveResponseVariableAsJson" stringValue="false"/>
       </extensionElements>
       <incoming>setReturnOrgType_to_performCalculations</incoming>
       <ioSpecification>
-        <dataInput id="Din_performCalculations_newSurvey" name="newSurvey" />
-        <dataInput id="Din_performCalculations_org" name="org" />
+        <dataInput id="Din_performCalculations_newSurvey" name="newSurvey"/>
+        <dataInput id="Din_performCalculations_org" name="org"/>
         <inputSet>
           <dataInputRefs>Din_performCalculations_newSurvey</dataInputRefs>
           <dataInputRefs>Din_performCalculations_org</dataInputRefs>
         </inputSet>
-        <outputSet />
+        <outputSet/>
       </ioSpecification>
       <dataInputAssociation id="dia_performCalculations_newSurvey">
         <sourceRef>newSurvey</sourceRef>
@@ -178,381 +187,355 @@
         <targetRef>Din_performCalculations_org</targetRef>
       </dataInputAssociation>
     </serviceTask>
-    <sequenceFlow id="importPreviousReturn_to_performCalculations" sourceRef="importPreviousReturn" targetRef="setReturnOrgType" />
-    <sequenceFlow id="requestNewYearReturn_to_importPreviousReturn" sourceRef="requestNewYearReturn" targetRef="importPreviousReturn" />
-    <sequenceFlow id="setStatusToPublished_to_requestNewYearReturn" sourceRef="parallelGatewaySplit" targetRef="requestNewYearReturn" />
-    <sequenceFlow id="_4" sourceRef="startEvent" targetRef="setStatusToPublished" />
-    <sequenceFlow id="importPreviousReturn_to_alertNewReturn" sourceRef="importPreviousReturn" targetRef="alertNewReturn" />
-    <sequenceFlow id="joinGateway_to_endEvent" sourceRef="joinGateway" targetRef="endEvent" />
-    <callActivity id="alertNewReturn" name="Alert return&#10;publication" calledElement="SendAlert">
+    <sequenceFlow id="importPreviousReturn_to_performCalculations" sourceRef="importPreviousReturn" targetRef="setReturnOrgType"/>
+    <sequenceFlow id="requestNewYearReturn_to_importPreviousReturn" sourceRef="requestNewYearReturn" targetRef="importPreviousReturn"/>
+    <sequenceFlow id="setStatusToPublished_to_requestNewYearReturn" sourceRef="parallelGatewaySplit" targetRef="requestNewYearReturn"/>
+    <sequenceFlow id="_4" sourceRef="startEvent" targetRef="setStatusToPublished"/>
+    <sequenceFlow id="importPreviousReturn_to_alertNewReturn" sourceRef="importPreviousReturn" targetRef="alertNewReturn"/>
+    <sequenceFlow id="joinGateway_to_endEvent" sourceRef="joinGateway" targetRef="endEvent"/>
+    <callActivity id="alertNewReturn" name="Alert return&#xA;publication" calledElement="SendAlert">
       <extensionElements>
-        <activiti:in sourceExpression="SRP: New return ${newSurvey} for ${org} is available and current has been published" target="subject" />
-        <activiti:in sourceExpression="tim@knowprocess.com" target="addressee" />
-        <activiti:in sourceExpression="SRP: &#60;a href=https://srp.digital/accounts.html?q=${org}&#62;Click to view&#60;/a&#62;" target="message" />
-        <activiti:in sourceExpression="${tenantId}" target="tenantId" />
+        <kp:in sourceExpression="SRP: New return ${newSurvey} for ${surveyReturn.findValue('org').asText()} is available and current has been published" target="subject"/>
+        <kp:in sourceExpression="tim@knowprocess.com" target="addressee"/>
+        <kp:in sourceExpression="SRP: &lt;a href=https://cloud.knowprocess.com/accounts.html?q=${surveyReturn.findValue('org').asText()}&gt;Click to view&lt;/a&gt;" target="message"/>
+        <kp:in sourceExpression="${tenantId}" target="tenantId"/>
       </extensionElements>
       <incoming>importPreviousReturn_to_alertNewReturn</incoming>
       <outgoing>joinGateway_to_endEvent</outgoing>
       <ioSpecification>
-        <dataInput id="Din_alertNewReturn_submitter" name="submitter" />
-        <dataInput id="Din_alertNewReturn_returnId" name="returnId" />
-        <dataInput id="Din_alertNewReturn_newSurvey" name="newSurvey" />
-        <dataInput id="Din_alertNewReturn_org" name="org" />
+        <dataInput id="Din_alertNewReturn_returnId" name="returnId"/>
+        <dataInput id="Din_alertNewReturn_newSurvey" name="newSurvey"/>
+        <dataInput id="Din_alertNewReturn_org" name="org"/>
         <inputSet>
-          <dataInputRefs>Din_alertNewReturn_submitter</dataInputRefs>
           <dataInputRefs>Din_alertNewReturn_returnId</dataInputRefs>
           <dataInputRefs>Din_alertNewReturn_newSurvey</dataInputRefs>
           <dataInputRefs>Din_alertNewReturn_org</dataInputRefs>
         </inputSet>
-        <outputSet />
+        <outputSet/>
       </ioSpecification>
-      <property id="Property_1ucqxh9" name="__targetRef_placeholder" />
-      <dataInputAssociation id="dia_alertNewReturn_submitter">
-        <sourceRef>submitter</sourceRef>
-        <targetRef>Property_1ucqxh9</targetRef>
-      </dataInputAssociation>
       <dataInputAssociation id="dia_alertNewReturn_returnId">
         <sourceRef>returnId</sourceRef>
-        <targetRef>Property_1ucqxh9</targetRef>
+        <targetRef>Din_alertNewReturn_returnId</targetRef>
       </dataInputAssociation>
       <dataInputAssociation id="dia_alertNewReturn_newSurvey">
         <sourceRef>newSurvey</sourceRef>
-        <targetRef>Property_1ucqxh9</targetRef>
+        <targetRef>Din_alertNewReturn_newSurvey</targetRef>
       </dataInputAssociation>
       <dataInputAssociation id="dia_alertNewReturn_org">
         <sourceRef>org</sourceRef>
-        <targetRef>Property_1ucqxh9</targetRef>
+        <targetRef>Din_alertNewReturn_org</targetRef>
       </dataInputAssociation>
     </callActivity>
-    <parallelGateway id="joinGateway" name="Join" />
-    <sequenceFlow id="performCalculations_to_joinGateway" sourceRef="performCalculations" targetRef="joinGateway" />
-    <sequenceFlow id="recordPublication_to_joinGateway" sourceRef="recordPublication" targetRef="joinGateway" />
-    <sequenceFlow id="alertNewReturn_to_joinGateway" sourceRef="alertNewReturn" targetRef="joinGateway" />
+    <parallelGateway id="joinGateway" name="Join"/>
+    <sequenceFlow id="performCalculations_to_joinGateway" sourceRef="performCalculations" targetRef="joinGateway"/>
+    <sequenceFlow id="recordPublication_to_joinGateway" sourceRef="recordPublication" targetRef="joinGateway"/>
+    <sequenceFlow id="alertNewReturn_to_joinGateway" sourceRef="alertNewReturn" targetRef="joinGateway"/>
     <endEvent id="endEvent" name="End Event">
       <incoming>joinGateway_to_endEvent</incoming>
-      <inputSet />
+      <inputSet/>
     </endEvent>
-    <serviceTask id="getAccountDetails" name="Get account details" activiti:async="true" activiti:class="com.knowprocess.resource.spi.RestGet">
+    <serviceTask id="getAccountDetails" name="Get account details" implementation="kp:http" kp:async="true">
       <extensionElements>
-        <activiti:field name="resourceUsername" stringValue="userInfo(&#39;tenant-bot&#39;)" />
-        <activiti:field name="resourcePassword" expression="userInfo(&#39;cust-mgmt-secret&#39;)" />
-        <activiti:field name="jwtLoginResource" expression="userInfo(&#39;jwt-login-url&#39;)" />
-        <activiti:field name="globalResource" expression="userInfo(&#39;cust-mgmt-url&#39;)/${tenantId}/accounts/findByCustomField/orgCode/${org}" />
-        <activiti:field name="headers" stringValue="Content-Type:application/json,Accept:application/json" />
-        <activiti:field name="responseVar" expression="accounts" />
+        <kp:field name="requestMethod" stringValue="GET"/>
+        <kp:field name="requestUrl" expression="${crmServer}/${tenantId}/accounts/findByCustomField/orgCode/${surveyReturn.findValue('org').asText()}"/>
+        <kp:field name="requestHeaders">
+          <kp:string>Content-Type:application/json
+Accept:application/json</kp:string>
+        </kp:field>
+        <kp:field name="responseVariableName" expression="accounts"/>
+        <kp:field name="saveRequestVariables" stringValue="false"/>
+        <kp:field name="saveResponseParameters" stringValue="false"/>
+        <kp:field name="saveResponseVariableAsJson" stringValue="true"/>
       </extensionElements>
       <incoming>setStatusToPublished_to_getAccountDetails</incoming>
       <outgoing>getAccountDetails_to_parallelGatewaySplit</outgoing>
       <ioSpecification>
-        <dataInput id="Din_getAccountDetails_org" name="org" />
+        <dataInput id="Din_getAccountDetails_org" name="org"/>
         <inputSet>
           <dataInputRefs>Din_getAccountDetails_org</dataInputRefs>
         </inputSet>
-        <outputSet />
+        <outputSet/>
       </ioSpecification>
       <dataInputAssociation id="dia_getAccountDetails_org">
-        <sourceRef>org</sourceRef>
+        <sourceRef>dor_org</sourceRef>
         <targetRef>Din_getAccountDetails_org</targetRef>
       </dataInputAssociation>
     </serviceTask>
-    <sequenceFlow id="setStatusToPublished_to_getAccountDetails" sourceRef="setStatusToPublished" targetRef="getAccountDetails" />
-    <sequenceFlow id="getAccountDetails_to_parallelGatewaySplit" sourceRef="getAccountDetails" targetRef="parallelGatewaySplit" />
+    <sequenceFlow id="setStatusToPublished_to_getAccountDetails" sourceRef="setStatusToPublished" targetRef="getAccountDetails"/>
+    <sequenceFlow id="getAccountDetails_to_parallelGatewaySplit" sourceRef="getAccountDetails" targetRef="parallelGatewaySplit"/>
     <parallelGateway id="parallelGatewaySplit" name="Both">
       <incoming>getAccountDetails_to_parallelGatewaySplit</incoming>
       <outgoing>setStatusToPublished_to_requestNewYearReturn</outgoing>
       <outgoing>setStatusToPublished_to_recordPublication</outgoing>
     </parallelGateway>
-    <serviceTask id="setReturnOrgType" name="Set org type on new return" activiti:async="true" activiti:class="com.knowprocess.resource.spi.RestPost">
+    <serviceTask id="setReturnOrgType" name="Set org type on new return" implementation="kp:http" kp:async="true">
       <extensionElements>
-        <activiti:field name="resourceUsername" stringValue="userInfo(&#39;tenant-bot&#39;)" />
-        <activiti:field name="resourcePassword" expression="userInfo(&#39;cust-mgmt-secret&#39;)" />
-        <activiti:field name="jwtLoginResource" expression="userInfo(&#39;jwt-login-url&#39;)" />
-        <activiti:field name="globalResource" expression="userInfo(&#39;cust-mgmt-url&#39;)/returns/${newReturn.getJsonNumber(&#39;id&#39;).longValue()}/answers/ORG_TYPE/${newReturn.getString(&#39;applicablePeriod&#39;,&#39;&#39;)}" />
-        <activiti:field name="headers" stringValue="Content-Type:application/json,Accept:application/json" />
-        <activiti:field name="data" expression="&#34;${accounts.getJsonObject(0).getString(&#39;accountType&#39;,&#39;&#39;)}&#34;"/>
+        <kp:field name="requestMethod" stringValue="POST"/>
+        <kp:field name="requestUrl" expression="${srpServer}/returns/${newReturn.findValue('id').asLong()}/answers/ORG_TYPE/${newReturn.findValue('applicablePeriod').asText()}"/>
+        <kp:field name="requestHeaders">
+          <kp:string>Content-Type:application/json
+Accept:application/json</kp:string>
+        </kp:field>
+        <kp:field name="requestBody" expression="&quot;${accounts.get((0).intValue()).findValue('accountType')}&quot;"/>
+        <kp:field name="saveRequestVariables" stringValue="false"/>
+        <kp:field name="saveResponseParameters" stringValue="false"/>
+        <kp:field name="saveResponseVariableAsJson" stringValue="false"/>
       </extensionElements>
       <incoming>importPreviousReturn_to_performCalculations</incoming>
       <outgoing>setReturnOrgType_to_performCalculations</outgoing>
       <ioSpecification>
-        <dataInput id="Din_setReturnOrgType_newReturn" name="newReturn" />
+        <dataInput id="Din_setReturnOrgType_newReturn" name="newReturn"/>
         <inputSet>
           <dataInputRefs>Din_setReturnOrgType_newReturn</dataInputRefs>
         </inputSet>
-        <outputSet />
+        <outputSet/>
       </ioSpecification>
       <dataInputAssociation id="dia_setReturnOrgType_newReturn">
+        <sourceRef>newReturn</sourceRef>
         <targetRef>Din_setReturnOrgType_newReturn</targetRef>
       </dataInputAssociation>
     </serviceTask>
-    <sequenceFlow id="setReturnOrgType_to_performCalculations" sourceRef="setReturnOrgType" targetRef="performCalculations" />
-    <dataObjectReference id="newReturn" name="newReturn" dataObjectRef="DataObject_13sncby" />
-    <dataObject id="DataObject_13sncby" />
+    <sequenceFlow id="setReturnOrgType_to_performCalculations" sourceRef="setReturnOrgType" targetRef="performCalculations"/>
+    <dataObjectReference id="newReturn" name="newReturn" dataObjectRef="DataObject_13sncby"/>
+    <dataObjectReference id="dor_org" name="org" dataObjectRef="org"/>
+    <dataObject id="DataObject_13sncby" name="newReturn"/>
+    <dataObject id="org" name="org"/>
+    <dataObject id="crmServer" name="crmServer" itemSubjectRef="xsd:string">
+      <extensionElements>
+        <kp:value>https://crm.knowprocess.com</kp:value>
+      </extensionElements>
+    </dataObject>
+    <dataObject id="srpServer" name="srpServer" itemSubjectRef="xsd:string">
+      <extensionElements>
+        <kp:value>https://v3.srp.digital</kp:value>
+      </extensionElements>
+    </dataObject>
+    <dataObject id="tenantId" name="tenantId" itemSubjectRef="xsd:string">
+      <extensionElements>
+        <kp:value>sdu</kp:value>
+      </extensionElements>
+    </dataObject>
   </process>
-  <bpmndi:BPMNDiagram id="Yaoqiang_Diagram-PublishReturnAndCreateNew" name="Publish sustainability return and create the next one" resolution="96">
+  <bpmndi:BPMNDiagram id="di_PublishReturnAndCreateNew" name="Publish sustainability return and create the next one" resolution="96">
     <bpmndi:BPMNPlane bpmnElement="PublishReturnAndCreateNew">
       <bpmndi:BPMNEdge id="setReturnOrgType_to_performCalculations_di" bpmnElement="setReturnOrgType_to_performCalculations">
-        <di:waypoint x="900" y="180" />
-        <di:waypoint x="920" y="180" />
+        <di:waypoint x="900" y="180"/>
+        <di:waypoint x="920" y="180"/>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="getAccountDetails_to_parallelGatewaySplit_di" bpmnElement="getAccountDetails_to_parallelGatewaySplit">
-        <di:waypoint x="490" y="270" />
-        <di:waypoint x="515" y="270" />
+        <di:waypoint x="490" y="270"/>
+        <di:waypoint x="515" y="270"/>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="setStatusToPublished_to_getAccountDetails_di" bpmnElement="setStatusToPublished_to_getAccountDetails">
-        <di:waypoint x="350" y="270" />
-        <di:waypoint x="390" y="270" />
+        <di:waypoint x="350" y="270"/>
+        <di:waypoint x="390" y="270"/>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="alertNewReturn_to_joinGateway_di" bpmnElement="alertNewReturn_to_joinGateway">
-        <di:waypoint x="970" y="270" />
-        <di:waypoint x="1020" y="270" />
+        <di:waypoint x="970" y="270"/>
+        <di:waypoint x="1020" y="270"/>
         <bpmndi:BPMNLabel color:color="#666666">
-          <dc:Bounds x="696" y="162" width="0" height="14" />
+          <dc:Bounds x="696" y="162" width="0" height="14"/>
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="recordPublication_to_joinGateway_di" bpmnElement="recordPublication_to_joinGateway">
-        <di:waypoint x="690" y="126" />
-        <di:waypoint x="1040" y="126" />
-        <di:waypoint x="1040" y="250" />
+        <di:waypoint x="690" y="126"/>
+        <di:waypoint x="1040" y="126"/>
+        <di:waypoint x="1040" y="250"/>
         <bpmndi:BPMNLabel color:color="#666666">
-          <dc:Bounds x="416" y="98" width="0" height="14" />
+          <dc:Bounds x="416" y="98" width="0" height="14"/>
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="performCalculations_to_joinGateway_di" bpmnElement="performCalculations_to_joinGateway">
-        <di:waypoint x="1020" y="180" />
-        <di:waypoint x="1040" y="180" />
-        <di:waypoint x="1040" y="250" />
+        <di:waypoint x="1020" y="180"/>
+        <di:waypoint x="1040" y="180"/>
+        <di:waypoint x="1040" y="250"/>
         <bpmndi:BPMNLabel color:color="#666666">
-          <dc:Bounds x="696" y="152" width="0" height="14" />
+          <dc:Bounds x="696" y="152" width="0" height="14"/>
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Yaoqiang-joinGateway_to_endEvent" bpmnElement="joinGateway_to_endEvent">
-        <di:waypoint x="1060" y="270" />
-        <di:waypoint x="1130" y="270" />
+      <bpmndi:BPMNEdge id="di_joinGateway_to_endEvent" bpmnElement="joinGateway_to_endEvent">
+        <di:waypoint x="1060" y="270"/>
+        <di:waypoint x="1130" y="270"/>
         <bpmndi:BPMNLabel color:color="#666666">
-          <dc:Bounds x="696" y="162" width="0" height="14" />
+          <dc:Bounds x="696" y="162" width="0" height="14"/>
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Yaoqiang-importPreviousReturn_to_alertNewReturn" bpmnElement="importPreviousReturn_to_alertNewReturn">
-        <di:waypoint x="830" y="270" />
-        <di:waypoint x="870" y="270" />
+      <bpmndi:BPMNEdge id="di_importPreviousReturn_to_alertNewReturn" bpmnElement="importPreviousReturn_to_alertNewReturn">
+        <di:waypoint x="830" y="270"/>
+        <di:waypoint x="870" y="270"/>
         <bpmndi:BPMNLabel color:color="#666666">
-          <dc:Bounds x="556" y="162" width="0" height="14" />
+          <dc:Bounds x="556" y="162" width="0" height="14"/>
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Yaoqiang-_4" bpmnElement="_4">
-        <di:waypoint x="206" y="270" />
-        <di:waypoint x="250" y="270" />
+      <bpmndi:BPMNEdge id="di__4" bpmnElement="_4">
+        <di:waypoint x="206" y="270"/>
+        <di:waypoint x="250" y="270"/>
         <bpmndi:BPMNLabel color:color="#666666">
-          <dc:Bounds x="106" y="186" width="0" height="14" />
+          <dc:Bounds x="106" y="186" width="0" height="14"/>
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="setStatusToPublished_to_requestNewYearReturn_di" bpmnElement="setStatusToPublished_to_requestNewYearReturn">
-        <di:waypoint x="565" y="270" />
-        <di:waypoint x="590" y="270" />
+        <di:waypoint x="565" y="270"/>
+        <di:waypoint x="590" y="270"/>
         <bpmndi:BPMNLabel color:color="#666666">
-          <dc:Bounds x="276" y="162" width="0" height="14" />
+          <dc:Bounds x="276" y="162" width="0" height="14"/>
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="requestNewYearReturn_to_importPreviousReturn_di" bpmnElement="requestNewYearReturn_to_importPreviousReturn">
-        <di:waypoint x="690" y="270" />
-        <di:waypoint x="730" y="270" />
+        <di:waypoint x="690" y="270"/>
+        <di:waypoint x="730" y="270"/>
         <bpmndi:BPMNLabel color:color="#666666">
-          <dc:Bounds x="416" y="162" width="0" height="14" />
+          <dc:Bounds x="416" y="162" width="0" height="14"/>
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="importPreviousReturn_to_performCalculations_di" bpmnElement="importPreviousReturn_to_performCalculations">
-        <di:waypoint x="780" y="230" />
-        <di:waypoint x="780" y="180" />
-        <di:waypoint x="800" y="180" />
+        <di:waypoint x="780" y="230"/>
+        <di:waypoint x="780" y="180"/>
+        <di:waypoint x="800" y="180"/>
         <bpmndi:BPMNLabel color:color="#666666">
-          <dc:Bounds x="506" y="242" width="0" height="14" />
+          <dc:Bounds x="506" y="242" width="0" height="14"/>
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="setStatusToPublished_to_recordPublication_di" bpmnElement="setStatusToPublished_to_recordPublication">
-        <di:waypoint x="540" y="245" />
-        <di:waypoint x="540" y="126" />
-        <di:waypoint x="590" y="126" />
+        <di:waypoint x="540" y="245"/>
+        <di:waypoint x="540" y="126"/>
+        <di:waypoint x="590" y="126"/>
         <bpmndi:BPMNLabel color:color="#666666">
-          <dc:Bounds x="226" y="242" width="0" height="14" />
+          <dc:Bounds x="226" y="242" width="0" height="14"/>
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNShape id="Yaoqiang-startEvent" bpmnElement="startEvent">
-        <dc:Bounds x="174" y="254" width="32" height="32" />
+      <bpmndi:BPMNShape id="di_startEvent" bpmnElement="startEvent">
+        <dc:Bounds x="174" y="254" width="32" height="32"/>
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="164" y="286" width="55" height="14" />
+          <dc:Bounds x="164" y="286" width="55" height="14"/>
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Yaoqiang-setStatusToPublished" bpmnElement="setStatusToPublished">
-        <dc:Bounds x="250" y="230" width="100" height="80" />
+      <bpmndi:BPMNShape id="di_setStatusToPublished" bpmnElement="setStatusToPublished">
+        <dc:Bounds x="250" y="230" width="100" height="80"/>
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="250" y="250" width="100" height="60" />
+          <dc:Bounds x="250" y="250" width="100" height="60"/>
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="dor_org_di" bpmnElement="dor_org" color:border-color="#666666" color:background-color="#ecd8e6">
+        <dc:Bounds x="350" y="350" height="60" width="48"/>
+        <bpmndi:BPMNLabel color:color="#666666">
+          <dc:Bounds x="355" y="400" height="14" width="30"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="dia_getAccountDetails_org_di" bpmnElement="dia_getAccountDetails_org">
+        <di:waypoint x="398" y="290"/>
+        <di:waypoint x="390" y="290"/>
+        <bpmndi:BPMNLabel color:color="#666666">
+          <dc:Bounds x="425" y="416" height="14" width="0"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="doa_setStatusToPublished_org_di" bpmnElement="doa_setStatusToPublished_org">
+        <di:waypoint x="320" y="310"/>
+        <di:waypoint x="320" y="365"/>
+        <di:waypoint x="350" y="365"/>
+        <bpmndi:BPMNLabel color:color="#666666">
+          <dc:Bounds x="320" y="330" height="60" width="100"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="recordPublication_di" bpmnElement="recordPublication" color:border-color="#666666" color:background-color="#779C95">
-        <dc:Bounds x="590" y="86" width="100" height="80" />
+        <dc:Bounds x="590" y="86" width="100" height="80"/>
         <bpmndi:BPMNLabel color:color="#ffffff">
-          <dc:Bounds x="590" y="106" width="100" height="60" />
+          <dc:Bounds x="590" y="106" width="100" height="60"/>
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="requestNewYearReturn_di" bpmnElement="requestNewYearReturn" color:border-color="#666666" color:background-color="#779C95">
-        <dc:Bounds x="590" y="230" width="100" height="80" />
+        <dc:Bounds x="590" y="230" width="100" height="80"/>
         <bpmndi:BPMNLabel color:color="#ffffff">
-          <dc:Bounds x="590" y="250" width="100" height="60" />
+          <dc:Bounds x="590" y="250" width="100" height="60"/>
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="importPreviousReturn_di" bpmnElement="importPreviousReturn" color:border-color="#666666" color:background-color="#779C95">
-        <dc:Bounds x="730" y="230" width="100" height="80" />
+        <dc:Bounds x="730" y="230" width="100" height="80"/>
         <bpmndi:BPMNLabel color:color="#ffffff">
-          <dc:Bounds x="730" y="250" width="100" height="60" />
+          <dc:Bounds x="730" y="250" width="100" height="60"/>
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="performCalculations_di" bpmnElement="performCalculations" color:border-color="#666666" color:background-color="#779C95">
-        <dc:Bounds x="920" y="140" width="100" height="80" />
+        <dc:Bounds x="920" y="140" width="100" height="80"/>
         <bpmndi:BPMNLabel color:color="#ffffff">
-          <dc:Bounds x="920" y="160" width="100" height="60" />
+          <dc:Bounds x="920" y="160" width="100" height="60"/>
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Yaoqiang-alertNewReturn" bpmnElement="alertNewReturn" isExpanded="false">
-        <dc:Bounds x="870" y="230" width="100" height="80" />
+      <bpmndi:BPMNShape id="di_alertNewReturn" bpmnElement="alertNewReturn" isExpanded="false">
+        <dc:Bounds x="870" y="230" width="100" height="80"/>
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="870" y="250" width="100" height="60" />
+          <dc:Bounds x="870" y="250" width="100" height="60"/>
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="joinGateway_di" bpmnElement="joinGateway" color:border-color="#666666" color:background-color="#ffffff">
-        <dc:Bounds x="1020" y="250" width="40" height="40" />
+        <dc:Bounds x="1020" y="250" width="40" height="40"/>
         <bpmndi:BPMNLabel color:color="#666666">
-          <dc:Bounds x="1030" y="290" width="21" height="14" />
+          <dc:Bounds x="1030" y="290" width="21" height="14"/>
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Yaoqiang-endEvent" bpmnElement="endEvent">
-        <dc:Bounds x="1130" y="254" width="32" height="32" />
+      <bpmndi:BPMNShape id="di_endEvent" bpmnElement="endEvent">
+        <dc:Bounds x="1130" y="254" width="32" height="32"/>
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="1121" y="286" width="51" height="14" />
+          <dc:Bounds x="1121" y="286" width="51" height="14"/>
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="getAccountDetails_di" bpmnElement="getAccountDetails">
-        <dc:Bounds x="390" y="230" width="100" height="80" />
+        <dc:Bounds x="390" y="230" width="100" height="80"/>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Gateway_0a8kvb1_di" bpmnElement="parallelGatewaySplit">
-        <dc:Bounds x="515" y="245" width="50" height="50" />
+        <dc:Bounds x="515" y="245" width="50" height="50"/>
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="529" y="302" width="23" height="14" />
+          <dc:Bounds x="529" y="302" width="23" height="14"/>
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="setReturnOrgType_di" bpmnElement="setReturnOrgType">
-        <dc:Bounds x="800" y="140" width="100" height="80" />
+        <dc:Bounds x="800" y="140" width="100" height="80"/>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Yaoqiang-returnId" bpmnElement="returnId">
-        <dc:Bounds x="170" y="340" width="40" height="50" />
-        <bpmndi:BPMNLabel>
-          <dc:Bounds x="171" y="391" width="38" height="14" />
+      <bpmndi:BPMNShape id="di_returnId" bpmnElement="returnId" color:border-color="#666666" color:background-color="#ecd8e6">
+        <dc:Bounds x="170" y="400" width="40" height="50"/>
+        <bpmndi:BPMNLabel color:color="#666666">
+          <dc:Bounds x="170" y="451" width="38" height="14"/>
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Yaoqian_13g-submitter" bpmnElement="submitter">
-        <dc:Bounds x="170" y="412" width="40" height="50" />
-        <bpmndi:BPMNLabel>
-          <dc:Bounds x="167" y="463" width="46" height="14" />
+      <bpmndi:BPMNEdge id="dia_alertNewReturn_returnId_di" bpmnElement="dia_alertNewReturn_returnId">
+        <di:waypoint x="210" y="420"/>
+        <di:waypoint x="870" y="420"/>
+        <di:waypoint x="890" y="310"/>
+        <bpmndi:BPMNLabel color:color="#666666">
+          <dc:Bounds x="217" y="456" height="14" width="0"/>
         </bpmndi:BPMNLabel>
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Yaoqiang-currentSurvey" bpmnElement="currentSurvey">
-        <dc:Bounds x="170" y="481" width="40" height="50" />
-        <bpmndi:BPMNLabel>
-          <dc:Bounds x="155" y="529" width="69" height="14" />
-        </bpmndi:BPMNLabel>
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Yaoqiang-newSurvey" bpmnElement="newSurvey">
-        <dc:Bounds x="170" y="552" width="40" height="50" />
-        <bpmndi:BPMNLabel>
-          <dc:Bounds x="162" y="608" width="55" height="14" />
-        </bpmndi:BPMNLabel>
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Yaoqiang-org" bpmnElement="org">
-        <dc:Bounds x="170" y="626" width="40" height="50" />
-        <bpmndi:BPMNLabel>
-          <dc:Bounds x="182" y="684" width="16" height="14" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="di_newSurvey" bpmnElement="newSurvey" color:border-color="#666666" color:background-color="#ecd8e6">
+        <dc:Bounds x="170" y="500" width="40" height="50"/>
+        <bpmndi:BPMNLabel color:color="#666666">
+          <dc:Bounds x="162" y="556" width="55" height="14"/>
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="DataObjectReference_0718b28_di" bpmnElement="newReturn">
-        <dc:Bounds x="722" y="145" width="36" height="50" />
+        <dc:Bounds x="722" y="145" width="36" height="50"/>
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="714" y="202" width="54" height="14" />
+          <dc:Bounds x="714" y="202" width="54" height="14"/>
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNEdge id="Yaoqiang-_7" bpmnElement="_7">
-        <di:waypoint x="210" y="365" />
-        <di:waypoint x="245" y="365" />
-        <di:waypoint x="275" y="310" />
+      <bpmndi:BPMNEdge id="di_dia_alertNewReturn_newSurvey" bpmnElement="dia_alertNewReturn_newSurvey">
+        <di:waypoint x="210" y="520"/>
+        <di:waypoint x="850" y="520"/>
+        <di:waypoint x="889" y="310"/>
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="263.25" y="284.1" width="6" height="18.8" />
+          <dc:Bounds x="418.88" y="365.35" width="6" height="18.8"/>
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Yaoqiang-_11" bpmnElement="_11">
-        <di:waypoint x="210" y="457" />
-        <di:waypoint x="230" y="457" />
-        <di:waypoint x="275" y="310" />
+      <bpmndi:BPMNEdge id="di_dia_alertNewReturn_org" bpmnElement="dia_alertNewReturn_org">
+        <di:waypoint x="390" y="365"/>
+        <di:waypoint x="860" y="365"/>
+        <di:waypoint x="895" y="310"/>
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="303.88" y="365.35" width="6" height="18.8" />
+          <dc:Bounds x="378.25" y="284.1" width="6" height="18.8"/>
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Yaoqiang-dia_requestNewYearReturn_newSurvey" bpmnElement="dia_requestNewYearReturn_newSurvey">
-        <di:waypoint x="210" y="572" />
-        <di:waypoint x="540" y="572" />
-        <di:waypoint x="605" y="310" />
-        <bpmndi:BPMNLabel>
-          <dc:Bounds x="418.88" y="365.35" width="6" height="18.8" />
-        </bpmndi:BPMNLabel>
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Yaoqiang-dia_importPreviousReturn_currentSurvey" bpmnElement="dia_importPreviousReturn_currentSurvey">
-        <di:waypoint x="210" y="501" />
-        <di:waypoint x="680" y="501" />
-        <di:waypoint x="742" y="310" />
-        <bpmndi:BPMNLabel>
-          <dc:Bounds x="418.88" y="365.35" width="6" height="18.8" />
-        </bpmndi:BPMNLabel>
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Yaoqiang-dia_importPreviousReturn_newSurvey" bpmnElement="dia_importPreviousReturn_newSurvey">
-        <di:waypoint x="210" y="572" />
-        <di:waypoint x="680" y="572" />
-        <di:waypoint x="745" y="310" />
-        <bpmndi:BPMNLabel>
-          <dc:Bounds x="418.88" y="365.35" width="6" height="18.8" />
-        </bpmndi:BPMNLabel>
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Yaoqiang-dia_alertNewReturn_submitter" bpmnElement="dia_alertNewReturn_submitter">
-        <di:waypoint x="210" y="457" />
-        <di:waypoint x="850" y="457" />
-        <di:waypoint x="885" y="310" />
-        <bpmndi:BPMNLabel>
-          <dc:Bounds x="418.88" y="365.35" width="6" height="18.8" />
-        </bpmndi:BPMNLabel>
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Yaoqiang-dia_alertNewReturn_returnId" bpmnElement="dia_alertNewReturn_returnId">
-        <di:waypoint x="210" y="365" />
-        <di:waypoint x="850" y="365" />
-        <di:waypoint x="877" y="309" />
-        <bpmndi:BPMNLabel>
-          <dc:Bounds x="378.25" y="284.1" width="6" height="18.8" />
-        </bpmndi:BPMNLabel>
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Yaoqiang-dia_alertNewReturn_newSurvey" bpmnElement="dia_alertNewReturn_newSurvey">
-        <di:waypoint x="210" y="572" />
-        <di:waypoint x="850" y="572" />
-        <di:waypoint x="889" y="310" />
-        <bpmndi:BPMNLabel>
-          <dc:Bounds x="418.88" y="365.35" width="6" height="18.8" />
-        </bpmndi:BPMNLabel>
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Yaoqiang-dia_alertNewReturn_org" bpmnElement="dia_alertNewReturn_org">
-        <di:waypoint x="210" y="646" />
-        <di:waypoint x="860" y="646" />
-        <di:waypoint x="895" y="310" />
-        <bpmndi:BPMNLabel>
-          <dc:Bounds x="378.25" y="284.1" width="6" height="18.8" />
-        </bpmndi:BPMNLabel>
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="DataOutputAssociation_10ejit9_di" bpmnElement="DataOutputAssociation_10ejit9">
-        <di:waypoint x="762" y="230" />
-        <di:waypoint x="747" y="195" />
+      <bpmndi:BPMNEdge id="doa_importPreviousReturn_newReturn_di" bpmnElement="doa_importPreviousReturn_newReturn">
+        <di:waypoint x="762" y="230"/>
+        <di:waypoint x="747" y="195"/>
       </bpmndi:BPMNEdge>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>
