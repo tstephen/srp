@@ -1,0 +1,20 @@
+{
+  "key": "SubmitReturn",
+  "name": "Submit return",
+  "version": 0,
+  "fields": [
+    {
+      "fieldType": "FormField",
+      "id": "returnId",
+      "name": "Return id",
+      "type": "text",
+      "value": null,
+      "required": true,
+      "readOnly": false,
+      "overrideId": true,
+      "placeholder": "The database identifier for the return to be submitted",
+      "layout": null
+    }
+  ],
+  "outcomes": []
+}

@@ -1,181 +1,153 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
-    xmlns:activiti="http://activiti.org/bpmn"
-    xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
-    xmlns:dc="http://www.omg.org/spec/DD/20100524/DC"
-    xmlns:di="http://www.omg.org/spec/DD/20100524/DI"
-    xmlns:tns="http://srp.digital/returns"
-    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    exporter="KnowProcess Modeler"
-    exporterVersion="4.0"
-    expressionLanguage="http://www.w3.org/1999/XPath"
-    id="_1446819276528" name=""
-    targetNamespace="http://srp.digital/returns"
-    typeLanguage="http://www.w3.org/2001/XMLSchema"
-    xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL http://bpmn.sourceforge.net/schemas/BPMN20.xsd">
-  <process id="SubmitSustainabilityReturn" isClosed="false" isExecutable="true" name="Submit a new SDU Sustainability Return" processType="None">
+<definitions
+  xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:flowable="http://flowable.org/bpmn"
+  xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+  xmlns:color="http://www.omg.org/spec/BPMN/non-normative/color/1.0"
+  xmlns:dc="http://www.omg.org/spec/DD/20100524/DC"
+  xmlns:di="http://www.omg.org/spec/DD/20100524/DI"
+  xmlns:kp="http://knowprocess.com/bpmn"
+  xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" exporter="KnowProcess Modeler" exporterVersion="4.0" expressionLanguage="http://www.w3.org/1999/XPath" id="SubmitSustainabilityReturnDefinitions" name="Submit sustainability return definitions" targetNamespace="http://srp.digital/returns" typeLanguage="http://www.w3.org/2001/XMLSchema" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL http://bpmn.sourceforge.net/schemas/BPMN20.xsd">
+  <process id="SubmitSustainabilityReturn" isClosed="false" isExecutable="true" name="Submit a Sustainability Return">
+    <documentation>Submit a Sustainability Return making it no longer editable</documentation>
     <ioSpecification>
-      <dataInput id="_6" isCollection="false" name="returnId"/>
-      <dataInput id="_8" isCollection="false" name="submitter"/>
+      <dataInput id="returnId" isCollection="false" name="returnId"/>
       <inputSet>
-        <dataInputRefs>_6</dataInputRefs>
-        <dataInputRefs>_8</dataInputRefs>
+        <dataInputRefs>returnId</dataInputRefs>
       </inputSet>
       <outputSet/>
     </ioSpecification>
-    <startEvent id="_2" isInterrupting="true" name="Start Event" parallelMultiple="false">
-      <outgoing>_4</outgoing>
+    <dataObject id="srpServer" name="srpServer" itemSubjectRef="xsd:string">
+      <extensionElements>
+        <kp:value>https://v3.srp.digital</kp:value>
+      </extensionElements>
+    </dataObject>
+    <startEvent id="startEvent" isInterrupting="true" name="Start Event" parallelMultiple="false" kp:initiator="initiator" kp:formKey="SubmitReturn">
+      <outgoing>startEvent_to_setReturnStatusSubmitted</outgoing>
       <outputSet/>
     </startEvent>
-    <serviceTask activiti:class="com.knowprocess.resource.spi.RestPost" completionQuantity="1" id="_3" implementation="##WebService" isForCompensation="false" name="Set return status&#10;to submitted" startQuantity="1">
+    <serviceTask completionQuantity="1" id="setReturnStatusSubmitted" implementation="kp:http" isForCompensation="false" name="Set return status&#xA;to submitted" startQuantity="1">
       <extensionElements>
-        <activiti:field name="resourceUsername" stringValue="userInfo('tenant-bot')"/>
-        <activiti:field name="resourcePassword" expression="userInfo('cust-mgmt-secret')"/>
-        <activiti:field name="jwtLoginResource" expression="userInfo('jwt-login-url')"/>
-        <activiti:field name="globalResource" expression="userInfo('cust-mgmt-url')/returns/${returnId}/status/Submitted"/>
-        <activiti:field name="headers" stringValue="Content-Type:application/json,Accept:application/json,X-RunAs:${initiator}"/>
+        <kp:field name="requestMethod" stringValue="POST"/>
+        <kp:field name="requestUrl" expression="${srpServer}/returns/${returnId}/status/Submitted"/>
+        <kp:field name="requestHeaders">
+          <kp:expression>Content-Type:application/json
+Accept:application/json
+X-RunAs:${initiator}</kp:expression>
+        </kp:field>
+        <kp:field name="responseVariableName" stringValue="surveyReturn"/>
+        <kp:field name="saveResponseParameters" stringValue="true"/>
+        <kp:field name="saveResponseVariableAsJson" stringValue="true"/>
       </extensionElements>
-      <incoming>_4</incoming>
-      <outgoing>_5</outgoing>
+      <incoming>startEvent_to_setReturnStatusSubmitted</incoming>
+      <outgoing>setReturnStatusSubmitted_to_alertNewReturn</outgoing>
       <ioSpecification>
-        <dataInput id="Din_3_6" isCollection="false" name="returnId"/>
-        <dataInput id="Din_3_8" isCollection="false" name="submitter"/>
+        <dataInput id="di_setReturnStatusSubmitted_returnId" isCollection="false" name="returnId"/>
         <inputSet>
-          <dataInputRefs>Din_3_6</dataInputRefs>
-          <dataInputRefs>Din_3_8</dataInputRefs>
+          <dataInputRefs>di_setReturnStatusSubmitted_returnId</dataInputRefs>
         </inputSet>
         <outputSet/>
       </ioSpecification>
-      <dataInputAssociation id="_7">
-        <sourceRef>_6</sourceRef>
-        <targetRef>Din_3_6</targetRef>
-      </dataInputAssociation>
-      <dataInputAssociation id="_11">
-        <sourceRef>_8</sourceRef>
-        <targetRef>Din_3_8</targetRef>
+      <dataInputAssociation id="dia_setReturnStatusSubmitted_returnId">
+        <sourceRef>returnId</sourceRef>
+        <targetRef>di_setReturnStatusSubmitted_returnId</targetRef>
       </dataInputAssociation>
     </serviceTask>
-    <sequenceFlow id="_4" sourceRef="_2" targetRef="_3"/>
-    <sequenceFlow id="_5" sourceRef="_3" targetRef="alertNewReturn"/>
-    <sequenceFlow id="_10" sourceRef="alertNewReturn" targetRef="_9"/>
+    <sequenceFlow id="startEvent_to_setReturnStatusSubmitted" sourceRef="startEvent" targetRef="setReturnStatusSubmitted"/>
+    <sequenceFlow id="setReturnStatusSubmitted_to_alertNewReturn" sourceRef="setReturnStatusSubmitted" targetRef="alertNewReturn"/>
+    <sequenceFlow id="alertNewReturn_to_endEvent" sourceRef="alertNewReturn" targetRef="endEvent"/>
     <callActivity calledElement="SendAlert" completionQuantity="1" id="alertNewReturn" isForCompensation="false" name="Alert new return submitted" startQuantity="1">
       <extensionElements>
-        <activiti:in sourceExpression="SRP: New return for ${org} ${applicablePeriod} is available" target="subject"/>
-        <activiti:in sourceExpression="tim@knowprocess.com" target="addressee"/>
-        <activiti:in sourceExpression="SRP: &lt;a href=https://srp.digital/accounts.html?q=${org}>Click to view&lt;/a>" target="message"/>
-        <activiti:in sourceExpression="${tenantId}" target="tenantId"/>
+        <kp:in sourceExpression="SRP: New return submitted ${variables:getOrDefault('surveyReturn','n/a').findValue('org').asText()} ${variables:getOrDefault('surveyReturn','n/a').findValue('applicablePeriod').asText()} (${returnId})" target="subject"/>
+        <kp:in sourceExpression="tim@knowprocess.com" target="addressee"/>
+        <kp:in sourceExpression="SRP: &lt;a href=https://cloud.knowprocess.com/accounts.html?q=${variables:getOrDefault('surveyReturn','n/a').findValue('org').asText()}&gt;Click to view&lt;/a&gt;" target="message"/>
+        <kp:in sourceExpression="sdu" target="tenantId"/>
       </extensionElements>
-      <incoming>_5</incoming>
-      <outgoing>_10</outgoing>
+      <incoming>setReturnStatusSubmitted_to_alertNewReturn</incoming>
+      <outgoing>alertNewReturn_to_endEvent</outgoing>
       <ioSpecification>
-        <dataInput id="DinalertNewReturn_8" isCollection="false" name="submitter"/>
-        <dataInput id="DinalertNewReturn_6" isCollection="false" name="returnId"/>
+        <dataInput id="di_alertNewReturn_returnId" isCollection="false" name="returnId"/>
         <inputSet>
-          <dataInputRefs>DinalertNewReturn_8</dataInputRefs>
-          <dataInputRefs>DinalertNewReturn_6</dataInputRefs>
+          <dataInputRefs>di_alertNewReturn_returnId</dataInputRefs>
         </inputSet>
         <outputSet/>
       </ioSpecification>
-      <dataInputAssociation id="_12">
-        <sourceRef>_8</sourceRef>
-        <targetRef>DinalertNewReturn_8</targetRef>
-      </dataInputAssociation>
-      <dataInputAssociation id="_13">
-        <sourceRef>_6</sourceRef>
-        <targetRef>DinalertNewReturn_6</targetRef>
+      <dataInputAssociation id="dia_alertNewReturn_returnId">
+        <sourceRef>returnId</sourceRef>
+        <targetRef>di_alertNewReturn_returnId</targetRef>
       </dataInputAssociation>
     </callActivity>
-    <endEvent id="_9" name="End Event">
-      <incoming>_10</incoming>
+    <endEvent id="endEvent" name="End Event">
+      <incoming>alertNewReturn_to_endEvent</incoming>
       <inputSet/>
     </endEvent>
   </process>
-  <bpmndi:BPMNDiagram id="Yaoqiang_Diagram-SubmitSustainabilityReturn" name="Submit sustainability report" resolution="96.0">
+  <bpmndi:BPMNDiagram id="di_SubmitSustainabilityReturn" name="Submit sustainability return" resolution="96.0">
     <bpmndi:BPMNPlane bpmnElement="SubmitSustainabilityReturn">
-      <bpmndi:BPMNShape bpmnElement="alertNewReturn" id="Yaoqiang-alertNewReturn" isExpanded="false">
+      <bpmndi:BPMNShape bpmnElement="alertNewReturn" id="di_alertNewReturn" isExpanded="false">
         <dc:Bounds height="76.0" width="110.0" x="504.68181818181813" y="145.04545454545456"/>
         <bpmndi:BPMNLabel>
           <dc:Bounds height="32.8" width="98.0" x="510.68" y="168.64"/>
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape bpmnElement="_9" id="Yaoqiang-_9">
+      <bpmndi:BPMNShape bpmnElement="endEvent" id="di_endEvent">
         <dc:Bounds height="32.0" width="32.0" x="702.2272727272726" y="167.04545454545456"/>
         <bpmndi:BPMNLabel>
           <dc:Bounds height="18.8" width="62.0" x="687.23" y="207.71"/>
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape bpmnElement="_3" id="Yaoqiang-_3">
+      <bpmndi:BPMNShape bpmnElement="setReturnStatusSubmitted" id="di_setReturnStatusSubmitted">
         <dc:Bounds height="76.0" width="110.0" x="280.625" y="145.04545454545456"/>
         <bpmndi:BPMNLabel>
           <dc:Bounds height="32.8" width="104.0" x="283.63" y="168.64"/>
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape bpmnElement="_6" id="Yaoqiang-_6">
-        <dc:Bounds height="38.0" width="29.0" x="121.37499999999997" y="273.0"/>
+      <bpmndi:BPMNShape bpmnElement="returnId" id="di_returnId" color:border-color="#666666"
+         color:background-color="#ecd8e6">
+        <dc:Bounds height="38" width="29" x="120" y="273"/>
         <bpmndi:BPMNLabel>
-          <dc:Bounds height="18.8" width="51.0" x="110.37" y="313.0"/>
+          <dc:Bounds height="18" width="40" x="120" y="325"/>
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape bpmnElement="_2" id="Yaoqiang-_2">
+      <bpmndi:BPMNEdge id="dia_setReturnStatusSubmitted_returnId_di" bpmnElement="dia_setReturnStatusSubmitted_returnId">
+        <di:waypoint x="160" y="295"/>
+        <di:waypoint x="310" y="295"/>
+        <di:waypoint x="310" y="223"/>
+        <bpmndi:BPMNLabel color:color="#666666">
+          <dc:Bounds x="171.5" y="377" height="14" width="0"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="dia_alertNewReturn_returnId_di" bpmnElement="dia_alertNewReturn_returnId">
+        <di:waypoint x="160" y="295"/>
+        <di:waypoint x="530" y="295"/>
+        <di:waypoint x="530" y="223"/>
+        <bpmndi:BPMNLabel color:color="#666666"
+          xmlns:color="http://www.omg.org/spec/BPMN/non-normative/color/1.0">
+          <dc:Bounds x="171.5" y="377" height="14" width="0"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape bpmnElement="startEvent" id="di_startEvent">
         <dc:Bounds height="32.0" width="32.0" x="68.0454545454546" y="167.04545454545456"/>
         <bpmndi:BPMNLabel>
           <dc:Bounds height="18.8" width="69.0" x="49.55" y="207.71"/>
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape bpmnElement="_8" id="Yaoqiang-_8">
-        <dc:Bounds height="38.0" width="29.0" x="121.37499999999997" y="354.25"/>
-        <bpmndi:BPMNLabel>
-          <dc:Bounds height="18.8" width="61.0" x="105.37" y="394.25"/>
-        </bpmndi:BPMNLabel>
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNEdge bpmnElement="_13" id="Yaoqiang-_13">
-        <di:waypoint x="150.375" y="293.5"/>
-        <di:waypoint x="540.125" y="293.5"/>
-        <di:waypoint x="540.125" y="221.5"/>
-        <bpmndi:BPMNLabel>
-          <dc:Bounds height="18.8" width="6.0" x="378.25" y="284.1"/>
-        </bpmndi:BPMNLabel>
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="_12" id="Yaoqiang-_12">
-        <di:waypoint x="150.375" y="374.75"/>
-        <di:waypoint x="540.125" y="374.75"/>
-        <di:waypoint x="540.125" y="221.5"/>
-        <bpmndi:BPMNLabel>
-          <dc:Bounds height="18.8" width="6.0" x="418.88" y="365.35"/>
-        </bpmndi:BPMNLabel>
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="_11" id="Yaoqiang-_11">
-        <di:waypoint x="150.375" y="374.75"/>
-        <di:waypoint x="310.125" y="374.75"/>
-        <di:waypoint x="310.125" y="221.5"/>
-        <bpmndi:BPMNLabel>
-          <dc:Bounds height="18.8" width="6.0" x="303.88" y="365.35"/>
-        </bpmndi:BPMNLabel>
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="_10" id="Yaoqiang-_10">
+      <bpmndi:BPMNEdge bpmnElement="alertNewReturn_to_endEvent" id="di_alertNewReturn_to_endEvent">
         <di:waypoint x="614.375" y="183.04545454545456"/>
         <di:waypoint x="702.381457914841" y="183.04545454545456"/>
         <bpmndi:BPMNLabel>
           <dc:Bounds height="18.8" width="6.0" x="655.38" y="173.64"/>
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="_7" id="Yaoqiang-_7">
-        <di:waypoint x="150.375" y="293.5"/>
-        <di:waypoint x="310.125" y="293.5"/>
-        <di:waypoint x="310.125" y="221.5"/>
-        <bpmndi:BPMNLabel>
-          <dc:Bounds height="18.8" width="6.0" x="263.25" y="284.1"/>
-        </bpmndi:BPMNLabel>
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="_5" id="Yaoqiang-_5">
+      <bpmndi:BPMNEdge bpmnElement="setReturnStatusSubmitted_to_alertNewReturn" id="di_setReturnStatusSubmitted_to_alertNewReturn">
         <di:waypoint x="390.375" y="183.04545454545456"/>
         <di:waypoint x="504.375" y="183.04545454545456"/>
         <bpmndi:BPMNLabel>
           <dc:Bounds height="18.8" width="6.0" x="444.38" y="173.64"/>
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="_4" id="Yaoqiang-_4">
+      <bpmndi:BPMNEdge bpmnElement="startEvent_to_setReturnStatusSubmitted" id="di_startEvent_to_setReturnStatusSubmitted">
         <di:waypoint x="100.36854208515899" y="183.04545454545456"/>
         <di:waypoint x="280.375" y="183.04545454545456"/>
         <bpmndi:BPMNLabel>
