@@ -44,15 +44,22 @@ X-RunAs:${initiator}</kp:expression>
       <outgoing>setReturnStatusSubmitted_to_alertNewReturn</outgoing>
       <ioSpecification>
         <dataInput id="di_setReturnStatusSubmitted_returnId" isCollection="false" name="returnId"/>
+        <dataOutput id="do_setReturnStatusSubmitted_surveyReturn"/>
         <inputSet>
           <dataInputRefs>di_setReturnStatusSubmitted_returnId</dataInputRefs>
         </inputSet>
-        <outputSet/>
+        <outputSet>
+          <dataOutputRefs>do_setReturnStatusSubmitted_surveyReturn</dataOutputRefs>
+        </outputSet>
       </ioSpecification>
       <dataInputAssociation id="dia_setReturnStatusSubmitted_returnId">
         <sourceRef>returnId</sourceRef>
         <targetRef>di_setReturnStatusSubmitted_returnId</targetRef>
       </dataInputAssociation>
+      <dataOutputAssociation id="_u8bp7mqdm">
+        <sourceRef>do_setReturnStatusSubmitted_surveyReturn</sourceRef>
+        <targetRef>dor_surveyReturn</targetRef>
+      </dataOutputAssociation>
     </serviceTask>
     <sequenceFlow id="startEvent_to_setReturnStatusSubmitted" sourceRef="startEvent" targetRef="setReturnStatusSubmitted"/>
     <sequenceFlow id="setReturnStatusSubmitted_to_alertNewReturn" sourceRef="setReturnStatusSubmitted" targetRef="alertNewReturn"/>
@@ -66,13 +73,19 @@ X-RunAs:${initiator}</kp:expression>
       </extensionElements>
       <incoming>setReturnStatusSubmitted_to_alertNewReturn</incoming>
       <outgoing>alertNewReturn_to_endEvent</outgoing>
-      <ioSpecification>
+      <ioSpecification id="ios_alertNewReturn">
         <dataInput id="di_alertNewReturn_returnId" isCollection="false" name="returnId"/>
+        <dataInput id="di_alertNewReturn_surveyReturn" isCollection="false" name="surveyReturn"/>
         <inputSet>
           <dataInputRefs>di_alertNewReturn_returnId</dataInputRefs>
+          <dataInputRefs>di_alertNewReturn_surveyReturn</dataInputRefs>
         </inputSet>
         <outputSet/>
       </ioSpecification>
+      <dataInputAssociation id="dia_alertNewReturn_surveyReturn">
+        <sourceRef>dor_surveyReturn</sourceRef>
+        <targetRef>di_alertNewReturn_surveyReturn</targetRef>
+      </dataInputAssociation>
       <dataInputAssociation id="dia_alertNewReturn_returnId">
         <sourceRef>returnId</sourceRef>
         <targetRef>di_alertNewReturn_returnId</targetRef>
@@ -82,6 +95,8 @@ X-RunAs:${initiator}</kp:expression>
       <incoming>alertNewReturn_to_endEvent</incoming>
       <inputSet/>
     </endEvent>
+    <dataObjectReference id="dor_surveyReturn" name="surveyReturn" dataObjectRef="surveyReturn"/>
+    <dataObject id="surveyReturn" name="surveyReturn"/>
   </process>
   <bpmndi:BPMNDiagram id="di_SubmitSustainabilityReturn" name="Submit sustainability return" resolution="96.0">
     <bpmndi:BPMNPlane bpmnElement="SubmitSustainabilityReturn">
@@ -103,8 +118,29 @@ X-RunAs:${initiator}</kp:expression>
           <dc:Bounds height="32.8" width="104.0" x="283.63" y="168.64"/>
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape bpmnElement="returnId" id="di_returnId" color:border-color="#666666"
-         color:background-color="#ecd8e6">
+      <bpmndi:BPMNShape id="di_dor_surveyReturn" bpmnElement="dor_surveyReturn" color:border-color="#666666" color:background-color="#ecd8e6">
+        <dc:Bounds x="430" y="50" height="60" width="48"/>
+        <bpmndi:BPMNLabel color:color="#666666">
+          <dc:Bounds x="440" y="105" height="14" width="20"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="di_dia_alertNewReturn_surveyReturn" bpmnElement="dia_alertNewReturn_surveyReturn">
+        <di:waypoint x="470" y="80"/>
+        <di:waypoint x="530" y="80"/>
+        <di:waypoint x="530" y="140"/>
+        <bpmndi:BPMNLabel color:color="#666666">
+          <dc:Bounds x="505" y="176" height="14" width="0"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="_u8bp7mqdm_di" bpmnElement="_u8bp7mqdm" color:border-color="#666666" color:background-color="#bbd3d3">
+        <di:waypoint x="362.5" y="145"/>
+        <di:waypoint x="362.5" y="80"/>
+        <di:waypoint x="430" y="80"/>
+        <bpmndi:BPMNLabel color:color="#666666">
+          <dc:Bounds x="338" y="244" height="60" width="100"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape bpmnElement="returnId" id="di_returnId" color:border-color="#666666" color:background-color="#ecd8e6">
         <dc:Bounds height="38" width="29" x="120" y="273"/>
         <bpmndi:BPMNLabel>
           <dc:Bounds height="18" width="40" x="120" y="325"/>
@@ -122,8 +158,7 @@ X-RunAs:${initiator}</kp:expression>
         <di:waypoint x="160" y="295"/>
         <di:waypoint x="530" y="295"/>
         <di:waypoint x="530" y="223"/>
-        <bpmndi:BPMNLabel color:color="#666666"
-          xmlns:color="http://www.omg.org/spec/BPMN/non-normative/color/1.0">
+        <bpmndi:BPMNLabel color:color="#666666">
           <dc:Bounds x="171.5" y="377" height="14" width="0"/>
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
