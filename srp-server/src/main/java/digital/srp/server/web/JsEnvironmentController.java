@@ -33,11 +33,12 @@ public class JsEnvironmentController {
     protected static final Logger LOGGER = LoggerFactory
             .getLogger(JsEnvironmentController.class);
 
-    protected static final String ENV = "var $env = (function () {\n" + 
-            "  var me = {\n" + 
-            "    appName: '%1$s',\n" + 
-            "    server: '%2$s',\n" + 
-            "    tagLine: '%3$s'\n" + 
+    protected static final String ENV = "var $env = (function () {\n" +
+            "  var me = {\n" +
+            "    appName: '%1$s',\n" +
+            "    period: '%2$s',\n" +
+            "    server: '%3$s',\n" +
+            "    tagLine: '%4$s'\n" +
             "  };\n" + 
             "\n" + 
             "  return me;\n" + 
@@ -45,6 +46,9 @@ public class JsEnvironmentController {
     
     @Value("${spring.application.name:SRP}")
     protected String appName;
+
+    @Value("${srp.application.period:2020-21}")
+    protected String period;
 
     @Value("${srp.application.tag-line:}")
     protected String tagLine;
@@ -71,7 +75,7 @@ public class JsEnvironmentController {
         HttpHeaders headers = new HttpHeaders();
         headers.add("Content-Type", "text/javascript");
         return new ResponseEntity<String>(
-                String.format(ENV, appName, getRestBaseUri(), tagLine), 
+                String.format(ENV, appName, period, getRestBaseUri(), tagLine), 
                 headers,
                 HttpStatus.OK);
     }

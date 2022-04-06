@@ -30,7 +30,9 @@ import digital.srp.macc.model.ModelParameter;
 public interface ModelParameterRepository extends
         CrudRepository<ModelParameter, Long> {
 
-    Optional<ModelParameter> findByName(@Param("name") String name);
+    @Query("SELECT c FROM ModelParameter c WHERE c.name = :name AND c.tenantId = :tenantId ORDER BY c.name ASC")
+    Optional<ModelParameter> findByName(@Param("name") String name,
+            @Param("tenantId") String tenantId);
 
     @Query("SELECT c FROM ModelParameter c WHERE c.tenantId = :tenantId ORDER BY c.name ASC")
     List<ModelParameter> findAllForTenant(@Param("tenantId") String tenantId);

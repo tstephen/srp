@@ -43,7 +43,9 @@ import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonView;
 
+import digital.srp.sreport.model.views.SurveyViews;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -71,17 +73,20 @@ public class Survey {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id")
+    @JsonView(SurveyViews.Summary.class)
     @JsonProperty
     private Long id;
 
     @NotNull
     @Size(max = 50)
+    @JsonView(SurveyViews.Summary.class)
     @JsonProperty
     @Column(name = "name")
     private String name;
 
     @NotNull
     @Size(max = 50)
+    @JsonView(SurveyViews.Summary.class)
     @JsonProperty
     @Column(name = "status")
     private String status = "Draft";
@@ -93,10 +98,12 @@ public class Survey {
      */
     @NotNull
     @Size(max = 20)
+    @JsonView(SurveyViews.Summary.class)
     @JsonProperty
     @Column(name = "applicable_period")
     private String applicablePeriod;
 
+    @JsonView(SurveyViews.Detailed.class)
     @JsonProperty
     @OneToMany(orphanRemoval=true, cascade= CascadeType.ALL, fetch = FetchType.EAGER, mappedBy = "survey")
     private List<SurveyCategory> categories;

@@ -101,7 +101,7 @@ public class ModelParameterController {
                             ModelParameter.class.getSimpleName()));
         } catch (NumberFormatException e) {
             String msg = String.format("No parameter with name %1$s", param);
-            parameter = modelParamRepo.findByName(param)
+            parameter = modelParamRepo.findByName(param, tenantId)
                     .orElseThrow(() -> new IllegalArgumentException(msg));
         }
 

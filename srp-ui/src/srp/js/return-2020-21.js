@@ -26,11 +26,11 @@ var $r = (function ($, ractive) {
   var _orgType;
   var _server = $env.server;
   var _survey;
-  var _surveyPeriod = '2020-21'; // TODO read system param
+  var _surveyPeriod = $env.period;
   var _now = new Date();
   var _params = getSearchParameters();
-  var _period = 'p' in _params ? _surveyPeriod : _params.p;
-  var _surveyName = 's' in _params ? 'SDU'+_period : _params.s;
+  var _period = 'p' in _params ? _params.p : _surveyPeriod;
+  var _surveyName = 's' in _params ? _params.s : 'SDU-'+_period;
 
   function _bindLists() {
     if ($('#ORG_NAME')!=undefined && $('#ORG_NAME[list]').length!=0) $('#ORG_NAME').attr('list','orgs');
@@ -66,7 +66,7 @@ var $r = (function ($, ractive) {
       console.info('skip fetch lists while logging in');
       return;
     }
-    $.getJSON('https://api.knowprocess.com/sdu/accounts/', function(data) {
+    $.getJSON('https://crm.knowprocess.com/sdu/accounts/', function(data) {
       ractive.set('orgs', data);
       ractive.addDataList({ name: 'orgs' },data);
       // if (_survey != undefined) $('#ORG_NAME').attr('list','orgs');
@@ -103,6 +103,9 @@ var $r = (function ($, ractive) {
     if ($r.rtn.status != 'Draft') {
       ractive.showError('This return has been submitted and cannot be changed. If you detect a problem you may create a new version from the report pages');
     }
+    survey.categories.sort(function(a, b) {
+      return a.id - b.id;
+    })
     for(var i in survey.categories) {
 
       for(var j in survey.categories[i].questions) {
@@ -460,8 +463,8 @@ var $r = (function ($, ractive) {
     $.each(me.rtn.links, function (i,d) {
       if (d.rel=='self') me.rtn.selfRef = d.href;
     });
-    if (_server.indexOf('api.srp.digital')!=-1) {
-      me.rtn.selfRef = me.rtn.selfRef.replace(/localhost/, 'api.srp.digital');
+    if (_server.indexOf('v3.srp.digital')!=-1) {
+      me.rtn.selfRef = me.rtn.selfRef.replace(/localhost/, 'v3.srp.digital');
     }
     // handle checkbox options
     for (var idx = 0 ; idx< me.rtn.answers.length ; idx++) {
@@ -549,9 +552,9 @@ var $r = (function ($, ractive) {
   $('head').append('<link href="/sdu/css/sdu-1.0.0.css" rel="stylesheet">');
   $('head').append('<link rel="icon" type="image/png" href="/srp/images/icon/sdu-icon-16x16.png">');
 
-  if ('fetchCallbacks' in ractive) ractive.fetchCallbacks = $.Callbacks();
-  ractive.fetchCallbacks.add(_hideCalcs);
+  if (!('fetchCallbacks' in ractive)) ractive.fetchCallbacks = $.Callbacks();
   ractive.fetchCallbacks.add(me.fill);
+  ractive.fetchCallbacks.add(_hideCalcs);
   ractive.fetchCallbacks.add(_showQuestionnaire);
   ractive.toggleSidebar = function() {
     console.info('toggleSidebar');

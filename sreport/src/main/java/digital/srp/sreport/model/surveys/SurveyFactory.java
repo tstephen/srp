@@ -36,7 +36,8 @@ public interface SurveyFactory {
                 Sdu1718.getInstance().getSurvey(),
                 Sdu1819.getInstance().getSurvey(),
                 Sdu1920.getInstance().getSurvey(),
-                Sdu2021.getInstance().getSurvey()
+                Sdu2021.getInstance().getSurvey(),
+                Sdu2122.getInstance().getSurvey()
         };
         return expectedSurveys;
     }
@@ -57,6 +58,8 @@ public interface SurveyFactory {
             return Sdu1920.getInstance();
         case Sdu2021.ID:
             return Sdu2021.getInstance();
+        case Sdu2122.ID:
+            return Sdu2122.getInstance();
         default:
             throw new ObjectNotFoundException(Survey.class,
                     String.format("No survey named %1$s is known", name));

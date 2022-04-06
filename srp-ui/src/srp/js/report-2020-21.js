@@ -25,9 +25,9 @@ var ractive = new BaseRactive({
         'PROVIDER7_COMMISSIONED','PROVIDER8_COMMISSIONED','CCG1_SERVED',
         'CCG2_SERVED','CCG3_SERVED','CCG4_SERVED','CCG5_SERVED','CCG6_SERVED','CCG7_SERVED','CCG8_SERVED'],
     requiredAnswers: ['ORG_CODE', 'ORG_NAME', 'ORG_TYPE', 'SDMP_CRMP', 'HEALTHY_TRANSPORT_PLAN', 'PROMOTE_HEALTHY_TRAVEL'],
-    period: '2020-21',
+    period: $env.period,
     server: $env.server,
-    survey: 'SDU-2020-21',
+    survey: 'SDU-'+$env.period,
     tenant: { id: 'sdu' },
     username: localStorage.getItem('username'),
     formatAbsAnswer: function(qName, period) {
@@ -215,7 +215,7 @@ var ractive = new BaseRactive({
     });
   },
   fetchImplicit: function() {
-    if (ractive.getProfile() == undefined) return; // still loading
+    if (ractive.getProfile() === undefined || ractive.keycloak.token === undefined) return; // still loading
     ractive.set('org', ractive.getAttribute('org'));
     $.ajax({
       dataType: "json",
@@ -231,6 +231,7 @@ var ractive = new BaseRactive({
     });
   },
   fetchMessages: function() {
+    if (ractive.getProfile() === undefined || ractive.keycloak.token === undefined) return; // still loading
     $.ajax({
       dataType: "json",
       url: ractive.getServer()+'/messages_'+navigator.language+'.json',
@@ -247,6 +248,7 @@ var ractive = new BaseRactive({
     });
   },
   fetchOrgData: function() {
+    if (ractive.getProfile() === undefined || ractive.keycloak.token === undefined) return; // still loading
     console.info('fetchOrgData');
     $( "#ajax-loader" ).show();
     ractive.set('saveObserver', false);
@@ -295,8 +297,7 @@ var ractive = new BaseRactive({
     ractive.set('saveObserver', false);
     if (Array.isArray(data)) ractive.set('surveyReturn', data[0]);
     else ractive.set('surveyReturn', data);
-    if (ractive.isCcg()) ractive.fetchOrgData();
-    else ractive.fetchOrgData();
+    ractive.fetchOrgData();
     //if (ractive.hasRole('admin')) $('.admin').show();
     //if (ractive.hasRole('power-user')) $('.power-user').show();
     if (ractive.fetchCallbacks!=null) ractive.fetchCallbacks.fire();
@@ -323,9 +324,6 @@ var ractive = new BaseRactive({
     });
     $('.rpt.stacked2').each(function(i,d) {
       ractive.renderCsv(d, renderStacked);
-    });
-    $('.rpt.table').each(function(i,d) {
-      ractive.fetchTable(d);
     });
     $('.rpt.table2').each(function(i,d) {
       ractive.renderTable(d);
@@ -380,36 +378,11 @@ var ractive = new BaseRactive({
   fetchSurvey: function() {
     console.info('fetchSurvey');
     ractive.srp.fetchSurvey(ractive.get('survey'))
-    .then(function(response) { return response.json(); })
-    .then(function(data) {
-      console.log('success:'+data);
-      ractive.set('q', data);
-    });
-  },
-  fetchTable: function(ctrl) {
-    $.ajax({
-      dataType: "html",
-      url: ractive.getServer()+$(ctrl).data('src'),
-      crossDomain: true,
-      headers: {
-        "X-Requested-With": "XMLHttpRequest",
-        "X-Authorization": "Bearer "+ractive.keycloak.token,
-        "Authorization": "Bearer "+ractive.keycloak.token,
-        "Cache-Control": "no-cache"
-      },
-      success: function( data ) {
-        ractive.set('saveObserver', false);
-        $(ctrl).empty().append(data)
-          .on('mouseover', function(ev) {
-            $('#'+ev.currentTarget.id+' .controls').show();
-          })
-          .on('mouseout', function(ev) {
-            $('#'+ev.currentTarget.id+' .controls').hide();
-          });
-        $('#'+ctrl.id+' .controls .kp-icon-new-tab').wrap('<a href="'+ractive.getServer()+$(ctrl).data('src')+'" target="_blank"></a>');
-        ractive.set('saveObserver', true);
-      }
-    });
+      .then(function(response) { return response.json(); })
+      .then(function(data) {
+        console.log('success reading survey: '+data.name);
+        ractive.set('q', data);
+      });
   },
   formatNumber: function() {
     $('.number').each(function(i,d) {
@@ -454,10 +427,10 @@ var ractive = new BaseRactive({
   },
   getProfile: function() {
     if ('profile' in localStorage) {
+      return JSON.parse(localStorage.getItem('profile'));
+    } else {
       alert('Unable to authenticate you at the moment, please try later');
       return;
-    } else {
-      return JSON.parse(localStorage.getItem('profile'));
     }
   },
   initNarrative: function() {
@@ -499,8 +472,6 @@ var ractive = new BaseRactive({
     var eClass = ractive.getAnswer('ECLASS_USER');
     if (eClass || (eClass!=undefined && eClass.charAt(0)==0)) return true;
     else return false;
-  },
-  oninit: function() {
   },
   renderLabel: function(qName) {
     if (ractive.get('labels.'+qName)!=undefined) return ractive.get('labels.'+qName);
@@ -616,25 +587,6 @@ var ractive = new BaseRactive({
     table += '</tfoot></table>';
     $(d).empty().append(table);
   },
-  reset: function() {
-    console.info('reset');
-    if (document.getElementById('resetForm').checkValidity()) {
-      $('#resetSect').slideUp();
-      $('#loginSect').slideDown();
-      var addr = $('#email').val();
-      $.ajax({
-        url: ractive.getServer()+'/msg/srp/omny.passwordResetRequest.json',
-        type: 'POST',
-        data: { json: JSON.stringify({ email: addr, tenantId: 'srp' }) },
-        dataType: 'text',
-        success: function() {
-          ractive.showMessage('A reset link has been sent to '+addr);
-        },
-      });
-    } else {
-      ractive.showError('Please enter the email address you registered with');
-    }
-  },
   restate: function () {
     console.info('restate...');
     $('#ajax-loader').show();
@@ -683,10 +635,6 @@ var ractive = new BaseRactive({
         },
       });
     }
-  },
-  showReset: function() {
-    $('#loginSect').slideUp();
-    $('#resetSect').slideDown();
   },
   submit: function () {
     console.info('submit...');
