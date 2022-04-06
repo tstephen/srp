@@ -11,6 +11,7 @@
 **/.*
 **/logs/*
 target/
+workspace.code-workspace
 
 *.ear
 *.jar
