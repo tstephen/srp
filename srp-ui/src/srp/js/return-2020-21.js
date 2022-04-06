@@ -105,7 +105,7 @@ var $r = (function ($, ractive) {
     }
     survey.categories.sort(function(a, b) {
       return a.id - b.id;
-    })
+    });
     for(var i in survey.categories) {
 
       for(var j in survey.categories[i].questions) {
