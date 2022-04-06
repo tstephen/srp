@@ -1,11 +1,26 @@
-function renderStacked(selector, csvString, options) {
+/*******************************************************************************
+ * Copyright 2015-2020 Tim Stephenson and contributors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ ******************************************************************************/
+function renderStacked(selector, csvString, options) { // jshint ignore:line
   var defaultOptions = {
     colors: ["#0B4BE5", "#0072CE", "#0BBDE5", "#0BDBC9", "#00F299", "#A2FC00", "#FFEB00", "#FFAD00"],
     legendWidth: 300,
     margin: {top: 20, right: 10, bottom: 50, left: 40},
     xAxisLabel: "Financial Years",
     yAxisLabel: "Tonnes CO\u2082e"
-  }
+  };
   options = $.extend(defaultOptions, options == undefined ? {} : options);
 
   // first clean up
@@ -29,8 +44,8 @@ function renderStacked(selector, csvString, options) {
       .range(options.colors);
 
   var data = d3.csvParse(csvString, function(d, i, columns) {
-    for (i = 1, t = 0; i < columns.length; ++i) t += d[columns[i]] = +d[columns[i]];
-    d.total = t;
+    d.total = 0;
+    for (i = 1; i < columns.length; ++i) d.total += d[columns[i]] = +d[columns[i]];
     return d;
   });
 
@@ -69,10 +84,10 @@ function renderStacked(selector, csvString, options) {
       .text(options.xAxisLabel);
 
   g.selectAll(".tick>text")
-  	.style("text-anchor","end")
-  	.attr("transform", function(d) {
-  		return "rotate(-45)";
-  	});
+    .style("text-anchor","end")
+    .attr("transform", function() {
+      return "rotate(-45)";
+    });
 
   g.append("g")
       .attr("class", "axis")
@@ -150,8 +165,9 @@ function renderStacked(selector, csvString, options) {
     var trendLines = ["CCA 2008"]; // just in case don't have enough org data
 
     // Organisation's own target - n% reduction in emissions from base year by 2020/21
-    if (data[4]!=undefined && data[4]['total'] != undefined
-        && data[4]['total'] > 0) {
+    /*jshint -W069 */
+    if (data[4]!=undefined && data[4]['total'] != undefined &&
+        data[4]['total'] > 0) {
       trendLines = ["CCA 2008", "Org'n Target"]; // both trend lines available
 
       var n = 32;
@@ -174,6 +190,7 @@ function renderStacked(selector, csvString, options) {
           .attr("stroke", "#0B4BE5")
           .attr("stroke-width", 1);
     }
+    /*jshint +W069 */
 
     var legend2 = g.append("g")
         .attr("text-anchor", "end")

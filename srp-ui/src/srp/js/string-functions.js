@@ -3,13 +3,13 @@ String.prototype.singular = function() {
   if (this.endsWith('ies')) return this.substring(0, this.length-3)+'y';
   else if (this.endsWith('s')) return this.substring(0, this.length-1);
   else return this;
-}
+};
 
 String.prototype.toCamelCase = function() {
   if (this == undefined) return this;
   var leadingCaps = this.toLeadingCaps().replace(/-/g, '');
   return leadingCaps.substring(0,1).toLowerCase()+leadingCaps.substring(1);
-}
+};
 
 String.prototype.toLabel = function() {
   return this.replace(/([A-Z])/, function(v) { return '_'+v; }).replace(/_/g, ' ').toLeadingCaps();
@@ -23,18 +23,17 @@ String.prototype.toLeadingCaps = function() {
     }
     return letter.toUpperCase() + word.toLowerCase();
   });
-}
-
+};
 
 String.prototype.toSlug = function() {
   if (this == undefined) return this;
   else return this.toLowerCase().replace(/ /g,'-').replace(/[^\w-]+/g,'');
-}
+};
 
 String.prototype.formatNumber = function(thousandsSeparator) {
   // reverse string and insert separator every 3 digits
   var chars = this.split('');
-  return chars.reverse().reduce(function(previousValue, currentValue, idx, arr) {
+  return chars.reverse().reduce(function(previousValue, currentValue, idx) {
     if (idx % 3 == 0 && idx != 0) { 
       return previousValue + thousandsSeparator + currentValue;
     } else { 
@@ -42,7 +41,7 @@ String.prototype.formatNumber = function(thousandsSeparator) {
     }
   }, '') // need to init string
   .split('').reverse().join(''); // don't forget to restore number to correct order!
-}
+};
 
 /**
  * Format a number with the specified separators and rounding to a specified
@@ -54,12 +53,12 @@ String.prototype.formatNumber = function(thousandsSeparator) {
  */
 Number.prototype.formatDecimal = function(c, d, t) {
   var n = this,
-      c = isNaN(c = Math.abs(c)) ? 2 : c,
-      d = d == undefined ? "." : d,
-      t = t == undefined ? "," : t,
       s = n < 0 ? "-" : "",
       i = parseInt(n = Math.abs(+n || 0).toFixed(c)) + "",
       j = (j = i.length) > 3 ? j % 3 : 0;
+  c = isNaN(c = Math.abs(c)) ? 2 : c;
+  d = d == undefined ? "." : d;
+  t = t == undefined ? "," : t;
   return s + (j ? i.substr(0, j) + t : "") + i.substr(j).replace(/(\d{3})(?=\d)/g, "$1" + t) + (c ? d + Math.abs(n - i).toFixed(c).slice(2) : "");
 };
 
@@ -77,8 +76,9 @@ Number.prototype.sigFigs = function(sig, d, t) {
   }else{
     r = r+'';
   }
-  if (r.indexOf(d) == -1) var j =  (j = r.length) > 3 ? j % 3 : 0;
-  else var j =  (j = r.substr(0,r.indexOf(d))).length > 3 ? j % 3 : 0;
+  var j = 0;
+  if (r.indexOf(d) == -1) j = (j = r.length) > 3 ? j % 3 : 0;
+  else j = (j = r.substr(0,r.indexOf(d))).length > 3 ? j % 3 : 0;
   if (r.indexOf('0.')==0) return s+r;
   else return s + (j ? r.substr(0, j) + t : "") + r.substr(j).replace(/(\d{3})(?=\d)/g, "$1" + t);
-}
+};

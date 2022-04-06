@@ -1,15 +1,29 @@
-function renderPie(selector, csvString, options) {
+/*******************************************************************************
+ * Copyright 2015-2020 Tim Stephenson and contributors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ ******************************************************************************/
+function renderPie(selector, csvString, options) { // jshint ignore:line
   var defaultOptions = {
     colors: ["#0B4BE5", "#0072CE", "#0BBDE5", "#0BDBC9", "#00F299", "#A2FC00", "#FFEB00", "#FFAD00"],
     labels: true,
     other: 5
-  }
+  };
   options = $.extend(defaultOptions, options == undefined ? {} : options);
 
   // If csvString missing or only header row without data
   if (csvString == undefined || csvString.trim().length==0 || csvString.trim().split('\n').length<2) {
-    csvString = 'classification,percentage\n'
-                  +'No data,100 \n';
+    csvString = 'classification,percentage\nNo data,100 \n';
   }
 
   var svg = d3.select(selector),
@@ -51,7 +65,7 @@ function renderPie(selector, csvString, options) {
 
   arc.append("path")
       .attr("d", path)
-      .attr('class', function(d) { return d.data.classification.toLowerCase() })
+      .attr('class', function(d) { return d.data.classification.toLowerCase(); })
       .attr("fill", function(d) { return color(d.data.classification); });
 
   if (options.labels) {

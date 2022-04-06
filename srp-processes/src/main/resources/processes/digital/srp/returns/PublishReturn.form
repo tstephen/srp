@@ -1,0 +1,32 @@
+{
+  "key": "PublishReturn",
+  "name": "Publish this year's return and create next year's",
+  "version": 0,
+  "fields": [
+    {
+      "fieldType": "FormField",
+      "id": "returnId",
+      "name": "Return id",
+      "type": "text",
+      "value": null,
+      "required": true,
+      "readOnly": false,
+      "overrideId": true,
+      "placeholder": "The database identifier for the return to be submitted",
+      "layout": null
+    },
+    {
+      "fieldType": "FormField",
+      "id": "newSurvey",
+      "name": "New survey",
+      "type": "text",
+      "value": null,
+      "required": true,
+      "readOnly": false,
+      "overrideId": true,
+      "placeholder": "The survey to start a return for",
+      "layout": null
+    }
+  ],
+  "outcomes": []
+}

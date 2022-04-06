@@ -17,6 +17,7 @@ target/
 *.war
 *.zip
 *.gz
+*.tgz
 target/
 *.class
 

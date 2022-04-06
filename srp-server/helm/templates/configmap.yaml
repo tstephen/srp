@@ -17,6 +17,9 @@ data:
   SPRING_JPA_SHOW-SQL: {{ .Values.jpa.showSql | quote }}
   SPRING_JPA_PROPERTIES_HIBERNATE_FORMAT_SQL: {{ .Values.jpa.properties.hibernate.formatSql | quote }}
   SRP_APPLICATION_BASE-URI: {{ .Values.srp.application.baseUri | quote }}
+  {{- if and .Values.srp.application.period }}
+  SRP_APPLICATION_PERIOD: {{ .Values.srp.application.period | quote }}
+  {{- end }}
   {{- if and .Values.srp.cors.allowedOrigins }}
   SRP_CORS_ALLOWED-ORIGINS: {{ .Values.srp.cors.allowedOrigins | quote }}
   {{- end }}

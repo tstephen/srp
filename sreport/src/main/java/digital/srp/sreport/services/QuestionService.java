@@ -55,7 +55,7 @@ public class QuestionService {
         LOGGER.info("existing questions found: {}", existingQuestions.size());
         for (Question question : questions) {
             Optional<Question> existingQ = findMatchingQ(question, existingQuestions);
-            if (existingQ.isPresent()) {
+            if (existingQ.isPresent() && !existingQ.get().equals(question)) {
                 LOGGER.info("found question that needs update\n  from: {},\n    to: {}...",
                         existingQ.get(), question);
                 BeanUtils.copyProperties(question, existingQ.get(), "id");
@@ -65,7 +65,7 @@ public class QuestionService {
                     LOGGER.error("unable to update question: {}\n  ({})",
                             question.name(), e.getMessage(), e);
                 }
-            } else {
+            } else if (!existingQ.isPresent()) {
                 LOGGER.info("found new question: {}, attempting to save...",
                         question.name());
                 try {
@@ -74,6 +74,8 @@ public class QuestionService {
                     LOGGER.error("unable to save new question: {}\n  ({})",
                             question.name(), e.getMessage());
                 }
+            } else {
+                LOGGER.info("no update needed for: {}...", question.getName());
             }
         }
     }

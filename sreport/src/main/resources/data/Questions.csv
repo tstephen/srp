@@ -54,10 +54,10 @@ PROC_ENV_ASSESSMENT$Do your commissioning, tendering and procurement processes i
 PROC_SOC_ASSESSMENT$Do your commissioning, tendering and procurement processes include an assessment of the social impacts?$$SDU$$yesno$$$$
 PROC_SUPPLIER_SUSTAINABILITY$Do your commissioning, tendering and procurement processes include a consideration of the suppliers' sustainability policies?$$SDU$$yesno$$$$
 STRATEGIC_SUSTAINABILITY_PARTNERSHIPS$Are you in a strategic partnership with other organisations on sustainability?$$SDU$$yesno$$$$
-STRATEGIC_SUSTAINABILITY_PARTNERS$Who are they?$$SDU$$$$$$
+STRATEGIC_SUSTAINABILITY_PARTNERS$If you have strategic sustainability partners, who are they?$$SDU$$$$$$
 GCC_USER$Does your organisation use the <a href=”http://www.sduhealth.org.uk/gcc/about.aspx”>Good Corporate Citizenship (GCC)</a> tool?$$SDU$$yesno$$$$
 LAST_GCC_DATE$If your organisation uses the <a href=”http://www.sduhealth.org.uk/sdat/”>Sustainable Development Assessment Tool (SDAT)</a> tool when was your last self assessment?$$SDU$$number$yyyy$$[\\d]{4}$
-LAST_GCC_SCORE$And what was your SDAT score?$%$SDU$$number$$$$
+LAST_GCC_SCORE$And what was your last SDAT score?$%$SDU$$number$$$$
 PROMOTE_SUSTAINABILITY_TO_STAFF$Does your organisation promote sustainability to its employees?$$SDU$$yesno$$$$
 ECLASS_USER$Do you use e-class for procurement classification? If so, please provide a breakdown of spending by category; otherwise proceed to the next section$$SDU$$yesno$$$$
 QUANT_ES_IMPACTS$What are the qualitative or quantified social and environmental impacts?$$SDU$$$$$$
@@ -275,8 +275,8 @@ ELEC_PEAK_LOAD$$$ERIC$$number$$$$
 ELEC_MAX_LOAD$$$ERIC$$number$$$$
 RENEWABLE_USED$$$ERIC$$number$$$$
 LANDFILL_COST$$$ERIC$$number$$$$
-SDG_STARTING$$$SDU$$number$$$$
-SDG_CLEAR$$$SDU$$number$$$$
+SDG_STARTING$Which of the Sustainable Development Goals are you <em>starting</em> to contribute to?$$SDU$$number$$$$
+SDG_CLEAR$Which of the Sustainable Development Goals are you <em>clearly</em> contributing to?$$SDU$$number$$$$
 PROVISIONS$Provisions$&pound;,000$SDU$$number$$$$
 PATIENTS_CLOTHING_AND_FOOTWEAR$Patient clothing and footwear$&pound;,000$SDU$$number$$$$
 STAFF_CLOTHING$Staff clothing$&pound;,000$SDU$$number$$$$
@@ -380,7 +380,7 @@ LORRIES_LEV_ULEV_PCT$Pct lorries LEV or ULEV$$SDU$$$$$$
 LORRIES_MILEAGE$Mileage by lorry$$SDU$$$$$$
 NO_EV_CHARGE_POINTS$Number of EV charging points$$SDU$The total number of electric vehicles charging points available on site including those for use by the trust's own internal fleet and available for patients, visitors and staff irrespective of any fees charged. cf. ERIC S09_04$number$$$$
 SDMP_INC_PROCUREMENT$Does your Green Plan include procurement?$$SDU$$$$$$
-PROC_SUPPLIER_ENGAGEMENT$Procurement includes supplier engagement on sustainability$$SDU$$$$$$
+PROC_SUPPLIER_ENGAGEMENT$Does your procurement include supplier engagement on sustainability?$$SDU$$$$$$
 SOCIAL_VALUE$Social value$$SDU$$$$$$
 BIODIVERSITY$Biodiversity$$SDU$$$$$$
 CAR_MILES_PETROL$Fleet mileage (petrol)$miles$SDU$$number$$$$

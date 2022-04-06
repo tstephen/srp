@@ -13,10 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *******************************************************************************/
-var EASING_DURATION = 500;
-fadeOutparameters = true;
-var newLineRegEx = /\n/g;
-
 var ractive = new BaseRactive({
   el: 'container',
   lazy: true,
@@ -26,52 +22,7 @@ var ractive = new BaseRactive({
     filter: undefined,
     //saveObserver:false,
     tenant: { id: 'sdu' },
-    username: localStorage['username'],
-    age: function(timeString) {
-      return i18n.getAgeString(new Date(timeString))
-    },
-    chars: function(string) {
-      console.info('chars: '+string);
-      var len = string == undefined ? 0 : string.length;
-      console.log('  returning: '+len);
-      return len;
-    },
-    customField: function(obj, name) {
-      if (obj['customFields']==undefined) {
-        return undefined;
-      } else if (!Array.isArray(obj['customFields'])) {
-        return obj.customFields[name];
-      } else {
-        //console.error('customField 30');
-        var val;
-        $.each(obj['customFields'], function(i,d) {
-          if (d.name == name) val = d.value;
-        });
-        return val;
-      }
-    },
-    formatDate: function(timeString) {
-      return new Date(timeString).toLocaleDateString(navigator.languages).replace('Invalid Date','n/a').replace('01/01/1970','n/a');
-    },
-    formatJson: function(json) {
-      console.log('formatJson: '+json);
-      try {
-        var obj = JSON.parse(json);
-        var html = '';
-        $.each(Object.keys(obj), function(i,d) {
-          html += (typeof obj[d] == 'object' ? '' : '<b>'+d+'</b>: '+obj[d]+'<br/>');
-        });
-        return html;
-      } catch (e) {
-        // So it wasn't JSON
-        return json;
-      }
-    },
-    hash: function(email) {
-      if (email == undefined) return '';
-      console.log('hash '+email+' = '+ractive.hash(email));
-      return '<img class="img-rounded" src="//www.gravatar.com/avatar/'+ractive.hash(email)+'?s=36"/>'
-    },
+    username: localStorage.getItem('username'),
     matchFilter: function(obj) {
       if (ractive.get('filter')==undefined) return true;
       else return ractive.get('filter').value.toLowerCase()==obj[ractive.get('filter').field].toLowerCase();
@@ -115,7 +66,7 @@ var ractive = new BaseRactive({
     sorted: function(column) {
 //      console.info('sorted:'+column);
       if (ractive.get('sortColumn') == column && ractive.get('sortAsc')) return 'sort-asc';
-      else if (ractive.get('sortColumn') == column && !ractive.get('sortAsc')) return 'sort-desc'
+      else if (ractive.get('sortColumn') == column && !ractive.get('sortAsc')) return 'sort-desc';
       else return 'hidden';
     },
     stdPartials: [
@@ -154,8 +105,7 @@ var ractive = new BaseRactive({
       crossDomain: true,
       success: function( data ) {
         console.warn('response;'+data);
-        something = window.open("data:text/csv," + encodeURIComponent(data),"_blank");
-        //something.focus();
+        window.open("data:text/csv," + encodeURIComponent(data),"_blank");
       }
     });
   },
@@ -166,17 +116,17 @@ var ractive = new BaseRactive({
     ractive.select(parameter);
   },
   delete: function (obj) {
-    ractive.srp.deleteParameter(ractive.get('current'))
-    .then(response => {
-      switch (response.status) {
-      case 204:
-        ractive.fetch();
-        ractive.toggleResults();
-        break;
-      default:
-        ractive.showMessage('Unable to delete the parameter ('+response.status+')');
-      }
-    });
+    ractive.srp.deleteParameter(obj)
+      .then(function(response) {
+        switch (response.status) {
+        case 204:
+          ractive.fetch();
+          ractive.toggleResults();
+          break;
+        default:
+          ractive.showMessage('Unable to delete the parameter ('+response.status+')');
+        }
+      });
     return false; // cancel bubbling to prevent edit as well as delete
   },
   fetch: function() {
@@ -184,12 +134,12 @@ var ractive = new BaseRactive({
     if (ractive.keycloak.token === undefined) return;
     ractive.set('saveObserver', false);
     ractive.srp.fetchParameters(ractive.get('tenant.id'))
-    .then(response => response.json()) // catch (e) { console.error('unable to parse response as JSON') } })
-    .then(data => {
-        if (data['_embedded'] == undefined) {
+    .then(function(response) { return response.json(); }) // catch (e) { console.error('unable to parse response as JSON') } })
+    .then(function(data) {
+        if ('_embedded' in data) {
+          ractive.merge('parameters', data._embedded.parameters);
+        } else {
           ractive.merge('parameters', data);
-        }else{
-          ractive.merge('parameters', data['_embedded'].parameters);
         }
         if (ractive.hasRole('admin')) $('.admin').show();
         if (ractive.fetchCallbacks!=null) ractive.fetchCallbacks.fire();
@@ -225,21 +175,16 @@ var ractive = new BaseRactive({
   getId: function(parameter) {
     console.log('getId: '+parameter);
     var uri;
-    if (parameter['links']!=undefined) {
+    if ('links' in parameter) {
       $.each(parameter.links, function(i,d) {
         if (d.rel == 'self') {
           uri = d.href;
         }
       });
-    } else if (parameter['_links']!=undefined) {
+    } else if ('_links' in parameter) {
       uri = parameter._links.self.href.indexOf('?')==-1 ? parameter._links.self.href : parameter._links.self.href.substr(0,parameter._links.self.href.indexOf('?')-1);
     }
     return uri;
-  },
-  hideResults: function() {
-    $('#parametersTableToggle').addClass('kp-icon-caret-right').removeClass('kp-icon-caret-down');
-    $('#parametersTable').slideUp();
-    $('#currentSect').slideDown({ queue: true });
   },
   postSelect: function(parameter) {
     ractive.set('saveObserver', false);
@@ -262,13 +207,13 @@ var ractive = new BaseRactive({
     else if(document.getElementById('currentForm').checkValidity()) {
       ractive.set('current.tenantId', ractive.get('tenant.id'));
       ractive.srp.saveParameter(ractive.get('current'), ractive.get('tenant.id'))
-      .then(response => {
+      .then(function(response) {
         switch(response.status) {
         case 201:
           return ractive.set('currentIdx',ractive.get('parameters').push(ractive.get('current'))-1);
         }
       })
-      .then(data => {
+      .then(function(data) {
         if (data !== undefined) ractive.set('current', data);
         ractive.splice('parameters',ractive.get('currentIdx'),1,ractive.get('current'));
         ractive.set('saveObserver', true);
@@ -291,59 +236,24 @@ var ractive = new BaseRactive({
     } else {
       console.log('loading detail for '+url);
       ractive.srp.fetchParameter(url)
-      .then(response => response.json())
-      .then(data => ractive.postSelect(data));
+      .then(function(response) { return response.json(); })
+      .then(function(data) { ractive.postSelect(data); });
     }
-  },
-  showActivityIndicator: function(msg, addClass) {
-    document.body.style.cursor='progress';
-    this.showMessage(msg, addClass);
-  },
-  showResults: function() {
-    $('#parametersTableToggle').addClass('kp-icon-caret-down').removeClass('kp-icon-caret-right');
-    $('#currentSect').slideUp();
-    $('#parametersTable').slideDown({ queue: true });
   },
   sortparameters: function() {
     ractive.get('parameters').sort(function(a,b) { return new Date(b.lastUpdated)-new Date(a.lastUpdated); });
-  },
-  toggleResults: function() {
-    console.log('toggleResults');
-    $('#parametersTableToggle').toggleClass('kp-icon-caret-down').toggleClass('kp-icon-caret-right');
-    $('#parametersTable').slideToggle();
   }
-});
-
-ractive.observe('searchTerm', function(newValue, oldValue, keypath) {
-  console.log('searchTerm changed');
-  ractive.showResults();
-  setTimeout(function() {
-    ractive.set('searchMatched',$('#parametersTable tbody tr').length);
-  }, 500);
-});
-
-$(document).ready(function() {
-  console.info('ready handler')
-//  if (ractive.fetchCallbacks==null) ractive.fetchCallbacks = $.Callbacks();
 });
 
 // Save on model change
 // done this way rather than with on-* attributes because autocomplete
 // controls done that way save the oldValue
 ractive.observe('current.*', function(newValue, oldValue, keypath) {
-  ignored=[];
+  var ignored=[];
   if (ractive.get('saveObserver') && ignored.indexOf(keypath)==-1) {
     console.log('current prop change: '+newValue +','+oldValue+' '+keypath);
     ractive.save();
   } else {
     console.warn  ('Skipped save of '+keypath);
-    //console.log('current prop change: '+newValue +','+oldValue+' '+keypath);
-    //console.log('  saveObserver: '+ractive.get('saveObserver'));
   }
-});
-ractive.on( 'sort', function ( event, column ) {
-  console.info('sort on '+column);
-  // if already sorted by this column reverse order
-  if (this.get('sortColumn')==column) this.set('sortAsc', !this.get('sortAsc'));
-  this.set( 'sortColumn', column );
 });

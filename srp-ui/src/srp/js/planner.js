@@ -13,15 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *******************************************************************************/
-var EASING_DURATION = 500;
-var fadeOutMessages = true;
 var ractive = new BaseRactive({
   el: 'container',
   template: '#template',
   data: {
     server: $env.server,
     age: function(timeString) {
-      return i18n.getAgeString(new Date(timeString))
+      return i18n.getAgeString(new Date(timeString));
     },
     commissioningOrganisationTypes: [],
     display000s: false,
@@ -33,10 +31,7 @@ var ractive = new BaseRactive({
     haveOverlaps: function(orgIntvns) {
       console.info('haveOverlaps:'+orgIntvns.length);
       var haveOverlaps = 0;
-      var baseMsg = '<p>There are overlapping interventions shown in the \
-        curve, further detailed analysis would be needed to understand the \
-        magnitude of the overlap. Below follows a list of the interventions \
-        affected and the interventions that overlaps with each.</p>';
+      var baseMsg = '<p>There are overlapping interventions shown in the curve, further detailed analysis would be needed to understand the magnitude of the overlap. Below follows a list of the interventions affected and the interventions that overlaps with each.</p>';
       var applicableIntvnNames = orgIntvns.map(function(obj) {
         return obj.name;
      });
@@ -45,7 +40,7 @@ var ractive = new BaseRactive({
         if (d.overlappingInterventionList!=undefined && d.overlappingInterventionList.length>0) {
           haveOverlaps++;
           specificMsgs += '<li><b>'+d.name+':</b> ';
-          specificMsgs += d.overlappingInterventionList.reduce(function(previousValue, currentValue, currentIndex, array) {
+          specificMsgs += d.overlappingInterventionList.reduce(function(previousValue, currentValue) {
             if (applicableIntvnNames.indexOf(currentValue)!=-1)
               return previousValue += (', '+currentValue);
             else
@@ -65,7 +60,6 @@ var ractive = new BaseRactive({
       }
     },
     showAddUserIntervention: true,
-    server: $env.server,
     sort: function (array, column, asc) {
       console.info('sort '+(asc ? 'ascending' : 'descending')+' on: '+column);
       array = array.slice(); // clone, so we don't modify the underlying data
@@ -85,7 +79,7 @@ var ractive = new BaseRactive({
     sorted: function(column) {
       console.info('sorted');
       if (ractive.get('sortColumn') == column && ractive.get('sortAsc')) return 'sort-asc';
-      else if (ractive.get('sortColumn') == column && !ractive.get('sortAsc')) return 'sort-desc'
+      else if (ractive.get('sortColumn') == column && !ractive.get('sortAsc')) return 'sort-desc';
       else return 'hidden';
     },
     stdPartials: [
@@ -101,14 +95,14 @@ var ractive = new BaseRactive({
       if (ractive.get('interventions').length==0) return;
       var interventions = ractive.get('interventions');
       var sum = 0;
-      for (i = 0 ; i < interventions.length ; i++) {
+      for (var i = 0 ; i < interventions.length ; i++) {
         sum += interventions[i][column];
       }
       return sum;
     },
     tenant: {id: 'sdu'},
     title: 'Healthy Returns by 2020',
-    username: localStorage['username'],
+    username: localStorage.getItem('username'),
     yNegLimit:-100,
     yPosLimit:500
   },
@@ -166,10 +160,10 @@ var ractive = new BaseRactive({
       url: ractive.getServer()+'/'+ractive.get('tenant.id')+'/organisation-interventions/plan/'+ractive.get('current.orgTypeName'),
       crossDomain: true,
       success: function( data ) {
-        if (data['_embedded'] == undefined) {
+        if ('_embedded' in data) {
+          ractive.set('interventions', data._embedded.interventions.sort(ractive.sortByName));
+        } else {
           ractive.set('interventions', data.sort(ractive.sortByName));
-        }else{
-          ractive.set('interventions', data['_embedded'].interventions.sort(ractive.sortByName));
         }
         ractive.set('current.existingInterventions',[]);
         ractive.set('current.characteristics',ractive.uniqUnits());
@@ -200,18 +194,18 @@ var ractive = new BaseRactive({
       url: ractive.getServer()+'/'+ractive.get('tenant.id')+'/organisation-types/status/green',
       crossDomain: true,
       success: function( data ) {
-        if (data['_embedded'] == undefined) {
+        if ('_embedded' in data) {
+          ractive.merge('organisationTypes', data._embedded.organisationTypes.map(function(d) {
+            return d.commissioner==false ? d : undefined;
+          }).clean());
+          ractive.merge('commissioningOrganisationTypes', data._embedded.organisationTypes.map(function(d) {
+            return d.commissioner==true ? d : undefined;
+          }).clean());
+        } else {
           ractive.merge('organisationTypes', data.map(function(d) {
             return d.commissioner==false ? d : undefined;
           }).clean());
           ractive.merge('commissioningOrganisationTypes', data.map(function(d) {
-            return d.commissioner==true ? d : undefined;
-          }).clean());
-        }else{
-          ractive.merge('organisationTypes', data['_embedded'].organisationTypes.map(function(d) {
-            return d.commissioner==false ? d : undefined;
-          }).clean());
-          ractive.merge('commissioningOrganisationTypes', data['_embedded'].organisationTypes.map(function(d) {
             return d.commissioner==true ? d : undefined;
           }).clean());
         }
@@ -220,7 +214,7 @@ var ractive = new BaseRactive({
     });
   },
   getOrg: function() {
-    return ractive.keycloak.profile.attributes['org'];
+    return ractive.keycloak.profile.attributes.org;
   },
   getUsername: function() {
     return ractive.keycloak.profile.username;
@@ -254,7 +248,7 @@ var ractive = new BaseRactive({
         url: 'https://api.knowprocess.com/msg/'+ractive.get('tenant.id')+'/srp.abatementplan.json',
         type: 'POST',
         data: { json: JSON.stringify(tmp) },
-        success: completeHandler = function(data) {
+        success: function(data) {
           console.log('submitted plan, response was: '+ data);
         }
       });
@@ -274,9 +268,9 @@ var ractive = new BaseRactive({
         }
       }
 
-      for (var j in ractive.get('current.existingInterventions')) {
-        if (ractive.get('current.existingInterventions.'+j)==ractive.get('interventions.'+i+'.name')) {
-          ractive.splice('interventions',i,1);
+      for (var k in ractive.get('current.existingInterventions')) {
+        if (ractive.get('current.existingInterventions.'+k)==ractive.get('interventions.'+i+'.name')) {
+          ractive.splice('interventions',k,1);
         }
       }
     }
@@ -368,13 +362,13 @@ var ractive = new BaseRactive({
     var seen = {};
     var units = [];
     for (var i=0 ; i<ractive.get('interventions').length ; i++) {
-      var item = ractive.get('interventions')[i]['unit'];
+      var item = ractive.get('interventions.'+i+'.unit');
       if(seen[item] !== 1) {
         seen[item] = 1;
         units.push({
-          unit: ractive.get('interventions')[i]['unit'],
-          unitCount: ractive.get('interventions')[i]['unitCount'],
-          unitDescription: ractive.get('interventions')[i]['unitDescription']
+          unit: item,
+          unitCount: ractive.get('interventions.'+i+'.unitCount'),
+          unitDescription: ractive.get('interventions.'+i+'.unitDescription')
         });
       }
     }
@@ -392,18 +386,14 @@ var ractive = new BaseRactive({
   }
 });
 
-ractive.on( 'sort', function ( event, column ) {
-  console.info('sort on '+column);
-  // if already sorted by this column reverse order
-  if (this.get('sortColumn')==column) this.set('sortAsc', !this.get('sortAsc'));
-  this.set( 'sortColumn', column );
-});
 ractive.observe('yNegLimit', function(newValue, oldValue, keypath) {
+  console.log("'"+keypath+"' changed from '"+oldValue+"' to '"+newValue+"'");
   if (newValue!=undefined && newValue!='') {
     ractive.setYNegLimit(newValue);
   }
 });
 ractive.observe('yPosLimit', function(newValue, oldValue, keypath) {
+  console.log("'"+keypath+"' changed from '"+oldValue+"' to '"+newValue+"'");
   if (newValue!=undefined && newValue!='') {
     ractive.setYPosLimit(newValue);
   }
@@ -413,4 +403,4 @@ $(document).ready(function() {
   $('head').append('<link href="/sdu/css/sdu-1.0.0.css" rel="stylesheet">');
 
   ractive.fetchOrganisationTypes();
-})
+});

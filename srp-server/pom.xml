@@ -20,7 +20,7 @@
   <parent>
     <groupId>digital.srp</groupId>
     <artifactId>srp-root</artifactId>
-    <version>3.0.1</version>
+    <version>3.1.0</version>
     <relativePath>..</relativePath>
   </parent>
 
@@ -45,6 +45,12 @@
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-actuator</artifactId>
+      <exclusions>
+        <exclusion>
+          <groupId>org.springframework.boot</groupId>
+          <artifactId>spring-boot-starter-logging</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.springframework.boot</groupId>

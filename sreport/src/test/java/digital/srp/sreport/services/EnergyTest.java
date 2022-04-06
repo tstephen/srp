@@ -50,6 +50,8 @@ public class EnergyTest {
     private static final String HOT_WATER_USED = "1773091";
     private static final String ORG_CODE = "ZZ1";
     private static final String PERIOD = "2017-18";
+    private static final String PERIOD_2019_20 = "2019-20";
+    private static final String PERIOD_2020_21 = "2020-21";
     private static Cruncher svc;
 
     private static List<CarbonFactor> cfactors;
@@ -184,6 +186,34 @@ public class EnergyTest {
 
         // check inputs unchanged
         assertEquals(new BigDecimal(COAL_USED), rtn.answer(PERIOD, Q.COAL_USED).get().responseAsBigDecimal());
+    }
+
+    @Test
+    public void testThermalEnergyRVJCalcs() {
+        SurveyReturn rtn = new SurveyReturn().applicablePeriod(PERIOD_2020_21).org("RVJ");
+        rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD_2020_21).question(Q.GAS_USED).response(GAS_USED));
+        String oilUsed1920 = "583708";
+        rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD_2019_20).question(Q.OIL_USED).response(oilUsed1920));
+        String oilUsed2021 = "1048078";
+        rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD_2020_21).question(Q.OIL_USED).response(oilUsed2021));
+
+        rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD_2020_21).question(Q.TOTAL_ENERGY));
+        rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD_2020_21).question(Q.TOTAL_ENERGY_BY_WTE));
+        rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD_2020_21).question(Q.TOTAL_ENERGY_CO2E));
+        rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD_2019_20).question(Q.OWNED_BUILDINGS));
+        rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD_2020_21).question(Q.OWNED_BUILDINGS));
+        rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD_2020_21).question(Q.OWNED_BUILDINGS_GAS));
+        rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD_2019_20).question(Q.OWNED_BUILDINGS_OIL));
+        rtn.getAnswers().add(new Answer().applicablePeriod(PERIOD_2020_21).question(Q.OWNED_BUILDINGS_OIL));
+
+        svc.crunchOwnedBuildings(PERIOD_2019_20, rtn);
+        svc.crunchOwnedBuildings(PERIOD_2020_21, rtn);
+        assertEquals(new BigDecimal("186"), rtn.answer(PERIOD_2019_20, Q.OWNED_BUILDINGS_OIL).get().responseAsBigDecimal().setScale(0, RoundingMode.HALF_UP));
+        assertEquals(new BigDecimal("334"), rtn.answer(PERIOD_2020_21, Q.OWNED_BUILDINGS_OIL).get().responseAsBigDecimal().setScale(0, RoundingMode.HALF_UP));
+
+        // check inputs unchanged
+        assertEquals(new BigDecimal(oilUsed1920), rtn.answer(PERIOD_2019_20, Q.OIL_USED).get().responseAsBigDecimal());
+        assertEquals(new BigDecimal(oilUsed2021), rtn.answer(PERIOD_2020_21, Q.OIL_USED).get().responseAsBigDecimal());
     }
 
     @Test

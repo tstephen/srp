@@ -456,7 +456,7 @@ var ractive = new BaseRactive({
     server: $env.server,
     survey: 'SDU-2019-20',
     tenant: { id: 'sdu' },
-    username: localStorage['username'],
+    username: localStorage.getItem('username'),
     formatAbsAnswer: function(qName, period) {
       try {
         var answer = ractive.getAnswer(qName, period);

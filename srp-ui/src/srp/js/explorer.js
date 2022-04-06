@@ -23,10 +23,6 @@ var ractive = new BaseRactive({
     criteria: [
       { field: "", operator: " = ", value: "" }
     ],
-    // formatAnswer: function(qName) {
-    //   if (qName==undefined || ractive.get('answers')==undefined) return '';
-    //   return ractive.getAnswer(qName);
-    // },
     formatDate: function(timeString) {
       return new Date(timeString).toLocaleDateString(navigator.languages).replace('Invalid Date','n/a').replace('01/01/1970','n/a');
     },
@@ -47,14 +43,14 @@ var ractive = new BaseRactive({
         var search = ractive.get('searchTerm').split(' ');
         for (var idx = 0 ; idx < search.length ; idx++) {
           var searchTerm = search[idx].toLowerCase();
-          var match = ( (obj.id.indexOf(searchTerm)>=0)
-              || (obj.applicablePeriod.toLowerCase().indexOf(searchTerm.toLowerCase())>=0)
-              || (obj.question.name.toLowerCase().indexOf(searchTerm.toLowerCase())>=0)
-              || (searchTerm.startsWith('updated>') && new Date(obj.lastUpdated)>new Date(ractive.get('searchTerm').substring(8)))
-              || (searchTerm.startsWith('created>') && new Date(obj.created)>new Date(ractive.get('searchTerm').substring(8)))
-              || (searchTerm.startsWith('updated<') && new Date(obj.lastUpdated)<new Date(ractive.get('searchTerm').substring(8)))
-              || (searchTerm.startsWith('created<') && new Date(obj.created)<new Date(ractive.get('searchTerm').substring(8)))
-              || (searchTerm.startsWith('status:') && obj.status!=undefined && obj.status.toLowerCase().indexOf(ractive.get('searchTerm').substring(7))!=-1)
+          var match = ( (obj.id.indexOf(searchTerm)>=0) ||
+              (obj.applicablePeriod.toLowerCase().indexOf(searchTerm.toLowerCase())>=0) ||
+              (obj.question.name.toLowerCase().indexOf(searchTerm.toLowerCase())>=0) ||
+              (searchTerm.startsWith('updated>') && new Date(obj.lastUpdated)>new Date(ractive.get('searchTerm').substring(8))) ||
+              (searchTerm.startsWith('created>') && new Date(obj.created)>new Date(ractive.get('searchTerm').substring(8))) ||
+              (searchTerm.startsWith('updated<') && new Date(obj.lastUpdated)<new Date(ractive.get('searchTerm').substring(8))) ||
+              (searchTerm.startsWith('created<') && new Date(obj.created)<new Date(ractive.get('searchTerm').substring(8))) ||
+              (searchTerm.startsWith('status:') && obj.status!=undefined && obj.status.toLowerCase().indexOf(ractive.get('searchTerm').substring(7))!=-1)
           );
           //no match is definitive but matches may fail other terms (AND logic)
           if (!match) return false;
@@ -82,7 +78,7 @@ var ractive = new BaseRactive({
     sorted: function(column) {
       console.info('sorted');
       if (ractive.get('sortColumn') == column && ractive.get('sortAsc')) return 'sort-asc';
-      else if (ractive.get('sortColumn') == column && !ractive.get('sortAsc')) return 'sort-desc'
+      else if (ractive.get('sortColumn') == column && !ractive.get('sortAsc')) return 'sort-desc';
       else return 'hidden';
     },
     stdPartials: [
@@ -151,8 +147,10 @@ var ractive = new BaseRactive({
       $('datalist#orgs').remove();
       $('body').append('<datalist id="orgs">');
       for (var idx = 0 ; idx < data.length ; idx++) {
-        $('datalist#orgs').append('<option value="'+data[idx]['code']+'">'+data[idx].name+'</option>');
-      };
+        $('datalist#orgs').append(
+          '<option value="'+data[idx]['code']+'">'+data[idx].name+'</option>' // jshint ignore:line
+        );
+      }
     });
   },
   fetchOrgTypes: function() {
@@ -171,15 +169,15 @@ var ractive = new BaseRactive({
       $('body').append('<datalist id="questions">');
       for (var idx = 0 ; idx < data.length ; idx++) {
         $('datalist#questions').append('<option value="'+data[idx].name+'">'+data[idx].label+'</option>');
-      };
+      }
     });
   },
   search: function() {
     console.log('search');
-    if (ractive.get('criteria').length==1
-        && (ractive.get('criteria.0.field')=='organisation type'
-            || ractive.get('criteria.0.field')=='region'
-            || ractive.get('criteria.0.field')=='answerStatus')) {
+    if (ractive.get('criteria').length==1 &&
+        (ractive.get('criteria.0.field')=='organisation type' ||
+            ractive.get('criteria.0.field')=='region' ||
+            ractive.get('criteria.0.field')=='answerStatus')) {
       return ractive.showMessage('Please specify more criteria to narrow down your search');
     }
     var crit = ractive.get('criteria');
@@ -204,9 +202,9 @@ var ractive = new BaseRactive({
           // associate category with answer
           data[i].category = function(q) {
             return 'Cat of '+q;//data[i]['question'].name
-          }
+          };
           // flatten surveys this appears in
-          data[i].source = data[i]['surveyReturns'].map(function(rtn) {
+          data[i].source = data[i]['surveyReturns'].map(function(rtn) { // jshint ignore:line
             return rtn.name.indexOf('ERIC')==-1 ? 'SDU return' : 'ERIC';
           });
         }
@@ -242,8 +240,8 @@ var ractive = new BaseRactive({
         type: 'POST',
         data: { json: JSON.stringify({ email: addr, tenantId: 'srp' }) },
         dataType: 'text',
-        success: function(data) {
-          ractive.showMessage('An reset link has been sent to '+addr);
+        success: function() {
+          ractive.showMessage('A reset link has been sent to '+addr);
         },
       });
     } else {
@@ -306,4 +304,4 @@ $(document).ready(function() {
     }
   });
 
-})
+});

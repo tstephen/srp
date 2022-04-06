@@ -13,10 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *******************************************************************************/
-var EASING_DURATION = 500;
-fadeOutMessages = true;
-var newLineRegEx = /\n/g;
-
 var ractive = new BaseRactive({
   el: 'container',
   lazy: true,
@@ -24,14 +20,6 @@ var ractive = new BaseRactive({
   data: {
     filter: { },
     server: $env.server,
-    age: function(timeString) {
-      return i18n.getAgeString(new Date(timeString))
-    },
-    hash: function(email) {
-      if (email == undefined) return '';
-      //console.log('hash '+email+' = '+ractive.hash(email));
-      return '<img class="img-rounded" src="//www.gravatar.com/avatar/'+ractive.hash(email)+'?s=36"/>'
-    },
     display000s: true,
     commissioningOrganisationTypes: [],
     interventions: [],
@@ -82,7 +70,7 @@ var ractive = new BaseRactive({
     sorted: function(column) {
       console.info('sorted');
       if (ractive.get('sortColumn') == column && ractive.get('sortAsc')) return 'sort-asc';
-      else if (ractive.get('sortColumn') == column && !ractive.get('sortAsc')) return 'sort-desc'
+      else if (ractive.get('sortColumn') == column && !ractive.get('sortAsc')) return 'sort-desc';
       else return 'hidden';
     },
     sum: function(column) {
@@ -90,7 +78,7 @@ var ractive = new BaseRactive({
       if (ractive.get('interventions').length==0) return;
       var interventions = ractive.get('interventions');
       var sum = 0;
-      for (i = 0 ; i < interventions.length ; i++) {
+      for (var i = 0 ; i < interventions.length ; i++) {
         sum += interventions[i][column];
       }
       return sum;
@@ -127,7 +115,7 @@ var ractive = new BaseRactive({
           $.each(data, function(i,d) {
             //console.log('costPerTonneCo2e: '+d.costPerTonneCo2e);
             d.slug  = d.name.toSlug();
-          })
+          });
           ractive.merge('interventions',data.sort(ractive.sortByCostPerTonneCo2e));
           if (ractive.hasRole('admin')) $('.admin').show();
           if (ractive.fetchCallbacks!=null) ractive.fetchCallbacks.fire();
@@ -144,23 +132,22 @@ var ractive = new BaseRactive({
       url: ractive.getServer()+'/'+ractive.get('tenant.id')+'/organisation-types/status/green',
       crossDomain: true,
       success: function( data ) {
-        if (data['_embedded'] == undefined) {
+        if ('_embedded' in data) {
+          ractive.merge('organisationTypes', data._embedded.organisationTypes.map(function(d) {
+            return d.commissioner==false ? d : undefined;
+          }).clean());
+          ractive.merge('commissioningOrganisationTypes', data._embedded.organisationTypes.map(function(d) {
+            return d.commissioner==true ? d : undefined;
+          }).clean());
+        } else {
           ractive.merge('organisationTypes', data.map(function(d) {
             return d.commissioner==false ? d : undefined;
           }).clean());
           ractive.merge('commissioningOrganisationTypes', data.map(function(d) {
             return d.commissioner==true ? d : undefined;
           }).clean());
-        }else{
-          ractive.merge('organisationTypes', data['_embedded'].organisationTypes.map(function(d) {
-            return d.commissioner==false ? d : undefined;
-          }).clean());
-          ractive.merge('commissioningOrganisationTypes', data['_embedded'].organisationTypes.map(function(d) {
-            return d.commissioner==true ? d : undefined;
-          }).clean());
         }
         ractive.set('saveObserver', true);
-//        if (ractive.get('optScaleType')==undefined) ractive.set('optScaleType',ractive.get('scaleTypes.0.name'));
         if (ractive.get('optOrgType')==undefined) ractive.set('optOrgType',ractive.get('organisationTypes.0.name'));
       }
     });
@@ -204,10 +191,6 @@ var ractive = new BaseRactive({
     macc.options.yPosLimit = limit;
     ractive.replaceGraph();
   },
-  showActivityIndicator: function(msg, addClass) {
-    document.body.style.cursor='progress';
-    this.showMessage(msg, addClass);
-  },
   sortByCostPerTonneCo2e: function (a, b) {
     if (a.costPerTonneCo2e > b.costPerTonneCo2e) {
       return 1;
@@ -221,17 +204,20 @@ var ractive = new BaseRactive({
 });
 
 ractive.observe('optOrgType', function(newValue, oldValue, keypath) {
+  console.log("'"+keypath+"' changed from '"+oldValue+"' to '"+newValue+"'");
   if (newValue!=undefined && newValue!='') {
     ractive.fetch();
   }
 });
 
 ractive.observe('yNegLimit', function(newValue, oldValue, keypath) {
+  console.log("'"+keypath+"' changed from '"+oldValue+"' to '"+newValue+"'");
   if (newValue!=undefined && newValue!='') {
     ractive.setYNegLimit(newValue);
   }
 });
 ractive.observe('yPosLimit', function(newValue, oldValue, keypath) {
+  console.log("'"+keypath+"' changed from '"+oldValue+"' to '"+newValue+"'");
   if (newValue!=undefined && newValue!='') {
     ractive.setYPosLimit(newValue);
   }
@@ -242,13 +228,6 @@ ractive.on( 'filterOrgType', function ( event, orgType ) {
   ractive.set('optOrgType',orgType);
   ractive.fetch();
 });
-ractive.on( 'sort', function ( event, column ) {
-  console.info('sort on '+column);
-  // if already sorted by this column reverse order
-  if (this.get('sortColumn')==column) this.set('sortAsc', !this.get('sortAsc'));
-  this.set( 'sortColumn', column );
-});
-
 $(document).ready(function() {
   $('head').append('<link href="/sdu/css/sdu-1.0.0.css" rel="stylesheet">');
 
@@ -257,9 +236,4 @@ $(document).ready(function() {
     //console.log('resized to '+window.innerWidth);
     ractive.replaceGraph();
   });
-})
-
-String.prototype.toSlug = function() {
-  if (this == undefined) return this;
-  return this.replace(/[.,()'"&%\/]/g,'').toLeadingCaps().replace(/ /g,'');
-}
+});

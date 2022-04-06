@@ -16,7 +16,7 @@
 var macc = new Macc(); 
 
 function Macc() {
-  this.data; 
+  this.data = undefined; 
 
   this.options = { 
     margin: {top: 10, right: 100, bottom: 10, left: 75},
@@ -48,26 +48,15 @@ function Macc() {
       .append('svg')
       .attr('width',macc.options.width)
       .attr('height',macc.options.height); 
-//    svg.append('<defs> \
-//        <filter id="dropGlow" width="1.5" height="1.5" x="-.25" y="-.25"> \
-//            <feGaussianBlur id="feGaussianBlur5384" in="SourceAlpha" stdDeviation="15.000000" result="blur"/> \
-//            <feColorMatrix id="feColorMatrix5386" result="bluralpha" type="matrix" values="-1 0 0 0 1 0 -1 0 0 1 0 0 -1 0 1 0 0 0 0.800000 0 "/> \
-//            <feOffset id="feOffset5388" in="bluralpha" dx="0.000000" dy="0.000000" result="offsetBlur"/> \
-//            <feMerge id="feMerge5390"> \
-//                <feMergeNode id="feMergeNode5392" in="offsetBlur"/> \
-//                <feMergeNode id="feMergeNode5394" in="SourceGraphic"/> \
-//            </feMerge> \
-//        </filter>\
-//    </defs>');
     
     // set up scales
-    var sumTonnesCo2eSavedTargetYear = d3.sum(data, function(d,i){
+    var sumTonnesCo2eSavedTargetYear = d3.sum(data, function(d) {
       return d.tonnesCo2eSavedTargetYear;
     });
     var xScale = d3.scale.linear()
       .domain([0,sumTonnesCo2eSavedTargetYear])
       .range([macc.options.margin.left,macc.options.width]);
-    macc.yExtent = d3.extent(data, function(d,i) {
+    macc.yExtent = d3.extent(data, function(d) {
       return d.costPerTonneCo2e;
     });
     if (macc.yExtent[0]<macc.options.yNegLimit) macc.yExtent[0] = macc.options.yNegLimit;
@@ -106,7 +95,7 @@ function Macc() {
             }
           },
           x: function(d,i) {
-            x = 0;
+            var x = 0;
             $.each(data,function(j,d) {
               if (j<i) {
                 x+=d.tonnesCo2eSavedTargetYear;
@@ -140,7 +129,6 @@ function Macc() {
           // NOTE: will return px even if set in %, but ONLY when visible
           var ttWidth = $('.macc-tooltip').css('width');
           if (ttWidth.indexOf('px')!=-1) ttWidth = parseFloat(ttWidth.substring(0,ttWidth.indexOf('px'))); 
-//          console.error('  ttWidth:'+ttWidth);
           var xPos = d3.mouse(this)[0];
           // Position tooltip to left when it would otherwise be off page.
           if ((xPos+ttWidth)>macc.options.width) {
@@ -152,7 +140,6 @@ function Macc() {
 
           var overlapAdj = ractive.get('overlapCount')==undefined ? 0 :ractive.get('overlapCount');
           var yPos = d3.mouse(this)[1]+50+(overlapAdj*20);
-//          console.log('  x,y:'+xPos+','+yPos);
           d3.select('.macc-tooltip')
             .style({
               'left':xPos+'px',
@@ -166,8 +153,7 @@ function Macc() {
           d3.select('.macc-tooltip #confidence').text(' '+d.confidence+' %');
           d3.select('#'+this.id).classed('selected',true);
         })
-        .on("mouseout", function(d) {
-          //console.log('Hide tooltip');
+        .on("mouseout", function() {
           d3.select(".macc-tooltip").classed("hidden", true);
           d3.select('#'+this.id).classed('selected',false);
         });
@@ -200,17 +186,5 @@ function Macc() {
     var yAxis = d3.svg.axis().scale(macc.yScale).orient('left');
     svg.append('g').classed('axis',true)
       .attr('transform','translate('+macc.options.margin.left+',0)').call(yAxis);
-  }
-}
-
-function initHeader() {
-  console.info('ready...');
-  $('#resultTable').on('mouseover', function() {
-    console.log('hello');
-    $('#resultTable thead').css('position','fixed').css('top','10px').css('width',$('#resultTable').width());
-  });
-  $('#resultTable').on('mouseout', function() {
-    console.log('bye');
-    $('#resultTable thead').css('position','static').css('top','10px').css('width',$('#resultTable').width());
-  });
+  };
 }

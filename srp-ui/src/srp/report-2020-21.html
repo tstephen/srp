@@ -484,7 +484,7 @@
 	  </section>
 	  <section class="col-md-6 col-xs-12">
             <p>Travel where fuel use is estimated. All travel is shown in miles.</p>
-            <div class="rpt table2" id="fleetTravelRptTable2" data-total="true" data-qs="CAR_MILES_PETROL,CAR_MILES_DIESEL,CAR_MILES_UNKNOWN_FUEL,OWNED_LEASED_CARBON_MILES" data-periods="4"
+            <div class="rpt table2" id="fleetTravelRptTable2" data-total="true" data-qs="CAR_MILES_PETROL,CAR_MILES_DIESEL,CAR_MILES_UNKOWN_FUEL,OWNED_LEASED_CARBON_MILES" data-periods="4"
                  data-share="http://localhost:8083/reports/{{formatAnswer('ORG_CODE')}}/{{surveyReturn.applicablePeriod}}/fleet-travel.html"></div>
 	  </section>
           <h4>Breakdown of business mileage</h4>
@@ -503,7 +503,7 @@
           <p class="narrative performance {{#if !haveAnswer('TRAVEL_PERF')}}hidden-print{{/if}}" data-q="TRAVEL_PERF">{{formatAnswer('TRAVEL_PERF')}}</p>
           <h4>Breakdown of fleet emissions</h4>
           <p>CO<sub>2</sub> Emissions (tCO<sub>2</sub>e)</p>
-          <div class="rpt table2" id="roadTravelCo2eRptTable2" data-total="true" data-qs="CAR_MILES_PETROL_CO2E,CAR_MILES_DIESEL_CO2E,CAR_HYBRID_FUEL_USED_CO2E" data-periods="4"
+          <div class="rpt table2" id="roadTravelCo2eRptTable2" data-total="true" data-qs="CAR_PETROL_USED_CO2E,CAR_DIESEL_USED_CO2E,CAR_HYBRID_FUEL_USED_CO2E" data-periods="4"
                data-share="http://localhost:8083/reports/{{formatAnswer('ORG_CODE')}}/{{surveyReturn.applicablePeriod}}/travel-co2e.html"></div>
           <h4>Breakdown of business travel emissions</h4>
           <p>CO<sub>2</sub> Emissions (tCO<sub>2</sub>e)</p>
@@ -548,13 +548,13 @@
                data-share="http://localhost:8083/reports/{{formatAnswer('ORG_CODE')}}/{{surveyReturn.applicablePeriod}}/waste.html"></div>
           <h4>Carbon emissions resulting</h4>
           <p>
-            <svg data-qs="PAPER_CO2E,WASTE_CLINICAL_INCINERATED_CO2E,ALT_WASTE_DISPOSAL_WEIGHT_CO2E,WASTE_OFFENSIVE_CO2E,LANDFILL_WEIGHT_CO2E,RECYCLING_WEIGHT_CO2E,WASTE_CONFIDENTIAL_CO2E,WASTE_FOOD_CO2E,WASTE_TEXTILES_CO2E,INCINERATION_WEIGHT_CO2E,WASTE_PROCESSED_ON_SITE_CO2E,WEEE_WEIGHT_CO2E"
+            <svg data-qs="PAPER_CO2E,WASTE_CLINICAL_INCINERATED_CO2E,ALT_WASTE_DISPOSAL_WEIGHT_CO2E,WASTE_OFFENSIVE_CO2E,LANDFILL_CO2E,RECYCLING_CO2E,WASTE_CONFIDENTIAL_CO2E,WASTE_FOOD_CO2E,WASTE_TEXTILES_CO2E,INCINERATION_CO2E,WASTE_PROCESSED_ON_SITE_CO2E,WEEE_WEIGHT_CO2E"
                  data-colors="#0B4BE5,#0BBDE5,#00F299,#A2FC00,#FFEB00,#FFAD00" data-periods="4"
                  class="rpt stacked2" id="wasteGraph2" width="600" height="400"></svg>
           </p>
           <p>CO<sub>2</sub> Emissions (tCO<sub>2</sub>e)</p>
 
-          <div class="rpt table2" id="wasteCo2eRptTable2" data-total="true" data-qs="PAPER_CO2E,WASTE_CLINICAL_INCINERATED_CO2E,ALT_WASTE_DISPOSAL_WEIGHT_CO2E,WASTE_OFFENSIVE_CO2E,LANDFILL_WEIGHT_CO2E,RECYCLING_WEIGHT_CO2E,WASTE_CONFIDENTIAL_CO2E,WASTE_FOOD_CO2E,WASTE_TEXTILES_CO2E,INCINERATION_WEIGHT_CO2E,WASTE_PROCESSED_ON_SITE_CO2E,WEEE_WEIGHT_CO2E" data-periods="4"
+          <div class="rpt table2" id="wasteCo2eRptTable2" data-total="true" data-qs="PAPER_CO2E,WASTE_CLINICAL_INCINERATED_CO2E,ALT_WASTE_DISPOSAL_WEIGHT_CO2E,WASTE_OFFENSIVE_CO2E,LANDFILL_CO2E,RECYCLING_CO2E,WASTE_CONFIDENTIAL_CO2E,WASTE_FOOD_CO2E,WASTE_TEXTILES_CO2E,INCINERATION_CO2E,WASTE_PROCESSED_ON_SITE_CO2E,WEEE_WEIGHT_CO2E" data-periods="4"
                data-share="http://localhost:8083/reports/{{formatAnswer('ORG_CODE')}}/{{surveyReturn.applicablePeriod}}/waste-c2oe.html"></div>
           <p class="narrative performance {{#if !haveAnswer('WASTE_PERF')}}hidden-print{{/if}}" data-q="WASTE_PERF">{{formatAnswer('WASTE_PERF')}}</p>
           <p class="narrative context {{#if !haveAnswer('WASTE_CONTEXT')}}hidden-print{{/if}}" data-q="WASTE_CONTEXT">{{formatAnswer('WASTE_CONTEXT')}}</p>

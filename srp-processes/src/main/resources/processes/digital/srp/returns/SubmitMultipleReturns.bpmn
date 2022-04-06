@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:activiti="http://activiti.org/bpmn" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:flowable="http://flowable.org/bpmn" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="SubmitMultipleReturnsDefinitions" targetNamespace="http://srp.digital/returns" exporter="Camunda Modeler" exporterVersion="3.4.1">
+  <bpmn:process id="SubmitReturns" isExecutable="false" name="Submit multiple returns">
+    <bpmn:startEvent id="StartEvent_1" name="srp.returns" activiti:initiator="initiator" camunda:initiator="initiator">
+      <bpmn:outgoing>SequenceFlow_07pnlqi</bpmn:outgoing>
+      <bpmn:messageEventDefinition messageRef="srp.returns"/>
+    </bpmn:startEvent>
+    <bpmn:sequenceFlow id="SequenceFlow_07pnlqi" sourceRef="StartEvent_1" targetRef="Task_0aj19f6"/>
+    <bpmn:endEvent id="EndEvent_0eab5kf" name="Returns submitted">
+      <bpmn:incoming>SequenceFlow_0yjvm35</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="SequenceFlow_0yjvm35" sourceRef="Task_0aj19f6" targetRef="EndEvent_0eab5kf"/>
+    <bpmn:callActivity activiti:async="true" id="Task_0aj19f6" name="Submit each return" calledElement="SubmitSustainabilityReturn">
+      <bpmn:extensionElements>
+        <activiti:in source="returnId" target="returnId"/>
+        <activiti:in sourceExpression="Submitted" target="newStatus"/>
+        <activiti:in source="initiator" target="initiator"/>
+        <!--activiti:out source="newReturnId" target="newReturnId"/-->
+      </bpmn:extensionElements>
+      <bpmn:incoming>SequenceFlow_07pnlqi</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_0yjvm35</bpmn:outgoing>
+      <bpmn:multiInstanceLoopCharacteristics activiti:collection="${srp_returns.getJsonArray('ids')}" activiti:elementVariable="returnId" camunda:collection="${srp_returns.getJsonArray('ids')}" camunda:elementVariable="returnId"/>
+    </bpmn:callActivity>
+  </bpmn:process>
+  <bpmn:message id="srp.returns" name="srp.returns"/>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1" name="Submit multiple returns diagram">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="SubmitReturns">
+      <bpmndi:BPMNShape id="StartEvent_0ct95rd_di" bpmnElement="StartEvent_1">
+        <dc:Bounds x="179" y="99" width="36" height="36"/>
+        <!--semId = StartEvent_1--><bpmndi:BPMNLabel>
+          <dc:Bounds x="170" y="142" width="54" height="14"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_07pnlqi_di" bpmnElement="SequenceFlow_07pnlqi">
+        <di:waypoint x="215" y="117"/>
+        <di:waypoint x="270" y="117"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="EndEvent_0eab5kf_di" bpmnElement="EndEvent_0eab5kf">
+        <dc:Bounds x="432" y="99" width="36" height="36"/>
+        <!--semId = EndEvent_0eab5kf--><bpmndi:BPMNLabel>
+          <dc:Bounds x="405" y="142" width="90" height="14"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_0yjvm35_di" bpmnElement="SequenceFlow_0yjvm35">
+        <di:waypoint x="370" y="117"/>
+        <di:waypoint x="432" y="117"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="CallActivity_1pzyxac_di" bpmnElement="Task_0aj19f6">
+        <dc:Bounds x="270" y="77" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>
