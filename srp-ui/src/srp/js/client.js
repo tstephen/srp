@@ -154,6 +154,12 @@ function SrpClient(o) { // jshint ignore:line
   };
 
   me.saveAnswer = function(rtn, answer, successHandler) {
+    if (answer.response == undefined || answer.response.trim() === '') {
+      console.warn('save answer "'+answer.response+'" to ' +
+          answer.question.name+' for '+rtn.id+' in '+answer.applicablePeriod);
+      console.warn('...returning as nothing to save.');
+      return successHandler();
+    }
     fetch(me.options.server+'/returns/'+rtn.id+'/answers/'+answer.question.name+'/'+answer.applicablePeriod, {
       "headers": {
         "Accept": "application/json",
@@ -165,7 +171,11 @@ function SrpClient(o) { // jshint ignore:line
       "method": "POST",
       "mode": "cors"
     })
-    .then(function() { return successHandler(); });
+    .then(function() { return successHandler(); })
+    .catch(function(error) {
+      console.error('Error:', error);
+      $('#reloadModal').modal('show');
+    });
   };
 
   me.saveCarbonFactor = function(cFactor, tenantId) {
