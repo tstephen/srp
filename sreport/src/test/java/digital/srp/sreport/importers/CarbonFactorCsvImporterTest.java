@@ -32,7 +32,7 @@ import digital.srp.sreport.model.CarbonFactors;
 
 public class CarbonFactorCsvImporterTest {
 
-    private static final int NO_OF_YEARS_INCLUDED = 14;
+    private static final int NO_OF_YEARS_INCLUDED = 15;
     private static final int NO_OF_FACTORS = 172;
 
     @Test

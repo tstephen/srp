@@ -45,7 +45,7 @@ public class CarbonFactorCsvImporter {
     public static final String[] HEADERS = {
             "category","name","unit","scope","2007-08","2008-09","2009-10",
             "2010-11","2011-12","2012-13","2013-14","2014-15","2015-16",
-            "2016-17","2017-18","2018-19","2019-20","2020-21","comments"};
+            "2016-17","2017-18","2018-19","2019-20","2020-21","2021-22","comments"};
 
     public List<CarbonFactor> readCarbonFactors() throws IOException {
         try (InputStreamReader isr = new InputStreamReader(
@@ -82,6 +82,7 @@ public class CarbonFactorCsvImporter {
                     cfactors.add(newCarbonFactor(record, HEADERS[15], 15));
                     cfactors.add(newCarbonFactor(record, HEADERS[16], 16));
                     cfactors.add(newCarbonFactor(record, HEADERS[17], 17));
+                    cfactors.add(newCarbonFactor(record, HEADERS[18], 18));
                 } catch (Exception e) {
                     String msg = String.format("Problem with record: %1$s: %2$s", record.getRecordNumber(), e.getMessage());
                     LOGGER.error(msg);
