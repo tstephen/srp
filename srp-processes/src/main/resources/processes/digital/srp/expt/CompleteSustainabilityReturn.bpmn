@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://flowable.org/bpmn" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="Definitions_1iy5qfo" targetNamespace="http://srp.digital/returns" exporter="Camunda Modeler" exporterVersion="4.4.0">
+  <bpmn:process id="CompleteSustainabilityReport" isExecutable="true" name="Complete sustainability report">
+    <bpmn:startEvent id="StartEvent_1" camunda:initiator="initiator">
+      <bpmn:outgoing>Flow_0u8t1l3</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:sequenceFlow id="Flow_0u8t1l3" sourceRef="StartEvent_1" targetRef="enterPolicyData" />
+    <bpmn:sequenceFlow id="Flow_0fklz5u" sourceRef="enterPolicyData" targetRef="enterSizeData" />
+    <bpmn:sequenceFlow id="Flow_0n1xzig" sourceRef="enterSizeData" targetRef="enterSpendData" />
+    <bpmn:sequenceFlow id="Flow_17wgpjp" sourceRef="enterSpendData" targetRef="enterElecData" />
+    <bpmn:sequenceFlow id="Flow_1lvzibp" sourceRef="enterElecData" targetRef="enterThermalData" />
+    <bpmn:sequenceFlow id="Flow_1xjlqtr" sourceRef="enterThermalData" targetRef="enterWasteData" />
+    <bpmn:sequenceFlow id="Flow_1snjio4" sourceRef="enterWasteData" targetRef="enterTravelData" />
+    <bpmn:endEvent id="Event_00tk6a1">
+      <bpmn:incoming>Flow_11syjzx</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_11syjzx" sourceRef="enterTravelData" targetRef="Event_00tk6a1" />
+    <bpmn:userTask id="enterPolicyData" name="Enter policy data" camunda:formKey="Policy" camunda:assignee="${initiator}">
+      <bpmn:incoming>Flow_0u8t1l3</bpmn:incoming>
+      <bpmn:outgoing>Flow_0fklz5u</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:userTask id="enterSizeData" name="Enter size data" camunda:formKey="SizeMetrics" camunda:assignee="${initiator}">
+      <bpmn:incoming>Flow_0fklz5u</bpmn:incoming>
+      <bpmn:outgoing>Flow_0n1xzig</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:userTask id="enterSpendData" name="Enter spend data" camunda:formKey="Spend" camunda:assignee="${initiator}">
+      <bpmn:incoming>Flow_0n1xzig</bpmn:incoming>
+      <bpmn:outgoing>Flow_17wgpjp</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:userTask id="enterElecData" name="Enter elec data" camunda:formKey="Elec" camunda:assignee="${initiator}">
+      <bpmn:incoming>Flow_17wgpjp</bpmn:incoming>
+      <bpmn:outgoing>Flow_1lvzibp</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:userTask id="enterThermalData" name="Enter thermal data" camunda:formKey="Thermal" camunda:assignee="${initiator}">
+      <bpmn:incoming>Flow_1lvzibp</bpmn:incoming>
+      <bpmn:outgoing>Flow_1xjlqtr</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:userTask id="enterWasteData" name="Enter waste data" camunda:formKey="Waste" camunda:assignee="${initiator}">
+      <bpmn:incoming>Flow_1xjlqtr</bpmn:incoming>
+      <bpmn:outgoing>Flow_1snjio4</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:userTask id="enterTravelData" name="Enter travel data" camunda:formKey="Travel" camunda:assignee="${initiator}">
+      <bpmn:incoming>Flow_1snjio4</bpmn:incoming>
+      <bpmn:outgoing>Flow_11syjzx</bpmn:outgoing>
+    </bpmn:userTask>
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="CompleteSustainabilityReport">
+      <bpmndi:BPMNEdge id="Flow_0u8t1l3_di" bpmnElement="Flow_0u8t1l3">
+        <di:waypoint x="215" y="117" />
+        <di:waypoint x="270" y="117" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0fklz5u_di" bpmnElement="Flow_0fklz5u">
+        <di:waypoint x="370" y="117" />
+        <di:waypoint x="430" y="117" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0n1xzig_di" bpmnElement="Flow_0n1xzig">
+        <di:waypoint x="530" y="117" />
+        <di:waypoint x="590" y="117" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_17wgpjp_di" bpmnElement="Flow_17wgpjp">
+        <di:waypoint x="690" y="117" />
+        <di:waypoint x="750" y="117" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1lvzibp_di" bpmnElement="Flow_1lvzibp">
+        <di:waypoint x="850" y="117" />
+        <di:waypoint x="910" y="117" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1xjlqtr_di" bpmnElement="Flow_1xjlqtr">
+        <di:waypoint x="1010" y="117" />
+        <di:waypoint x="1070" y="117" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1snjio4_di" bpmnElement="Flow_1snjio4">
+        <di:waypoint x="1170" y="117" />
+        <di:waypoint x="1230" y="117" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_11syjzx_di" bpmnElement="Flow_11syjzx">
+        <di:waypoint x="1330" y="117" />
+        <di:waypoint x="1392" y="117" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_1">
+        <dc:Bounds x="179" y="99" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_00tk6a1_di" bpmnElement="Event_00tk6a1">
+        <dc:Bounds x="1392" y="99" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_02ggc26_di" bpmnElement="enterPolicyData">
+        <dc:Bounds x="270" y="77" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_12hq5uu_di" bpmnElement="enterSizeData">
+        <dc:Bounds x="430" y="77" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1mh13yp_di" bpmnElement="enterSpendData">
+        <dc:Bounds x="590" y="77" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0xtmfjx_di" bpmnElement="enterElecData">
+        <dc:Bounds x="750" y="77" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_15r9fk3_di" bpmnElement="enterThermalData">
+        <dc:Bounds x="910" y="77" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_131xk2l_di" bpmnElement="enterWasteData">
+        <dc:Bounds x="1070" y="77" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_17wf4au_di" bpmnElement="enterTravelData">
+        <dc:Bounds x="1230" y="77" width="100" height="80" />
+      </bpmndi:BPMNShape>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>
