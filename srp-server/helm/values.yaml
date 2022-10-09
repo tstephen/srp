@@ -54,6 +54,7 @@ ingress:
     - host: v3.srp.digital
       paths:
       - path: /
+        pathType: Exact
         backend:
           serviceName: srp-server
           servicePort: 8080
