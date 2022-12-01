@@ -118,7 +118,10 @@ rest:
 keycloak:
   enabled: true
   realm: knowprocess
-  authServerUrl: https://auth.knowprocess.com/auth
+  authServerUrl: https://auth.srp.digital/auth
   resource: srp
   publicClient: true
   principalAttribute: preferred_username
+  sslRequired: external
+  #credentials.secret: 11111111-1111-1111-1111-111111111111
+  #use-resource-role-mappings: true
