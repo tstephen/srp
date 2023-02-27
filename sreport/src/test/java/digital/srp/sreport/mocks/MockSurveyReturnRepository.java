@@ -18,7 +18,7 @@ public class MockSurveyReturnRepository implements SurveyReturnRepository {
     @Override
     public <S extends SurveyReturn> S save(S entity) {
         if (entity.id() == null) {
-            entity.id(new Long(returns.size() + 1));
+            entity.id(Long.valueOf(returns.size() + 1));
         }
         returns.put(entity.id(), entity);
         return entity;
@@ -57,10 +57,29 @@ public class MockSurveyReturnRepository implements SurveyReturnRepository {
     }
 
     @Override
+    public void deleteAll(Iterable<? extends SurveyReturn> entities) {
+        entities.forEach(i -> delete(i));
+    }
+
+    @Override
+    public void deleteAllById(Iterable<? extends Long> ids) {
+        ids.forEach(i -> deleteById(i));
+    }
+
+    @Override
     public List<SurveyReturn> findAll() {
         List<SurveyReturn> list = new ArrayList<SurveyReturn>();
         list.addAll(returns.values());
         return list;
+    }
+
+    @Override
+    public Iterable<SurveyReturn> findAllById(Iterable<Long> ids) {
+        List<Long> idList = new ArrayList<Long>();
+        ids.forEach(idList::add);
+        return returns.values().stream()
+                        .filter(i -> idList.contains(i.getId()))
+                        .collect(Collectors.toList());
     }
 
     @Override
@@ -127,17 +146,6 @@ public class MockSurveyReturnRepository implements SurveyReturnRepository {
     @Override
     public boolean existsById(Long id) {
         return findById(id).isPresent();
-    }
-
-    @Override
-    public Iterable<SurveyReturn> findAllById(Iterable<Long> ids) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public void deleteAll(Iterable<? extends SurveyReturn> entities) {
-        // TODO Auto-generated method stub
     }
 
 }

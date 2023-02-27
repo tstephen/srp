@@ -17,9 +17,9 @@ package digital.srp.sreport.validators;
 
 import java.util.Set;
 
-import javax.validation.ConstraintViolation;
-import javax.validation.Path;
-import javax.validation.metadata.ConstraintDescriptor;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.Path;
+import jakarta.validation.metadata.ConstraintDescriptor;
 
 import digital.srp.sreport.model.Answer;
 import digital.srp.sreport.model.SurveyReturn;

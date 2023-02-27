@@ -30,7 +30,7 @@ public class MockQuestionRepository implements QuestionRepository {
     @Override
     public <S extends Question> S save(S entity) {
         if (entity.id() == null) {
-            entity.id(new Long(questions.size() + 1));
+            entity.id(Long.valueOf(questions.size() + 1));
         }
         questions.put(entity.id(), entity);
         return entity;
@@ -78,13 +78,18 @@ public class MockQuestionRepository implements QuestionRepository {
     }
 
     @Override
-    public void deleteAll(Iterable<? extends Question> entities) {
-        // TODO Auto-generated method stub
+    public void deleteAll() {
+        questions.clear();
     }
 
     @Override
-    public void deleteAll() {
-        questions.clear();
+    public void deleteAll(Iterable<? extends Question> entities) {
+        entities.forEach(i -> delete(i));
+    }
+
+    @Override
+    public void deleteAllById(Iterable<? extends Long> ids) {
+        ids.forEach(i -> deleteById(i));
     }
 
     @Override

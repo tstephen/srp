@@ -26,8 +26,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
-import javax.annotation.security.RolesAllowed;
-import javax.transaction.Transactional;
+import jakarta.annotation.security.RolesAllowed;
+import jakarta.transaction.Transactional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -471,12 +471,12 @@ public class SurveyReturnController {
                 .org(existing.org())
                 .status(StatusType.Draft.name())
                 .applicablePeriod(existing.applicablePeriod())
-                .revision(new Integer(existing.revision()+1).shortValue())
+                .revision(Integer.valueOf(existing.revision()+1).shortValue())
                 .survey(existing.survey());
         for (Answer a : existing.answers()) {
             restatedRtn.answers().add(new Answer()
                     .applicablePeriod(a.applicablePeriod())
-                    .revision(new Integer(a.revision()+1).shortValue())
+                    .revision(Integer.valueOf(a.revision()+1).shortValue())
                     .status(StatusType.Draft.name())
                     .response(a.response())
                     .question(a.question())

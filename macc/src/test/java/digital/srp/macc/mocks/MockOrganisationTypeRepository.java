@@ -1,5 +1,6 @@
 package digital.srp.macc.mocks;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -19,7 +20,7 @@ public class MockOrganisationTypeRepository
     @Override
     public <S extends OrganisationType> S save(S entity) {
         if (entity.getId() == null) {
-            entity.setId(new Long(orgTypes.size() + 1));
+            entity.setId(Long.valueOf(orgTypes.size() + 1));
         }
         orgTypes.put(entity.getId(), entity);
         return entity;
@@ -61,6 +62,16 @@ public class MockOrganisationTypeRepository
     }
 
     @Override
+    public void deleteAll(Iterable<? extends OrganisationType> entities) {
+        entities.forEach(i -> delete(i));
+    }
+
+    @Override
+    public void deleteAllById(Iterable<? extends Long> ids) {
+        ids.forEach(i -> deleteById(i));
+    }
+
+    @Override
     public List<OrganisationType> findAll() {
         return orgTypes.values().stream().collect(Collectors.toList());
     }
@@ -72,13 +83,11 @@ public class MockOrganisationTypeRepository
 
     @Override
     public Iterable<OrganisationType> findAllById(Iterable<Long> ids) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public void deleteAll(Iterable<? extends OrganisationType> entities) {
-        // TODO Auto-generated method stub
+        List<Long> idList = new ArrayList<Long>();
+        ids.forEach(idList::add);
+        return orgTypes.values().stream()
+                        .filter(i -> idList.contains(i.getId()))
+                        .collect(Collectors.toList());
     }
 
     @Override

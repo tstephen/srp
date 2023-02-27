@@ -21,7 +21,7 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.annotation.security.RolesAllowed;
+import jakarta.annotation.security.RolesAllowed;
 
 import org.hibernate.ObjectNotFoundException;
 import org.slf4j.Logger;
@@ -97,7 +97,7 @@ public class ModelParameterController {
         ModelParameter parameter;
         try {
             parameter = modelParamRepo.findById(Long.valueOf(param))
-                    .orElseThrow(() -> new ObjectNotFoundException(param,
+                    .orElseThrow(() -> new ObjectNotFoundException((Object) param,
                             ModelParameter.class.getSimpleName()));
         } catch (NumberFormatException e) {
             String msg = String.format("No parameter with name %1$s", param);

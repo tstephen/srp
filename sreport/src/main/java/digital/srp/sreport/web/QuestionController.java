@@ -25,9 +25,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.annotation.PostConstruct;
-import javax.annotation.security.RolesAllowed;
-import javax.transaction.Transactional;
+import jakarta.annotation.PostConstruct;
+import jakarta.annotation.security.RolesAllowed;
+import jakarta.transaction.Transactional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

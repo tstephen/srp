@@ -24,9 +24,6 @@ import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.annotation.PostConstruct;
-import javax.annotation.security.RolesAllowed;
-
 import org.hibernate.ObjectNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -56,6 +53,8 @@ import digital.srp.macc.importers.InterventionTypeCsvImporter;
 import digital.srp.macc.internal.CsvImporter;
 import digital.srp.macc.model.InterventionType;
 import digital.srp.macc.repositories.InterventionTypeRepository;
+import jakarta.annotation.PostConstruct;
+import jakarta.annotation.security.RolesAllowed;
 
 /**
  * REST endpoint for accessing {@link InterventionType}
@@ -217,12 +216,12 @@ public class InterventionTypeController {
         try {
             return addLinks(tenantId, interventionTypeRepo
                     .findById(Long.parseLong(idOrName)).orElseThrow(
-                            () -> new ObjectNotFoundException(idOrName,
+                            () -> new ObjectNotFoundException((Object) idOrName,
                                     InterventionType.class.getSimpleName())));
         } catch (NumberFormatException e) {
             return addLinks(tenantId, interventionTypeRepo
                     .findByName(tenantId, idOrName)
-                    .orElseThrow(() -> new ObjectNotFoundException(idOrName,
+                    .orElseThrow(() -> new ObjectNotFoundException((Object) idOrName,
                                     InterventionType.class.getSimpleName())));
         }
     }

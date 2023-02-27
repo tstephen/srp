@@ -133,13 +133,13 @@ public class CsvImporter {
                 method.invoke(bean, Double.valueOf(value.toString()));
                 break;
             case "java.lang.Float":
-                method.invoke(bean, new Float(value.toString()));
+                method.invoke(bean, Float.valueOf(value.toString()));
                 break;
             case "java.lang.Integer":
-                method.invoke(bean, new Integer(value.toString()));
+                method.invoke(bean, Integer.valueOf(value.toString()));
                 break;
             case "java.lang.Short":
-                method.invoke(bean, new Short(value.toString()));
+                method.invoke(bean, Short.valueOf(value.toString()));
                 break;
             case "java.lang.String":
                 if (value != null && value.toString().trim().length() > 0) {

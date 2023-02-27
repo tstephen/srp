@@ -18,8 +18,8 @@ package digital.srp.sreport.internal;
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.InvocationTargetException;
 
-import javax.persistence.PrePersist;
-import javax.persistence.PreUpdate;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.PreUpdate;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

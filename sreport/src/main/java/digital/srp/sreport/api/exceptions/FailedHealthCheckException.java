@@ -17,7 +17,7 @@ package digital.srp.sreport.api.exceptions;
 
 import java.util.Set;
 
-import javax.validation.ConstraintViolation;
+import jakarta.validation.ConstraintViolation;
 
 import digital.srp.sreport.model.SurveyReturn;
 

@@ -17,7 +17,7 @@ package digital.srp.sreport.services;
 
 import java.util.Optional;
 
-import javax.persistence.NonUniqueResultException;
+import jakarta.persistence.NonUniqueResultException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

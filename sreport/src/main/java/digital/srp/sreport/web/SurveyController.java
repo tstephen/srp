@@ -21,10 +21,6 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.annotation.PostConstruct;
-import javax.annotation.security.RolesAllowed;
-import javax.transaction.Transactional;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,7 +34,6 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -58,6 +53,9 @@ import digital.srp.sreport.repositories.SurveyCategoryRepository;
 import digital.srp.sreport.repositories.SurveyRepository;
 import digital.srp.sreport.repositories.SurveyReturnRepository;
 import digital.srp.sreport.services.SurveyService;
+import jakarta.annotation.PostConstruct;
+import jakarta.annotation.security.RolesAllowed;
+import jakarta.transaction.Transactional;
 
 /**
  * REST web service for accessing surveys.

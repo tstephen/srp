@@ -1,5 +1,6 @@
 package digital.srp.sreport.mocks;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -18,7 +19,7 @@ public class MockSurveyRepository implements SurveyRepository {
     @Override
     public <S extends Survey> S save(S entity) {
         if (entity.id() == null) {
-            entity.id(new Long(surveys.size() + 1));
+            entity.id(Long.valueOf(surveys.size() + 1));
         }
         surveys.put(entity.id(), entity);
         return entity;
@@ -60,8 +61,27 @@ public class MockSurveyRepository implements SurveyRepository {
     }
 
     @Override
+    public void deleteAll(Iterable<? extends Survey> entities) {
+        entities.forEach(i -> delete(i));
+    }
+
+    @Override
+    public void deleteAllById(Iterable<? extends Long> ids) {
+        ids.forEach(i -> deleteById(i));
+    }
+
+    @Override
     public List<Survey> findAll() {
         return surveys.values().stream().collect(Collectors.toList());
+    }
+
+    @Override
+    public Iterable<Survey> findAllById(Iterable<Long> ids) {
+        List<Long> idList = new ArrayList<Long>();
+        ids.forEach(idList::add);
+        return surveys.values().stream()
+                        .filter(i -> idList.contains(i.getId()))
+                        .collect(Collectors.toList());
     }
 
     @Override
@@ -77,17 +97,6 @@ public class MockSurveyRepository implements SurveyRepository {
     @Override
     public boolean existsById(Long id) {
         return findById(id).isPresent();
-    }
-
-    @Override
-    public Iterable<Survey> findAllById(Iterable<Long> ids) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public void deleteAll(Iterable<? extends Survey> entities) {
-        // TODO Auto-generated method stub
     }
 
     @Override

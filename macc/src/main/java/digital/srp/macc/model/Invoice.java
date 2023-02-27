@@ -21,8 +21,8 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
 
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
+import jakarta.persistence.Temporal;
+import jakarta.persistence.TemporalType;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

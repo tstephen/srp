@@ -18,8 +18,8 @@ package digital.srp.sreport.web;
 import java.util.ArrayList;
 import java.util.Set;
 
-import javax.annotation.security.RolesAllowed;
-import javax.validation.ConstraintViolation;
+import jakarta.annotation.security.RolesAllowed;
+import jakarta.validation.ConstraintViolation;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -1,5 +1,6 @@
 package digital.srp.macc.mocks;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -14,14 +15,14 @@ import digital.srp.macc.repositories.InterventionTypeRepository;
 public class MockInterventionTypeRepository
         implements InterventionTypeRepository {
 
-    public Map<Long, InterventionType> orgTypes = new HashMap<Long, InterventionType>();
+    public Map<Long, InterventionType> intvnTypes = new HashMap<Long, InterventionType>();
 
     @Override
     public <S extends InterventionType> S save(S entity) {
         if (entity.getId() == null) {
-            entity.setId(new Long(orgTypes.size() + 1));
+            entity.setId(Long.valueOf(intvnTypes.size() + 1));
         }
-        orgTypes.put(entity.getId(), entity);
+        intvnTypes.put(entity.getId(), entity);
         return entity;
     }
 
@@ -36,33 +37,43 @@ public class MockInterventionTypeRepository
 
     @Override
     public Optional<InterventionType> findById(Long id) {
-        return orgTypes.values().stream().filter((r) -> id.equals(r.getId()))
+        return intvnTypes.values().stream().filter((r) -> id.equals(r.getId()))
                 .findAny();
     }
 
     @Override
     public long count() {
-        return orgTypes.size();
+        return intvnTypes.size();
     }
 
     @Override
     public void deleteById(Long id) {
-        orgTypes.remove(id);
+        intvnTypes.remove(id);
     }
 
     @Override
     public void delete(InterventionType entity) {
-        orgTypes.remove(entity.getId());
+        intvnTypes.remove(entity.getId());
     }
 
     @Override
     public void deleteAll() {
-        orgTypes.clear();
+        intvnTypes.clear();
+    }
+
+    @Override
+    public void deleteAll(Iterable<? extends InterventionType> entities) {
+        entities.forEach(i -> delete(i));
+    }
+
+    @Override
+    public void deleteAllById(Iterable<? extends Long> ids) {
+        ids.forEach(i -> deleteById(i));
     }
 
     @Override
     public List<InterventionType> findAll() {
-        return orgTypes.values().stream().collect(Collectors.toList());
+        return intvnTypes.values().stream().collect(Collectors.toList());
     }
 
     @Override
@@ -72,18 +83,16 @@ public class MockInterventionTypeRepository
 
     @Override
     public Iterable<InterventionType> findAllById(Iterable<Long> ids) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public void deleteAll(Iterable<? extends InterventionType> entities) {
-        // TODO Auto-generated method stub
+        List<Long> idList = new ArrayList<Long>();
+        ids.forEach(idList::add);
+        return intvnTypes.values().stream()
+                        .filter(i -> idList.contains(i.getId()))
+                        .collect(Collectors.toList());
     }
 
     @Override
     public List<InterventionType> findAllForTenant(String tenantId) {
-        return orgTypes.values().stream()
+        return intvnTypes.values().stream()
                 .filter(ot -> tenantId.equals(ot.getTenantId()))
                 .collect(Collectors.toList());
     }
@@ -91,7 +100,7 @@ public class MockInterventionTypeRepository
     @Override
     public List<InterventionType> findPageForTenant(String tenantId,
             Pageable pageable) {
-        return orgTypes.values().stream()
+        return intvnTypes.values().stream()
                 .filter(ot -> tenantId.equals(ot.getTenantId()))
                 .collect(Collectors.toList());
     }
@@ -99,7 +108,7 @@ public class MockInterventionTypeRepository
     @Override
     public List<InterventionType> findByStatusForTenant(String tenantId,
             String status) {
-        return orgTypes.values().stream()
+        return intvnTypes.values().stream()
                 .filter(ot -> tenantId.equals(ot.getTenantId()))
                 .filter(ot -> status.equals(ot.getStatus()))
                 .collect(Collectors.toList());
@@ -108,7 +117,7 @@ public class MockInterventionTypeRepository
     @Override
     public List<InterventionType> findByStatusForTenantAndCommissioners(
             String tenantId, String status) {
-        return orgTypes.values().stream()
+        return intvnTypes.values().stream()
                 .filter(ot -> tenantId.equals(ot.getTenantId()))
                 .filter(ot -> status.equals(ot.getStatus()))
                 .filter(ot -> ot.isCrossOrganisation())
@@ -117,7 +126,7 @@ public class MockInterventionTypeRepository
 
     @Override
     public Optional<InterventionType> findByName(String tenantId, String name) {
-        return orgTypes.values().stream()
+        return intvnTypes.values().stream()
                 .filter(ot -> tenantId.equals(ot.getTenantId()))
                 .filter(ot -> name.equals(ot.getName()))
                 .findAny();

@@ -24,11 +24,11 @@ import java.util.Iterator;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 
-import javax.script.Bindings;
-import javax.script.ScriptContext;
-import javax.script.ScriptEngine;
-import javax.script.ScriptEngineManager;
-import javax.script.ScriptException;
+import jakarta.script.Bindings;
+import jakarta.script.ScriptContext;
+import jakarta.script.ScriptEngine;
+import jakarta.script.ScriptEngineManager;
+import jakarta.script.ScriptException;
 
 import org.junit.jupiter.api.Test;
 

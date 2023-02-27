@@ -15,8 +15,8 @@
  ******************************************************************************/
 package digital.srp.macc.model;
 
-import javax.persistence.OneToOne;
-import javax.validation.constraints.NotNull;
+import jakarta.persistence.OneToOne;
+import jakarta.validation.constraints.NotNull;
 
 import lombok.Data;
 

@@ -47,7 +47,7 @@ public class SignificantFiguresFormatTest {
 
     @Test
     public void testNegative() {
-        assertEquals(new Double(-20100),
+        assertEquals(Double.valueOf(-20100),
                 sigFigFormatter.asDouble(new BigDecimal("-20133")));
     }
 

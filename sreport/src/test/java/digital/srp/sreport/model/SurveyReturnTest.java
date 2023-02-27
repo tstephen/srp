@@ -25,7 +25,7 @@ import java.util.Collections;
 import java.util.Set;
 import java.util.function.Predicate;
 
-import javax.validation.ConstraintViolation;
+import jakarta.validation.ConstraintViolation;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -119,11 +119,11 @@ public class SurveyReturnTest implements EricQuestions{
         SurveyReturn return1 = new SurveyReturn().id(1l).name("15-16 return for ACME")
                 .answers(Collections.singleton(
                         new Answer().id(1l).question(q1).response("response")
-                )).revision(new Short("1"));
+                )).revision(Short.valueOf("1"));
         SurveyReturn return2 = new SurveyReturn().id(2l).name("15-16 return for ACME")
                 .answers(Collections.singleton(
                         new Answer().id(1l).question(q1).response("response")
-                )).revision(new Short("2"));
+                )).revision(Short.valueOf("2"));
         assertEquals(return1, return2);
     }
 

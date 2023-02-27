@@ -1,5 +1,7 @@
 package digital.srp.sreport.mocks;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -20,7 +22,7 @@ public class MockAnswerRepository implements AnswerRepository {
     @Override
     public <S extends Answer> S save(S entity) {
         if (entity.id() == null) {
-            entity.id(new Long(answers.size() + 1));
+            entity.id(Long.valueOf(answers.size() + 1));
         }
         answers.put(entity.id(), entity);
         return entity;
@@ -62,8 +64,38 @@ public class MockAnswerRepository implements AnswerRepository {
     }
 
     @Override
+    public void deleteAll(Iterable<? extends Answer> entities) {
+        entities.forEach(i -> delete(i));
+    }
+
+    @Override
+    public void deleteAllById(Iterable<? extends Long> ids) {
+        ids.forEach(i -> deleteById(i));
+    }
+
+    @Override
+    public void deleteDerivedAnswers(Long[] ids) {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public void deleteAnswers(Long[] ids) {
+        Arrays.asList(ids).forEach(i -> deleteById(i));
+    }
+
+    @Override
     public List<Answer> findAll() {
         return answers.values().stream().collect(Collectors.toList());
+    }
+
+    @Override
+    public Iterable<Answer> findAllById(Iterable<Long> ids) {
+        List<Long> idList = new ArrayList<Long>();
+        ids.forEach(idList::add);
+        return answers.values().stream()
+                        .filter(i -> idList.contains(i.getId()))
+                        .collect(Collectors.toList());
     }
 
     @Override
@@ -79,23 +111,6 @@ public class MockAnswerRepository implements AnswerRepository {
     @Override
     public boolean existsById(Long id) {
         return findById(id).isPresent();
-    }
-
-    @Override
-    public Iterable<Answer> findAllById(Iterable<Long> ids) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public void deleteAll(Iterable<? extends Answer> entities) {
-        // TODO Auto-generated method stub
-    }
-
-    @Override
-    public List<Answer> findByQuestion(String... qNames) {
-        // TODO Auto-generated method stub
-        return null;
     }
 
     @Override
@@ -184,15 +199,12 @@ public class MockAnswerRepository implements AnswerRepository {
     }
 
     @Override
-    public void deleteDerivedAnswers(Long[] ids) {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public void deleteAnswers(Long[] ids) {
-        // TODO Auto-generated method stub
-
+    public List<Answer> findByQuestion(String... qNames) {
+        List<String> qList = new ArrayList<String>();
+        Arrays.asList(qNames).forEach(qList::add);
+        return answers.values().stream()
+                        .filter(i -> qList.contains(i.question().name()))
+                        .collect(Collectors.toList());
     }
 
 }

@@ -1,5 +1,6 @@
 package digital.srp.macc.mocks;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -19,7 +20,7 @@ public class MockInterventionRepository
     @Override
     public <S extends Intervention> S save(S entity) {
         if (entity.getId() == null) {
-            entity.setId(new Long(interventions.size() + 1));
+            entity.setId(Long.valueOf(interventions.size() + 1));
         }
         interventions.put(entity.getId(), entity);
         return entity;
@@ -61,6 +62,16 @@ public class MockInterventionRepository
     }
 
     @Override
+    public void deleteAll(Iterable<? extends Intervention> entities) {
+        entities.forEach(i -> delete(i));
+    }
+
+    @Override
+    public void deleteAllById(Iterable<? extends Long> ids) {
+        ids.forEach(i -> deleteById(i));
+    }
+
+    @Override
     public List<Intervention> findAll() {
         return interventions.values().stream().collect(Collectors.toList());
     }
@@ -72,13 +83,11 @@ public class MockInterventionRepository
 
     @Override
     public Iterable<Intervention> findAllById(Iterable<Long> ids) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public void deleteAll(Iterable<? extends Intervention> entities) {
-        // TODO Auto-generated method stub
+        List<Long> idList = new ArrayList<Long>();
+        ids.forEach(idList::add);
+        return interventions.values().stream()
+                        .filter(i -> idList.contains(i.getId()))
+                        .collect(Collectors.toList());
     }
 
     @Override

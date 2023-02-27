@@ -43,7 +43,7 @@ public class InterventionTypeControllerTest {
         // prep
         svc.init();
         assertEquals(INTVN_TYPE_COUNT, ((MockInterventionTypeRepository)
-                svc.interventionTypeRepo).orgTypes.size());
+                svc.interventionTypeRepo).intvnTypes.size());
 
         // finders
         List<EntityModel<InterventionType>> typesFound = svc

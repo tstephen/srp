@@ -18,7 +18,7 @@ public class MockSurveyCategoryRepository implements SurveyCategoryRepository {
     @Override
     public <S extends SurveyCategory> S save(S entity) {
         if (entity.id() == null) {
-            entity.id(new Long(cats.size() + 1));
+            entity.id(Long.valueOf(cats.size() + 1));
         }
         cats.put(entity.id(), entity);
         return entity;
@@ -57,10 +57,29 @@ public class MockSurveyCategoryRepository implements SurveyCategoryRepository {
     }
 
     @Override
+    public void deleteAll(Iterable<? extends SurveyCategory> entities) {
+        entities.forEach(i -> delete(i));
+    }
+
+    @Override
+    public void deleteAllById(Iterable<? extends Long> ids) {
+        ids.forEach(i -> deleteById(i));
+    }
+
+    @Override
     public List<SurveyCategory> findAll() {
         List<SurveyCategory> list = new ArrayList<SurveyCategory>();
         list.addAll(cats.values());
         return list;
+    }
+
+    @Override
+    public Iterable<SurveyCategory> findAllById(Iterable<Long> ids) {
+        List<Long> idList = new ArrayList<Long>();
+        ids.forEach(idList::add);
+        return cats.values().stream()
+                        .filter(i -> idList.contains(i.getId()))
+                        .collect(Collectors.toList());
     }
 
     @Override
@@ -81,32 +100,24 @@ public class MockSurveyCategoryRepository implements SurveyCategoryRepository {
     }
 
     @Override
-    public boolean existsById(Long id) {
-        return findById(id).isPresent();
-    }
-
-    @Override
-    public Iterable<SurveyCategory> findAllById(Iterable<Long> ids) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public void deleteAll(Iterable<? extends SurveyCategory> entities) {
-        // TODO Auto-generated method stub
-    }
-
-    @Override
     public Optional<SurveyCategory> findByName(String name) {
-        // TODO Auto-generated method stub
-        return null;
+         return cats.values().stream()
+                .filter((c) -> name.equals(c.name()))
+                .findAny();
     }
 
     @Override
     public Optional<SurveyCategory> findBySurveyAndCategory(String survey,
             String category) {
-        // TODO Auto-generated method stub
-        return null;
+        return cats.values().stream()
+                .filter((r) -> survey.equals(r.survey().name()))
+                .filter((c) -> category.equals(c.name()))
+                .findAny();
+    }
+
+    @Override
+    public boolean existsById(Long id) {
+        return findById(id).isPresent();
     }
 
 }
