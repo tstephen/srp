@@ -22,6 +22,13 @@ jobs:
         server-id: github # Value of the distributionManagement/repository/id field of the pom.xml
         settings-path: ${{ github.workspace }} # location for the settings.xml file
 
+    # Avoid public key error reading npm packages from github
+    # https://stackoverflow.com/questions/69634515/npm-err-gitgithub-com-permission-denied-publickey-in-github-action
+    - name: Reconfigure git to use HTTP authentication
+      run: >
+        git config --global url."https://github.com/".insteadOf
+        ssh://git@github.com/
+
     # Step that does that actual cache save and restore
     - uses: actions/cache@v1
       with:
