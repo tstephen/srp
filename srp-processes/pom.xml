@@ -11,38 +11,6 @@
     <relativePath>..</relativePath>
   </parent>
 
-  <dependencies>
-    <dependency>
-      <groupId>org.activiti</groupId>
-      <artifactId>activiti-engine</artifactId>
-      <version>${activiti.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.subethamail</groupId>
-      <artifactId>subethasmtp-wiser</artifactId>
-      <version>1.2</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.activiti</groupId>
-      <artifactId>activiti-bdd</artifactId>
-      <version>${activiti.bdd.version}</version>
-      <scope>test</scope>
-    </dependency>
-    <!-- required by integration tests, look for another way... -->
-    <dependency>
-      <groupId>com.knowprocess.bpaas</groupId>
-      <artifactId>kp-processes</artifactId>
-      <version>${work-mgmt.version}</version>
-      <exclusions>
-        <exclusion>
-          <groupId>org.springframework.boot</groupId>
-          <artifactId>spring-boot-starter</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-  </dependencies>
-
   <build>
       <plugins>
           <plugin>
