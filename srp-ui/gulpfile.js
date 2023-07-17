@@ -156,6 +156,7 @@ gulp.task('_deploy', function() {
       root: buildDir+'/',
       hostname: config.server.host,
       destination: config.server.dir,
+      username: config.server.usr,
       archive: false,
       silent: false,
       compress: true

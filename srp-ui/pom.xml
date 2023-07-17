@@ -35,44 +35,51 @@
         <environment.name>prod</environment.name>
       </properties>
     </profile>
+    <profile>
+      <id>ui</id>
+      <activation>
+        <file>
+          <exists>config.js</exists>
+        </file>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>com.github.eirslett</groupId>
+            <artifactId>frontend-maven-plugin</artifactId>
+            <version>1.4</version>
+            <executions>
+              <execution>
+                <id>install node and npm</id>
+                <goals>
+                  <goal>install-node-and-npm</goal>
+                </goals>
+                <configuration>
+                  <nodeVersion>v10.23.0</nodeVersion>
+                </configuration>
+              </execution>
+              <execution>
+                <id>npm install</id>
+                <goals>
+                  <goal>npm</goal>
+                </goals>
+                <configuration>
+                  <arguments>install</arguments>
+                </configuration>
+              </execution>
+              <execution>
+                <id>gulp</id>
+                <goals>
+                  <goal>gulp</goal>
+                </goals>
+                <configuration>
+                  <arguments>default --env=${environment.name}</arguments>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
   </profiles>
-
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>com.github.eirslett</groupId>
-        <artifactId>frontend-maven-plugin</artifactId>
-        <version>1.4</version>
-        <executions>
-          <execution>
-            <id>install node and npm</id>
-            <goals>
-              <goal>install-node-and-npm</goal>
-            </goals>
-            <configuration>
-              <nodeVersion>v10.23.0</nodeVersion>
-            </configuration>
-          </execution>
-          <execution>
-            <id>npm install</id>
-            <goals>
-              <goal>npm</goal>
-            </goals>
-            <configuration>
-              <arguments>install</arguments>
-            </configuration>
-          </execution>
-          <execution>
-            <id>gulp</id>
-            <goals>
-              <goal>gulp</goal>
-            </goals>
-            <configuration>
-              <arguments>default --env=${environment.name}</arguments>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-    </plugins>
-  </build>
 </project>
